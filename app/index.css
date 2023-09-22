@@ -3,3 +3,11 @@
 .leaflet-popup-content {
   margin: 0 !important;
 }
+
+.marker {
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 2px solid black;
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.4);
+  background-color: black;
+}

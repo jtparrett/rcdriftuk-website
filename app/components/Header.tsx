@@ -48,11 +48,11 @@ export const Header = () => {
 
           <Spacer />
 
-          <styled.a fontSize="2xl">
+          <styled.a fontSize="2xl" href="https://www.facebook.com/RCDriftGB/">
             <BsFacebook />
           </styled.a>
 
-          <styled.a fontSize="2xl">
+          <styled.a fontSize="2xl" href="https://www.instagram.com/rcdriftuk">
             <BsInstagram />
           </styled.a>
         </Flex>

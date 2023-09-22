@@ -1,5 +1,7 @@
 import { defineConfig } from "@pandacss/dev";
 
+const brandColor = "#ec1a55";
+
 export default defineConfig({
   // Whether to use css reset
   preflight: true,
@@ -23,6 +25,13 @@ export default defineConfig({
     extend: {
       tokens: {
         colors: {
+          "brand-500": {
+            value: brandColor,
+          },
+          "brand-700": {
+            value: "#a6143c",
+          },
+
           "gray-50": {
             value: "#fafafa",
           },

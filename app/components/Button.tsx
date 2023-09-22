@@ -10,9 +10,9 @@ const ButtonStyles = cva({
     },
     px: {
       base: 3,
-      md: 5,
+      md: 4,
     },
-    rounded: "lg",
+    rounded: "full",
     display: "inline-flex",
     gap: 3,
     alignItems: "center",
@@ -20,28 +20,18 @@ const ButtonStyles = cva({
     fontWeight: "semibold",
     borderWidth: 2,
     transition: "all .2s",
-    color: "inherit",
     cursor: "pointer",
     fontSize: "sm",
-    _hover: {
-      backgroundColor: "transparent",
-    },
+    color: "white !important",
   },
   variants: {
     variant: {
       primary: {
-        bg: "blue.400",
-        borderColor: "blue.400",
-      },
-      secondary: {
-        bg: "gray.700",
-        borderColor: "gray.700",
-      },
-      ghost: {
-        bg: "transparent",
-        borderColor: "transparent",
+        bg: "brand-500",
+        borderColor: "brand-500",
         _hover: {
-          bgColor: "gray.900",
+          backgroundColor: "brand-700",
+          borderColor: "brand-700",
         },
       },
     },

@@ -6,8 +6,8 @@ import { getTabParam } from "~/utils/getTabParam";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "RC Drift UK | Home" },
+    { name: "description", content: "Welcome to RCDriftUK" },
   ];
 };
 
