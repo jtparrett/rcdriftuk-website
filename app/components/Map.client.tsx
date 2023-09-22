@@ -165,7 +165,7 @@ const ITEMS: {
     lat: 51.8237,
     lng: -2.2776,
     tags: [HEADER_TABS.CLUBS],
-    image: "/covers/gloucester.jpg",
+    image: "/covers/gloucester-rc.jpg",
     url: "https://www.facebook.com/groups/968939443285738",
   },
   {
