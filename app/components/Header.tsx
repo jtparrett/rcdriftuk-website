@@ -48,7 +48,7 @@ export const Header = () => {
 
           <Spacer />
 
-          <styled.a fontSize="2xl" href="https://www.facebook.com/RCDriftGB/">
+          <styled.a fontSize="2xl" href="https://www.facebook.com/RCDr1ftUK/">
             <BsFacebook />
           </styled.a>
 
