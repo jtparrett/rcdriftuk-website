@@ -224,6 +224,14 @@ const ITEMS: {
     image: "/covers/slide-nation.png",
     url: "https://www.facebook.com/groups/284682895556757",
   },
+  {
+    name: "Salisbury Drift Rc",
+    lat: 51.1022,
+    lng: -1.7884,
+    tags: [HEADER_TABS.CLUBS],
+    image: "/covers/salisbury.jpg",
+    url: "https://www.facebook.com/groups/249221097726994/",
+  },
 
   {
     name: "AsboRC.com",
