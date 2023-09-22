@@ -1,0 +1,5 @@
+@layer reset, base, tokens, recipes, utilities;
+
+.leaflet-popup-content {
+  margin: 0 !important;
+}
