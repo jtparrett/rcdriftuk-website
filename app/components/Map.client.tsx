@@ -45,7 +45,7 @@ const ITEMS: {
     lat: 52.841,
     lng: -0.1168,
     tags: [HEADER_TABS.TRACKS],
-    image: "/covers/slidehouse.png",
+    image: "/covers/slidehouse-logo.jpg",
     url: "https://www.facebook.com/SlideH0use/",
   },
   {
@@ -85,7 +85,7 @@ const ITEMS: {
     lat: 52.5666,
     lng: -1.3402,
     tags: [HEADER_TABS.TRACKS],
-    image: "/covers/ronin.png",
+    image: "/covers/ronin-logo.jpg",
     url: "https://www.facebook.com/groups/2189799561199079",
   },
   {
@@ -125,7 +125,7 @@ const ITEMS: {
     lat: 53.7104,
     lng: -1.6923,
     tags: [HEADER_TABS.SHOPS, HEADER_TABS.TRACKS],
-    image: "/covers/drift-manji.png",
+    image: "/covers/driftmanji-logo.jpg",
     url: "https://www.driftmanjirc.com",
   },
   {
