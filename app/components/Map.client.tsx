@@ -15,6 +15,7 @@ const ITEMS: {
   image: string;
   tags: Omit<Values<typeof HEADER_TABS>, "all">[];
   url: string;
+  description?: string;
 }[] = [
   {
     name: "Northern Race & Drift (NRD)",
@@ -23,14 +24,18 @@ const ITEMS: {
     tags: [HEADER_TABS.TRACKS],
     image: "/covers/nrd.png",
     url: "https://www.facebook.com/groups/1457446027820953",
-  },
-  {
-    name: "Zeus RC Drift Club",
-    lat: 53.4945,
-    lng: -2.5096,
-    tags: [HEADER_TABS.CLUBS],
-    image: "/covers/zeus.png",
-    url: "https://www.facebook.com/groups/zeusrcdriftclubuk",
+    description: `Ratrap rc, N.R.D the UKs newest indoor radio control venue, including the uks largest indoor drift track and largest indoor scale area, with detailed play area and car park with high rise road holding weekly meets and competitions, 2nd floor truck meets, weekly rally car meets, dancing riders, and other fun packs all under 1 roof at the venue N.R.D (Northern Race & Drift)
+
+Unit C
+Tadman Street
+Wakefield
+WF1 5QU
+
+Open times are
+Wednesday 4-10
+Friday 5-late
+Saturday 10-late
+Sunday 10-6 (only truck meets,4th Sunday)`,
   },
   {
     name: "ScaleDrift - Bracknell",
@@ -39,6 +44,11 @@ const ITEMS: {
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/scaledrift-bracknell.jpg",
     url: "https://www.facebook.com/ScaleDrift/",
+    description: `Weekly run club located in Bracknell 📍
+See our facebook group for event dates and track rules ✊
+
+Carnation Hall
+RG42 7PA`,
   },
   {
     name: "Slide House",
@@ -47,6 +57,13 @@ const ITEMS: {
     tags: [HEADER_TABS.TRACKS],
     image: "/covers/slidehouse-logo.jpg",
     url: "https://www.facebook.com/SlideH0use/",
+    description: `Seas End Road
+Surfleet Seas End
+Spalding
+PE11 4DQ
+
+Weds and Friday evenings £12
+Saturday open days £15`,
   },
   {
     name: "Dori-Style どり風",
@@ -320,8 +337,20 @@ export const Map = () => {
   const tab = getTabParam(params.tab);
 
   return (
-    <Box h="100%" position="relative" overflow="hidden" zIndex={1}>
-      <MapContainer center={[54.5, -2]} style={{ height: "100%" }} zoom={6}>
+    <Box
+      h="100%"
+      position="relative"
+      overflow="hidden"
+      zIndex={1}
+      paddingTop={{ base: 125, md: 75 }}
+    >
+      <MapContainer
+        center={[54.5, -2]}
+        style={{ height: "100%" }}
+        zoom={6}
+        zoomControl
+        doubleClickZoom
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {ITEMS.filter((item) => {
@@ -349,6 +378,15 @@ export const Map = () => {
                   <styled.h1 fontSize="md" fontWeight="bold" mb={2}>
                     {item.name}
                   </styled.h1>
+                  {item.description && (
+                    <styled.p
+                      mt="0 !important"
+                      mb={2}
+                      whiteSpace="break-spaces"
+                    >
+                      {item.description}
+                    </styled.p>
+                  )}
                   <LinkButton to={item.url} target="_blank" w="full">
                     {item.url.includes("facebook")
                       ? "Visit Facebook"

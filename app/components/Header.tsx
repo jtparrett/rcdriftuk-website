@@ -42,8 +42,8 @@ export const Header = () => {
 
   return (
     <Box position="relative" bgColor="black" zIndex={10}>
-      <Container py={4}>
-        <Flex gap={4} alignItems="center">
+      <Container>
+        <Flex gap={4} alignItems="center" h={75}>
           <styled.img w={180} src="/rcdriftuk.svg" />
 
           <Spacer />
@@ -66,8 +66,8 @@ export const Header = () => {
           transform={{
             md: "translateX(-50%) translateY(-50%)",
           }}
-          marginTop={{
-            base: 6,
+          paddingBottom={{
+            base: 4,
             md: 0,
           }}
         >
