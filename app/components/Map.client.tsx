@@ -72,6 +72,12 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/dori-style.png",
     url: "https://www.facebook.com/groups/627317704727438",
+    description: `Poplar Ave
+Dogsthorpe
+Peterborough
+PE1 4QF
+
+Friday nights, 18:30 - 22:30, £10 per session`,
   },
   {
     name: "Lincoln Drift Spot",
@@ -80,6 +86,7 @@ Saturday open days £15`,
     tags: [HEADER_TABS.TRACKS],
     image: "/covers/lincoln.jpg",
     url: "https://www.facebook.com/groups/driftspotlincoln",
+    description: `RC Drift group for Lincoln and the surrounding area.`,
   },
   {
     name: "Drift Therapy",
@@ -88,6 +95,15 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/drift-therapy.png",
     url: "https://www.facebook.com/groups/507344574087886",
+    description: `Mutford village hall
+Mill Road
+Mutford
+Suffolk
+NR347UR
+
+Events posted on Facebook 
+
+Carpet Track - MST Silver dots `,
   },
   {
     name: "Fazeley Sliders",
@@ -96,6 +112,13 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/fazeley-sliders.png",
     url: "https://www.facebook.com/groups/2196772197237222",
+    description: `Fazeley Town Hall
+Lichfield Street
+Tamworth
+B78 3QN
+
+First Saturday of every month at 9am til 10pm £15 all day £10 half day
+`,
   },
   {
     name: "Ronin Drift Lounge",
@@ -104,6 +127,14 @@ Saturday open days £15`,
     tags: [HEADER_TABS.TRACKS],
     image: "/covers/ronin-logo.jpg",
     url: "https://www.facebook.com/groups/2189799561199079",
+    description: `Unit 7 The Enterprise Center
+Dawson Lane
+Barwell
+LE98BE
+
+Wednesday 5.30 pm till 10pm
+Saturday 9am till 10pm
+Sunday 10am till 6pm`,
   },
   {
     name: "Midlands Drift warehouSe",
@@ -112,6 +143,15 @@ Saturday open days £15`,
     tags: [HEADER_TABS.TRACKS],
     image: "/covers/midlands.png",
     url: "https://www.facebook.com/groups/620329222572894",
+    description: `Midlands Drift warehouSe
+Unit 5, Lower Farm,
+Common Lane,
+Bednall,
+Stafford,
+Staffordshire
+ST17 OSA
+
+Tuesday 5pm - 10pm is £10, Saturday 9am - 10pm is £15 and Sunday 8am until 5pm is £10`,
   },
   {
     name: "West Suffolk Drift",
@@ -120,6 +160,11 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/west-suffolk.png",
     url: "https://www.facebook.com/groups/WestSuffolkDrift",
+    description: `Aylmer Close, Risby
+Bury St Edmunds
+IP28 6RT
+
+Check facebook for events `,
   },
   {
     name: "East Coast RC",
@@ -136,6 +181,12 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/essex.png",
     url: "https://www.facebook.com/DriftEssex",
+    description: `Great Parndon Community Centre,
+Abercrombie Way
+Harlow
+CM18 6YJ
+
+One Saturday a Month dates pinned on Facebook page £15 flat fee all day`,
   },
   {
     name: "Drift Manji",
@@ -144,6 +195,13 @@ Saturday open days £15`,
     tags: [HEADER_TABS.SHOPS, HEADER_TABS.TRACKS],
     image: "/covers/driftmanji-logo.jpg",
     url: "https://www.driftmanjirc.com",
+    description: `Unit 5
+Valley road
+Liversedge
+WF15 6LE
+United Kingdom
+
+OPening TBC`,
   },
   {
     name: "Kustom Kulture RC",
@@ -152,6 +210,15 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/kustom-kulture.png",
     url: "https://www.facebook.com/groups/1555229134898359",
+    description: `Panteg Industrial Estate
+Station Rd
+Griffithstown
+Pontypool
+NP4 5LX
+
+Wednesday 6pm-1030pm
+Saturday 11am-9pm
+Sunday 11am-1030pm`,
   },
   {
     name: "Bristol & Bath RC Drift Club (Slide Effects)",
@@ -160,6 +227,9 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/bristol-bath.png",
     url: "https://www.facebook.com/groups/313330462158599",
+    description: `Unit 8B
+Timsbury Workshops
+BA2 0HQ`,
   },
   {
     name: "Dorizoku - RC Drift Fife",
@@ -184,6 +254,10 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/gloucester-rc.jpg",
     url: "https://www.facebook.com/groups/968939443285738",
+    description: `Quedgeley
+Gloucester
+
+Pop up events on various dates to be advertised via Facebook`,
   },
   {
     name: "Drift Monkeys",
@@ -192,6 +266,7 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/drift-monkeys.png",
     url: "https://www.facebook.com/groups/168931554522749",
+    description: `Trinity Sports and Social Club`,
   },
   {
     name: "DDRC Dorset Drift Rc Club",
@@ -200,6 +275,11 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/dorset.png",
     url: "https://www.facebook.com/groups/386026751596248",
+    description: `Braeside Rd,
+St Leonards
+BH24 2PH
+
+Friday evenings between 7pm - 11pm usually`,
   },
   {
     name: "Ireland R/C Drift Group",
@@ -208,6 +288,9 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/ireland.png",
     url: "https://www.facebook.com/groups/361905092288414",
+    description: `Rathdowney Community Centre
+
+See Facebook group for details `,
   },
   {
     name: "Initial G",
@@ -216,6 +299,8 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     url: "https://www.facebook.com/profile.php?id=100091409463427",
     image: "/covers/initial-g.jpg",
+    description: `£10 a session
+10am to 17:30pm`,
   },
   {
     name: "Stockport R.C. Drifters",
@@ -224,6 +309,11 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/stockport.png",
     url: "https://www.facebook.com/groups/stockportrcdrifters",
+    description: `St. Andrews community church hall
+35 hall street
+stockport SK1 4DA
+
+Friday night 6 till 10`,
   },
   {
     name: "East Yorkshire Drift RC",
@@ -232,6 +322,12 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/east-yorkshire.png",
     url: "https://www.facebook.com/groups/832029918169926",
+    description: `Church St
+Kilham
+Driffield
+YO25 4RG
+
+Once a month, check the Facebook page for details `,
   },
   {
     name: "Slide Nation RC",
@@ -240,6 +336,16 @@ Saturday open days £15`,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/slide-nation.png",
     url: "https://www.facebook.com/groups/284682895556757",
+    description: `Lancing Methodist church
+Worthing
+BN15 8
+
+Every 2 weeks on a Wednesday evening and every 3rd Sunday.
+Prices:
+Wednesday eve-
+Bring your own car- £10
+Sunday all day-
+Bring your own car- £15`,
   },
   {
     name: "Salisbury Drift Rc",
@@ -313,6 +419,15 @@ Saturday open days £15`,
     tags: [HEADER_TABS.SHOPS],
     url: "https://www.asborc.com/",
     image: "/covers/asbo.jpg",
+    description: `ASBO RC Drift shop
+official UK distributors
+Sideways RC
+yokomo
+Skyrc
+Topline
+Pandora
+d like
+overdose`,
   },
   {
     name: "RCPace.com",
@@ -321,6 +436,7 @@ Saturday open days £15`,
     tags: [HEADER_TABS.SHOPS],
     image: "/covers/pace.png",
     url: "https://rcpace.com/",
+    description: `RCPACE.com is a high-end RC Drift specialist store with world-wide shipping`,
   },
   {
     name: "RCKitOut.com",
@@ -329,6 +445,7 @@ Saturday open days £15`,
     tags: [HEADER_TABS.SHOPS],
     url: "https://rckitout.com/",
     image: "/covers/rckitout.jpg",
+    description: `Your go to RC body builder, we do custom RC shells including custom accessories and paint jobs.`,
   },
   {
     name: "RCModelShopDirect.com",
@@ -337,6 +454,7 @@ Saturday open days £15`,
     tags: [HEADER_TABS.SHOPS],
     url: "https://rcmodelshopdirect.com/",
     image: "/covers/rcmodelshopdirect.jpg",
+    description: `RC Model Shop Direct was set up by a model enthusiast for model enthusiasts. Why? to have fun!`,
   },
 ];
 
