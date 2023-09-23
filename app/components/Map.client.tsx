@@ -297,6 +297,14 @@ Saturday open days £15`,
     image: "/covers/driftdicks.jpg",
     url: "https://www.facebook.com/profile.php?id=100091093733338",
   },
+  {
+    name: "Angle Addicts",
+    lat: 51.5711,
+    lng: 0.6697,
+    tags: [HEADER_TABS.CLUBS],
+    image: "/covers/angle-addicts.jpg",
+    url: "https://www.facebook.com/profile.php?id=61551370445603",
+  },
 
   {
     name: "AsboRC.com",
