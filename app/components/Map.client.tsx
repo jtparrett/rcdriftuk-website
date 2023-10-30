@@ -106,18 +106,19 @@ Events posted on Facebook
 Carpet Track - MST Silver dots `,
   },
   {
-    name: "Fazeley Sliders",
+    name: "A5 drifters",
     lat: 52.6154,
     lng: -1.7019,
     tags: [HEADER_TABS.CLUBS],
-    image: "/covers/fazeley-sliders.jpg",
+    image: "/covers/A5-sliders.jpg",
     url: "https://www.facebook.com/groups/2196772197237222",
-    description: `Fazeley Town Hall
-Lichfield Street
-Tamworth
-B78 3QN
+    description: `Pop-up PVC tile track once a month in Birch coppice Miners welfare social Club.
+Focusing on RWD drift spec cars and using DS LF-5T Control tyre.
 
-First Saturday of every month at 9am til 10pm £15 all day £10 half day
+Birch coppice miners welfare social Club 
+Watling Street Dordon 
+Nr tamworth 
+B78 1SY 
 `,
   },
   {
