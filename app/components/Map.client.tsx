@@ -301,7 +301,7 @@ See Facebook group for details `,
     url: "https://www.facebook.com/profile.php?id=100091409463427",
     image: "/covers/initial-g.jpg",
     description: `£10 a session
-10am to 17:30pm`,
+10:00am to 7:00pm`,
   },
   {
     name: "Stockport R.C. Drifters",
