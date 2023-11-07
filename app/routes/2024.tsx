@@ -1,7 +1,8 @@
 import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
+import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
 import { ChampHeader } from "~/components/ChampHeader";
-import { styled, Box } from "~/styled-system/jsx";
+import { styled, Box, Flex } from "~/styled-system/jsx";
 import { NEXT_EVENT } from "~/utils/consts/nextEvent";
 
 export const meta: MetaFunction = () => {
@@ -36,6 +37,23 @@ const Page = () => {
         textAlign="center"
         mt={4}
       >
+        <Flex justifyContent="center" gap={4} pb={4}>
+          <styled.a
+            fontSize="2xl"
+            target="_blank"
+            href="https://www.facebook.com/RCDRIFTUK2024/"
+          >
+            <BsFacebook />
+          </styled.a>
+
+          <styled.a
+            target="_blank"
+            fontSize="2xl"
+            href="https://www.instagram.com/rcdriftuk"
+          >
+            <BsInstagram />
+          </styled.a>
+        </Flex>
         <styled.p>&copy; RC Drift UK 2024</styled.p>
       </Box>
     </>

@@ -3,7 +3,6 @@ import { LinkButton } from "./Button";
 import { Tab } from "./Tab";
 import { Link, useLocation } from "@remix-run/react";
 import { NEXT_EVENT } from "~/utils/consts/nextEvent";
-import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
 
 export const ChampHeader = () => {
   const location = useLocation();
@@ -11,7 +10,7 @@ export const ChampHeader = () => {
   return (
     <Box position="relative" bgColor="black" zIndex={10}>
       <Container>
-        <Flex alignItems="center" h={75} gap={4}>
+        <Flex alignItems="center" h={75}>
           <Link to={`/2024/schedule/${NEXT_EVENT}`}>
             <styled.img
               src="/2024-logo.svg"
@@ -25,22 +24,6 @@ export const ChampHeader = () => {
           <LinkButton to="/2024/live" ml={4}>
             Watch Live
           </LinkButton>
-
-          <styled.a
-            fontSize="2xl"
-            target="_blank"
-            href="https://www.facebook.com/RCDRIFTUK2024/"
-          >
-            <BsFacebook />
-          </styled.a>
-
-          <styled.a
-            target="_blank"
-            fontSize="2xl"
-            href="https://www.instagram.com/rcdriftuk"
-          >
-            <BsInstagram />
-          </styled.a>
         </Flex>
 
         <Box
