@@ -1,8 +1,18 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import { ChampHeader } from "~/components/ChampHeader";
 import { styled, Box } from "~/styled-system/jsx";
 import { NEXT_EVENT } from "~/utils/consts/nextEvent";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "RC Drift UK | Championship" },
+    {
+      name: "description",
+      content: "Welcome to the RCDrift.uk 2024 championship",
+    },
+  ];
+};
 
 export const loader = ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);

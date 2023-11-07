@@ -1,7 +1,15 @@
+import { MetaFunction } from "@remix-run/node";
 import { BsArrowRight } from "react-icons/bs/index.js";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { NEXT_EVENT } from "~/utils/consts/nextEvent";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "RC Drift UK | Home" },
+    { name: "description", content: "Welcome to RCDrift.uk" },
+  ];
+};
 
 const Page = () => {
   return (
