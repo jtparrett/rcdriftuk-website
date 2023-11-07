@@ -1,7 +1,6 @@
 import { BsCalendar } from "react-icons/bs/index.js";
 import { LinkButton } from "~/components/Button";
 import { styled, Box, Container, Center } from "~/styled-system/jsx";
-import { NEXT_EVENT } from "~/utils/consts/nextEvent";
 
 const Page = () => {
   return (
@@ -12,7 +11,7 @@ const Page = () => {
             <styled.p fontSize="lg" fontWeight="bold" mb={5}>
               We're not live right now.
             </styled.p>
-            <LinkButton to={`/2024/schedule/${NEXT_EVENT}`}>
+            <LinkButton to="/2024/schedule">
               Check The Schedule <BsCalendar />
             </LinkButton>
           </Box>

@@ -14,7 +14,7 @@ export const Tab = ({ children, isActive, to }: Props) => {
   return (
     <TabBase
       to={to}
-      px={2}
+      px={3}
       py={1}
       textTransform="capitalize"
       bgColor={isActive ? "black" : undefined}

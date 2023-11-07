@@ -14,7 +14,7 @@ const ButtonStyles = cva({
     },
     rounded: "lg",
     display: "inline-flex",
-    gap: 3,
+    gap: 2,
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "semibold",

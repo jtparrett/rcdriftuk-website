@@ -3,7 +3,6 @@ import { Outlet } from "@remix-run/react";
 import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
 import { ChampHeader } from "~/components/ChampHeader";
 import { styled, Box, Flex } from "~/styled-system/jsx";
-import { NEXT_EVENT } from "~/utils/consts/nextEvent";
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,7 +18,7 @@ export const loader = ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
 
   if (url.pathname === "/2024" || url.pathname === "/2024/") {
-    return redirect(`/2024/schedule/${NEXT_EVENT}`);
+    return redirect(`/2024/schedule`);
   }
 
   return null;
@@ -32,7 +31,7 @@ const Page = () => {
       <Outlet />
       <Box
         borderTopWidth={1}
-        borderColor="gray.700"
+        borderColor="gray.800"
         py={8}
         textAlign="center"
         mt={4}
@@ -54,7 +53,7 @@ const Page = () => {
             <BsInstagram />
           </styled.a>
         </Flex>
-        <styled.p>&copy; RC Drift UK 2024</styled.p>
+        <styled.p>&copy; RCDrift UK 2024</styled.p>
       </Box>
     </>
   );

@@ -471,60 +471,66 @@ export const Map = () => {
       zIndex={1}
       paddingTop={{ base: 125, md: 75 }}
     >
-      <MapContainer
-        center={[54.5, -2]}
-        style={{ height: "100%" }}
-        zoom={6}
-        zoomControl
-        doubleClickZoom
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <Box h="100%" overflow="hidden" roundedTop="xl">
+        <MapContainer
+          center={[54.5, -2]}
+          style={{ height: "100%" }}
+          zoom={6}
+          zoomControl
+          doubleClickZoom
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {ITEMS.filter((item) => {
-          if (tab === HEADER_TABS.ALL) {
-            return true;
-          }
+          {ITEMS.filter((item) => {
+            if (tab === HEADER_TABS.ALL) {
+              return true;
+            }
 
-          return item.tags.includes(tab);
-        }).map((item) => {
-          const icon = L.icon({
-            iconUrl: item.image,
-            iconSize: [50, 50],
-            className: "marker",
-          });
+            return item.tags.includes(tab);
+          }).map((item) => {
+            const icon = L.icon({
+              iconUrl: item.image,
+              iconSize: [50, 50],
+              className: "marker",
+            });
 
-          return (
-            <Marker key={item.name} position={[item.lat, item.lng]} icon={icon}>
-              <Popup closeButton>
-                <Box minWidth={280} p={4}>
-                  {item.image && (
-                    <Box mb={2} overflow="hidden" rounded="md">
-                      <styled.img src={item.image} />
-                    </Box>
-                  )}
-                  <styled.h1 fontSize="md" fontWeight="bold" mb={2}>
-                    {item.name}
-                  </styled.h1>
-                  {item.description && (
-                    <styled.p
-                      mt="0 !important"
-                      mb={2}
-                      whiteSpace="break-spaces"
-                    >
-                      {item.description}
-                    </styled.p>
-                  )}
-                  <LinkButton to={item.url} target="_blank" w="full">
-                    {item.url.includes("facebook")
-                      ? "Visit Facebook"
-                      : "Visit Website"}
-                  </LinkButton>
-                </Box>
-              </Popup>
-            </Marker>
-          );
-        })}
-      </MapContainer>
+            return (
+              <Marker
+                key={item.name}
+                position={[item.lat, item.lng]}
+                icon={icon}
+              >
+                <Popup closeButton>
+                  <Box minWidth={280} p={4}>
+                    {item.image && (
+                      <Box mb={2} overflow="hidden" rounded="md">
+                        <styled.img src={item.image} />
+                      </Box>
+                    )}
+                    <styled.h1 fontSize="md" fontWeight="bold" mb={2}>
+                      {item.name}
+                    </styled.h1>
+                    {item.description && (
+                      <styled.p
+                        mt="0 !important"
+                        mb={2}
+                        whiteSpace="break-spaces"
+                      >
+                        {item.description}
+                      </styled.p>
+                    )}
+                    <LinkButton to={item.url} target="_blank" w="full">
+                      {item.url.includes("facebook")
+                        ? "Visit Facebook"
+                        : "Visit Website"}
+                    </LinkButton>
+                  </Box>
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
+      </Box>
     </Box>
   );
 };

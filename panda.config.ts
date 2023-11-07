@@ -24,6 +24,14 @@ export default defineConfig({
   theme: {
     extend: {
       tokens: {
+        fonts: {
+          body: {
+            value: '"Inter", sans-serif',
+          },
+          heading: {
+            value: '"Bebas Neue", sans-serif',
+          },
+        },
         colors: {
           "brand-500": {
             value: brandColor,
@@ -77,7 +85,7 @@ export default defineConfig({
     html: {
       color: "white",
       backgroundColor: "black",
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: "body",
       scrollBehavior: "smooth",
     },
   },
