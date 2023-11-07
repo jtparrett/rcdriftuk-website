@@ -78,7 +78,7 @@ const Page = () => {
         </Container>
       </Box>
 
-      <Container py={8}>
+      <Container pt={{ base: 0, md: 8 }} pb={8}>
         <Outlet />
       </Container>
     </styled.main>
