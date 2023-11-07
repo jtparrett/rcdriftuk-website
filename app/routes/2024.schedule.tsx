@@ -13,7 +13,7 @@ const Month = ({ name, disabled = false, to }: Props) => {
   const location = useLocation();
 
   return (
-    <Box flex={1} pb={8} className="month" pos="relative" zIndex={1} maxW={120}>
+    <Box flex={1} pb={4} className="month" pos="relative" zIndex={1} maxW={120}>
       {!disabled && (
         <LinkOverlay
           to={to}
@@ -26,7 +26,7 @@ const Month = ({ name, disabled = false, to }: Props) => {
         </LinkOverlay>
       )}
 
-      <Center h={100} w="full">
+      <Center h="80px" w="full">
         {!disabled && (
           <Box
             className="dot"
@@ -61,7 +61,7 @@ const Page = () => {
       <styled.h1 srOnly>RC Drift UK 2024 Championship</styled.h1>
 
       <Box bgColor="gray.900" pos="relative">
-        <Box w="100vw" pos="absolute" h="1px" bgColor="brand-700" top="50px" />
+        <Box w="100vw" pos="absolute" h="1px" bgColor="brand-700" top="40px" />
 
         <Container>
           <Flex>
