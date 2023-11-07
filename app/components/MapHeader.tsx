@@ -25,11 +25,19 @@ export const MapHeader = () => {
 
           <Spacer />
 
-          <styled.a fontSize="2xl" href="https://www.facebook.com/RCDr1ftUK/">
+          <styled.a
+            target="_blank"
+            fontSize="2xl"
+            href="https://www.facebook.com/RCDriftingUK/"
+          >
             <BsFacebook />
           </styled.a>
 
-          <styled.a fontSize="2xl" href="https://www.instagram.com/rcdriftuk">
+          <styled.a
+            target="_blank"
+            fontSize="2xl"
+            href="https://www.instagram.com/rcdriftuk"
+          >
             <BsInstagram />
           </styled.a>
         </Flex>
