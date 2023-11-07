@@ -1,6 +1,6 @@
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { styled, Box } from "~/styled-system/jsx";
-import { HEADER_TABS } from "./Header";
+import { HEADER_TABS } from "./MapHeader";
 import { useParams } from "@remix-run/react";
 import { getTabParam } from "~/utils/getTabParam";
 import { Button, LinkButton } from "./Button";

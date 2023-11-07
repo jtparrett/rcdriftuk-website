@@ -1,33 +1,8 @@
 import { styled, Box, Container, Flex, Spacer } from "~/styled-system/jsx";
 import { BsInstagram, BsFacebook } from "react-icons/bs/index.js";
-import { ReactNode } from "react";
 import { Link, useParams } from "@remix-run/react";
 import { getTabParam } from "~/utils/getTabParam";
-
-interface Props {
-  children: ReactNode;
-  isActive?: boolean;
-  to: string;
-}
-
-const TabBase = styled(Link);
-
-const Tab = ({ children, isActive, to }: Props) => {
-  return (
-    <TabBase
-      to={to}
-      px={2}
-      py={1}
-      textTransform="capitalize"
-      bgColor={isActive ? "black" : undefined}
-      rounded="sm"
-      fontWeight={isActive ? "semibold" : undefined}
-      transition="all .3s"
-    >
-      {children}
-    </TabBase>
-  );
-};
+import { Tab } from "./Tab";
 
 export const HEADER_TABS = {
   ALL: "all",
@@ -36,7 +11,7 @@ export const HEADER_TABS = {
   SHOPS: "shops",
 } as const;
 
-export const Header = () => {
+export const MapHeader = () => {
   const params = useParams();
   const tab = getTabParam(params.tab);
 
@@ -44,7 +19,9 @@ export const Header = () => {
     <Box position="relative" bgColor="black" zIndex={10}>
       <Container>
         <Flex gap={4} alignItems="center" h={75}>
-          <styled.img w={180} src="/rcdriftuk.svg" />
+          <Link to="/map/all">
+            <styled.img w={180} src="/rcdriftuk.svg" />
+          </Link>
 
           <Spacer />
 
@@ -73,7 +50,7 @@ export const Header = () => {
         >
           <Flex p={1} bgColor="gray.800" rounded="md" gap={2}>
             {Object.values(HEADER_TABS).map((item) => (
-              <Tab key={item} isActive={item === tab} to={`/${item}`}>
+              <Tab key={item} isActive={item === tab} to={`/map/${item}`}>
                 {item}
               </Tab>
             ))}

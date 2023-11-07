@@ -12,7 +12,7 @@ const ButtonStyles = cva({
       base: 3,
       md: 4,
     },
-    rounded: "full",
+    rounded: "lg",
     display: "inline-flex",
     gap: 3,
     alignItems: "center",
@@ -32,6 +32,23 @@ const ButtonStyles = cva({
         _hover: {
           backgroundColor: "brand-700",
           borderColor: "brand-700",
+        },
+      },
+      outline: {
+        bg: "transparent",
+        borderColor: "brand-500",
+        borderWidth: 2,
+        _hover: {
+          backgroundColor: "brand-700",
+          borderColor: "brand-700",
+        },
+      },
+      ghost: {
+        bg: "transparent",
+        borderColor: "transparent",
+        _hover: {
+          bgColor: "gray.800",
+          borderColor: "gray.800",
         },
       },
     },

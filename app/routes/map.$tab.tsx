@@ -6,8 +6,8 @@ import { getTabParam } from "~/utils/getTabParam";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Home" },
-    { name: "description", content: "Welcome to RCDriftUK" },
+    { title: "RC Drift UK | Map" },
+    { name: "description", content: "Welcome to RCDrift.uk" },
   ];
 };
 
@@ -17,7 +17,7 @@ export const loader = ({ params }: LoaderFunctionArgs) => {
   return { tab };
 };
 
-export default function Index() {
+const Page = () => {
   return (
     <Box position="absolute" inset={0} zIndex={1}>
       <Suspense fallback={<p>loading..</p>}>
@@ -25,4 +25,6 @@ export default function Index() {
       </Suspense>
     </Box>
   );
-}
+};
+
+export default Page;

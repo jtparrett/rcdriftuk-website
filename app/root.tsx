@@ -10,7 +10,6 @@ import {
 } from "@remix-run/react";
 
 import styles from "./index.css";
-import { Header } from "./components/Header";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -40,7 +39,6 @@ export default function App() {
         <script async src="https://cdn.splitbee.io/sb.js"></script>
       </head>
       <body>
-        <Header />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
