@@ -13,7 +13,7 @@ const Month = ({ name, disabled = false, to }: Props) => {
   const location = useLocation();
 
   return (
-    <Box flex={1} pb={8} className="month" pos="relative" zIndex={1}>
+    <Box flex={1} pb={8} className="month" pos="relative" zIndex={1} maxW={120}>
       {!disabled && (
         <LinkOverlay
           to={to}
@@ -74,9 +74,6 @@ const Page = () => {
             <Month to="/2024/schedule/jul" name="Jul" />
             <Month to="/2024/schedule/aug" name="Aug" />
             <Month to="/2024/schedule/sep" name="Sep" />
-            <Month to="/2024/schedule/oct" name="Oct" disabled />
-            <Month to="/2024/schedule/nov" name="Nov" disabled />
-            <Month to="/2024/schedule/dec" name="Dec" disabled />
           </Flex>
         </Container>
       </Box>

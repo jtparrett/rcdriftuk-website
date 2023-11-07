@@ -14,14 +14,14 @@ export const ChampHeader = () => {
           <Link to={`/2024/schedule/${NEXT_EVENT}`}>
             <styled.img
               src="/2024-logo.svg"
-              w={170}
+              w={160}
               alt="RC Drift UK 2024 Championship"
             />
           </Link>
 
           <Spacer />
 
-          <LinkButton to="/live" ml={4}>
+          <LinkButton to="/2024/live" ml={4}>
             Watch Live
           </LinkButton>
         </Flex>
@@ -47,7 +47,12 @@ export const ChampHeader = () => {
             >
               Schedule
             </Tab>
-            <Tab to="/2024/points">Points</Tab>
+            <Tab
+              to="/2024/points"
+              isActive={location.pathname.startsWith("/2024/points")}
+            >
+              Points
+            </Tab>
           </Flex>
         </Box>
       </Container>

@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import { ChampHeader } from "~/components/ChampHeader";
+import { styled, Box } from "~/styled-system/jsx";
 import { NEXT_EVENT } from "~/utils/consts/nextEvent";
 
 export const loader = ({ request }: LoaderFunctionArgs) => {
@@ -18,6 +19,15 @@ const Page = () => {
     <>
       <ChampHeader />
       <Outlet />
+      <Box
+        borderTopWidth={1}
+        borderColor="gray.700"
+        py={8}
+        textAlign="center"
+        mt={4}
+      >
+        <styled.p>&copy; RC Drift UK 2024</styled.p>
+      </Box>
     </>
   );
 };
