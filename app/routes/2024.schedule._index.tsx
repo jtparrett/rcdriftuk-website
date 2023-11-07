@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
@@ -32,7 +33,16 @@ const Card = ({ round, track, image, date, to }: Props) => {
 
 const Page = () => {
   return (
-    <styled.main pt={8}>
+    <styled.main>
+      <Breadcrumbs
+        paths={[
+          {
+            to: "/2024/schedule",
+            title: "Schedule",
+          },
+        ]}
+      />
+
       <styled.h1
         fontSize="5xl"
         fontFamily="heading"

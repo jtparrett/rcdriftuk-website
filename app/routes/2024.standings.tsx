@@ -1,9 +1,19 @@
+import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { Box, Container, Divider, styled } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
     <styled.main>
-      <Container py={{ base: 0, md: 8 }}>
+      <Container>
+        <Breadcrumbs
+          paths={[
+            {
+              to: "/2024/standings",
+              title: "Standings",
+            },
+          ]}
+        />
+
         <Box maxW={800}>
           <styled.h1
             fontSize="5xl"

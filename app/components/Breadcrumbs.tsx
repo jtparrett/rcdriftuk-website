@@ -9,10 +9,14 @@ interface Props {
 
 export const Breadcrumbs = ({ paths }: Props) => {
   return (
-    <Flex alignItems="center" my={4}>
+    <Flex alignItems="center" mt={{ base: 0, md: 4 }} mb={4}>
       <LinkButton to="/" variant="ghost" px={2} py={2}>
         <BsHouse />
       </LinkButton>
+
+      <styled.span color="brand-500" px={1}>
+        //
+      </styled.span>
 
       {paths.map((path, i) => (
         <Fragment key={i}>
