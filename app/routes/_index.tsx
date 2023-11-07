@@ -1,5 +1,5 @@
 import { MetaFunction } from "@remix-run/node";
-import { BsArrowRight } from "react-icons/bs/index.js";
+import { BsArrowRight, BsFacebook, BsInstagram } from "react-icons/bs/index.js";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { NEXT_EVENT } from "~/utils/consts/nextEvent";
@@ -33,6 +33,24 @@ const Page = () => {
           <LinkButton to="/map/all" variant="outline" fontSize="lg">
             Find Your Local Track <BsArrowRight />
           </LinkButton>
+        </Flex>
+
+        <Flex justifyContent="center" gap={4} pt={8}>
+          <styled.a
+            fontSize="2xl"
+            target="_blank"
+            href="https://www.facebook.com/RCDriftingUK/"
+          >
+            <BsFacebook />
+          </styled.a>
+
+          <styled.a
+            target="_blank"
+            fontSize="2xl"
+            href="https://www.instagram.com/rcdriftuk"
+          >
+            <BsInstagram />
+          </styled.a>
         </Flex>
       </Container>
     </Box>
