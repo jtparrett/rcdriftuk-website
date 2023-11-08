@@ -1,6 +1,6 @@
-import { BsCalendar } from "react-icons/bs/index.js";
+import { BsCalendar, BsTicketPerforatedFill } from "react-icons/bs/index.js";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
-import { Pay } from "~/components/Pay";
+import { LinkButton } from "~/components/Button";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 
 const Page = () => {
@@ -71,7 +71,13 @@ const Page = () => {
         </styled.p>
 
         <Box>
-          <Pay />
+          <LinkButton
+            to="https://www.tickettailor.com/checkout/new-session/id/3266078/chk/deb7/"
+            target="_blank"
+            fontSize="md"
+          >
+            Buy Ticket <BsTicketPerforatedFill />
+          </LinkButton>
         </Box>
       </Flex>
     </styled.main>
