@@ -22,7 +22,7 @@ const Card = ({ round, track, image, date, to }: Props) => {
 
           <styled.p color="gray.400">{date}, 2024</styled.p>
 
-          <LinkButton to={to} w="full" mt={4}>
+          <LinkButton to={to} w="full" mt={4} py={1}>
             More Info
           </LinkButton>
         </Box>
