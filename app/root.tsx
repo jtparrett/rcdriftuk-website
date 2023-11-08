@@ -42,6 +42,16 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
+        <script
+          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+          data-url="https://www.tickettailor.com/checkout/new-session/id/3266078/chk/deb7/"
+          data-type="inline"
+          data-inline-minimal="true"
+          data-inline-show-logo="false"
+          data-inline-bg-fill="true"
+          data-inline-inherit-ref-from-url-param=""
+          data-inline-ref=""
+        ></script>
         <LiveReload />
       </body>
     </html>

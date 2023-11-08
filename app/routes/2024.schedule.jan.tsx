@@ -1,6 +1,6 @@
-import { BsCalendar, BsChevronRight, BsHouse } from "react-icons/bs/index.js";
+import { BsCalendar } from "react-icons/bs/index.js";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
-import { Button, LinkButton } from "~/components/Button";
+import { Pay } from "~/components/Pay";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 
 const Page = () => {
@@ -71,7 +71,7 @@ const Page = () => {
         </styled.p>
 
         <Box>
-          <Button fontSize="md">Buy Tickets (Coming Soon)</Button>
+          <Pay />
         </Box>
       </Flex>
     </styled.main>
