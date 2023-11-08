@@ -123,7 +123,7 @@ const Page = () => {
           <LinkButton
             to="https://www.facebook.com/events/2649108381945026/"
             target="_blank"
-            variant="outline"
+            variant="ghost"
           >
             Open Facebook Event <BsFacebook />
           </LinkButton>

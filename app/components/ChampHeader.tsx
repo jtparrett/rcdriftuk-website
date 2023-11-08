@@ -40,7 +40,7 @@ export const ChampHeader = () => {
             md: 0,
           }}
         >
-          <Flex p={1} bgColor="gray.800" rounded="md" gap={2}>
+          <Flex p={1} bgColor="gray.800" rounded="lg" gap={2}>
             <Tab
               to="/2024/schedule"
               isActive={

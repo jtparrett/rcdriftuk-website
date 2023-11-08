@@ -56,7 +56,7 @@ export const MapHeader = () => {
             md: 0,
           }}
         >
-          <Flex p={1} bgColor="gray.800" rounded="md" gap={2}>
+          <Flex p={1} bgColor="gray.800" rounded="lg" gap={2}>
             {Object.values(HEADER_TABS).map((item) => (
               <Tab key={item} isActive={item === tab} to={`/map/${item}`}>
                 {item}

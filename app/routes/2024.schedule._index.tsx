@@ -63,49 +63,49 @@ const Page = () => {
           <Card
             round="Launch"
             track="AutoSport International"
-            image="/launch-event-cover.jpg"
+            image="/launch-event-card.jpg"
             date="January 11th - 14th"
             to="/2024/schedule/jan"
           />
           <Card
             round="Round 1"
             track="ScaleDrift"
-            image="/round-1-cover.jpg"
+            image="/round-1-card.jpg"
             date="March 2nd"
             to="/2024/schedule/mar"
           />
           <Card
             round="Round 2"
             track="Drift Essex"
-            image="/round-2-cover.jpg"
+            image="/round-2-card.jpg"
             date="April 6th"
             to="/2024/schedule/apr"
           />
           <Card
             round="Round 3"
             track="NRD"
-            image="/round-3-cover.jpg"
+            image="/round-3-card.jpg"
             date="May 4th"
             to="/2024/schedule/may"
           />
           <Card
             round="Round 4"
             track="Slide House"
-            image="/round-4-cover.jpg"
+            image="/round-4-card.jpg"
             date="June 1st"
             to="/2024/schedule/jun"
           />
           <Card
             round="Round 5"
             track="MDS"
-            image="/round-5-cover.jpg"
+            image="/round-5-card.jpg"
             date="July 6th"
             to="/2024/schedule/jul"
           />
           <Card
             round="Round 6"
             track="Ronin Drift Lounge"
-            image="/round-6-cover.jpg"
+            image="/round-6-card.jpg"
             date="August 3rd"
             to="/2024/schedule/aug"
           />

@@ -18,7 +18,7 @@ export const Tab = ({ children, isActive, to }: Props) => {
       py={1}
       textTransform="capitalize"
       bgColor={isActive ? "black" : undefined}
-      rounded="sm"
+      rounded="md"
       fontWeight={isActive ? "semibold" : undefined}
       transition="all .3s"
     >
