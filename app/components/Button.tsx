@@ -39,8 +39,8 @@ const ButtonStyles = cva({
         borderColor: "brand-500",
         borderWidth: 2,
         _hover: {
-          backgroundColor: "brand-700",
-          borderColor: "brand-700",
+          backgroundColor: "brand-500",
+          borderColor: "brand-500",
         },
       },
       ghost: {

@@ -1,4 +1,8 @@
-import { BsCalendar, BsTicketPerforatedFill } from "react-icons/bs/index.js";
+import {
+  BsCalendar,
+  BsFacebook,
+  BsTicketPerforatedFill,
+} from "react-icons/bs/index.js";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { LinkButton } from "~/components/Button";
 import { Box, Flex, styled } from "~/styled-system/jsx";
@@ -34,7 +38,11 @@ const Page = () => {
           </Flex>
         </Box>
 
-        <styled.h1 fontSize="4xl" fontWeight="bold">
+        <styled.h1
+          fontSize={{ base: "3xl", md: "4xl" }}
+          lineHeight={1.1}
+          fontWeight="bold"
+        >
           RC DRIFT UK 2024 Championship launch 🔥
         </styled.h1>
 
@@ -102,15 +110,24 @@ const Page = () => {
         </styled.p>
         <styled.p>NB* This event is not suitable for beginners!</styled.p>
 
-        <Box>
+        <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
           <LinkButton
             to="https://www.tickettailor.com/checkout/new-session/id/3266078/chk/deb7/"
             target="_blank"
             fontSize="md"
+            px={8}
           >
-            Buy Ticket <BsTicketPerforatedFill />
+            Buy Tickets <BsTicketPerforatedFill />
           </LinkButton>
-        </Box>
+
+          <LinkButton
+            to="https://www.facebook.com/events/2649108381945026/"
+            target="_blank"
+            variant="outline"
+          >
+            Open Facebook Event <BsFacebook />
+          </LinkButton>
+        </Flex>
       </Flex>
     </styled.main>
   );
