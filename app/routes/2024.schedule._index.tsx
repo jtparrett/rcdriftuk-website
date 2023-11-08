@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { LinkButton } from "~/components/Button";
-import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { Box, Flex, styled } from "~/styled-system/jsx";
 
 interface Props {
   round: string;

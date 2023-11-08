@@ -7,6 +7,10 @@ export const meta: MetaFunction = () => {
   return [
     { title: "RC Drift UK | Home" },
     { name: "description", content: "Welcome to RCDrift.uk" },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/rcdriftuk-logo.jpg",
+    },
   ];
 };
 

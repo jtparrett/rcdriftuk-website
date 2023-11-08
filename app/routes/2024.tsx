@@ -11,6 +11,10 @@ export const meta: MetaFunction = () => {
       name: "description",
       content: "Welcome to the RCDrift.uk 2024 championship",
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/2024-cover.jpg",
+    },
   ];
 };
 
