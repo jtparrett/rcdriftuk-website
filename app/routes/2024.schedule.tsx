@@ -3,7 +3,7 @@ import { Container } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
-    <Container>
+    <Container pb={4}>
       <Outlet />
     </Container>
   );

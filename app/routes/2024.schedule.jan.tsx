@@ -35,40 +35,72 @@ const Page = () => {
         </Box>
 
         <styled.h1 fontSize="4xl" fontWeight="bold">
-          RC Drift UK at the Autosport show
+          RC DRIFT UK 2024 Championship launch 🔥
         </styled.h1>
 
         <styled.p>
-          The national championship for RC drifting in the UK is proud to
-          announce we will be attending the Autosport Show International 2024.
+          We are delighted to be launching the RC DRIFT UK championship 2024 at
+          the largest car show in Europe, the Autosport International show at
+          the NEC!
+        </styled.p>
+
+        <styled.p>
+          We will be putting on a display of RC drifting for the 80,000+ people
+          who will be attending the show over the 4 days.
+        </styled.p>
+
+        <styled.p>
+          We know how popular the track is having witnessed Slide House at the
+          show in 2020. You can expect crowds, huge crowds watching what we do
+          and asking about our hobby, the perfect place to launch the
+          championship. The track will be a hard surface and designed to
+          showcase RC drifting at its best.
+        </styled.p>
+
+        <styled.p>We will supply tables and power for every driver.</styled.p>
+
+        <styled.p>
+          Drivers from across the UK will be there with every type of car you
+          can think of.
+        </styled.p>
+
+        <styled.p>
+          There will be 4 ticket options for drivers and additional people, like
+          fathers and partners:
+        </styled.p>
+
+        <ul>
+          <li>4 x days</li>
+          <li>3 x days</li>
+          <li>2 x days</li>
+          <li>1 x day - Saturday</li>
+          <li>1 x day - Sunday</li>
+        </ul>
+
+        <styled.p>
+          These will be released in stages, people who are attending for the 4
+          days will be given the chance to buy tickets first, then 3 days, 2
+          days, Saturday and then Sunday.
+        </styled.p>
+
+        <styled.p>
+          If tickets sell out before the single day tickets are due to be
+          released, we will of course let you know in advance.
+        </styled.p>
+
+        <styled.p>
+          *Please note these ticket are not for the general public*
+        </styled.p>
+
+        <styled.p>
+          ALL names will be checked and verified, if you are not an RC drifter
+          or partner, your ticket will NOT be refunded and the ticket will not
+          be valid for the event!
         </styled.p>
         <styled.p>
-          We invite you to join us for the show and drive your RC car with
-          others in front of 80,000 people over 4 days.
+          All tickets are non refundable under any circumstances!
         </styled.p>
-        <styled.p>
-          These tickets will be sold on a first come first serve basis, we will
-          create a reserve list if places for the event sell out. Tickets You
-          will find 8 options available, 4 x are for driver tickets, 4 x are
-          available for addtional people, This might be your Dad or partner.
-          Tickets to attend the show retail at £40 per day. We are offering you
-          a HUGE saving by offering you;
-        </styled.p>
-        <styled.ul>
-          <styled.li>4 x day ticket for just £75!</styled.li>
-          <styled.li>3 x day ticket £60</styled.li>
-          <styled.li>2 x day ticket £50</styled.li>
-          <styled.li>1 x day ticket £25</styled.li>
-        </styled.ul>
-        <styled.p>The longer you stay, the cheaper it gets.</styled.p>
-        <styled.p>Release dates.</styled.p>
-        <styled.p>
-          They will all be released in the same order as above on each Sunday at
-          8pm GMT starting on November 12th.
-        </styled.p>
-        <styled.p>
-          There will be further details emailed to you to avoid any confusion.
-        </styled.p>
+        <styled.p>NB* This event is not suitable for beginners!</styled.p>
 
         <Box>
           <LinkButton
