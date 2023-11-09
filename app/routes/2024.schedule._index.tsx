@@ -7,6 +7,12 @@ import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { client } from "~/utils/contentful.server";
 import { eventSchema } from "~/utils/contentfulSchema";
 
+export function headers() {
+  return {
+    "Cache-Control": "s-maxage=60, stale-while-revalidate=120",
+  };
+}
+
 export const loader = async () => {
   const events = await client.getEntries({
     content_type: "event",

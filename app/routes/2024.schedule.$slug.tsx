@@ -16,6 +16,12 @@ import {
 import { format } from "date-fns";
 import { LinkButton } from "~/components/Button";
 
+export function headers() {
+  return {
+    "Cache-Control": "s-maxage=60, stale-while-revalidate=120",
+  };
+}
+
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const slug = z.string().parse(params.slug);
 
