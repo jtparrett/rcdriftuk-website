@@ -1,117 +1,104 @@
+import { useLoaderData } from "@remix-run/react";
+import { format } from "date-fns";
+import { z } from "zod";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { LinkButton } from "~/components/Button";
-import { Box, Flex, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { client } from "~/utils/contentful.server";
+import { eventSchema } from "~/utils/contentfulSchema";
 
-interface Props {
-  round: string;
-  track: string;
-  image: string;
-  date: string;
-  to: string;
-}
+export const loader = async () => {
+  const events = await client.getEntries({
+    content_type: "event",
+    order: ["sys.createdAt"],
+  });
 
-const Card = ({ round, track, image, date, to }: Props) => {
-  return (
-    <Flex pt={4} pl={4} w={{ base: "50%", lg: "25%" }}>
-      <styled.article bgColor="gray.900" overflow="hidden" rounded="xl">
-        <styled.img src={image} />
-        <Box p={4}>
-          <styled.h1 fontSize="2xl" fontFamily="heading" lineHeight={1}>
-            {round} <styled.span color="brand-500">//</styled.span> {track}
-          </styled.h1>
-
-          <styled.p color="gray.400">{date}, 2024</styled.p>
-
-          <LinkButton to={to} w="full" mt={4} py={1}>
-            More Info
-          </LinkButton>
-        </Box>
-      </styled.article>
-    </Flex>
-  );
+  return z.array(eventSchema).parse(events.items);
 };
 
 const Page = () => {
+  const events = useLoaderData<typeof loader>();
+
   return (
-    <styled.main>
-      <Breadcrumbs
-        paths={[
-          {
-            to: "/2024/schedule",
-            title: "Schedule",
-          },
-        ]}
-      />
+    <Container>
+      <styled.main>
+        <Breadcrumbs
+          paths={[
+            {
+              to: "/2024/schedule",
+              title: "Schedule",
+            },
+          ]}
+        />
 
-      <styled.h1
-        fontSize="5xl"
-        fontFamily="heading"
-        lineHeight={1}
-        fontStyle="italic"
-      >
-        2024 Schedule
-      </styled.h1>
+        <styled.h1
+          fontSize="5xl"
+          fontFamily="heading"
+          lineHeight={1}
+          fontStyle="italic"
+        >
+          2024 Schedule
+        </styled.h1>
 
-      <Box maxW={200} h="4px" bgColor="brand-500" mt={2} mb={4} />
+        <Box maxW={200} h="4px" bgColor="brand-500" mt={2} mb={4} />
 
-      <Box overflow="hidden" rounded="xl" mb={4}>
-        <styled.img src="/2024-cover.jpg" w="full" />
-      </Box>
+        <Box overflow="hidden" rounded="xl" mb={4}>
+          <styled.img src="/2024-cover.jpg" w="full" />
+        </Box>
 
-      <Box overflow="hidden">
-        <Flex flexWrap="wrap" ml={-4} mt={-4}>
-          <Card
-            round="Launch"
-            track="AutoSport International"
-            image="/launch-event-card.jpg"
-            date="January 11th - 14th"
-            to="/2024/schedule/jan"
-          />
-          <Card
-            round="Round 1"
-            track="ScaleDrift"
-            image="/round-1-card.jpg"
-            date="March 2nd"
-            to="/2024/schedule/mar"
-          />
-          <Card
-            round="Round 2"
-            track="Drift Essex"
-            image="/round-2-card.jpg"
-            date="April 6th"
-            to="/2024/schedule/apr"
-          />
-          <Card
-            round="Round 3"
-            track="NRD"
-            image="/round-3-card.jpg"
-            date="May 4th"
-            to="/2024/schedule/may"
-          />
-          <Card
-            round="Round 4"
-            track="Slide House"
-            image="/round-4-card.jpg"
-            date="June 1st"
-            to="/2024/schedule/jun"
-          />
-          <Card
-            round="Round 5"
-            track="MDS"
-            image="/round-5-card.jpg"
-            date="July 6th"
-            to="/2024/schedule/jul"
-          />
-          <Card
-            round="Round 6"
-            track="Ronin Drift Lounge"
-            image="/round-6-card.jpg"
-            date="August 3rd"
-            to="/2024/schedule/aug"
-          />
-        </Flex>
-      </Box>
-    </styled.main>
+        <Box overflow="hidden">
+          <Flex flexWrap="wrap" ml={-4} mt={-4}>
+            {events.map((event) => {
+              const startDate = new Date(event.fields.startDate);
+
+              return (
+                <Flex
+                  key={event.sys.id}
+                  pt={4}
+                  pl={4}
+                  w={{ base: "50%", lg: "25%" }}
+                >
+                  <styled.article
+                    bgColor="gray.900"
+                    overflow="hidden"
+                    rounded="xl"
+                  >
+                    <styled.img src={event.fields.card.fields.file.url} />
+                    <Box p={4}>
+                      <styled.h1
+                        fontSize="2xl"
+                        fontFamily="heading"
+                        lineHeight={1}
+                      >
+                        {event.fields.title}{" "}
+                        <styled.span color="brand-500">//</styled.span>{" "}
+                        {event.fields.subTitle}
+                      </styled.h1>
+
+                      <styled.p color="gray.400">
+                        {format(startDate, "MMM do")}
+                        {event.fields.endDate &&
+                          format(new Date(event.fields.endDate), "-do")}
+                        {format(startDate, ", Y")}
+                      </styled.p>
+
+                      <LinkButton
+                        to={`/2024/schedule/${event.fields.slug}`}
+                        w="full"
+                        mt={4}
+                        py={1}
+                      >
+                        More Info
+                      </LinkButton>
+                    </Box>
+                  </styled.article>
+                </Flex>
+              );
+            })}
+          </Flex>
+        </Box>
+      </styled.main>
+    </Container>
   );
 };
 
