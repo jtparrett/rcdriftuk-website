@@ -168,12 +168,24 @@ IP28 6RT
 Check facebook for events `,
   },
   {
-    name: "East Coast RC",
+    name: "East Coast RC Drift",
     lat: 51.8884,
     lng: 1.028,
     tags: [HEADER_TABS.CLUBS],
     image: "/covers/east-coast.jpg",
     url: "https://www.facebook.com/eastcoastdriftrc",
+    description: `
+Great Bromley Hall,
+Great Bromley,
+Essex,
+CO7 7JA
+
+Track is open every other Friday night.
+18:00 - 23:30
+£10 per driver
+
+Event Carpet Track - MST Silver Dot Tyres
+    `,
   },
   {
     name: "Drift Essex",
