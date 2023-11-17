@@ -10,6 +10,7 @@ import {
 } from "@remix-run/react";
 
 import styles from "./index.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -43,6 +44,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <Analytics />
       </body>
     </html>
   );
