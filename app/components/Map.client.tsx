@@ -481,7 +481,7 @@ export const Map = () => {
       position="relative"
       overflow="hidden"
       zIndex={1}
-      paddingTop={{ base: 125, md: 75 }}
+      paddingTop={{ base: 135, md: 75 }}
     >
       <Box h="100%" overflow="hidden" roundedTop="xl">
         <MapContainer

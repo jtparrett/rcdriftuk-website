@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { styled } from "~/styled-system/jsx";
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
   isActive?: boolean;
   to: string;
 }
@@ -19,8 +19,8 @@ export const Tab = ({ children, isActive, to }: Props) => {
       textTransform="capitalize"
       bgColor={isActive ? "black" : undefined}
       rounded="md"
-      fontWeight={isActive ? "semibold" : undefined}
-      transition="all .3s"
+      fontWeight="medium"
+      transition="background-color .3s"
     >
       {children}
     </TabBase>

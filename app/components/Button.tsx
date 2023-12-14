@@ -25,6 +25,14 @@ const ButtonStyles = cva({
     color: "white !important",
   },
   variants: {
+    size: {
+      md: {},
+      sm: {
+        py: 1,
+        px: 2,
+        rounded: "md",
+      },
+    },
     variant: {
       primary: {
         bg: "brand-500",
@@ -32,6 +40,14 @@ const ButtonStyles = cva({
         _hover: {
           backgroundColor: "brand-700",
           borderColor: "brand-700",
+        },
+      },
+      secondary: {
+        bg: "gray.800",
+        borderColor: "gray.800",
+        _hover: {
+          backgroundColor: "gray.700",
+          borderColor: "gray.700",
         },
       },
       outline: {
@@ -55,6 +71,7 @@ const ButtonStyles = cva({
   },
   defaultVariants: {
     variant: "primary",
+    size: "md",
   },
 });
 
