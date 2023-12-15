@@ -27,6 +27,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const events = await prisma.events.findMany({
     where: {
+      approved: true,
       startDate: {
         gte: startOfWeek(date, {
           weekStartsOn: 1,

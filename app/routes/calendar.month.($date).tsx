@@ -37,6 +37,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const events = await prisma.events.findMany({
     where: {
+      approved: true,
       startDate: {
         gte: startOfMonth(date),
         lte: endOfMonth(date),

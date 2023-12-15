@@ -22,7 +22,10 @@ export const meta: MetaFunction = () => {
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
 
-  if (!params.date && url.pathname !== "/calendar/new") {
+  if (
+    !params.date &&
+    !(url.pathname === "/calendar/new" || url.pathname === "/calendar/success")
+  ) {
     const today = format(new Date(), "dd-MM-yy");
     return redirect(`/calendar/day/${today}`);
   }
