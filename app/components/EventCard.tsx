@@ -18,9 +18,9 @@ interface Props {
 
 export const EventCard = ({ event }: Props) => {
   return (
-    <Flex rounded="md" bgColor="brand.500" p={4} alignItems="center">
+    <Flex rounded="md" bgColor="brand.500" p={4} alignItems="center" gap={2}>
       <Box flex={1}>
-        <styled.h3 fontSize="lg" fontWeight="bold">
+        <styled.h3 fontSize="lg" fontWeight="bold" textWrap="balance">
           {event.name}
         </styled.h3>
 
