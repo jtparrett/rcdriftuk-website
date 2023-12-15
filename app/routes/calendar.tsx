@@ -19,10 +19,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  if (!params.date) {
-    const today = new Date();
-    return redirect(`/calendar/day/${format(today, "dd-MM-yy")}`);
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+
+  if (!params.date && url.pathname !== "/calendar/new") {
+    const today = format(new Date(), "dd-MM-yy");
+    return redirect(`/calendar/day/${today}`);
   }
 
   return null;
@@ -31,6 +33,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 const CalendarPage = () => {
   const location = useLocation();
   const params = useParams();
+  const today = format(new Date(), "dd-MM-yy");
+  const dateParam = params.date ?? today;
 
   return (
     <Box maxW={900} mx="auto" px={2}>
@@ -40,19 +44,19 @@ const CalendarPage = () => {
       <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
         <Tab
           isActive={location.pathname.includes("/calendar/day")}
-          to={`/calendar/day/${params.date}`}
+          to={`/calendar/day/${dateParam}`}
         >
           Day
         </Tab>
         <Tab
           isActive={location.pathname.includes("/calendar/week")}
-          to={`/calendar/week/${params.date}`}
+          to={`/calendar/week/${dateParam}`}
         >
           Week
         </Tab>
         <Tab
           isActive={location.pathname.includes("/calendar/month")}
-          to={`/calendar/month/${params.date}`}
+          to={`/calendar/month/${dateParam}`}
         >
           Month
         </Tab>

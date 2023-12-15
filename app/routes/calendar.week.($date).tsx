@@ -97,7 +97,7 @@ const CalendarWeeksPage = () => {
           );
 
           return (
-            <Box key={i}>
+            <Box key={i} rounded="sm" overflow="hidden" bgColor="gray.900">
               <Box
                 p={1}
                 textAlign="center"

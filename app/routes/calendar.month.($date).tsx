@@ -1,10 +1,12 @@
 import { redirect } from "@remix-run/node";
-import { useParams } from "@remix-run/react";
+import { Link, useLoaderData, useParams } from "@remix-run/react";
 import {
   add,
   differenceInDays,
+  endOfMonth,
   format,
   getDaysInMonth,
+  isSameDay,
   parse,
   startOfMonth,
   startOfWeek,
@@ -14,19 +16,40 @@ import { BsChevronLeft, BsChevronRight } from "react-icons/bs/index.js";
 import { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
-import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
+import { styled, Flex, Spacer, Box, Center } from "~/styled-system/jsx";
+import { prisma } from "~/utils/prisma.server";
+
+const LinkOverlay = styled(Link, {
+  base: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 2,
+  },
+});
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
     const today = format(new Date(), "dd-MM-yy");
-    return redirect(`/calendar/month/${today}`);
+    throw redirect(`/calendar/month/${today}`);
   }
 
-  return null;
+  const date = parse(params.date, "dd-MM-yy", new Date());
+
+  const events = await prisma.events.findMany({
+    where: {
+      startDate: {
+        gte: startOfMonth(date),
+        lte: endOfMonth(date),
+      },
+    },
+  });
+
+  return events;
 };
 
 const CalendarMonthsPage = () => {
   const params = useParams();
+  const events = useLoaderData<typeof loader>();
 
   invariant(params.date);
 
@@ -63,7 +86,7 @@ const CalendarMonthsPage = () => {
         </LinkButton>
       </Flex>
 
-      <Flex flexWrap="wrap" gap={1} py={2}>
+      <Flex flexWrap="wrap" py={2} ml={-1}>
         {Array.from(
           new Array(
             differenceInDays(
@@ -74,7 +97,7 @@ const CalendarMonthsPage = () => {
             )
           )
         ).map((_, i) => (
-          <Box key={i} w={`calc(${100 / 7}% - 4px)`}></Box>
+          <Box key={i} w={`${100 / 7}%`}></Box>
         ))}
 
         {Array.from(new Array(getDaysInMonth(monthStartDate))).map((_, i) => {
@@ -82,22 +105,45 @@ const CalendarMonthsPage = () => {
             days: i,
           });
 
+          const dayEvents = events.filter((event) =>
+            isSameDay(new Date(event.startDate), day)
+          );
+
           return (
-            <Box
-              key={i}
-              w={`calc(${100 / 7}% - 4px)`}
-              aspectRatio={1}
-              bgColor="gray.900"
-            >
+            <Box key={i} w={`${100 / 7}%`} pl={1} mb={1}>
               <Box
-                fontSize="sm"
-                textAlign="center"
                 bgColor="gray.900"
-                borderBottomWidth={1}
-                borderColor="gray.800"
-                py={1}
+                pos="relative"
+                rounded="sm"
+                overflow="hidden"
               >
-                <styled.h3>{format(day, "E do")}</styled.h3>
+                <Box
+                  fontSize={{ base: "11px", md: "sm" }}
+                  textAlign="center"
+                  bgColor="gray.800"
+                  borderBottomWidth={1}
+                  borderColor="gray.700"
+                  py={1}
+                >
+                  <styled.h3>{format(day, "E do")}</styled.h3>
+                </Box>
+
+                <LinkOverlay to={`/calendar/day/${format(day, "dd-MM-yy")}`} />
+
+                <Center aspectRatio={1}>
+                  {dayEvents.length > 0 && (
+                    <Center
+                      w="50%"
+                      aspectRatio={1}
+                      bgColor="brand.500"
+                      rounded="full"
+                      fontWeight="bold"
+                      fontSize="xs"
+                    >
+                      {dayEvents.length}
+                    </Center>
+                  )}
+                </Center>
               </Box>
             </Box>
           );
