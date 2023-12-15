@@ -126,7 +126,9 @@ const CalendarMonthsPage = () => {
                   borderColor="gray.700"
                   py={1}
                 >
-                  <styled.h3>{format(day, "E do")}</styled.h3>
+                  <styled.h3 whiteSpace="nowrap">
+                    {format(day, "E do")}
+                  </styled.h3>
                 </Box>
 
                 <LinkOverlay to={`/calendar/day/${format(day, "dd-MM-yy")}`} />
