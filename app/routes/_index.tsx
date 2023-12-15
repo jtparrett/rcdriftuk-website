@@ -18,7 +18,7 @@ const Page = () => {
   return (
     <Box
       bgGradient="to-b"
-      gradientFrom="brand-700"
+      gradientFrom="brand.700"
       gradientVia="transparent"
       gradientTo="transparent"
     >

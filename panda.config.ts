@@ -33,44 +33,44 @@ export default defineConfig({
           },
         },
         colors: {
-          "brand-500": {
+          "brand.500": {
             value: brandColor,
           },
-          "brand-700": {
+          "brand.700": {
             value: "#a6143c",
           },
 
-          "gray-50": {
+          "gray.50": {
             value: "#fafafa",
           },
-          "gray-100": {
+          "gray.100": {
             value: "#f4f4f5",
           },
-          "gray-200": {
+          "gray.200": {
             value: "#e4e4e7",
           },
-          "gray-300": {
+          "gray.300": {
             value: "#d4d4d8",
           },
-          "gray-400": {
+          "gray.400": {
             value: "#a1a1aa",
           },
-          "gray-500": {
+          "gray.500": {
             value: "#71717a",
           },
-          "gray-600": {
+          "gray.600": {
             value: "#52525b",
           },
-          "gray-700": {
+          "gray.700": {
             value: "#3f3f46",
           },
-          "gray-800": {
+          "gray.800": {
             value: "#27272a",
           },
-          "gray-900": {
+          "gray.900": {
             value: "#18181b",
           },
-          "gray-950": {
+          "gray.950": {
             value: "#09090b",
           },
         },

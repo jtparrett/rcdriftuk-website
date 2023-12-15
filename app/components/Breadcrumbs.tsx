@@ -14,7 +14,7 @@ export const Breadcrumbs = ({ paths }: Props) => {
         <BsHouse />
       </LinkButton>
 
-      <styled.span color="brand-500" px={1}>
+      <styled.span color="brand.500" px={1}>
         //
       </styled.span>
 
@@ -25,7 +25,7 @@ export const Breadcrumbs = ({ paths }: Props) => {
           </LinkButton>
 
           {i < paths.length - 1 && (
-            <styled.span color="brand-500" px={1}>
+            <styled.span color="brand.500" px={1}>
               //
             </styled.span>
           )}
