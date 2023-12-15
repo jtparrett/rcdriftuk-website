@@ -1,5 +1,5 @@
 import { MetaFunction } from "@remix-run/node";
-import { BsArrowRight, BsFacebook, BsInstagram } from "react-icons/bs/index.js";
+import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
@@ -18,7 +18,7 @@ const Page = () => {
   return (
     <Box
       bgGradient="to-b"
-      gradientFrom="brand-700"
+      gradientFrom="brand.700"
       gradientVia="transparent"
       gradientTo="transparent"
     >
@@ -26,11 +26,14 @@ const Page = () => {
         <Flex flexDir="column" gap={4}>
           <styled.img w="80%" src="/rcdriftuk.svg" mx="auto" mb={8} />
 
+          <LinkButton to="/map/all" variant="outline" fontSize="lg">
+            Find Your Local Track 📍
+          </LinkButton>
+          <LinkButton to="/calendar" variant="outline" fontSize="lg">
+            Drift Calendar 🗓️
+          </LinkButton>
           <LinkButton to="/2024/schedule" variant="primary" fontSize="lg">
             🏆 2024 Championship 🏆
-          </LinkButton>
-          <LinkButton to="/map/all" variant="outline" fontSize="lg">
-            Find Your Local Track <BsArrowRight />
           </LinkButton>
         </Flex>
 

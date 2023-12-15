@@ -28,7 +28,7 @@ const Page = () => {
             ahead of the final.
           </styled.p>
 
-          <Box maxW={200} h="4px" bgColor="brand-500" mt={2} mb={6} />
+          <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={6} />
 
           <Box rounded="xl" bgColor="gray.900" overflow="hidden" px={8} py={4}>
             <styled.table w="full">

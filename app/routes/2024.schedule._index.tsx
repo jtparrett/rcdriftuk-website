@@ -46,7 +46,7 @@ const Page = () => {
           2024 Schedule
         </styled.h1>
 
-        <Box maxW={200} h="4px" bgColor="brand-500" mt={2} mb={4} />
+        <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={4} />
 
         <Box overflow="hidden" rounded="xl" mb={4}>
           <styled.img src="/2024-cover.jpg" w="full" />
@@ -77,7 +77,7 @@ const Page = () => {
                         lineHeight={1}
                       >
                         {event.fields.title}{" "}
-                        <styled.span color="brand-500">//</styled.span>{" "}
+                        <styled.span color="brand.500">//</styled.span>{" "}
                         {event.fields.subTitle}
                       </styled.h1>
 
