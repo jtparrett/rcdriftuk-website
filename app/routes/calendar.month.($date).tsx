@@ -141,7 +141,7 @@ const CalendarMonthsPage = () => {
                       bgColor="brand.500"
                       rounded="full"
                       fontWeight="bold"
-                      fontSize="xs"
+                      fontSize={{ base: "xs", md: "xl" }}
                     >
                       {dayEvents.length}
                     </Center>
