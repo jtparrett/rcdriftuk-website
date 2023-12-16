@@ -27,7 +27,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     !(url.pathname === "/calendar/new" || url.pathname === "/calendar/success")
   ) {
     const today = format(new Date(), "dd-MM-yy");
-    return redirect(`/calendar/day/${today}`);
+    return redirect(`/calendar/week/${today}`);
   }
 
   return null;
