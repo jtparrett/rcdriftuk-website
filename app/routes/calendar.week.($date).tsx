@@ -109,13 +109,13 @@ const CalendarWeeksPage = () => {
                 <styled.h3>{format(day, "EEEE do")}</styled.h3>
               </Box>
 
-              <Box p={4}>
+              <Flex p={4} flexDir="column" gap={2}>
                 {dayEvents.length <= 0 && <styled.p>No Events...</styled.p>}
 
                 {dayEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
-              </Box>
+              </Flex>
             </Box>
           );
         })}
