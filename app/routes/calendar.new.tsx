@@ -47,7 +47,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     parseInt(endMinutes)
   );
 
-  await prisma.events.create({
+  const event = await prisma.events.create({
     data: {
       name: data.name,
       track: data.track,
@@ -56,6 +56,41 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       endDate,
     },
   });
+
+  await fetch(
+    "https://hooks.slack.com/services/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",
+    {
+      method: "post",
+      body: JSON.stringify({
+        text: "New Event",
+
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: JSON.stringify(data, null, 2),
+            },
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Approve",
+                },
+                style: "primary",
+                action_id: "approve",
+                value: event.id,
+              },
+            ],
+          },
+        ],
+      }),
+    }
+  );
 
   return redirect("/calendar/success");
 };
