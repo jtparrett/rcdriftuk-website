@@ -19,13 +19,10 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
 
-  if (
-    !params.date &&
-    !(url.pathname === "/calendar/new" || url.pathname === "/calendar/success")
-  ) {
+  if (url.pathname === "/calendar" || url.pathname === "/calendar/") {
     const today = format(new Date(), "dd-MM-yy");
     return redirect(`/calendar/week/${today}`);
   }

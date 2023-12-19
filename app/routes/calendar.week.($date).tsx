@@ -40,6 +40,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     orderBy: {
       startDate: "asc",
     },
+    include: {
+      eventTrack: true,
+    },
   });
 
   return events;

@@ -1,6 +1,6 @@
-import { Events } from "@prisma/client";
+import { Events, Tracks } from "@prisma/client";
 import { format } from "date-fns";
-import { BsClock, BsPinMap } from "react-icons/bs/index.js";
+import { BsCalendar, BsClock, BsPinMap } from "react-icons/bs/index.js";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
 
@@ -10,6 +10,7 @@ interface QueriedEvent
   endDate: string;
   createdAt: string;
   updatedAt: string;
+  eventTrack: Tracks | null;
 }
 
 interface Props {
@@ -24,19 +25,30 @@ export const EventCard = ({ event }: Props) => {
           {event.name}
         </styled.h3>
 
-        <Flex alignItems="center" gap={1} fontWeight="medium">
-          <styled.span fontSize="sm">
-            <BsClock />
-          </styled.span>
-          <styled.span fontSize="sm">
-            {format(new Date(event.startDate), "HH:mm")}-
-            {format(new Date(event.endDate), "HH:mm")}
-          </styled.span>
-        </Flex>
-
         <Flex fontSize="sm" fontWeight="medium" alignItems="center" gap={1}>
           <BsPinMap />
-          <styled.span>{event.track}</styled.span>
+          <styled.span>{event.eventTrack?.name ?? event.track}</styled.span>
+        </Flex>
+
+        <Flex gap={2} flexWrap="wrap">
+          <Flex alignItems="center" gap={1} fontWeight="medium">
+            <styled.span fontSize="sm">
+              <BsCalendar />
+            </styled.span>
+            <styled.span fontSize="sm">
+              {format(new Date(event.startDate), "dd/MM/yyyy")}
+            </styled.span>
+          </Flex>
+
+          <Flex alignItems="center" gap={1} fontWeight="medium">
+            <styled.span fontSize="sm">
+              <BsClock />
+            </styled.span>
+            <styled.span fontSize="sm">
+              {format(new Date(event.startDate), "HH:mm")}-
+              {format(new Date(event.endDate), "HH:mm")}
+            </styled.span>
+          </Flex>
         </Flex>
       </Box>
 

@@ -1,18 +1,30 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { setHours, setMinutes } from "date-fns";
+import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
+import { Select } from "~/components/Select";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+
+export const loader = async () => {
+  const tracks = await prisma.tracks.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  return tracks;
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const body = await request.formData();
 
   const name = body.get("name");
-  const track = body.get("track");
+  const trackId = body.get("trackId");
   const date = body.get("date");
   const startTime = body.get("startTime");
   const endTime = body.get("endTime");
@@ -21,7 +33,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = z
     .object({
       name: z.string(),
-      track: z.string(),
+      trackId: z.string(),
       date: z.coerce.date(),
       link: z.string(),
       startTime: z.string(),
@@ -29,7 +41,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     })
     .parse({
       name,
-      track,
+      trackId,
       date,
       startTime,
       endTime,
@@ -47,13 +59,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     parseInt(endMinutes)
   );
 
+  const track = await prisma.tracks.findFirst({
+    where: {
+      id: data.trackId,
+    },
+  });
+
+  invariant(track);
+
   const event = await prisma.events.create({
     data: {
       name: data.name,
-      track: data.track,
+      trackId: track.id,
       link: data.link,
       startDate,
       endDate,
+    },
+    include: {
+      eventTrack: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -96,6 +123,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const CalendarNewPage = () => {
+  const tracks = useLoaderData<typeof loader>();
+
   return (
     <Box>
       <styled.h1 fontSize="4xl" fontStyle="italic" fontFamily="heading">
@@ -109,7 +138,13 @@ const CalendarNewPage = () => {
           </Box>
           <Box>
             <Label>Track</Label>
-            <Input name="track" required />
+            <Select name="trackId">
+              {tracks.map((track) => (
+                <option key={track.id} value={track.id}>
+                  {track.name}
+                </option>
+              ))}
+            </Select>
           </Box>
           <Box>
             <Label>Event Link</Label>

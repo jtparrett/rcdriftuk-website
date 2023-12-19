@@ -43,6 +43,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         lte: endOfMonth(date),
       },
     },
+    include: {
+      eventTrack: true,
+    },
   });
 
   return events;

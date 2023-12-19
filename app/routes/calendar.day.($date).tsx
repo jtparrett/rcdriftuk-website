@@ -24,6 +24,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         lte: endOfDay(date),
       },
     },
+    include: {
+      eventTrack: true,
+    },
     orderBy: [
       {
         startDate: "asc",

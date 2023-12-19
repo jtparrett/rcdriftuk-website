@@ -3,13 +3,7 @@ import { BsInstagram, BsFacebook } from "react-icons/bs/index.js";
 import { Link, useParams } from "@remix-run/react";
 import { getTabParam } from "~/utils/getTabParam";
 import { Tab } from "./Tab";
-
-export const HEADER_TABS = {
-  ALL: "all",
-  TRACKS: "tracks",
-  CLUBS: "clubs",
-  SHOPS: "shops",
-} as const;
+import { TrackTypes } from "@prisma/client";
 
 export const MapHeader = () => {
   const params = useParams();
@@ -57,9 +51,13 @@ export const MapHeader = () => {
           }}
         >
           <Flex p={1} bgColor="gray.800" rounded="lg" gap={2}>
-            {Object.values(HEADER_TABS).map((item) => (
-              <Tab key={item} isActive={item === tab} to={`/map/${item}`}>
-                {item}
+            {Object.values(TrackTypes).map((item) => (
+              <Tab
+                key={item}
+                isActive={item === tab}
+                to={`/map/${item.toLowerCase()}`}
+              >
+                {item.toLowerCase()}
               </Tab>
             ))}
           </Flex>

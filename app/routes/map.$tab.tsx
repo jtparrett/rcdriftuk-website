@@ -1,8 +1,10 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Suspense } from "react";
+import type { MetaFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { ClientOnly } from "~/components/ClientOnly";
 import { Map } from "~/components/Map.client";
+
 import { Box } from "~/styled-system/jsx";
-import { getTabParam } from "~/utils/getTabParam";
+import { prisma } from "~/utils/prisma.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,18 +13,20 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = ({ params }: LoaderFunctionArgs) => {
-  const tab = getTabParam(params.tab);
+export const loader = async () => {
+  const tracks = await prisma.tracks.findMany();
 
-  return { tab };
+  return tracks;
 };
 
 const Page = () => {
+  const tracks = useLoaderData<typeof loader>();
+
   return (
     <Box position="absolute" inset={0} zIndex={1}>
-      <Suspense fallback={<p>loading..</p>}>
-        <Map />
-      </Suspense>
+      <ClientOnly>
+        <Map tracks={tracks} />
+      </ClientOnly>
     </Box>
   );
 };

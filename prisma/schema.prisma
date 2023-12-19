@@ -11,13 +11,35 @@ datasource db {
 }
 
 model Events {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  track     String
-  startDate DateTime
-  endDate   DateTime
-  approved  Boolean  @default(false)
-  link      String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  trackId    String?  @db.Uuid
+  eventTrack Tracks?  @relation(fields: [trackId], references: [id])
+  track      String?
+  startDate  DateTime
+  endDate    DateTime
+  approved   Boolean  @default(false)
+  link       String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+}
+
+model Tracks {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  lat         Float
+  lng         Float
+  types       TrackTypes[]
+  image       String
+  url         String
+  slug        String @default("")
+  description String?
+  events Events[]
+}
+
+enum TrackTypes {
+  ALL
+  TRACKS
+  CLUBS
+  SHOPS
 }
