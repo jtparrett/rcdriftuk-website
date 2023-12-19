@@ -14,6 +14,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
     include: {
       events: {
+        where: {
+          approved: true,
+        },
         include: {
           eventTrack: true,
         },
