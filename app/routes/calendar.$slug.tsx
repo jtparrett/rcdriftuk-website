@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { startOfDay } from "date-fns";
 import { z } from "zod";
 import { EventCard } from "~/components/EventCard";
 import { styled, Box, Flex } from "~/styled-system/jsx";
@@ -16,6 +17,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       events: {
         where: {
           approved: true,
+          startDate: {
+            gte: startOfDay(new Date()),
+          },
         },
         include: {
           eventTrack: true,
