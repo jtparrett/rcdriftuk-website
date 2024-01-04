@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
 import {
   add,
@@ -10,13 +10,9 @@ import {
   parse,
   startOfMonth,
   startOfWeek,
-  sub,
 } from "date-fns";
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs/index.js";
-import { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
-import { LinkButton } from "~/components/Button";
-import { styled, Flex, Spacer, Box, Center } from "~/styled-system/jsx";
+import { styled, Box, Flex, Center } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 
 const LinkOverlay = styled(Link, {
@@ -51,7 +47,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return events;
 };
 
-const CalendarMonthsPage = () => {
+const Page = () => {
   const params = useParams();
   const events = useLoaderData<typeof loader>();
 
@@ -61,102 +57,70 @@ const CalendarMonthsPage = () => {
   const monthStartDate = startOfMonth(date);
 
   return (
-    <>
-      <Flex gap={2}>
-        <styled.h1 fontWeight="bold" alignSelf="center">
-          {format(date, "MMMM, yyyy")}
-        </styled.h1>
-        <Spacer />
-        <LinkButton
-          size="sm"
-          variant="secondary"
-          to={`/calendar/month/${format(sub(date, { months: 1 }), "dd-MM-yy")}`}
-        >
-          <BsChevronLeft />
-        </LinkButton>
-        <LinkButton
-          size="sm"
-          variant="secondary"
-          to={`/calendar/month/${format(new Date(), "dd-MM-yy")}`}
-        >
-          Today
-        </LinkButton>
-        <LinkButton
-          size="sm"
-          variant="secondary"
-          to={`/calendar/month/${format(add(date, { months: 1 }), "dd-MM-yy")}`}
-        >
-          <BsChevronRight />
-        </LinkButton>
-      </Flex>
-
-      <Flex flexWrap="wrap" py={2} ml={-1}>
-        {Array.from(
-          new Array(
-            differenceInDays(
-              monthStartDate,
-              startOfWeek(monthStartDate, {
-                weekStartsOn: 1,
-              })
-            )
+    <Flex flexWrap="wrap" py={2} ml={-1}>
+      {Array.from(
+        new Array(
+          differenceInDays(
+            monthStartDate,
+            startOfWeek(monthStartDate, {
+              weekStartsOn: 1,
+            })
           )
-        ).map((_, i) => (
-          <Box key={i} w={`${100 / 7}%`}></Box>
-        ))}
+        )
+      ).map((_, i) => (
+        <Box key={i} w={`${100 / 7}%`}></Box>
+      ))}
 
-        {Array.from(new Array(getDaysInMonth(monthStartDate))).map((_, i) => {
-          const day = add(monthStartDate, {
-            days: i,
-          });
+      {Array.from(new Array(getDaysInMonth(monthStartDate))).map((_, i) => {
+        const day = add(monthStartDate, {
+          days: i,
+        });
 
-          const dayEvents = events.filter((event) =>
-            isSameDay(new Date(event.startDate), day)
-          );
+        const dayEvents = events.filter((event) =>
+          isSameDay(new Date(event.startDate), day)
+        );
 
-          return (
-            <Box key={i} w={`${100 / 7}%`} pl={1} mb={1}>
+        return (
+          <Box key={i} w={`${100 / 7}%`} pl={1} mb={1}>
+            <Box
+              bgColor="gray.900"
+              pos="relative"
+              rounded="sm"
+              overflow="hidden"
+            >
               <Box
-                bgColor="gray.900"
-                pos="relative"
-                rounded="sm"
-                overflow="hidden"
+                fontSize={{ base: "11px", md: "sm" }}
+                textAlign="center"
+                bgColor="gray.800"
+                borderBottomWidth={1}
+                borderColor="gray.700"
+                py={1}
               >
-                <Box
-                  fontSize={{ base: "11px", md: "sm" }}
-                  textAlign="center"
-                  bgColor="gray.800"
-                  borderBottomWidth={1}
-                  borderColor="gray.700"
-                  py={1}
-                >
-                  <styled.h3 whiteSpace="nowrap">
-                    {format(day, "E do")}
-                  </styled.h3>
-                </Box>
-
-                <LinkOverlay to={`/calendar/day/${format(day, "dd-MM-yy")}`} />
-
-                <Center aspectRatio={1}>
-                  {dayEvents.length > 0 && (
-                    <Center
-                      w="50%"
-                      aspectRatio={1}
-                      bgColor="brand.500"
-                      rounded="full"
-                      fontWeight="bold"
-                      fontSize={{ base: "xs", md: "xl" }}
-                    >
-                      {dayEvents.length}
-                    </Center>
-                  )}
-                </Center>
+                <styled.h3 whiteSpace="nowrap">{format(day, "E do")}</styled.h3>
               </Box>
+
+              <LinkOverlay to={`/calendar/day/${format(day, "dd-MM-yy")}`} />
+
+              <Center aspectRatio={1}>
+                {dayEvents.length > 0 && (
+                  <Center
+                    w="50%"
+                    aspectRatio={1}
+                    bgColor="brand.500"
+                    rounded="full"
+                    fontWeight="bold"
+                    fontSize={{ base: "xs", md: "xl" }}
+                  >
+                    {dayEvents.length}
+                  </Center>
+                )}
+              </Center>
             </Box>
-          );
-        })}
-      </Flex>
-    </>
+          </Box>
+        );
+      })}
+    </Flex>
   );
 };
 
-export default CalendarMonthsPage;
+export default Page;
