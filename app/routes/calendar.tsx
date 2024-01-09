@@ -1,9 +1,10 @@
 import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
-import { Outlet, useLocation, useParams } from "@remix-run/react";
+import { Link, Outlet, useLocation, useParams } from "@remix-run/react";
 import { format } from "date-fns";
 import { LinkButton } from "~/components/Button";
+import { MainNav } from "~/components/MainNav";
 import { Tab } from "~/components/Tab";
-import { styled, Box, Flex, Spacer } from "~/styled-system/jsx";
+import { styled, Box, Flex, Spacer, Container } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
@@ -37,10 +38,22 @@ const CalendarPage = () => {
   const dateParam = params.date ?? today;
 
   return (
-    <Box maxW={900} mx="auto" px={2}>
-      <Box py={8}>
-        <styled.img src="/rcdriftuk.svg" w={180} mx="auto" />
-      </Box>
+    <Container maxW={900} px={2}>
+      <Flex
+        py={4}
+        alignItems="center"
+        flexDir={{ base: "column", md: "row" }}
+        gap={2}
+      >
+        <Link to="/">
+          <styled.img src="/rcdriftuk.svg" w={180} mx="auto" />
+        </Link>
+
+        <Spacer />
+
+        <MainNav />
+      </Flex>
+
       <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
         <Tab
           isActive={location.pathname.includes("/calendar/day")}
@@ -69,7 +82,7 @@ const CalendarPage = () => {
       </Flex>
 
       <Outlet />
-    </Box>
+    </Container>
   );
 };
 
