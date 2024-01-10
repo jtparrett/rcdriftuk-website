@@ -1,10 +1,10 @@
 import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
-import { Link, Outlet, useLocation, useParams } from "@remix-run/react";
+import { Outlet, useLocation, useParams } from "@remix-run/react";
 import { format } from "date-fns";
 import { LinkButton } from "~/components/Button";
-import { MainNav } from "~/components/MainNav";
+import { Header } from "~/components/Header";
 import { Tab } from "~/components/Tab";
-import { styled, Box, Flex, Spacer, Container } from "~/styled-system/jsx";
+import { Flex, Spacer, Container } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
@@ -39,20 +39,7 @@ const CalendarPage = () => {
 
   return (
     <Container maxW={900} px={2}>
-      <Flex
-        py={4}
-        alignItems="center"
-        flexDir={{ base: "column", md: "row" }}
-        gap={2}
-      >
-        <Link to="/">
-          <styled.img src="/rcdriftuk.svg" w={180} mx="auto" />
-        </Link>
-
-        <Spacer />
-
-        <MainNav />
-      </Flex>
+      <Header />
 
       <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
         <Tab
