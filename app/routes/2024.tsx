@@ -1,8 +1,10 @@
 import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import { Outlet, useLocation } from "@remix-run/react";
 import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
-import { ChampHeader } from "~/components/ChampHeader";
-import { styled, Box, Flex } from "~/styled-system/jsx";
+import { LinkButton } from "~/components/Button";
+import { Header } from "~/components/Header";
+import { Tab } from "~/components/Tab";
+import { styled, Box, Flex, Spacer, Container } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
@@ -29,10 +31,40 @@ export const loader = ({ request }: LoaderFunctionArgs) => {
 };
 
 const Page = () => {
+  const location = useLocation();
+
   return (
     <>
-      <ChampHeader />
+      <Container px={2}>
+        <Header />
+
+        <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
+          <Tab
+            to="/2024/schedule"
+            isActive={
+              location.pathname === "/2024/schedule" ||
+              location.pathname === "/2024/schedule/"
+            }
+          >
+            Schedule
+          </Tab>
+          <Tab
+            to="/2024/standings"
+            isActive={location.pathname.startsWith("/2024/standings")}
+          >
+            Standings
+          </Tab>
+
+          <Spacer />
+
+          <LinkButton to="/2024/live" size="sm">
+            Watch Live
+          </LinkButton>
+        </Flex>
+      </Container>
+
       <Outlet />
+
       <Box
         borderTopWidth={1}
         borderColor="gray.800"

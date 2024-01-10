@@ -17,14 +17,8 @@ export const Map = ({ tracks }: Props) => {
   const tab = getTabParam(params.tab);
 
   return (
-    <Box
-      h="100%"
-      position="relative"
-      overflow="hidden"
-      zIndex={1}
-      paddingTop={{ base: 135, md: 75 }}
-    >
-      <Box h="100%" overflow="hidden" roundedTop="xl">
+    <Box h="100%" position="relative" overflow="hidden" zIndex={1}>
+      <Box h="100%" overflow="hidden">
         <MapContainer
           center={[54.5, -2]}
           style={{ height: "100%" }}
