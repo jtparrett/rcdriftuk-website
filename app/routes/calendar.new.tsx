@@ -4,6 +4,7 @@ import {
   add,
   differenceInWeeks,
   endOfYear,
+  format,
   setHours,
   setMinutes,
 } from "date-fns";
@@ -194,7 +195,7 @@ const CalendarNewPage = () => {
               name="date"
               type="hidden"
               required
-              value={selectedDate.toString()}
+              value={format(selectedDate, "MM/dd/yyyy")}
             />
             <DatePicker
               value={selectedDate}
