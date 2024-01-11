@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,30 +8,30 @@ datasource db {
 }
 
 model Events {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String
-  trackId    String?  @db.Uuid
-  eventTrack Tracks?  @relation(fields: [trackId], references: [id])
   track      String?
   startDate  DateTime
   endDate    DateTime
-  approved   Boolean  @default(false)
-  link       String   @default("")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
+  approved   Boolean  @default(false)
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link       String   @default("")
+  trackId    String?  @db.Uuid
+  eventTrack Tracks?  @relation(fields: [trackId], references: [id])
 }
 
 model Tracks {
   id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
+  description String?
+  image       String
   lat         Float
   lng         Float
   types       TrackTypes[]
-  image       String
   url         String
-  slug        String @default("")
-  description String?
-  events Events[]
+  slug        String       @default("")
+  events      Events[]
 }
 
 enum TrackTypes {
@@ -42,4 +39,22 @@ enum TrackTypes {
   TRACKS
   CLUBS
   SHOPS
+}
+
+model Products {
+  slug        String @id
+  title       String
+  image       String
+  description String
+  shop        Shops
+  url         String
+}
+
+enum Shops {
+  ASBO
+  RCKITOUT
+  DRIFTMANJI
+  SLIDEDYNAMICS
+  RCPACE
+  MODELSHOPDIRECT
 }

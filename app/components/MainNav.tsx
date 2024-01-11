@@ -4,6 +4,7 @@ import {
   BsFacebook,
   BsInstagram,
   BsMap,
+  BsSearch,
   BsTrophy,
 } from "react-icons/bs/index.js";
 import { styled, Flex, Box } from "~/styled-system/jsx";
@@ -16,6 +17,9 @@ export const MainNav = () => {
       </Link>
       <Link to="/calendar">
         <BsCalendar />
+      </Link>
+      <Link to="/catalogue">
+        <BsSearch />
       </Link>
       <Link to="/2024/schedule">
         <BsTrophy />

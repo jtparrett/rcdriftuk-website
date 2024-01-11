@@ -30,7 +30,10 @@ const Page = () => {
             Find Your Local Track 📍
           </LinkButton>
           <LinkButton to="/calendar" variant="outline" fontSize="lg">
-            Drift Calendar 🗓️
+            UK Drift Calendar 🗓️
+          </LinkButton>
+          <LinkButton to="/catalogue" variant="outline" fontSize="lg">
+            Shops Catalogue 🔎
           </LinkButton>
           <LinkButton to="/2024/schedule" variant="primary" fontSize="lg">
             🏆 2024 Championship 🏆
