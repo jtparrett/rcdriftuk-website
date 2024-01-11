@@ -1,9 +1,11 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { setHours, setMinutes } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
+import { useState } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
+import { DatePicker } from "~/components/DatePicker";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
@@ -124,6 +126,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const CalendarNewPage = () => {
   const tracks = useLoaderData<typeof loader>();
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   return (
     <Box>
@@ -152,13 +155,29 @@ const CalendarNewPage = () => {
           </Box>
           <Box>
             <Label>Date</Label>
-            <Input name="date" type="date" required />
+            <Input
+              name="date"
+              type="hidden"
+              required
+              value={selectedDate.toISOString()}
+            />
+            <DatePicker
+              value={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+            />
           </Box>
+
           <Box>
-            <Label>Start/End Time</Label>
             <Flex gap={2}>
-              <Input name="startTime" type="time" required />
-              <Input name="endTime" type="time" required />
+              <Box flex={1}>
+                <Label>Start Time</Label>
+                <Input name="startTime" type="time" required />
+              </Box>
+
+              <Box flex={1}>
+                <Label>End Time</Label>
+                <Input name="endTime" type="time" required />
+              </Box>
             </Flex>
           </Box>
           <Button type="submit">Create Event</Button>
