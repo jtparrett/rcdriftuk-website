@@ -26,9 +26,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const action = result.actions[0];
   const eventId = action.value;
 
-  await prisma.events.update({
+  const event = await prisma.events.findFirst({
     where: {
       id: eventId,
+    },
+  });
+
+  invariant(event, "Cannot find event");
+
+  await prisma.events.updateMany({
+    where: {
+      trackId: event.trackId,
+      approved: false,
+      name: event.name,
+      createdAt: event.createdAt,
     },
     data: {
       approved: true,
@@ -38,7 +49,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   await fetch(result.response_url, {
     method: "POST",
     body: JSON.stringify({
-      text: `Cheers boss, event is now approved`,
+      text: `Event(s) now approved`,
     }),
   });
 

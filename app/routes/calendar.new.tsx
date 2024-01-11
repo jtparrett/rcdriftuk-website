@@ -1,6 +1,12 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { format, setHours, setMinutes } from "date-fns";
+import {
+  add,
+  differenceInWeeks,
+  endOfYear,
+  setHours,
+  setMinutes,
+} from "date-fns";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
@@ -11,6 +17,43 @@ import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+
+const sendEventToSlack = (text: string, id: string) => {
+  return fetch(
+    "https://hooks.slack.com/services/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",
+    {
+      method: "post",
+      body: JSON.stringify({
+        text: "New Event",
+
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text,
+            },
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Approve",
+                },
+                style: "primary",
+                action_id: "approve",
+                value: id,
+              },
+            ],
+          },
+        ],
+      }),
+    }
+  );
+};
 
 export const loader = async () => {
   const tracks = await prisma.tracks.findMany({
@@ -31,6 +74,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const startTime = body.get("startTime");
   const endTime = body.get("endTime");
   const link = body.get("link");
+  const repeatWeeks = body.get("repeatWeeks");
 
   const data = z
     .object({
@@ -40,6 +84,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       link: z.string(),
       startTime: z.string(),
       endTime: z.string(),
+      repeatWeeks: z.coerce.number(),
     })
     .parse({
       name,
@@ -48,6 +93,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       startTime,
       endTime,
       link,
+      repeatWeeks,
     });
 
   const [startHours, startMinutes] = data.startTime.split(":");
@@ -69,14 +115,34 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   invariant(track);
 
-  const event = await prisma.events.create({
-    data: {
-      name: data.name,
+  const diff = differenceInWeeks(endOfYear(startDate), startDate);
+  const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
+
+  await prisma.events.createMany({
+    data: Array.from({ length: arrayLength }).map((_, i) => {
+      const repeatStartDate = add(startDate, { weeks: i * data.repeatWeeks });
+      const repeatEndDate = add(endDate, { weeks: i * data.repeatWeeks });
+
+      return {
+        name: data.name,
+        trackId: track.id,
+        link: data.link,
+        startDate: repeatStartDate,
+        endDate: repeatEndDate,
+      };
+    }),
+  });
+
+  const event = await prisma.events.findFirst({
+    where: {
       trackId: track.id,
-      link: data.link,
-      startDate,
-      endDate,
     },
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+      { startDate: "desc" },
+    ],
     include: {
       eventTrack: {
         select: {
@@ -86,40 +152,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     },
   });
 
-  await fetch(
-    "https://hooks.slack.com/services/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",
-    {
-      method: "post",
-      body: JSON.stringify({
-        text: "New Event",
-
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: JSON.stringify(data, null, 2),
-            },
-          },
-          {
-            type: "actions",
-            elements: [
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Approve",
-                },
-                style: "primary",
-                action_id: "approve",
-                value: event.id,
-              },
-            ],
-          },
-        ],
-      }),
-    }
-  );
+  if (event) {
+    await sendEventToSlack(JSON.stringify(event, null, 2), event.id);
+  }
 
   return redirect("/calendar/success");
 };
@@ -150,7 +185,7 @@ const CalendarNewPage = () => {
             </Select>
           </Box>
           <Box>
-            <Label>Event Link</Label>
+            <Label>Event Link (https://)</Label>
             <Input name="link" required />
           </Box>
           <Box>
@@ -165,6 +200,15 @@ const CalendarNewPage = () => {
               value={selectedDate}
               onChange={(date) => setSelectedDate(date)}
             />
+          </Box>
+
+          <Box>
+            <Label>Repeat Event</Label>
+            <Select name="repeatWeeks">
+              <option value="0">Never</option>
+              <option value="1">Weekly</option>
+              <option value="2">Bi-Weekly</option>
+            </Select>
           </Box>
 
           <Box>
