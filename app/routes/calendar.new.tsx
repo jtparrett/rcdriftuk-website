@@ -194,7 +194,7 @@ const CalendarNewPage = () => {
               name="date"
               type="hidden"
               required
-              value={selectedDate.toDateString()}
+              value={selectedDate.toString()}
             />
             <DatePicker
               value={selectedDate}
