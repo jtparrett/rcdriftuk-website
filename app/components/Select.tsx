@@ -7,5 +7,6 @@ export const Select = styled("select", {
     rounded: "md",
     color: "white",
     w: "full",
+    minH: "40px",
   },
 });

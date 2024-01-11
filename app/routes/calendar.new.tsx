@@ -171,12 +171,12 @@ const CalendarNewPage = () => {
             <Flex gap={2}>
               <Box flex={1}>
                 <Label>Start Time</Label>
-                <Input name="startTime" type="time" required />
+                <Input name="startTime" type="time" required w="full" />
               </Box>
 
               <Box flex={1}>
                 <Label>End Time</Label>
-                <Input name="endTime" type="time" required />
+                <Input name="endTime" type="time" required w="full" />
               </Box>
             </Flex>
           </Box>

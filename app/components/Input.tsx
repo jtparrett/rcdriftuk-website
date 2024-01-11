@@ -7,5 +7,6 @@ export const Input = styled("input", {
     rounded: "md",
     color: "white",
     w: "full",
+    minH: "40px",
   },
 });
