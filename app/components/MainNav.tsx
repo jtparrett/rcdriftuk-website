@@ -9,6 +9,9 @@ import {
   RiSearchLine,
   RiTrophyFill,
 } from "react-icons/ri/index.js";
+import { format } from "date-fns";
+
+const today = format(new Date(), "dd-MM-yy");
 
 export const MainNav = () => {
   const location = useLocation();
@@ -31,7 +34,7 @@ export const MainNav = () => {
         <RiMapPin2Fill />
       </LinkButton>
       <LinkButton
-        to="/calendar"
+        to={`/calendar/week/${today}`}
         size="sm"
         fontSize="lg"
         variant={location.pathname.includes("/calendar") ? "primary" : "ghost"}
