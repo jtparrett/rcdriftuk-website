@@ -8,13 +8,15 @@ import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS, Document } from "@contentful/rich-text-types";
-import {
-  BsCalendar,
-  BsFacebook,
-  BsTicketPerforatedFill,
-} from "react-icons/bs/index.js";
+
 import { format } from "date-fns";
 import { LinkButton } from "~/components/Button";
+import {
+  RiCalendarFill,
+  RiFacebookBoxFill,
+  RiFacebookFill,
+  RiTicketFill,
+} from "react-icons/ri/index.js";
 
 export function headers() {
   return {
@@ -55,7 +57,7 @@ const Page = () => {
   const startDate = new Date(event.fields.startDate);
 
   return (
-    <Container px={2}>
+    <Container px={2} maxW={1100}>
       <styled.main>
         <Breadcrumbs
           paths={[
@@ -78,7 +80,7 @@ const Page = () => {
           <Box>
             <Flex alignItems="start" gap={2}>
               <styled.span color="gray.400" mt={1}>
-                <BsCalendar />
+                <RiCalendarFill />
               </styled.span>
               <styled.p>
                 {format(startDate, "MMMM do")}
@@ -98,7 +100,7 @@ const Page = () => {
                 to={event.fields.ticketUrl}
                 target="_blank"
               >
-                Buy Tickets <BsTicketPerforatedFill />
+                Buy Tickets <RiTicketFill />
               </LinkButton>
             )}
             {event.fields.facebookEventUrl && (
@@ -108,7 +110,7 @@ const Page = () => {
                 to={event.fields.facebookEventUrl}
                 target="_blank"
               >
-                Facebook Event <BsFacebook />
+                Facebook Event <RiFacebookBoxFill />
               </LinkButton>
             )}
           </Flex>

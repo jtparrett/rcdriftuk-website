@@ -1,39 +1,82 @@
-import { Link } from "@remix-run/react";
+import { useLocation } from "@remix-run/react";
+import { Flex, Box, Spacer } from "~/styled-system/jsx";
+import { LinkButton } from "./Button";
 import {
-  BsCalendar,
-  BsFacebook,
-  BsInstagram,
-  BsMap,
-  BsSearch,
-  BsTrophy,
-} from "react-icons/bs/index.js";
-import { styled, Flex, Box } from "~/styled-system/jsx";
+  RiCalendarFill,
+  RiFacebookFill,
+  RiInstagramFill,
+  RiMapPin2Fill,
+  RiSearchLine,
+  RiTrophyFill,
+} from "react-icons/ri/index.js";
 
 export const MainNav = () => {
+  const location = useLocation();
+
   return (
-    <Flex gap={4} fontSize="lg" px={4}>
-      <Link to="/map/all">
-        <BsMap />
-      </Link>
-      <Link to="/calendar">
-        <BsCalendar />
-      </Link>
-      <Link to="/catalogue">
-        <BsSearch />
-      </Link>
-      <Link to="/2024/schedule">
-        <BsTrophy />
-      </Link>
+    <Flex
+      gap={1}
+      fontSize="lg"
+      bgColor="gray.800"
+      p={1}
+      rounded="lg"
+      w={{ base: "full", md: "auto" }}
+    >
+      <LinkButton
+        to="/map/all"
+        size="sm"
+        fontSize="lg"
+        variant={location.pathname.includes("/map") ? "primary" : "ghost"}
+      >
+        <RiMapPin2Fill />
+      </LinkButton>
+      <LinkButton
+        to="/calendar"
+        size="sm"
+        fontSize="lg"
+        variant={location.pathname.includes("/calendar") ? "primary" : "ghost"}
+      >
+        <RiCalendarFill />
+      </LinkButton>
+      <LinkButton
+        to="/catalogue"
+        size="sm"
+        fontSize="lg"
+        variant={location.pathname.includes("/catalogue") ? "primary" : "ghost"}
+      >
+        <RiSearchLine />
+      </LinkButton>
+      <LinkButton
+        to="/2024/schedule"
+        size="sm"
+        fontSize="lg"
+        variant={location.pathname.includes("/2024") ? "primary" : "ghost"}
+      >
+        <RiTrophyFill />
+      </LinkButton>
 
-      <Box w="1px" bgColor="white" />
+      <Spacer />
+      <Box w="1px" bgColor="gray.500" />
 
-      <styled.a target="_blank" href="https://www.facebook.com/RCDriftingUK/">
-        <BsFacebook />
-      </styled.a>
+      <LinkButton
+        size="sm"
+        fontSize="lg"
+        target="_blank"
+        variant="ghost"
+        to="https://www.facebook.com/RCDriftingUK/"
+      >
+        <RiFacebookFill />
+      </LinkButton>
 
-      <styled.a target="_blank" href="https://www.instagram.com/rcdriftuk">
-        <BsInstagram />
-      </styled.a>
+      <LinkButton
+        size="sm"
+        fontSize="lg"
+        target="_blank"
+        variant="ghost"
+        to="https://www.instagram.com/rcdriftuk"
+      >
+        <RiInstagramFill />
+      </LinkButton>
     </Flex>
   );
 };

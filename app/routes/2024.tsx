@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
 import { Outlet, useLocation } from "@remix-run/react";
-import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
+import { RiFacebookFill, RiInstagramFill } from "react-icons/ri/index.js";
 import { LinkButton } from "~/components/Button";
 import { Header } from "~/components/Header";
 import { Tab } from "~/components/Tab";
@@ -35,7 +35,7 @@ const Page = () => {
 
   return (
     <>
-      <Container px={2}>
+      <Container px={2} maxW={1100}>
         <Header />
 
         <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
@@ -78,7 +78,7 @@ const Page = () => {
             target="_blank"
             href="https://www.facebook.com/RCDRIFTUK2024/"
           >
-            <BsFacebook />
+            <RiFacebookFill />
           </styled.a>
 
           <styled.a
@@ -86,7 +86,7 @@ const Page = () => {
             fontSize="2xl"
             href="https://www.instagram.com/rcdriftuk"
           >
-            <BsInstagram />
+            <RiInstagramFill />
           </styled.a>
         </Flex>
         <styled.p>&copy; RCDrift UK 2024</styled.p>

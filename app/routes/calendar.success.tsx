@@ -1,4 +1,4 @@
-import { BsCheck2Circle } from "react-icons/bs/index.js";
+import { RiCheckboxCircleLine } from "react-icons/ri/index.js";
 import { LinkButton } from "~/components/Button";
 import { styled, Box, Center } from "~/styled-system/jsx";
 
@@ -7,7 +7,7 @@ const CalendarSuccessPage = () => {
     <Box maxW={400} mx="auto">
       <Box textAlign="center" py={12}>
         <Center fontSize="4xl" color="green.400" mb={4}>
-          <BsCheck2Circle />
+          <RiCheckboxCircleLine />
         </Center>
         <styled.h1 fontSize="3xl" fontWeight="bold">
           Event Submitted

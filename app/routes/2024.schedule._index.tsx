@@ -26,7 +26,7 @@ const Page = () => {
   const events = useLoaderData<typeof loader>();
 
   return (
-    <Container px={2}>
+    <Container px={2} maxW={1100}>
       <styled.main>
         <Breadcrumbs
           paths={[
@@ -48,7 +48,7 @@ const Page = () => {
 
         <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={4} />
 
-        <Box overflow="hidden" rounded="xl" mb={4}>
+        <Box overflow="hidden" rounded="lg" mb={4}>
           <styled.img src="/2024-cover.jpg" w="full" />
         </Box>
 
@@ -67,7 +67,7 @@ const Page = () => {
                   <styled.article
                     bgColor="gray.900"
                     overflow="hidden"
-                    rounded="xl"
+                    rounded="lg"
                   >
                     <styled.img src={event.fields.card.fields.file.url} />
                     <Box p={4}>

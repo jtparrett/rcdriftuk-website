@@ -1,11 +1,11 @@
 import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import {
-  BsArrowLeft,
-  BsArrowRight,
-  BsPin,
-  BsSearch,
-} from "react-icons/bs/index.js";
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiMapPinLine,
+  RiSearchLine,
+} from "react-icons/ri/index.js";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
 import {
@@ -97,9 +97,9 @@ const Page = () => {
 
       <Box>
         <Form action="/catalogue">
-          <Flex borderWidth={1} borderColor="gray.700" rounded="full" pl={4}>
-            <Center>
-              <BsSearch />
+          <Flex bgColor="gray.800" rounded="lg" p={1}>
+            <Center pl={4} color="gray.500">
+              <RiSearchLine />
             </Center>
             <styled.input
               name="query"
@@ -112,16 +112,7 @@ const Page = () => {
               color="inherit"
               outline="none"
             />
-            <Button
-              type="submit"
-              rounded="full"
-              cursor="pointer"
-              my="-1px"
-              mr="-1px"
-              variant="secondary"
-            >
-              Go
-            </Button>
+            <Button type="submit">Go</Button>
           </Flex>
         </Form>
       </Box>
@@ -180,7 +171,7 @@ const Page = () => {
                     <Flex alignItems="center" gap={1} color="gray.400">
                       <styled.p fontSize="sm">{product.shop}</styled.p>
                       <styled.span fontSize="sm">
-                        <BsPin />
+                        <RiMapPinLine />
                       </styled.span>
                     </Flex>
                   </Box>
@@ -197,7 +188,7 @@ const Page = () => {
             to={`/catalogue?query=${query}&page=${page - 1}`}
             variant="secondary"
           >
-            <BsArrowLeft /> Previous
+            <RiArrowLeftSLine /> Previous
           </LinkButton>
         )}
 
@@ -208,7 +199,7 @@ const Page = () => {
             to={`/catalogue?query=${query}&page=${page + 1}`}
             variant="secondary"
           >
-            Next <BsArrowRight />
+            Next <RiArrowRightSLine />
           </LinkButton>
         )}
       </Flex>

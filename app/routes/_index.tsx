@@ -1,5 +1,5 @@
 import { MetaFunction } from "@remix-run/node";
-import { BsFacebook, BsInstagram } from "react-icons/bs/index.js";
+import { RiFacebookFill, RiInstagramFill } from "react-icons/ri/index.js";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
@@ -46,7 +46,7 @@ const Page = () => {
             target="_blank"
             href="https://www.facebook.com/RCDriftingUK/"
           >
-            <BsFacebook />
+            <RiFacebookFill />
           </styled.a>
 
           <styled.a
@@ -54,7 +54,7 @@ const Page = () => {
             fontSize="2xl"
             href="https://www.instagram.com/rcdriftuk"
           >
-            <BsInstagram />
+            <RiInstagramFill />
           </styled.a>
         </Flex>
       </Container>

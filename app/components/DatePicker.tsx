@@ -9,7 +9,7 @@ import {
   sub,
 } from "date-fns";
 import { useState } from "react";
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs/index.js";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri/index.js";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 
 interface Props {
@@ -32,7 +32,7 @@ export const DatePicker = ({ value = new Date(), onChange }: Props) => {
           onClick={() => setSelectedMonth(sub(selectedMonth, { months: 1 }))}
         >
           <styled.span srOnly>Previous Month</styled.span>
-          <BsChevronLeft />
+          <RiArrowLeftSLine />
         </styled.button>
         <styled.span flex={1} textAlign="center">
           {format(selectedMonth, "MMMM, yyyy")}
@@ -45,7 +45,7 @@ export const DatePicker = ({ value = new Date(), onChange }: Props) => {
           onClick={() => setSelectedMonth(add(selectedMonth, { months: 1 }))}
         >
           <styled.span srOnly>Next Month</styled.span>
-          <BsChevronRight />
+          <RiArrowRightSLine />
         </styled.button>
       </Flex>
 

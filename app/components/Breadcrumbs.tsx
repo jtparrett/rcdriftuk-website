@@ -1,6 +1,6 @@
 import { Flex, styled } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import { BsHouse } from "react-icons/bs/index.js";
+import { RiHomeFill } from "react-icons/ri/index.js";
 import { Fragment } from "react";
 
 interface Props {
@@ -9,9 +9,9 @@ interface Props {
 
 export const Breadcrumbs = ({ paths }: Props) => {
   return (
-    <Flex alignItems="center" mt={{ base: 0, md: 4 }}>
+    <Flex alignItems="center" mt={{ base: 0, md: 4 }} mb={2}>
       <LinkButton to="/" variant="ghost" px={2} py={2}>
-        <BsHouse />
+        <RiHomeFill />
       </LinkButton>
 
       <styled.span color="brand.500" px={1}>

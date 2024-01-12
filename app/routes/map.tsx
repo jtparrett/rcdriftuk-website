@@ -11,7 +11,7 @@ const Page = () => {
 
   return (
     <Flex h="100dvh" flexDir="column">
-      <Container px={2} w="full">
+      <Container px={2} w="full" maxW={1100}>
         <Header />
 
         <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>

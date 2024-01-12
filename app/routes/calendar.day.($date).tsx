@@ -1,6 +1,6 @@
 import { useLoaderData, useParams } from "@remix-run/react";
 import { add, endOfDay, format, parse, startOfDay, sub } from "date-fns";
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs/index.js";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri/index.js";
 import { LoaderFunctionArgs, redirect } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
@@ -57,7 +57,7 @@ const CalendarDaysPage = () => {
           variant="secondary"
           to={`/calendar/day/${format(sub(date, { days: 1 }), "dd-MM-yy")}`}
         >
-          <BsChevronLeft />
+          <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
@@ -71,7 +71,7 @@ const CalendarDaysPage = () => {
           variant="secondary"
           to={`/calendar/day/${format(add(date, { days: 1 }), "dd-MM-yy")}`}
         >
-          <BsChevronRight />
+          <RiArrowRightSLine />
         </LinkButton>
       </Flex>
 

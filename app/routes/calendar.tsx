@@ -38,7 +38,7 @@ const CalendarPage = () => {
   const dateParam = params.date ?? today;
 
   return (
-    <Container maxW={900} px={2}>
+    <Container maxW={1100} px={2}>
       <Header />
 
       <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>

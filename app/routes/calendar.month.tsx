@@ -1,11 +1,11 @@
 import { useParams, Outlet, useLocation } from "@remix-run/react";
 import { add, format, parse, sub } from "date-fns";
 import {
-  BsCalendar,
-  BsChevronLeft,
-  BsChevronRight,
-  BsList,
-} from "react-icons/bs/index.js";
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiCalendarFill,
+  RiListUnordered,
+} from "react-icons/ri/index.js";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { styled, Flex, Spacer } from "~/styled-system/jsx";
@@ -33,7 +33,7 @@ const CalendarMonthsPage = () => {
           size="sm"
           variant={isListView ? "secondary" : "primary"}
         >
-          <BsCalendar />
+          <RiCalendarFill />
         </LinkButton>
 
         <LinkButton
@@ -41,7 +41,7 @@ const CalendarMonthsPage = () => {
           size="sm"
           variant={isListView ? "primary" : "secondary"}
         >
-          <BsList />
+          <RiListUnordered />
         </LinkButton>
 
         <LinkButton
@@ -49,7 +49,7 @@ const CalendarMonthsPage = () => {
           variant="secondary"
           to={`${basePath}/${format(sub(date, { months: 1 }), "dd-MM-yy")}`}
         >
-          <BsChevronLeft />
+          <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
@@ -63,7 +63,7 @@ const CalendarMonthsPage = () => {
           variant="secondary"
           to={`${basePath}/${format(add(date, { months: 1 }), "dd-MM-yy")}`}
         >
-          <BsChevronRight />
+          <RiArrowRightSLine />
         </LinkButton>
       </Flex>
 

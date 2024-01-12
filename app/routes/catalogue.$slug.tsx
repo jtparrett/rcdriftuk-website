@@ -5,7 +5,7 @@ import { getShopImage } from "~/utils/getShopImage";
 import { prisma } from "~/utils/prisma.server";
 import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { getShopName } from "~/utils/getShopName";
-import { BsLink, BsPin } from "react-icons/bs/index.js";
+import { RiLink, RiMapPinFill } from "react-icons/ri/index.js";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -66,7 +66,7 @@ const CatalogueListingPage = () => {
             <Box>
               <Flex alignItems="center" gap={1}>
                 <styled.span>{getShopName(product.shop)}</styled.span>
-                <BsPin />
+                <RiMapPinFill />
               </Flex>
             </Box>
             <Spacer />
@@ -75,7 +75,7 @@ const CatalogueListingPage = () => {
               target="_blank"
               data-splitbee-event="Clicked to Buy"
             >
-              Visit Shop <BsLink />
+              Visit Shop <RiLink />
             </LinkButton>
           </Flex>
         </Box>

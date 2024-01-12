@@ -1,8 +1,12 @@
 import { Events, Tracks } from "@prisma/client";
 import { format } from "date-fns";
-import { BsCalendar, BsClock, BsPinMap } from "react-icons/bs/index.js";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
+import {
+  RiCalendar2Fill,
+  RiMapPin2Fill,
+  RiTimeFill,
+} from "react-icons/ri/index.js";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
@@ -26,14 +30,14 @@ export const EventCard = ({ event }: Props) => {
         </styled.h3>
 
         <Flex fontSize="sm" fontWeight="medium" alignItems="center" gap={1}>
-          <BsPinMap />
+          <RiMapPin2Fill />
           <styled.span>{event.eventTrack?.name ?? event.track}</styled.span>
         </Flex>
 
         <Flex gap={2} flexWrap="wrap">
           <Flex alignItems="center" gap={1} fontWeight="medium">
             <styled.span fontSize="sm">
-              <BsCalendar />
+              <RiCalendar2Fill />
             </styled.span>
             <styled.span fontSize="sm">
               {format(new Date(event.startDate), "dd/MM/yyyy")}
@@ -42,7 +46,7 @@ export const EventCard = ({ event }: Props) => {
 
           <Flex alignItems="center" gap={1} fontWeight="medium">
             <styled.span fontSize="sm">
-              <BsClock />
+              <RiTimeFill />
             </styled.span>
             <styled.span fontSize="sm">
               {format(new Date(event.startDate), "HH:mm")}-

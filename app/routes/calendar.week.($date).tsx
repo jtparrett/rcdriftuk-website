@@ -9,7 +9,7 @@ import {
   startOfWeek,
   sub,
 } from "date-fns";
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs/index.js";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri/index.js";
 import { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
@@ -75,7 +75,7 @@ const CalendarWeeksPage = () => {
           variant="secondary"
           to={`/calendar/week/${format(sub(date, { weeks: 1 }), "dd-MM-yy")}`}
         >
-          <BsChevronLeft />
+          <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
@@ -89,7 +89,7 @@ const CalendarWeeksPage = () => {
           variant="secondary"
           to={`/calendar/week/${format(add(date, { weeks: 1 }), "dd-MM-yy")}`}
         >
-          <BsChevronRight />
+          <RiArrowRightSLine />
         </LinkButton>
       </Flex>
 
