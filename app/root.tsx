@@ -38,6 +38,11 @@ export default function App() {
         <Meta />
         <Links />
         <script async src="https://cdn.splitbee.io/sb.js"></script>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body>
         <Outlet />
