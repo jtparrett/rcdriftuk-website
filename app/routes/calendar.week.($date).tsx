@@ -116,7 +116,7 @@ const CalendarWeeksPage = () => {
                 {dayEvents.length <= 0 && <styled.p>No Events...</styled.p>}
 
                 {dayEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
+                  <EventCard key={event.id} event={event} showAvatar />
                 ))}
               </Flex>
             </Box>

@@ -15,11 +15,23 @@ interface QueriedEvent
 
 interface Props {
   event: QueriedEvent;
+  showAvatar?: boolean;
 }
 
-export const EventCard = ({ event }: Props) => {
+export const EventCard = ({ event, showAvatar = false }: Props) => {
   return (
     <Flex rounded="md" bgColor="brand.500" p={4} alignItems="center" gap={2}>
+      {showAvatar && event.eventTrack?.image && (
+        <Box w={16} h={16} rounded="full" overflow="hidden">
+          <styled.img
+            src={event.eventTrack.image}
+            w="full"
+            h="full"
+            objectFit="cover"
+          />
+        </Box>
+      )}
+
       <Box flex={1}>
         <styled.h3 fontSize="lg" fontWeight="bold" textWrap="balance">
           {event.name}
