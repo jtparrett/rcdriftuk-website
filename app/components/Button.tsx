@@ -12,7 +12,7 @@ const ButtonStyles = cva({
       base: 3,
       md: 4,
     },
-    rounded: "md",
+    rounded: "lg",
     display: "inline-flex",
     gap: 2,
     alignItems: "center",

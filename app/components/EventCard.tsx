@@ -65,7 +65,12 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
       </Box>
 
       <Box>
-        <LinkButton to={event.link} target="_blank" variant="secondary">
+        <LinkButton
+          to={event.link}
+          target="_blank"
+          variant="secondary"
+          size="sm"
+        >
           See Info
         </LinkButton>
       </Box>
