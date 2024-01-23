@@ -34,6 +34,25 @@ model Tracks {
   events      Events[]
 }
 
+model Drivers {
+  id           String    @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt    DateTime  @default(now())
+  name         String
+  leftBattles  Battles[] @relation("battleDriverLeft")
+  rightBattles Battles[] @relation("battleDriverRight")
+}
+
+model Battles {
+  createdAt     DateTime @default(now())
+  tournament    String
+  driverLeftId  String?
+  driverRightId String?
+  winnerId      String?
+  id            Int      @id @default(autoincrement())
+  driverLeft    Drivers? @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
+  driverRight   Drivers? @relation("battleDriverRight", fields: [driverRightId], references: [id])
+}
+
 enum TrackTypes {
   ALL
   TRACKS

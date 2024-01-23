@@ -1,6 +1,6 @@
 import { Flex, styled } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import { RiHomeFill } from "react-icons/ri/index.js";
+import { RiHomeFill } from "react-icons/ri";
 import { Fragment } from "react";
 
 interface Props {

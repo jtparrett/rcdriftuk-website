@@ -14,9 +14,8 @@ import { LinkButton } from "~/components/Button";
 import {
   RiCalendarFill,
   RiFacebookBoxFill,
-  RiFacebookFill,
   RiTicketFill,
-} from "react-icons/ri/index.js";
+} from "react-icons/ri";
 
 export function headers() {
   return {

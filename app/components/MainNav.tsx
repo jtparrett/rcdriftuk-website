@@ -5,10 +5,11 @@ import {
   RiCalendarFill,
   RiFacebookFill,
   RiInstagramFill,
+  RiListOrdered2,
   RiMapPin2Fill,
   RiSearchLine,
   RiTrophyFill,
-} from "react-icons/ri/index.js";
+} from "react-icons/ri";
 import { format } from "date-fns";
 
 const today = format(new Date(), "dd-MM-yy");
@@ -56,6 +57,14 @@ export const MainNav = () => {
         variant={location.pathname.includes("/2024") ? "primary" : "ghost"}
       >
         <RiTrophyFill />
+      </LinkButton>
+      <LinkButton
+        to="/ratings"
+        size="sm"
+        fontSize="lg"
+        variant={location.pathname.includes("/ratings") ? "primary" : "ghost"}
+      >
+        <RiListOrdered2 />
       </LinkButton>
 
       <Spacer />

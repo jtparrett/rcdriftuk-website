@@ -37,16 +37,7 @@ const Page = () => {
           ]}
         />
 
-        <styled.h1
-          fontSize="5xl"
-          fontFamily="heading"
-          lineHeight={1}
-          fontStyle="italic"
-        >
-          2024 Schedule
-        </styled.h1>
-
-        <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={4} />
+        <styled.h1 srOnly>2024 Schedule</styled.h1>
 
         <Box overflow="hidden" rounded="lg" mb={4}>
           <styled.img src="/2024-cover.jpg" w="full" />
@@ -71,22 +62,18 @@ const Page = () => {
                   >
                     <styled.img src={event.fields.card.fields.file.url} />
                     <Box p={4}>
-                      <styled.h1
-                        fontSize="2xl"
-                        fontFamily="heading"
-                        lineHeight={1}
-                      >
-                        {event.fields.title}{" "}
-                        <styled.span color="brand.500">//</styled.span>{" "}
-                        {event.fields.subTitle}
-                      </styled.h1>
-
                       <styled.p color="gray.400">
                         {format(startDate, "MMM do")}
                         {event.fields.endDate &&
                           format(new Date(event.fields.endDate), "-do")}
                         {format(startDate, ", Y")}
                       </styled.p>
+
+                      <styled.h1 fontWeight="bold" textWrap="balance">
+                        {event.fields.title}{" "}
+                        <styled.span color="brand.500">//</styled.span>{" "}
+                        {event.fields.subTitle}
+                      </styled.h1>
 
                       <LinkButton
                         to={`/2024/schedule/${event.fields.slug}`}

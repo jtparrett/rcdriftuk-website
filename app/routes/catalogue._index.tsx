@@ -5,7 +5,7 @@ import {
   RiArrowRightSLine,
   RiMapPinLine,
   RiSearchLine,
-} from "react-icons/ri/index.js";
+} from "react-icons/ri";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
 import {

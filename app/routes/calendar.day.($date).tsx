@@ -1,6 +1,6 @@
 import { useLoaderData, useParams } from "@remix-run/react";
 import { add, endOfDay, format, parse, startOfDay, sub } from "date-fns";
-import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri/index.js";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { LoaderFunctionArgs, redirect } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";

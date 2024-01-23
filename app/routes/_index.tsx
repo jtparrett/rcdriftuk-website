@@ -1,5 +1,12 @@
 import { MetaFunction } from "@remix-run/node";
-import { RiFacebookFill, RiInstagramFill } from "react-icons/ri/index.js";
+import {
+  RiCalendarFill,
+  RiFacebookFill,
+  RiInstagramFill,
+  RiListOrdered2,
+  RiMapPin2Fill,
+  RiSearchLine,
+} from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
@@ -27,13 +34,16 @@ const Page = () => {
           <styled.img w="80%" src="/rcdriftuk.svg" mx="auto" mb={8} />
 
           <LinkButton to="/map/all" variant="outline" fontSize="lg">
-            Find Your Local Track 📍
+            Find Your Local Track <RiMapPin2Fill />
           </LinkButton>
           <LinkButton to="/calendar" variant="outline" fontSize="lg">
-            UK Drift Calendar 🗓️
+            UK Drift Calendar <RiCalendarFill />
           </LinkButton>
           <LinkButton to="/catalogue" variant="outline" fontSize="lg">
-            Shops Catalogue 🔎
+            Shops Catalogue <RiSearchLine />
+          </LinkButton>
+          <LinkButton to="/ratings" variant="outline" fontSize="lg">
+            Driver Ratings <RiListOrdered2 />
           </LinkButton>
           <LinkButton to="/2024/schedule" variant="primary" fontSize="lg">
             🏆 2024 Championship 🏆

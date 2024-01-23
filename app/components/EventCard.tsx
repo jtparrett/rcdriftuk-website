@@ -2,11 +2,7 @@ import { Events, Tracks } from "@prisma/client";
 import { format } from "date-fns";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import {
-  RiCalendar2Fill,
-  RiMapPin2Fill,
-  RiTimeFill,
-} from "react-icons/ri/index.js";
+import { RiCalendar2Fill, RiMapPin2Fill, RiTimeFill } from "react-icons/ri";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {

@@ -1,4 +1,4 @@
-import { RiCalendarFill } from "react-icons/ri/index.js";
+import { RiCalendarFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Box, Container, Center } from "~/styled-system/jsx";
 

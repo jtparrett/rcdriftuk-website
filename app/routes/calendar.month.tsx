@@ -5,7 +5,7 @@ import {
   RiArrowRightSLine,
   RiCalendarFill,
   RiListUnordered,
-} from "react-icons/ri/index.js";
+} from "react-icons/ri";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { styled, Flex, Spacer } from "~/styled-system/jsx";

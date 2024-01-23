@@ -166,8 +166,8 @@ const CalendarNewPage = () => {
 
   return (
     <Box>
-      <styled.h1 fontSize="4xl" fontStyle="italic" fontFamily="heading">
-        Create an event
+      <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
+        Create An Event
       </styled.h1>
       <Form method="post">
         <Flex flexDir="column" maxW={500} gap={4}>

@@ -15,12 +15,7 @@ const Page = () => {
         />
 
         <Box maxW={800}>
-          <styled.h1
-            fontSize="5xl"
-            fontFamily="heading"
-            lineHeight={1}
-            fontStyle="italic"
-          >
+          <styled.h1 fontSize="4xl" fontWeight="extrabold">
             Driver Standings
           </styled.h1>
           <styled.p>

@@ -5,7 +5,7 @@ import { getShopImage } from "~/utils/getShopImage";
 import { prisma } from "~/utils/prisma.server";
 import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { getShopName } from "~/utils/getShopName";
-import { RiLink, RiMapPinFill } from "react-icons/ri/index.js";
+import { RiLink, RiMapPinFill } from "react-icons/ri";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [

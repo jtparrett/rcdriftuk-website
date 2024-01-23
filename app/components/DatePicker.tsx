@@ -9,7 +9,7 @@ import {
   sub,
 } from "date-fns";
 import { useState } from "react";
-import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri/index.js";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 
 interface Props {

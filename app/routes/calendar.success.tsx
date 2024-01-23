@@ -1,4 +1,4 @@
-import { RiCheckboxCircleLine } from "react-icons/ri/index.js";
+import { RiCheckboxCircleLine } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Box, Center } from "~/styled-system/jsx";
 

@@ -9,7 +9,7 @@ import {
   startOfWeek,
   sub,
 } from "date-fns";
-import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri/index.js";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";

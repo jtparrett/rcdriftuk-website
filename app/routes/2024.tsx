@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
 import { Outlet, useLocation } from "@remix-run/react";
-import { RiFacebookFill, RiInstagramFill } from "react-icons/ri/index.js";
+import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { Header } from "~/components/Header";
 import { Tab } from "~/components/Tab";
