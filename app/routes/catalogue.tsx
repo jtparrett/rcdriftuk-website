@@ -4,10 +4,12 @@ import { Container } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
-    <Container px={2} pb={8} maxW={1100}>
+    <>
       <Header />
-      <Outlet />
-    </Container>
+      <Container px={2} pb={8}>
+        <Outlet />
+      </Container>
+    </>
   );
 };
 

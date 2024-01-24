@@ -165,9 +165,9 @@ const CalendarNewPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   return (
-    <Box>
+    <Box pb={12}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
-        Create An Event
+        List An Event
       </styled.h1>
       <Form method="post">
         <Flex flexDir="column" maxW={500} gap={4}>
@@ -225,7 +225,7 @@ const CalendarNewPage = () => {
               </Box>
             </Flex>
           </Box>
-          <Button type="submit">Create Event</Button>
+          <Button type="submit">List Event</Button>
         </Flex>
       </Form>
     </Box>

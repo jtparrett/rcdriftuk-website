@@ -11,9 +11,9 @@ const Page = () => {
 
   return (
     <Flex h="100dvh" flexDir="column">
-      <Container px={2} w="full" maxW={1100}>
-        <Header />
+      <Header />
 
+      <Container px={2} w="full">
         <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
           {Object.values(TrackTypes).map((item) => (
             <Tab

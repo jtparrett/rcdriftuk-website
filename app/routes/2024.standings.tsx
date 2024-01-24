@@ -4,7 +4,7 @@ import { Box, Container, Divider, styled } from "~/styled-system/jsx";
 const Page = () => {
   return (
     <styled.main>
-      <Container px={2} maxW={1100}>
+      <Container px={2}>
         <Breadcrumbs
           paths={[
             {

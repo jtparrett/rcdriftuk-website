@@ -26,7 +26,7 @@ const Page = () => {
   const events = useLoaderData<typeof loader>();
 
   return (
-    <Container px={2} maxW={1100}>
+    <Container px={2}>
       <styled.main>
         <Breadcrumbs
           paths={[

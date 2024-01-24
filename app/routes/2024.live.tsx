@@ -4,7 +4,7 @@ import { styled, Box, Container, Center } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
-    <Container py={4} px={2} maxW={1100}>
+    <Container py={4} px={2}>
       <Box pt="52.5%" pos="relative" rounded="xl" bgColor="gray.700">
         <Center pos="absolute" inset={0}>
           <Box textAlign="center">

@@ -215,51 +215,52 @@ const RatingsPage = () => {
   };
 
   return (
-    <Container pb={12} maxW={1100} px={2}>
+    <>
       <Header />
+      <Container pb={12} px={2}>
+        <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          Driver Ratings
+        </styled.h1>
 
-      <styled.h1 fontSize="4xl" fontWeight="extrabold">
-        Driver Ratings
-      </styled.h1>
+        <styled.p>
+          See where you rank amoungst some of the best drivers in the UK.
+          <br />
+          Calculated using driver battle progression at UK ran tournaments.
+        </styled.p>
 
-      <styled.p>
-        See where you rank amoungst some of the best drivers in the UK.
-        <br />
-        Calculated using driver battle progression at UK ran tournaments.
-      </styled.p>
+        <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={6} />
 
-      <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={6} />
-
-      <Box
-        mt={6}
-        borderWidth={1}
-        borderColor="gray.600"
-        p={4}
-        maxW={720}
-        rounded="md"
-      >
-        <styled.table w="full">
-          <thead>
-            <tr>
-              <styled.th textAlign="left" pl={2} w="50px">
-                #
-              </styled.th>
-              <styled.th textAlign="left">Name</styled.th>
-              <styled.th textAlign="right">Points</styled.th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {drivers
-              .filter((driver) => driver.name !== "BUY")
-              .map((driver, i) => {
-                // @ts-ignore
-                return <Row key={driver.id} driver={driver} rank={i + 1} />;
-              })}
-          </tbody>
-        </styled.table>
-      </Box>
-    </Container>
+        <Box
+          mt={6}
+          borderWidth={1}
+          borderColor="gray.600"
+          p={4}
+          maxW={720}
+          rounded="md"
+        >
+          <styled.table w="full">
+            <thead>
+              <tr>
+                <styled.th textAlign="left" pl={2} w="50px">
+                  #
+                </styled.th>
+                <styled.th textAlign="left">Name</styled.th>
+                <styled.th textAlign="right">Points</styled.th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {drivers
+                .filter((driver) => driver.name !== "BUY")
+                .map((driver, i) => {
+                  // @ts-ignore
+                  return <Row key={driver.id} driver={driver} rank={i + 1} />;
+                })}
+            </tbody>
+          </styled.table>
+        </Box>
+      </Container>
+    </>
   );
 };
 

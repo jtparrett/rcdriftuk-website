@@ -1,22 +1,36 @@
-import { styled, Flex, Spacer } from "~/styled-system/jsx";
+import { styled, Flex, Spacer, Container, Box } from "~/styled-system/jsx";
 import { Link } from "@remix-run/react";
 import { MainNav } from "./MainNav";
 
 export const Header = () => {
   return (
-    <Flex
-      gap={2}
-      alignItems="center"
-      py={4}
-      flexDir={{ base: "column", md: "row" }}
+    <Box
+      mb={2}
+      borderBottomWidth={1}
+      borderColor="gray.800"
+      pos="sticky"
+      top={0}
+      zIndex={10}
+      bgColor="rgba(0, 0, 0, 0.8)"
+      backdropFilter="blur(10px)"
+      mt={4}
     >
-      <Link to="/">
-        <styled.img w={180} src="/rcdriftuk.svg" />
-      </Link>
+      <Container px={2}>
+        <Flex
+          gap={2}
+          alignItems="center"
+          py={{ base: 2, md: 4 }}
+          flexDir={{ base: "column", md: "row" }}
+        >
+          <Link to="/">
+            <styled.img w={160} src="/rcdriftuk.svg" />
+          </Link>
 
-      <Spacer />
+          <Spacer />
 
-      <MainNav />
-    </Flex>
+          <MainNav />
+        </Flex>
+      </Container>
+    </Box>
   );
 };

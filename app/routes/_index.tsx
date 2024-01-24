@@ -29,26 +29,36 @@ const Page = () => {
       gradientVia="transparent"
       gradientTo="transparent"
     >
-      <Container maxW={400} py={24}>
-        <Flex flexDir="column" gap={4}>
-          <styled.img w="80%" src="/rcdriftuk.svg" mx="auto" mb={8} />
+      <styled.h1 srOnly>RC Drift UK - Home</styled.h1>
+      <Container maxW={450} py={24}>
+        <Box>
+          <styled.img w={160} src="/rcdriftuk.svg" mx="auto" mb={8} />
 
-          <LinkButton to="/map/all" variant="outline" fontSize="lg">
-            Find Your Local Track <RiMapPin2Fill />
-          </LinkButton>
-          <LinkButton to="/calendar" variant="outline" fontSize="lg">
-            UK Drift Calendar <RiCalendarFill />
-          </LinkButton>
-          <LinkButton to="/catalogue" variant="outline" fontSize="lg">
-            Shops Catalogue <RiSearchLine />
-          </LinkButton>
-          <LinkButton to="/ratings" variant="outline" fontSize="lg">
-            Driver Ratings <RiListOrdered2 />
-          </LinkButton>
-          <LinkButton to="/2024/schedule" variant="primary" fontSize="lg">
-            🏆 2024 Championship 🏆
-          </LinkButton>
-        </Flex>
+          <Box
+            bgColor="rgba(0, 0, 0, 0.8)"
+            backdropFilter="blur(10px)"
+            p={8}
+            rounded="xl"
+          >
+            <Flex flexDir="column" gap={4}>
+              <LinkButton to="/map/all" variant="secondary">
+                Find Your Local Track <RiMapPin2Fill />
+              </LinkButton>
+              <LinkButton to="/calendar" variant="secondary">
+                UK Drift Calendar <RiCalendarFill />
+              </LinkButton>
+              <LinkButton to="/catalogue" variant="secondary">
+                Shops Catalogue <RiSearchLine />
+              </LinkButton>
+              <LinkButton to="/ratings" variant="secondary">
+                Driver Ratings <RiListOrdered2 />
+              </LinkButton>
+              <LinkButton to="/2024/schedule" variant="primary">
+                🏆 2024 Championship 🏆
+              </LinkButton>
+            </Flex>
+          </Box>
+        </Box>
 
         <Flex justifyContent="center" gap={4} pt={8}>
           <styled.a

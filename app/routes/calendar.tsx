@@ -38,38 +38,40 @@ const CalendarPage = () => {
   const dateParam = params.date ?? today;
 
   return (
-    <Container maxW={1100} px={2}>
+    <>
       <Header />
 
-      <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
-        <Tab
-          isActive={location.pathname.includes("/calendar/day")}
-          to={`/calendar/day/${dateParam}`}
-        >
-          Day
-        </Tab>
-        <Tab
-          isActive={location.pathname.includes("/calendar/week")}
-          to={`/calendar/week/${dateParam}`}
-        >
-          Week
-        </Tab>
-        <Tab
-          isActive={location.pathname.includes("/calendar/month")}
-          to={`/calendar/month/${dateParam}`}
-        >
-          Month
-        </Tab>
+      <Container px={2}>
+        <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
+          <Tab
+            isActive={location.pathname.includes("/calendar/day")}
+            to={`/calendar/day/${dateParam}`}
+          >
+            Day
+          </Tab>
+          <Tab
+            isActive={location.pathname.includes("/calendar/week")}
+            to={`/calendar/week/${dateParam}`}
+          >
+            Week
+          </Tab>
+          <Tab
+            isActive={location.pathname.includes("/calendar/month")}
+            to={`/calendar/month/${dateParam}`}
+          >
+            Month
+          </Tab>
 
-        <Spacer />
+          <Spacer />
 
-        <LinkButton size="sm" to="/calendar/new">
-          Add Event
-        </LinkButton>
-      </Flex>
+          <LinkButton size="sm" to="/calendar/new">
+            List New Event
+          </LinkButton>
+        </Flex>
 
-      <Outlet />
-    </Container>
+        <Outlet />
+      </Container>
+    </>
   );
 };
 
