@@ -251,7 +251,7 @@ const RatingsPage = () => {
             </thead>
             <tbody>
               {drivers
-                .filter((driver) => driver.name !== "BUY")
+                .filter((driver) => driver.name !== "BYE")
                 .map((driver, i) => {
                   // @ts-ignore
                   return <Row key={driver.id} driver={driver} rank={i + 1} />;
