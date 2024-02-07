@@ -26,7 +26,7 @@ const Page = () => {
   const events = useLoaderData<typeof loader>();
 
   return (
-    <Container px={2}>
+    <Container px={2} maxW={1100}>
       <styled.main>
         <Breadcrumbs
           paths={[
@@ -60,9 +60,11 @@ const Page = () => {
                     overflow="hidden"
                     rounded="lg"
                   >
-                    <styled.img src={event.fields.card.fields.file.url} />
+                    <Box borderBottomRadius="lg" overflow="hidden">
+                      <styled.img src={event.fields.card.fields.file.url} />
+                    </Box>
                     <Box p={4}>
-                      <styled.p color="gray.400">
+                      <styled.p color="gray.400" fontSize="sm">
                         {format(startDate, "MMM do")}
                         {event.fields.endDate &&
                           format(new Date(event.fields.endDate), "-do")}
@@ -78,6 +80,7 @@ const Page = () => {
                       <LinkButton
                         to={`/2024/schedule/${event.fields.slug}`}
                         w="full"
+                        variant="secondary"
                         mt={4}
                         py={1}
                       >

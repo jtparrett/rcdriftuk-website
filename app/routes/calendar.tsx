@@ -41,8 +41,8 @@ const CalendarPage = () => {
     <>
       <Header />
 
-      <Container px={2}>
-        <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
+      <Container px={2} maxW={1100}>
+        <Flex p={1} bgColor="gray.800" rounded="md" gap={2} mb={2}>
           <Tab
             isActive={location.pathname.includes("/calendar/day")}
             to={`/calendar/day/${dateParam}`}

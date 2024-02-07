@@ -40,7 +40,7 @@ const Page = () => {
             p={8}
             rounded="xl"
           >
-            <Flex flexDir="column" gap={4}>
+            <Flex flexDir="column" gap={3}>
               <LinkButton to="/map/all" variant="secondary">
                 Find Your Local Track <RiMapPin2Fill />
               </LinkButton>

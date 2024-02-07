@@ -217,7 +217,7 @@ const RatingsPage = () => {
   return (
     <>
       <Header />
-      <Container pb={12} px={2}>
+      <Container pb={12} px={2} maxW={1100}>
         <styled.h1 fontSize="4xl" fontWeight="extrabold">
           Driver Ratings
         </styled.h1>

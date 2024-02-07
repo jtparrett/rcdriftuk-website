@@ -6,6 +6,7 @@ export const Header = () => {
   return (
     <Box
       mb={2}
+      pt={{ base: 2, md: 0 }}
       borderBottomWidth={1}
       borderColor="gray.800"
       pos="sticky"
@@ -13,9 +14,9 @@ export const Header = () => {
       zIndex={10}
       bgColor="rgba(0, 0, 0, 0.8)"
       backdropFilter="blur(10px)"
-      mt={4}
+      shadow="2xl"
     >
-      <Container px={2}>
+      <Container px={2} maxW={1100}>
         <Flex
           gap={2}
           alignItems="center"

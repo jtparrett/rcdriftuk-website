@@ -13,8 +13,8 @@ const Page = () => {
     <Flex h="100dvh" flexDir="column">
       <Header />
 
-      <Container px={2} w="full">
-        <Flex p={1} bgColor="gray.800" rounded="lg" gap={2} mb={2}>
+      <Container px={2} w="full" maxW={1100}>
+        <Flex p={1} bgColor="gray.800" rounded="md" gap={2} mb={2}>
           {Object.values(TrackTypes).map((item) => (
             <Tab
               key={item}

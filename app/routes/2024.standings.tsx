@@ -1,10 +1,10 @@
 import { Breadcrumbs } from "~/components/Breadcrumbs";
-import { Box, Container, Divider, styled } from "~/styled-system/jsx";
+import { Box, Container, styled } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
     <styled.main>
-      <Container px={2}>
+      <Container px={2} maxW={1100}>
         <Breadcrumbs
           paths={[
             {

@@ -23,10 +23,11 @@ export const MainNav = () => {
       fontSize="lg"
       bgColor="gray.800"
       p={1}
-      rounded="lg"
+      rounded="full"
       w={{ base: "full", md: "auto" }}
     >
       <LinkButton
+        rounded="full"
         to="/map/all"
         size="sm"
         fontSize="lg"
@@ -35,6 +36,7 @@ export const MainNav = () => {
         <RiMapPin2Fill />
       </LinkButton>
       <LinkButton
+        rounded="full"
         to={`/calendar/week/${today}`}
         size="sm"
         fontSize="lg"
@@ -43,6 +45,7 @@ export const MainNav = () => {
         <RiCalendarFill />
       </LinkButton>
       <LinkButton
+        rounded="full"
         to="/catalogue"
         size="sm"
         fontSize="lg"
@@ -51,6 +54,7 @@ export const MainNav = () => {
         <RiSearchLine />
       </LinkButton>
       <LinkButton
+        rounded="full"
         to="/2024/schedule"
         size="sm"
         fontSize="lg"
@@ -59,6 +63,7 @@ export const MainNav = () => {
         <RiTrophyFill />
       </LinkButton>
       <LinkButton
+        rounded="full"
         to="/ratings"
         size="sm"
         fontSize="lg"

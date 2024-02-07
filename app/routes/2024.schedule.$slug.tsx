@@ -56,7 +56,7 @@ const Page = () => {
   const startDate = new Date(event.fields.startDate);
 
   return (
-    <Container px={2}>
+    <Container px={2} maxW={1100}>
       <styled.main>
         <Breadcrumbs
           paths={[

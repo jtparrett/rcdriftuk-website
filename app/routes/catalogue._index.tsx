@@ -97,7 +97,7 @@ const Page = () => {
 
       <Box>
         <Form action="/catalogue">
-          <Flex bgColor="gray.800" rounded="lg" p={1}>
+          <Flex bgColor="gray.800" rounded="md" p={1}>
             <Center pl={4} color="gray.500">
               <RiSearchLine />
             </Center>
