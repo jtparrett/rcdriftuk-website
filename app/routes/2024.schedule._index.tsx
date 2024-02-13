@@ -53,7 +53,7 @@ const Page = () => {
                   key={event.sys.id}
                   pt={4}
                   pl={4}
-                  w={{ base: "50%", lg: "25%" }}
+                  w={{ base: "50%", lg: "33.3333%" }}
                 >
                   <styled.article
                     bgColor="gray.900"
@@ -63,29 +63,41 @@ const Page = () => {
                     <Box borderBottomRadius="lg" overflow="hidden">
                       <styled.img src={event.fields.card.fields.file.url} />
                     </Box>
+
                     <Box p={4}>
-                      <styled.p color="gray.400" fontSize="sm">
+                      <styled.h1
+                        fontWeight="bold"
+                        textWrap="balance"
+                        fontSize="lg"
+                      >
+                        {event.fields.title}{" "}
+                        <styled.span color="brand.500">//</styled.span>{" "}
+                        {event.fields.subTitle}
+                      </styled.h1>
+
+                      <styled.p color="gray.400" fontSize="sm" mb={2}>
                         {format(startDate, "MMM do")}
                         {event.fields.endDate &&
                           format(new Date(event.fields.endDate), "-do")}
                         {format(startDate, ", Y")}
                       </styled.p>
 
-                      <styled.h1 fontWeight="bold" textWrap="balance">
-                        {event.fields.title}{" "}
-                        <styled.span color="brand.500">//</styled.span>{" "}
-                        {event.fields.subTitle}
-                      </styled.h1>
-
-                      <LinkButton
-                        to={`/2024/schedule/${event.fields.slug}`}
-                        w="full"
-                        variant="secondary"
-                        mt={4}
-                        py={1}
-                      >
-                        More Info
-                      </LinkButton>
+                      <Flex alignItems="center" gap={2}>
+                        <LinkButton
+                          to={`/2024/schedule/${event.fields.slug}`}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Buy Tickets
+                        </LinkButton>
+                        <LinkButton
+                          to={`/2024/schedule/${event.fields.slug}`}
+                          variant="secondary"
+                          size="sm"
+                        >
+                          More Info
+                        </LinkButton>
+                      </Flex>
                     </Box>
                   </styled.article>
                 </Flex>

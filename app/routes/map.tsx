@@ -1,6 +1,5 @@
 import { TrackTypes } from "@prisma/client";
 import { Outlet, useParams } from "@remix-run/react";
-import { Header } from "~/components/Header";
 import { Tab } from "~/components/Tab";
 import { Box, Container, Flex } from "~/styled-system/jsx";
 import { getTabParam } from "~/utils/getTabParam";
@@ -10,11 +9,9 @@ const Page = () => {
   const tab = getTabParam(params.tab);
 
   return (
-    <Flex h="100dvh" flexDir="column">
-      <Header />
-
+    <Flex h="calc(100dvh - 90px)" flexDir="column">
       <Container px={2} w="full" maxW={1100}>
-        <Flex p={1} bgColor="gray.800" rounded="md" gap={2} mb={2}>
+        <Flex gap={2} py={2}>
           {Object.values(TrackTypes).map((item) => (
             <Tab
               key={item}

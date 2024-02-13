@@ -1,10 +1,10 @@
-import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Outlet, useLocation, useParams } from "@remix-run/react";
 import { format } from "date-fns";
 import { LinkButton } from "~/components/Button";
-import { Header } from "~/components/Header";
 import { Tab } from "~/components/Tab";
-import { Flex, Spacer, Container } from "~/styled-system/jsx";
+import { Flex, Spacer, Container, Box } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
@@ -39,36 +39,38 @@ const CalendarPage = () => {
 
   return (
     <>
-      <Header />
+      <Box mb={2} py={2} borderBottomWidth={1} borderColor="gray.800">
+        <Container px={2} maxW={1100}>
+          <Flex gap={2}>
+            <Tab
+              isActive={location.pathname.includes("/calendar/day")}
+              to={`/calendar/day/${dateParam}`}
+            >
+              Day
+            </Tab>
+            <Tab
+              isActive={location.pathname.includes("/calendar/week")}
+              to={`/calendar/week/${dateParam}`}
+            >
+              Week
+            </Tab>
+            <Tab
+              isActive={location.pathname.includes("/calendar/month")}
+              to={`/calendar/month/${dateParam}`}
+            >
+              Month
+            </Tab>
+
+            <Spacer />
+
+            <LinkButton size="sm" to="/calendar/new">
+              List New Event
+            </LinkButton>
+          </Flex>
+        </Container>
+      </Box>
 
       <Container px={2} maxW={1100}>
-        <Flex p={1} bgColor="gray.800" rounded="md" gap={2} mb={2}>
-          <Tab
-            isActive={location.pathname.includes("/calendar/day")}
-            to={`/calendar/day/${dateParam}`}
-          >
-            Day
-          </Tab>
-          <Tab
-            isActive={location.pathname.includes("/calendar/week")}
-            to={`/calendar/week/${dateParam}`}
-          >
-            Week
-          </Tab>
-          <Tab
-            isActive={location.pathname.includes("/calendar/month")}
-            to={`/calendar/month/${dateParam}`}
-          >
-            Month
-          </Tab>
-
-          <Spacer />
-
-          <LinkButton size="sm" to="/calendar/new">
-            List New Event
-          </LinkButton>
-        </Flex>
-
         <Outlet />
       </Container>
     </>

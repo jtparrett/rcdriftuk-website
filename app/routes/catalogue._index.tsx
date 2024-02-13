@@ -95,9 +95,9 @@ const Page = () => {
     <>
       <styled.h1 srOnly>Shops Catalogue</styled.h1>
 
-      <Box>
+      <Box mt={4}>
         <Form action="/catalogue">
-          <Flex bgColor="gray.800" rounded="md" p={1}>
+          <Flex rounded="xl" p={1} borderWidth={1} borderColor="gray.800">
             <Center pl={4} color="gray.500">
               <RiSearchLine />
             </Center>

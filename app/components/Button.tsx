@@ -29,8 +29,8 @@ const ButtonStyles = cva({
       md: {},
       sm: {
         py: 1,
-        px: 2,
-        rounded: "md",
+        px: 3,
+        rounded: "lg",
       },
     },
     variant: {

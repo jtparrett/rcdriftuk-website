@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { styled } from "~/styled-system/jsx";
 
 interface Props {
@@ -17,7 +17,7 @@ export const Tab = ({ children, isActive, to }: Props) => {
       px={3}
       py={1}
       textTransform="capitalize"
-      bgColor={isActive ? "black" : undefined}
+      bgColor={isActive ? "gray.800" : undefined}
       rounded="md"
       fontWeight="medium"
       transition="background-color .3s"

@@ -11,6 +11,7 @@ import {
 
 import styles from "./index.css";
 import { Analytics } from "@vercel/analytics/react";
+import { Header } from "./components/Header";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -45,6 +46,7 @@ export default function App() {
         ></script>
       </head>
       <body>
+        <Header />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
