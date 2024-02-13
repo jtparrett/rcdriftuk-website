@@ -82,22 +82,13 @@ const Page = () => {
                         {format(startDate, ", Y")}
                       </styled.p>
 
-                      <Flex alignItems="center" gap={2}>
-                        <LinkButton
-                          to={`/2024/schedule/${event.fields.slug}`}
-                          variant="primary"
-                          size="sm"
-                        >
-                          Buy Tickets
-                        </LinkButton>
-                        <LinkButton
-                          to={`/2024/schedule/${event.fields.slug}`}
-                          variant="secondary"
-                          size="sm"
-                        >
-                          More Info
-                        </LinkButton>
-                      </Flex>
+                      <LinkButton
+                        to={`/2024/schedule/${event.fields.slug}`}
+                        variant="secondary"
+                        size="sm"
+                      >
+                        More Info
+                      </LinkButton>
                     </Box>
                   </styled.article>
                 </Flex>

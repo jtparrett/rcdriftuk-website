@@ -80,7 +80,7 @@ const Page = () => {
           zIndex: -1,
         }}
       >
-        <Container maxW={650} textAlign="center" py={100} px={2}>
+        <Container maxW={650} textAlign="center" py={100}>
           <styled.h1
             fontWeight="black"
             textTransform="uppercase"
