@@ -40,17 +40,17 @@ const RatingsPage = () => {
     return (
       <>
         <styled.tr
-          backgroundColor={isOpen ? "gray.800" : undefined}
+          backgroundColor={isOpen ? "gray.900" : undefined}
           onClick={() => toggle()}
         >
-          <styled.td fontFamily="mono" pl={2}>
+          <styled.td fontFamily="mono" pl={2} borderTopLeftRadius="lg">
             {rank}
           </styled.td>
           <td>{driver.name}</td>
           <styled.td textAlign="right" fontFamily="mono">
             {driver.points.toFixed(3)}
           </styled.td>
-          <styled.td w={50}>
+          <styled.td w={50} borderTopRightRadius="lg">
             <Box p={3} fontSize="2xl">
               {isOpen ? <HiChevronUp /> : <HiChevronDown />}
             </Box>
@@ -63,9 +63,10 @@ const RatingsPage = () => {
                 px={4}
                 py={2}
                 borderTopWidth={1}
-                borderColor="gray.500"
-                backgroundColor="gray.800"
+                borderColor="gray.800"
+                backgroundColor="gray.900"
                 mb={2}
+                borderBottomRadius="lg"
               >
                 {driver.breakdown.map((item) => {
                   const [left, right] =
@@ -76,20 +77,25 @@ const RatingsPage = () => {
                   return (
                     <p key={item.battle.id}>
                       <styled.span
-                        color={
+                        px={1}
+                        rounded="sm"
+                        fontWeight="semibold"
+                        bgColor={
                           left?.id === item.battle.winnerId
-                            ? "green.400"
-                            : "red.400"
+                            ? "green.600"
+                            : "red.700"
                         }
                       >
-                        {left?.name}
+                        ...
                       </styled.span>{" "}
                       <styled.span color="gray.400">vs</styled.span>{" "}
                       <styled.span
-                        color={
+                        rounded="sm"
+                        px={1}
+                        bgColor={
                           right?.id === item.battle.winnerId
-                            ? "green.400"
-                            : "red.400"
+                            ? "green.600"
+                            : "red.700"
                         }
                       >
                         {right?.name}
@@ -123,7 +129,7 @@ const RatingsPage = () => {
       <Box
         mt={6}
         borderWidth={1}
-        borderColor="gray.600"
+        borderColor="gray.800"
         p={4}
         maxW={720}
         rounded="md"

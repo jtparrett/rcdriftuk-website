@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLocation, useParams } from "@remix-run/react";
 import { format } from "date-fns";
+import { RiAddCircleFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { Tab } from "~/components/Tab";
 import { Flex, Spacer, Container, Box } from "~/styled-system/jsx";
@@ -41,7 +42,7 @@ const CalendarPage = () => {
     <>
       <Box mb={2} py={2} borderBottomWidth={1} borderColor="gray.800">
         <Container px={2} maxW={1100}>
-          <Flex gap={2}>
+          <Flex gap={2} alignItems="center">
             <Tab
               isActive={location.pathname.includes("/calendar/day")}
               to={`/calendar/day/${dateParam}`}
@@ -64,7 +65,7 @@ const CalendarPage = () => {
             <Spacer />
 
             <LinkButton size="sm" to="/calendar/new">
-              List New Event
+              Create Event <RiAddCircleFill />
             </LinkButton>
           </Flex>
         </Container>

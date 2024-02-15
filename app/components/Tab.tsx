@@ -15,11 +15,12 @@ export const Tab = ({ children, isActive, to }: Props) => {
     <TabBase
       to={to}
       px={3}
-      py={1}
+      py={2}
       textTransform="capitalize"
       bgColor={isActive ? "gray.800" : undefined}
-      rounded="md"
-      fontWeight="medium"
+      rounded="lg"
+      fontWeight="semibold"
+      fontSize="sm"
       transition="background-color .3s"
     >
       {children}

@@ -105,7 +105,7 @@ const Page = () => {
             {event.fields.facebookEventUrl && (
               <LinkButton
                 fontSize="md"
-                variant="outline"
+                variant="secondary"
                 to={event.fields.facebookEventUrl}
                 target="_blank"
               >
