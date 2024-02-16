@@ -1,21 +1,22 @@
-import { RiCalendarFill } from "react-icons/ri";
-import { LinkButton } from "~/components/Button";
-import { styled, Box, Container, Center } from "~/styled-system/jsx";
+import { styled, Box, Container } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
     <Container py={4} px={2} maxW={1100}>
-      <Box pt="52.5%" pos="relative" rounded="xl" bgColor="gray.700">
-        <Center pos="absolute" inset={0}>
-          <Box textAlign="center">
-            <styled.p fontSize="lg" fontWeight="bold" mb={5}>
-              We're not live right now.
-            </styled.p>
-            <LinkButton to="/2024/schedule">
-              Check The Schedule <RiCalendarFill />
-            </LinkButton>
-          </Box>
-        </Center>
+      <Box
+        pt="52.5%"
+        pos="relative"
+        rounded="xl"
+        bgColor="gray.800"
+        overflow="hidden"
+      >
+        <styled.iframe
+          src="https://www.youtube.com/embed/live_stream?channel=UCzxW07KOXZc9huwyDId7prw"
+          pos="absolute"
+          w="full"
+          h="full"
+          inset={0}
+        />
       </Box>
     </Container>
   );

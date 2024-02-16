@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import {
   RiCalendar2Line,
   RiFacebookFill,
+  RiHome2Line,
   RiInstagramFill,
   RiListOrdered2,
   RiMapPin2Line,
@@ -15,6 +16,7 @@ import {
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
+import { SignedIn, SignedOut, UserButton } from "@clerk/remix";
 
 const today = format(new Date(), "dd-MM-yy");
 
@@ -73,6 +75,15 @@ const Menu = () => {
       p={{ base: 2, md: 4 }}
     >
       <Flex gap={1} flexDir="column">
+        <MenuLink
+          to="/"
+          active={location.pathname === "/" ? "active" : "inactive"}
+        >
+          <MenuIcon>
+            <RiHome2Line />
+          </MenuIcon>
+          Home
+        </MenuLink>
         <MenuLink
           to="/map/all"
           active={location.pathname.includes("/map") ? "active" : "inactive"}
@@ -194,13 +205,25 @@ export const Header = () => {
                 size="sm"
                 px={2}
                 fontSize="lg"
-                variant={menu.isOpen ? "primary" : "ghost"}
+                variant={menu.isOpen ? "primary" : "outline"}
                 onClick={() => menu.toggle()}
+                mx={2}
+                aria-label="Menu"
               >
                 <RiMenu2Line />
               </Button>
             </Popover>
           </Box>
+
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+
+          <SignedOut>
+            <LinkButton variant="outline" size="sm" to="/sign-in">
+              Sign In
+            </LinkButton>
+          </SignedOut>
         </Flex>
       </Container>
     </Box>

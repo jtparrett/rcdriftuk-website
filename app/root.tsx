@@ -1,5 +1,6 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { dark } from "@clerk/themes";
 import {
   Links,
   LiveReload,
@@ -12,6 +13,8 @@ import {
 import styles from "./index.css";
 import { Analytics } from "@vercel/analytics/react";
 import { Header } from "./components/Header";
+import { rootAuthLoader } from "@clerk/remix/ssr.server";
+import { ClerkApp, ClerkErrorBoundary } from "@clerk/remix";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -30,7 +33,9 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export default function App() {
+export const loader = (args: LoaderFunctionArgs) => rootAuthLoader(args);
+
+function App() {
   return (
     <html lang="en">
       <head>
@@ -56,3 +61,26 @@ export default function App() {
     </html>
   );
 }
+
+export const ErrorBoundary = ClerkErrorBoundary();
+
+export default ClerkApp(App, {
+  appearance: {
+    baseTheme: dark,
+    layout: {
+      logoPlacement: "none",
+    },
+    variables: {
+      colorPrimary: "#ec1a55",
+    },
+    elements: {
+      rootBox: {
+        margin: "0 auto",
+        overflow: "hidden",
+      },
+      card: {
+        margin: 0,
+      },
+    },
+  },
+});

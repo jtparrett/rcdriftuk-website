@@ -1,7 +1,11 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLocation } from "@remix-run/react";
-import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
+import {
+  RiFacebookFill,
+  RiInstagramFill,
+  RiRecordCircleFill,
+} from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { Tab } from "~/components/Tab";
 import { styled, Box, Flex, Spacer, Container } from "~/styled-system/jsx";
@@ -57,6 +61,7 @@ const Page = () => {
             <Spacer />
 
             <LinkButton to="/2024/live" size="sm">
+              <RiRecordCircleFill />
               Watch Live
             </LinkButton>
           </Flex>

@@ -18,17 +18,22 @@ const Page = () => {
           <styled.h1 fontSize="4xl" fontWeight="extrabold">
             Driver Standings
           </styled.h1>
-          <styled.p>
+          <styled.p mb={4} color="gray.500">
             See how the top drivers from accross the championship are ranking
             ahead of the final.
           </styled.p>
 
-          <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={6} />
-
-          <Box rounded="xl" bgColor="gray.900" overflow="hidden" px={8} py={4}>
+          <Box
+            rounded="xl"
+            borderWidth={1}
+            borderColor="gray.800"
+            overflow="hidden"
+            px={8}
+            py={4}
+          >
             <styled.table w="full">
               <styled.thead>
-                <styled.tr borderBottomWidth={1} borderColor="gray.500">
+                <styled.tr borderBottomWidth={1} borderColor="gray.800">
                   <styled.th py={2}>#</styled.th>
                   <styled.th py={2}>Driver</styled.th>
                   <styled.th py={2}>Team</styled.th>

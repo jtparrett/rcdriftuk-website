@@ -118,13 +118,11 @@ const RatingsPage = () => {
         Driver Ratings
       </styled.h1>
 
-      <styled.p>
+      <styled.p mb={4} color="gray.500">
         See where you rank amoungst some of the best drivers in the UK.
         <br />
         Calculated using driver battle progression at UK ran tournaments.
       </styled.p>
-
-      <Box maxW={200} h="4px" bgColor="brand.500" mt={2} mb={6} />
 
       <Box
         mt={6}
