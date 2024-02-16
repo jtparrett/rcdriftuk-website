@@ -105,15 +105,6 @@ const Menu = () => {
           Shops Catalogue
         </MenuLink>
         <MenuLink
-          to="/2024/schedule"
-          active={location.pathname.includes("/2024") ? "active" : "inactive"}
-        >
-          <MenuIcon>
-            <RiTrophyLine />
-          </MenuIcon>
-          2024 Championship
-        </MenuLink>
-        <MenuLink
           to="/ratings"
           active={
             location.pathname.includes("/ratings") ? "active" : "inactive"
@@ -123,6 +114,15 @@ const Menu = () => {
             <RiListOrdered2 />
           </MenuIcon>
           Driver Ratings
+        </MenuLink>
+        <MenuLink
+          to="/2024/schedule"
+          active={location.pathname.includes("/2024") ? "active" : "inactive"}
+        >
+          <MenuIcon>
+            <RiTrophyLine />
+          </MenuIcon>
+          2024 Championship
         </MenuLink>
       </Flex>
     </Box>

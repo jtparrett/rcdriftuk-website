@@ -66,14 +66,13 @@ const CalendarTrackPage = () => {
         <styled.p>{track.description}</styled.p>
       </Box>
 
-      <Box rounded="sm" overflow="hidden" bgColor="gray.900">
-        <Box
-          p={1}
-          textAlign="center"
-          bgColor="gray.800"
-          borderBottomWidth={1}
-          borderColor="gray.700"
-        >
+      <Box
+        rounded="sm"
+        overflow="hidden"
+        borderWidth={1}
+        borderColor="gray.800"
+      >
+        <Box p={1} textAlign="center" bgColor="gray.800">
           <styled.h3>Events</styled.h3>
         </Box>
 

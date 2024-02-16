@@ -83,20 +83,21 @@ const Page = () => {
         return (
           <Box key={i} w={`${100 / 7}%`} pl={1} mb={1}>
             <Box
-              bgColor="gray.900"
               pos="relative"
-              rounded="sm"
+              rounded="md"
               overflow="hidden"
+              borderWidth={1}
+              borderColor="gray.800"
             >
               <Box
                 fontSize={{ base: "11px", md: "sm" }}
                 textAlign="center"
                 bgColor="gray.800"
-                borderBottomWidth={1}
-                borderColor="gray.700"
                 py={1}
               >
-                <styled.h3 whiteSpace="nowrap">{format(day, "E do")}</styled.h3>
+                <styled.h3 whiteSpace="nowrap" fontWeight="semibold">
+                  {format(day, "E do")}
+                </styled.h3>
               </Box>
 
               <LinkOverlay to={`/calendar/day/${format(day, "dd-MM-yy")}`} />
@@ -106,8 +107,8 @@ const Page = () => {
                   <Center
                     w="50%"
                     aspectRatio={1}
-                    bgColor="brand.500"
-                    rounded="full"
+                    bgColor="gray.800"
+                    rounded="xl"
                     fontWeight="bold"
                     fontSize={{ base: "xs", md: "xl" }}
                   >

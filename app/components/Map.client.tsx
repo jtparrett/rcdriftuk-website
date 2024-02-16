@@ -68,6 +68,7 @@ export const Map = ({ tracks }: Props) => {
                           {item.description}
                         </styled.p>
                       )}
+
                       <LinkButton to={item.url} target="_blank" w="full" mb={2}>
                         {item.url.includes("facebook")
                           ? "Visit Facebook"

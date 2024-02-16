@@ -20,7 +20,7 @@ interface Props {
 
 export const EventCard = ({ event, showAvatar = false }: Props) => {
   return (
-    <Flex rounded="md" bgColor="brand.500" p={4} alignItems="center" gap={2}>
+    <Flex rounded="md" bgColor="gray.900" p={4} alignItems="center" gap={2}>
       {showAvatar && event.eventTrack?.image && (
         <Box w={16} h={16} rounded="full" overflow="hidden">
           <styled.img

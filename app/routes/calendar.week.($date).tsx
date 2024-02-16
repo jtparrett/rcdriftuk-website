@@ -101,19 +101,21 @@ const CalendarWeeksPage = () => {
           );
 
           return (
-            <Box key={i} rounded="sm" overflow="hidden" bgColor="gray.900">
-              <Box
-                p={1}
-                textAlign="center"
-                bgColor="gray.800"
-                borderBottomWidth={1}
-                borderColor="gray.700"
-              >
+            <Box
+              key={i}
+              rounded="md"
+              overflow="hidden"
+              borderWidth={1}
+              borderColor="gray.800"
+            >
+              <Box py={1} px={4} bgColor="gray.800">
                 <styled.h3>{format(day, "EEEE do")}</styled.h3>
               </Box>
 
               <Flex p={4} flexDir="column" gap={2}>
-                {dayEvents.length <= 0 && <styled.p>No Events...</styled.p>}
+                {dayEvents.length <= 0 && (
+                  <styled.p fontSize="sm">No Events...</styled.p>
+                )}
 
                 {dayEvents.map((event) => (
                   <EventCard key={event.id} event={event} showAvatar />
