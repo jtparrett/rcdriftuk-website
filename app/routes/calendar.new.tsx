@@ -1,4 +1,5 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import {
   add,
@@ -8,7 +9,7 @@ import {
   setHours,
   setMinutes,
 } from "date-fns";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
@@ -215,13 +216,33 @@ const CalendarNewPage = () => {
           <Box>
             <Flex gap={2}>
               <Box flex={1}>
-                <Label>Start Time</Label>
-                <Input name="startTime" type="time" required w="full" />
+                <Label>Start Time (24hr)</Label>
+                <Select name="startTime" required>
+                  {Array.from({ length: 24 }).map((_, i) => {
+                    const hours = i.toString().padStart(2, "0");
+                    return (
+                      <Fragment key={i}>
+                        <option>{hours}:00</option>
+                        <option>{hours}:30</option>
+                      </Fragment>
+                    );
+                  })}
+                </Select>
               </Box>
 
               <Box flex={1}>
-                <Label>End Time</Label>
-                <Input name="endTime" type="time" required w="full" />
+                <Label>End Time (24hr)</Label>
+                <Select name="endTime" required>
+                  {Array.from({ length: 24 }).map((_, i) => {
+                    const hours = i.toString().padStart(2, "0");
+                    return (
+                      <Fragment key={i}>
+                        <option>{hours}:00</option>
+                        <option>{hours}:30</option>
+                      </Fragment>
+                    );
+                  })}
+                </Select>
               </Box>
             </Flex>
           </Box>
