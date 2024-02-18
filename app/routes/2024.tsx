@@ -41,7 +41,7 @@ const Page = () => {
     <>
       <Box borderBottomWidth={1} borderColor="gray.800">
         <Container px={2} maxW={1100}>
-          <Flex gap={2} py={2}>
+          <Flex gap={2} py={2} alignItems="center">
             <Tab
               to="/2024/schedule"
               isActive={
