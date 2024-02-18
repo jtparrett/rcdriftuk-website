@@ -1,8 +1,9 @@
-import { Events, Tracks } from "@prisma/client";
+import type { Events, Tracks } from "@prisma/client";
 import { format } from "date-fns";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
 import { RiCalendar2Fill, RiMapPin2Fill, RiTimeFill } from "react-icons/ri";
+import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
@@ -57,8 +58,8 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
               <RiTimeFill />
             </styled.span>
             <styled.span fontSize="sm">
-              {format(new Date(event.startDate), "HH:mm")}-
-              {format(new Date(event.endDate), "HH:mm")}
+              {format(dateWithoutTimezone(event.startDate), "HH:mm")}-
+              {format(dateWithoutTimezone(event.endDate), "HH:mm")}
             </styled.span>
           </Flex>
         </Flex>
