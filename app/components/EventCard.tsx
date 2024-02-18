@@ -4,6 +4,7 @@ import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
 import { RiCalendar2Fill, RiMapPin2Fill, RiTimeFill } from "react-icons/ri";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
+import { Link } from "@remix-run/react";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
@@ -24,12 +25,14 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
     <Flex rounded="md" bgColor="gray.900" p={4} alignItems="center" gap={2}>
       {showAvatar && event.eventTrack?.image && (
         <Box w={16} h={16} rounded="full" overflow="hidden">
-          <styled.img
-            src={event.eventTrack.image}
-            w="full"
-            h="full"
-            objectFit="cover"
-          />
+          <Link to={`/calendar/${event.eventTrack.slug}`}>
+            <styled.img
+              src={event.eventTrack.image}
+              w="full"
+              h="full"
+              objectFit="cover"
+            />
+          </Link>
         </Box>
       )}
 
