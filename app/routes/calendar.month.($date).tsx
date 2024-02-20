@@ -108,7 +108,7 @@ const Page = () => {
                     w="50%"
                     aspectRatio={1}
                     bgColor="gray.800"
-                    rounded="xl"
+                    rounded="full"
                     fontWeight="bold"
                     fontSize={{ base: "xs", md: "xl" }}
                   >

@@ -17,6 +17,7 @@ import { DatePicker } from "~/components/DatePicker";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
+import { Textarea } from "~/components/Textarea";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 
@@ -77,6 +78,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const endTime = body.get("endTime");
   const link = body.get("link");
   const repeatWeeks = body.get("repeatWeeks");
+  const description = body.get("description");
 
   const data = z
     .object({
@@ -87,6 +89,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       startTime: z.string(),
       endTime: z.string(),
       repeatWeeks: z.coerce.number(),
+      description: z.string().optional(),
     })
     .parse({
       name,
@@ -96,6 +99,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       endTime,
       link,
       repeatWeeks,
+      description,
     });
 
   const [startHours, startMinutes] = data.startTime.split(":");
@@ -131,6 +135,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         link: data.link,
         startDate: repeatStartDate,
         endDate: repeatEndDate,
+        description: data.description,
       };
     }),
   });
@@ -173,10 +178,6 @@ const CalendarNewPage = () => {
       <Form method="post">
         <Flex flexDir="column" maxW={500} gap={4}>
           <Box>
-            <Label>Event Name</Label>
-            <Input name="name" required />
-          </Box>
-          <Box>
             <Label>Track</Label>
             <Select name="trackId">
               {tracks.map((track) => (
@@ -186,10 +187,7 @@ const CalendarNewPage = () => {
               ))}
             </Select>
           </Box>
-          <Box>
-            <Label>Event Link (https://)</Label>
-            <Input name="link" required />
-          </Box>
+
           <Box>
             <Label>Date</Label>
             <Input
@@ -202,15 +200,6 @@ const CalendarNewPage = () => {
               value={selectedDate}
               onChange={(date) => setSelectedDate(date)}
             />
-          </Box>
-
-          <Box>
-            <Label>Repeat Event</Label>
-            <Select name="repeatWeeks">
-              <option value="0">Never</option>
-              <option value="1">Weekly</option>
-              <option value="2">Bi-Weekly</option>
-            </Select>
           </Box>
 
           <Box>
@@ -246,6 +235,31 @@ const CalendarNewPage = () => {
               </Box>
             </Flex>
           </Box>
+
+          <Box>
+            <Label>Repeat Event</Label>
+            <Select name="repeatWeeks">
+              <option value="0">Never</option>
+              <option value="1">Weekly</option>
+              <option value="2">Bi-Weekly</option>
+            </Select>
+          </Box>
+
+          <Box>
+            <Label>Event Name</Label>
+            <Input name="name" required />
+          </Box>
+
+          <Box>
+            <Label>Event Link (https://)</Label>
+            <Input name="link" required />
+          </Box>
+
+          <Box>
+            <Label>Event Description</Label>
+            <Textarea name="description" />
+          </Box>
+
           <Button type="submit">List Event</Button>
         </Flex>
       </Form>

@@ -9,6 +9,7 @@ datasource db {
 
 model Events {
   name       String
+  description String?
   track      String?
   startDate  DateTime
   endDate    DateTime

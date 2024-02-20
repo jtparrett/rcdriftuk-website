@@ -80,7 +80,7 @@ export const Map = ({ tracks }: Props) => {
                         w="full"
                         variant="secondary"
                       >
-                        View Events
+                        See All Events
                       </LinkButton>
                     </Box>
                   </Popup>

@@ -60,10 +60,17 @@ const CalendarTrackPage = () => {
       </Box>
 
       <Box textAlign="center" maxW={540} mx="auto" px={4} pb={8}>
-        <styled.h1 fontWeight="bold" fontSize="2xl">
+        <styled.h1 fontWeight="bold" fontSize="2xl" textWrap="balance">
           {track.name}
         </styled.h1>
-        <styled.p>{track.description}</styled.p>
+        <styled.p
+          color="gray.500"
+          fontSize="sm"
+          textWrap="balance"
+          whiteSpace="pre-line"
+        >
+          {track.description}
+        </styled.p>
       </Box>
 
       <Box
@@ -73,7 +80,7 @@ const CalendarTrackPage = () => {
         borderColor="gray.800"
       >
         <Box p={1} textAlign="center" bgColor="gray.800">
-          <styled.h3>Events</styled.h3>
+          <styled.h3 fontWeight="bold">Events</styled.h3>
         </Box>
 
         <Flex flexDir="column" gap={2} p={4}>
