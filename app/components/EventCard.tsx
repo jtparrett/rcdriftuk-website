@@ -46,7 +46,7 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
           <styled.span>{event.eventTrack?.name ?? event.track}</styled.span>
         </Flex>
 
-        <Flex gap={2} flexWrap="wrap">
+        <Flex gap={2} flexWrap="wrap" color="gray.500">
           <Flex alignItems="center" gap={1} fontWeight="medium">
             <styled.span fontSize="sm">
               <RiCalendar2Fill />

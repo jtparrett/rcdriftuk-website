@@ -146,7 +146,8 @@ const Page = () => {
                   py={1}
                 >
                   <styled.p>
-                    {i + 1} {driver.name}
+                    <styled.span fontWeight="semibold">#{i + 1}</styled.span>{" "}
+                    {driver.name}
                   </styled.p>
                 </Box>
               ))}
