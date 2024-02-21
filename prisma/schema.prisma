@@ -17,7 +17,7 @@ model Events {
   updatedAt   DateTime         @default(now()) @updatedAt
   approved    Boolean          @default(false)
   id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  link        String           @default("")
+  link        String?          @default("")
   trackId     String?          @db.Uuid
   eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
   responses   EventResponses[]

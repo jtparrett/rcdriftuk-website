@@ -85,7 +85,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       name: z.string(),
       trackId: z.string(),
       date: z.coerce.date(),
-      link: z.string(),
+      link: z.string().optional(),
       startTime: z.string(),
       endTime: z.string(),
       repeatWeeks: z.coerce.number(),
@@ -252,7 +252,7 @@ const CalendarNewPage = () => {
 
           <Box>
             <Label>Event Link (https://)</Label>
-            <Input name="link" required />
+            <Input name="link" />
           </Box>
 
           <Box>

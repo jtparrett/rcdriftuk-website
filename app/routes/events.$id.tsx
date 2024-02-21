@@ -12,7 +12,11 @@ import {
   startOfDay,
 } from "date-fns";
 import { useMemo } from "react";
-import { RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
+import {
+  RiCheckboxCircleFill,
+  RiCloseCircleFill,
+  RiTicketFill,
+} from "react-icons/ri";
 import { z } from "zod";
 import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
@@ -139,6 +143,7 @@ const Page = () => {
   const { event, isAttending } = useLoaderData<typeof loader>();
   const startDate = useMemo(() => new Date(event.startDate), [event]);
   const endDate = useMemo(() => new Date(event.endDate), [event]);
+  const hasTicketLink = event.link?.includes("tickettailor") ?? false;
 
   const clerk = useClerk();
 
@@ -246,6 +251,12 @@ const Page = () => {
           )}
 
           <Flex gap={2} pt={2}>
+            {event.link && hasTicketLink && (
+              <LinkButton to={event.link} target="_blank">
+                Buy Tickets <RiTicketFill />
+              </LinkButton>
+            )}
+
             <SignedIn>
               <Form method="post">
                 <Button type="submit">
@@ -269,9 +280,12 @@ const Page = () => {
                 I'm Going <RiCheckboxCircleFill />
               </Button>
             </SignedOut>
-            <LinkButton to={event.link} target="_blank" variant="secondary">
-              More Info
-            </LinkButton>
+
+            {event.link && !hasTicketLink && (
+              <LinkButton to={event.link} target="_blank" variant="secondary">
+                More Info
+              </LinkButton>
+            )}
           </Flex>
         </Box>
 
