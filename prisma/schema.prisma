@@ -8,22 +8,33 @@ datasource db {
 }
 
 model Events {
-  name       String
+  name        String
   description String?
-  track      String?
-  startDate  DateTime
-  endDate    DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-  approved   Boolean  @default(false)
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  link       String   @default("")
-  trackId    String?  @db.Uuid
-  eventTrack Tracks?  @relation(fields: [trackId], references: [id])
+  track       String?
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now()) @updatedAt
+  approved    Boolean          @default(false)
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link        String           @default("")
+  trackId     String?          @db.Uuid
+  eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
+  responses   EventResponses[]
+}
+
+model EventResponses {
+  id      String @id @default(dbgenerated("gen_random_uuid()"))
+  eventId String @db.Uuid
+  userId  String
+  event   Events @relation(fields: [eventId], references: [id])
+  user    Users  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
 }
 
 model Tracks {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
   image       String
@@ -31,7 +42,7 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String       @default("")
+  slug        String        @default("")
   events      Events[]
   owners      TrackOwners[]
 }
@@ -56,20 +67,21 @@ model Battles {
 }
 
 model Users {
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  id        String   @id
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now()) @updatedAt
+  id        String           @id
   tracks    TrackOwners[]
+  events    EventResponses[]
 }
 
 model TrackOwners {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  userId String
-  trackId String @db.Uuid
-  track Tracks?  @relation(fields: [trackId], references: [id])
-  owner Users?  @relation(fields: [userId], references: [id])
+  userId    String
+  trackId   String   @db.Uuid
+  track     Tracks?  @relation(fields: [trackId], references: [id])
+  owner     Users?   @relation(fields: [userId], references: [id])
 }
 
 enum TrackTypes {

@@ -1,21 +1,57 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { format, isThisWeek, startOfDay } from "date-fns";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
+import {
+  format,
+  formatDuration,
+  intervalToDuration,
+  isThisWeek,
+  startOfDay,
+} from "date-fns";
 import { useMemo } from "react";
-import { RiCheckboxCircleFill } from "react-icons/ri";
+import { RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import { z } from "zod";
+import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
 import { styled, Box, Container, Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { getAuth } from "@clerk/remix/ssr.server";
+import invariant from "tiny-invariant";
+import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    { title: `RC Drift UK | Events | ${data?.event.name}` },
+    { name: "description", content: data?.event.description },
+    {
+      property: "og:image",
+      content: `https://rcdrift.uk/${data?.event.eventTrack?.image}`,
+    },
+  ];
+};
+
+export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
 
   const event = await prisma.events.findFirst({
     where: {
       id,
     },
     include: {
+      _count: {
+        select: {
+          responses: true,
+        },
+      },
+      responses: {
+        where: {
+          userId: userId ?? undefined,
+        },
+      },
       eventTrack: {
         include: {
           _count: {
@@ -41,18 +77,63 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     });
   }
 
-  return event;
+  const isAttending = event.responses.length > 0;
+
+  return { event, isAttending };
+};
+
+export const action = async (args: ActionFunctionArgs) => {
+  const eventId = z.string().parse(args.params.id);
+  const body = await args.request.formData();
+  const isAttending = body.get("attending") === "true";
+  const { userId } = await getAuth(args);
+
+  invariant(userId, "User is not signed in");
+
+  if (isAttending) {
+    await prisma.eventResponses.create({
+      data: {
+        userId,
+        eventId,
+      },
+    });
+  } else {
+    const response = await prisma.eventResponses.findFirst({
+      where: {
+        eventId,
+        userId,
+      },
+    });
+
+    invariant(response, "This user has not responded to this event");
+
+    await prisma.eventResponses.delete({
+      where: {
+        id: response.id,
+      },
+    });
+  }
+
+  return null;
 };
 
 const Page = () => {
-  const event = useLoaderData<typeof loader>();
+  const { event, isAttending } = useLoaderData<typeof loader>();
   const startDate = useMemo(() => new Date(event.startDate), [event]);
   const endDate = useMemo(() => new Date(event.endDate), [event]);
+
+  const clerk = useClerk();
 
   return (
     <Container maxW={1100} px={2} py={12}>
       <Flex flexDir={{ base: "column", md: "row" }} gap={4}>
-        <Box borderWidth={1} borderColor="gray.800" rounded="xl" p={8} flex={1}>
+        <Box
+          borderWidth={1}
+          borderColor="gray.800"
+          rounded="xl"
+          p={{ base: 8, md: 12 }}
+          flex={1}
+        >
           <Box
             borderWidth={1}
             borderColor="brand.500"
@@ -95,14 +176,60 @@ const Page = () => {
             </styled.p>
           )}
 
-          <styled.span fontSize="sm" color="gray.500" mb={2} display="block">
-            Let the host know you're interested in this event by responding
-            below:
+          <styled.p color="gray.500" fontSize="sm">
+            Duration:{" "}
+            {formatDuration(
+              intervalToDuration({
+                start: startDate,
+                end: endDate,
+              })
+            )}
+          </styled.p>
+          <styled.p fontSize="sm" color="gray.500">
+            {event._count.responses}{" "}
+            {pluralize("people", event._count.responses)} responded
+          </styled.p>
+
+          <styled.span fontWeight="semibold" mt={4} display="block">
+            You're currently {isAttending ? "going" : "not going"} to this event
           </styled.span>
-          <Flex gap={2}>
-            <Button>
-              I'm Going <RiCheckboxCircleFill />
-            </Button>
+
+          {!isAttending && (
+            <styled.span fontSize="sm" color="gray.500" display="block">
+              Let the host know you're interested in this event by responding
+              below:
+            </styled.span>
+          )}
+
+          <Flex gap={2} pt={2}>
+            <SignedIn>
+              <Form method="post">
+                <input
+                  type="hidden"
+                  value={(!isAttending).toString()}
+                  name="attending"
+                />
+                <Button type="submit">
+                  I'm {isAttending && "Not "}Going{" "}
+                  {isAttending ? (
+                    <RiCloseCircleFill />
+                  ) : (
+                    <RiCheckboxCircleFill />
+                  )}
+                </Button>
+              </Form>
+            </SignedIn>
+            <SignedOut>
+              <Button
+                onClick={() =>
+                  clerk.openSignIn({
+                    redirectUrl: `/events/${event.id}`,
+                  })
+                }
+              >
+                I'm Going <RiCheckboxCircleFill />
+              </Button>
+            </SignedOut>
             <LinkButton to={event.link} target="_blank" variant="secondary">
               More Info
             </LinkButton>
