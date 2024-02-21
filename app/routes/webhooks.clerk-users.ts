@@ -16,9 +16,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const userData = z
     .object({
       id: z.string(),
-      first_name: z.string().optional(),
-      last_name: z.string().optional(),
-      profile_image_url: z.string().optional(),
+      first_name: z.string().nullable().optional(),
+      last_name: z.string().nullable().optional(),
+      profile_image_url: z.string().nullable().optional(),
     })
     .parse(data);
 
