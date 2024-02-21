@@ -191,7 +191,8 @@ const Page = () => {
           </styled.p>
 
           <styled.span fontWeight="semibold" mt={4} display="block">
-            You're currently {isAttending ? "going" : "not going"} to this event
+            You are currently {isAttending ? "going" : "not going"} to this
+            event
           </styled.span>
 
           {!isAttending && (
