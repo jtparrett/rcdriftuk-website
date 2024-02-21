@@ -156,6 +156,7 @@ const Page = () => {
           rounded="xl"
           p={{ base: 8, md: 12 }}
           flex={1}
+          maxW={800}
         >
           <Box
             borderWidth={1}
