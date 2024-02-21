@@ -8,7 +8,6 @@ import {
   format,
   formatDuration,
   intervalToDuration,
-  isThisWeek,
   startOfDay,
 } from "date-fns";
 import { useMemo } from "react";
@@ -25,6 +24,8 @@ import { prisma } from "~/utils/prisma.server";
 import { getAuth } from "@clerk/remix/ssr.server";
 import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
+import { getEventDate } from "~/utils/getEventDate";
+import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -141,8 +142,11 @@ export const action = async (args: ActionFunctionArgs) => {
 
 const Page = () => {
   const { event, isAttending } = useLoaderData<typeof loader>();
-  const startDate = useMemo(() => new Date(event.startDate), [event]);
-  const endDate = useMemo(() => new Date(event.endDate), [event]);
+  const startDate = useMemo(
+    () => dateWithoutTimezone(event.startDate),
+    [event]
+  );
+  const endDate = useMemo(() => dateWithoutTimezone(event.endDate), [event]);
   const hasTicketLink = event.link?.includes("tickettailor") ?? false;
 
   const clerk = useClerk();
@@ -179,10 +183,7 @@ const Page = () => {
           </Box>
 
           <styled.p color="brand.500" fontWeight="bold">
-            {isThisWeek(startDate)
-              ? format(startDate, "eeee")
-              : format(startDate, "do MMMM")}{" "}
-            from {format(startDate, "HH:mm")} - {format(endDate, "HH:mm")}
+            {getEventDate(startDate, endDate)}
           </styled.p>
 
           <styled.h1 fontSize="3xl" fontWeight="black">
