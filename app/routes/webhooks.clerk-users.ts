@@ -16,6 +16,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const userData = z
     .object({
       id: z.string(),
+      first_name: z.string().optional(),
+      last_name: z.string().optional(),
+      profile_image_url: z.string().optional(),
     })
     .parse(data);
 
@@ -24,6 +27,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await prisma.users.create({
         data: {
           id: userData.id,
+          firstName: userData.first_name,
+          lastName: userData.last_name,
+          image: userData.profile_image_url,
+        },
+      });
+      break;
+
+    case "user.updated":
+      await prisma.users.update({
+        where: {
+          id: userData.id,
+        },
+        data: {
+          firstName: userData.first_name,
+          lastName: userData.last_name,
+          image: userData.profile_image_url,
         },
       });
       break;

@@ -70,6 +70,9 @@ model Users {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @default(now()) @updatedAt
   id        String           @id
+  firstName String?
+  lastName  String?
+  image     String?
   tracks    TrackOwners[]
   events    EventResponses[]
 }
