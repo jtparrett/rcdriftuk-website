@@ -35,7 +35,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
-  const { userId } = await getAuth(args);
 
   const event = await prisma.events.findFirst({
     where: {
@@ -48,8 +47,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
       },
       responses: {
-        where: {
-          userId: userId ?? undefined,
+        take: 8,
+        orderBy: {
+          id: "asc",
+        },
+        include: {
+          user: true,
         },
       },
       eventTrack: {
@@ -77,39 +80,54 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  const isAttending = userId && event.responses.length > 0;
+  const { userId } = await getAuth(args);
 
-  return { event, isAttending };
+  if (userId) {
+    const userEventResponse = await prisma.eventResponses.findFirst({
+      where: {
+        userId,
+        eventId: id,
+      },
+    });
+
+    const isAttending = !!userEventResponse;
+
+    return {
+      event,
+      isAttending,
+    };
+  }
+
+  return {
+    event,
+    isAttending: false,
+  };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
   const eventId = z.string().parse(args.params.id);
-  const body = await args.request.formData();
-  const isAttending = body.get("attending") === "true";
   const { userId } = await getAuth(args);
 
   invariant(userId, "User is not signed in");
 
-  if (isAttending) {
+  const userEventResponse = await prisma.eventResponses.findFirst({
+    where: {
+      userId,
+      eventId,
+    },
+  });
+
+  if (userEventResponse) {
+    await prisma.eventResponses.delete({
+      where: {
+        id: userEventResponse.id,
+      },
+    });
+  } else {
     await prisma.eventResponses.create({
       data: {
         userId,
         eventId,
-      },
-    });
-  } else {
-    const response = await prisma.eventResponses.findFirst({
-      where: {
-        eventId,
-        userId,
-      },
-    });
-
-    invariant(response, "This user has not responded to this event");
-
-    await prisma.eventResponses.delete({
-      where: {
-        id: response.id,
       },
     });
   }
@@ -190,6 +208,31 @@ const Page = () => {
             {pluralize("people", event._count.responses)} responded
           </styled.p>
 
+          {event._count.responses > 0 && (
+            <Flex mt={1} flexWrap="wrap">
+              {event.responses.map((response) => {
+                return (
+                  <Box
+                    key={response.id}
+                    overflow="hidden"
+                    rounded="full"
+                    w="40px"
+                    h="40px"
+                    mr={-3}
+                    bgColor="gray.400"
+                  >
+                    <styled.img
+                      src={response.user.image ?? ""}
+                      alt={`${response.user.firstName ?? ""} ${
+                        response.user.lastName ?? ""
+                      }`}
+                    />
+                  </Box>
+                );
+              })}
+            </Flex>
+          )}
+
           <styled.span fontWeight="semibold" mt={4} display="block">
             You are currently {isAttending ? "going" : "not going"} to this
             event
@@ -205,11 +248,6 @@ const Page = () => {
           <Flex gap={2} pt={2}>
             <SignedIn>
               <Form method="post">
-                <input
-                  type="hidden"
-                  value={(!isAttending).toString()}
-                  name="attending"
-                />
                 <Button type="submit">
                   I'm {isAttending && "Not "}Going{" "}
                   {isAttending ? (
