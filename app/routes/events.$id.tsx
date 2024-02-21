@@ -77,7 +77,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  const isAttending = event.responses.length > 0;
+  const isAttending = userId && event.responses.length > 0;
 
   return { event, isAttending };
 };
