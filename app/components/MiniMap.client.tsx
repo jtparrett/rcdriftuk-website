@@ -1,4 +1,4 @@
-import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import type { Tracks } from "@prisma/client";
 
 export type Values<T> = T[keyof T];
@@ -16,8 +16,6 @@ export const MiniMap = ({ track }: Props) => {
       zoomControl={false}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-      <Marker position={[track.lat, track.lng]} />
     </MapContainer>
   );
 };
