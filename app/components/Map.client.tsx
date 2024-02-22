@@ -4,7 +4,8 @@ import { useParams } from "@remix-run/react";
 import { getTabParam } from "~/utils/getTabParam";
 import { LinkButton } from "./Button";
 import L from "leaflet";
-import { TrackTypes, Tracks } from "@prisma/client";
+import type { Tracks } from "@prisma/client";
+import { TrackTypes } from "@prisma/client";
 import { RiFacebookFill, RiLink } from "react-icons/ri";
 import { singular } from "pluralize";
 

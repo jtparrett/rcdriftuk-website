@@ -4,7 +4,7 @@ import { LinkButton } from "./Button";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { Link } from "@remix-run/react";
 import { getEventDate } from "~/utils/getEventDate";
-import { RiArrowRightFill, RiArrowRightSLine } from "react-icons/ri";
+import { RiArrowRightSLine } from "react-icons/ri";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
@@ -50,12 +50,13 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
 
         <styled.h3
           fontSize="lg"
-          fontWeight="bold"
+          fontWeight="black"
           textWrap="balance"
           lineHeight={1.1}
         >
           {event.name}
         </styled.h3>
+
         <styled.p fontSize="sm" color="gray.300" fontWeight="semibold" mb={2}>
           {getEventDate(
             dateWithoutTimezone(event.startDate),

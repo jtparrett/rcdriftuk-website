@@ -323,7 +323,7 @@ const Page = () => {
                 />
               </Box>
 
-              <styled.h2 fontSize="xl" fontWeight="bold" textWrap="balance">
+              <styled.h2 fontSize="xl" fontWeight="black" textWrap="balance">
                 {event.eventTrack.name}
               </styled.h2>
 
