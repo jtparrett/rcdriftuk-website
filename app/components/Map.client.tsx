@@ -1,10 +1,12 @@
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { styled, Box } from "~/styled-system/jsx";
+import { styled, Box, Flex } from "~/styled-system/jsx";
 import { useParams } from "@remix-run/react";
 import { getTabParam } from "~/utils/getTabParam";
 import { LinkButton } from "./Button";
 import L from "leaflet";
 import { TrackTypes, Tracks } from "@prisma/client";
+import { RiFacebookFill, RiLink } from "react-icons/ri";
+import { singular } from "pluralize";
 
 export type Values<T> = T[keyof T];
 
@@ -52,8 +54,21 @@ export const Map = ({ tracks }: Props) => {
                   <Popup closeButton>
                     <Box minWidth={280} p={4}>
                       {item.image && (
-                        <Box mb={2} overflow="hidden" rounded="md">
-                          <styled.img src={item.image} />
+                        <Box
+                          w="140px"
+                          h="140px"
+                          mb={2}
+                          rounded="full"
+                          overflow="hidden"
+                          borderWidth={2}
+                          borderColor="gray.500"
+                        >
+                          <styled.img
+                            src={item.image}
+                            w="full"
+                            h="full"
+                            objectFit="cover"
+                          />
                         </Box>
                       )}
                       <styled.h1 fontSize="md" fontWeight="bold" mb={2}>
@@ -63,25 +78,38 @@ export const Map = ({ tracks }: Props) => {
                         <styled.p
                           mt="0 !important"
                           mb={2}
-                          whiteSpace="pre-line"
+                          whiteSpace="pre-line !important"
+                          lineClamp={4}
+                          truncate="ellipsis"
+                          w="full"
+                          overflow="hidden"
                         >
                           {item.description}
                         </styled.p>
                       )}
 
-                      <LinkButton to={item.url} target="_blank" w="full" mb={2}>
-                        {item.url.includes("facebook")
-                          ? "Visit Facebook"
-                          : "Visit Website"}
-                      </LinkButton>
+                      <Flex gap={1}>
+                        <LinkButton
+                          to={`/calendar/${item.slug}`}
+                          flex={1}
+                          textTransform="capitalize"
+                        >
+                          {singular(item.types[0] ?? "").toLowerCase()} Info
+                        </LinkButton>
 
-                      <LinkButton
-                        to={`/calendar/${item.slug}`}
-                        w="full"
-                        variant="secondary"
-                      >
-                        See All Events
-                      </LinkButton>
+                        <LinkButton
+                          to={item.url}
+                          variant="secondary"
+                          target="_blank"
+                          size="sm"
+                        >
+                          {item.url.includes("facebook") ? (
+                            <RiFacebookFill />
+                          ) : (
+                            <RiLink />
+                          )}
+                        </LinkButton>
+                      </Flex>
                     </Box>
                   </Popup>
                 </Marker>

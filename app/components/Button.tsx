@@ -4,10 +4,7 @@ import { styled } from "~/styled-system/jsx";
 
 const ButtonStyles = cva({
   base: {
-    py: {
-      base: 2,
-      md: 2,
-    },
+    py: 2,
     px: 4,
     rounded: "lg",
     display: "inline-flex",
@@ -25,7 +22,11 @@ const ButtonStyles = cva({
     size: {
       md: {},
       sm: {
-        py: 2,
+        px: 3,
+      },
+      xs: {
+        gap: 1,
+        py: 1,
         px: 3,
       },
     },

@@ -4,6 +4,7 @@ import { LinkButton } from "./Button";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { Link } from "@remix-run/react";
 import { getEventDate } from "~/utils/getEventDate";
+import { RiArrowRightFill, RiArrowRightSLine } from "react-icons/ri";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
@@ -43,24 +44,27 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
       )}
 
       <Box flex={1}>
-        <styled.span fontSize="sm" color="gray.500">
+        <styled.span fontSize="xs" color="gray.500">
           {event.eventTrack?.name ?? event.track}
         </styled.span>
 
-        <styled.h3 fontSize="lg" fontWeight="bold" textWrap="balance">
+        <styled.h3
+          fontSize="lg"
+          fontWeight="bold"
+          textWrap="balance"
+          lineHeight={1.1}
+        >
           {event.name}
         </styled.h3>
-        <styled.span fontSize="sm" color="gray.300" fontWeight="semibold">
+        <styled.p fontSize="sm" color="gray.300" fontWeight="semibold" mb={2}>
           {getEventDate(
             dateWithoutTimezone(event.startDate),
             dateWithoutTimezone(event.endDate)
           )}
-        </styled.span>
-      </Box>
+        </styled.p>
 
-      <Box>
-        <LinkButton to={`/events/${event.id}`} variant="secondary" size="sm">
-          See Info
+        <LinkButton to={`/events/${event.id}`} variant="secondary" size="xs">
+          Event Info <RiArrowRightSLine />
         </LinkButton>
       </Box>
     </Flex>
