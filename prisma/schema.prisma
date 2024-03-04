@@ -48,11 +48,14 @@ model Tracks {
 }
 
 model Drivers {
-  id           String    @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt    DateTime  @default(now())
-  name         String
-  leftBattles  Battles[] @relation("battleDriverLeft")
-  rightBattles Battles[] @relation("battleDriverRight")
+  id              String                  @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt       DateTime                @default(now())
+  name            String
+  leftBattles     Battles[]               @relation("battleDriverLeft")
+  rightBattles    Battles[]               @relation("battleDriverRight")
+  battleStandings DriverBattleStandings[]
+  team            String?
+  champNo         Int?
 }
 
 model Battles {
@@ -64,6 +67,17 @@ model Battles {
   id            Int      @id @default(autoincrement())
   driverLeft    Drivers? @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
   driverRight   Drivers? @relation("battleDriverRight", fields: [driverRightId], references: [id])
+}
+
+model DriverBattleStandings {
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  id         Int      @id @default(autoincrement())
+  tournament String
+  driverId   String
+  driver     Drivers  @relation(fields: [driverId], references: [id])
+  position   Int
+  qualiBonus Int      @default(0)
 }
 
 model Users {

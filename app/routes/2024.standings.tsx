@@ -1,7 +1,75 @@
+import { useLoaderData } from "@remix-run/react";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { Box, Container, styled } from "~/styled-system/jsx";
+import { prisma } from "~/utils/prisma.server";
+
+const getBattlePoints = (position: number) => {
+  if (position === 1) {
+    return 28;
+  }
+
+  if (position === 2) {
+    return 24;
+  }
+
+  if (position === 3) {
+    return 21;
+  }
+
+  if (position === 4) {
+    return 18;
+  }
+
+  if (position === 5) {
+    return 16;
+  }
+
+  if (position === 6) {
+    return 14;
+  }
+
+  if (position === 7) {
+    return 12;
+  }
+
+  if (position === 8) {
+    return 10;
+  }
+
+  if (position <= 16) {
+    return 8;
+  }
+
+  if (position <= 32) {
+    return 4;
+  }
+
+  return 0;
+};
+
+export const loader = async () => {
+  const driverStandings = await prisma.driverBattleStandings.findMany({
+    orderBy: {
+      position: "asc",
+    },
+    include: {
+      driver: true,
+    },
+  });
+
+  return driverStandings
+    .map((driver) => {
+      return {
+        driver,
+        points: getBattlePoints(driver.position) + driver.qualiBonus,
+      };
+    })
+    .sort((a, b) => b.points - a.points);
+};
 
 const Page = () => {
+  const driverStandings = useLoaderData<typeof loader>();
+
   return (
     <styled.main>
       <Container px={2} maxW={1100}>
@@ -28,58 +96,46 @@ const Page = () => {
             borderWidth={1}
             borderColor="gray.800"
             overflow="hidden"
-            px={8}
-            py={4}
           >
             <styled.table w="full">
               <styled.thead>
                 <styled.tr borderBottomWidth={1} borderColor="gray.800">
-                  <styled.th py={2}>#</styled.th>
-                  <styled.th py={2}>Driver</styled.th>
-                  <styled.th py={2}>Team</styled.th>
-                  <styled.th textAlign="right" py={2}>
+                  <styled.th p={2} textAlign="left">
+                    #
+                  </styled.th>
+                  <styled.th p={2} textAlign="left">
+                    Driver
+                  </styled.th>
+                  <styled.th p={2} textAlign="left">
+                    Team
+                  </styled.th>
+                  <styled.th textAlign="right" p={2}>
                     Points
                   </styled.th>
                 </styled.tr>
               </styled.thead>
-              <styled.body>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-                <styled.tr>
-                  <styled.td colSpan={4}>-</styled.td>
-                </styled.tr>
-              </styled.body>
+              <styled.tbody>
+                {driverStandings.map((driver, i) => {
+                  const bgColor = i % 2 === 0 ? "gray.900" : "transparent";
+                  return (
+                    <styled.tr bgColor={bgColor} key={driver.driver.id}>
+                      <styled.td p={2}>{i + 1}</styled.td>
+                      <styled.td p={2}>
+                        {driver.driver.driver.name}{" "}
+                        <styled.span color="gray.600">
+                          #{driver.driver.driver.champNo}
+                        </styled.span>
+                      </styled.td>
+                      <styled.td p={2}>
+                        {driver.driver.driver.team ?? ""}
+                      </styled.td>
+                      <styled.td p={2} textAlign="right">
+                        {driver.points}
+                      </styled.td>
+                    </styled.tr>
+                  );
+                })}
+              </styled.tbody>
             </styled.table>
           </Box>
         </Box>
