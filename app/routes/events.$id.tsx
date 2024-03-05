@@ -229,6 +229,9 @@ const Page = () => {
                     bgColor="gray.400"
                   >
                     <styled.img
+                      title={
+                        response.user.firstName + " " + response.user.lastName
+                      }
                       src={response.user.image ?? ""}
                       alt={`${response.user.firstName ?? ""} ${
                         response.user.lastName ?? ""
