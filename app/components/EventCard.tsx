@@ -4,7 +4,8 @@ import { LinkButton } from "./Button";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { Link } from "@remix-run/react";
 import { getEventDate } from "~/utils/getEventDate";
-import { RiArrowRightSLine } from "react-icons/ri";
+import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
+import { isPast } from "date-fns";
 
 interface QueriedEvent
   extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
@@ -21,8 +22,38 @@ interface Props {
 }
 
 export const EventCard = ({ event, showAvatar = false }: Props) => {
+  const hasPast = isPast(dateWithoutTimezone(event.endDate));
+
   return (
-    <Flex rounded="md" bgColor="gray.900" p={4} alignItems="center" gap={4}>
+    <Flex
+      rounded="md"
+      bgColor="gray.900"
+      p={4}
+      alignItems="center"
+      gap={4}
+      pos="relative"
+      opacity={hasPast ? 0.65 : 1}
+    >
+      {hasPast && (
+        <styled.span
+          bgColor="gray.800"
+          pos="absolute"
+          top={3}
+          right={3}
+          rounded="sm"
+          px={3}
+          py={1}
+          fontSize="sm"
+          fontWeight="semibold"
+          zIndex={2}
+          display="flex"
+          alignItems="center"
+          gap={1}
+        >
+          Finished <RiCheckLine />
+        </styled.span>
+      )}
+
       {showAvatar && event.eventTrack?.image && (
         <Box
           w={16}
