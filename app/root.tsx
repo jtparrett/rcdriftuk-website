@@ -8,6 +8,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
 import styles from "./index.css";
@@ -15,6 +16,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { Header } from "./components/Header";
 import { rootAuthLoader } from "@clerk/remix/ssr.server";
 import { ClerkApp, ClerkErrorBoundary } from "@clerk/remix";
+import { CookieBanner } from "./components/CookieBanner";
+import { userPrefs } from "./utils/cookiePolicy.server";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -33,9 +36,17 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export const loader = (args: LoaderFunctionArgs) => rootAuthLoader(args);
+export const loader = (args: LoaderFunctionArgs) =>
+  rootAuthLoader(args, async ({ request }) => {
+    const cookieHeader = request.headers.get("Cookie");
+    const cookie = (await userPrefs.parse(cookieHeader)) || {};
+
+    return { hideBanner: cookie.hideBanner };
+  });
 
 function App() {
+  const { hideBanner } = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -51,6 +62,7 @@ function App() {
         ></script>
       </head>
       <body>
+        {!hideBanner && <CookieBanner />}
         <Header />
         <Outlet />
         <ScrollRestoration />
