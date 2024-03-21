@@ -182,6 +182,7 @@ const Page = () => {
           <LinkButton
             variant="secondary"
             size="xs"
+            target="_blank"
             to="https://rcdrift.uk/privacy-policy.html"
           >
             Privacy Policy
