@@ -11,24 +11,30 @@ export const CookieBanner = () => {
           flexDir={{ base: "column", md: "row" }}
           gap={2}
         >
-          <styled.p fontSize="sm">
+          <styled.p fontSize="sm" flex={1}>
             We use cookies to improve your experience on our website. By
             browsing this website, you agree to our use of cookies.
           </styled.p>
 
-          <Spacer />
-
           <Flex gap={2}>
             <LinkButton
+              variant="secondary"
+              size="xs"
+              to="https://rcdrift.uk/privacy-policy.html"
+            >
+              Privacy Policy
+            </LinkButton>
+
+            <LinkButton
               whiteSpace="nowrap"
-              size="sm"
+              size="xs"
               variant="secondary"
               to="/privacy-cookie-policy"
             >
               More Info
             </LinkButton>
             <Form method="post" action="/api/hide-banner">
-              <Button size="sm" type="submit">
+              <Button size="xs" type="submit">
                 Accept
               </Button>
             </Form>

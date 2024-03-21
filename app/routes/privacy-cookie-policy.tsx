@@ -4,7 +4,7 @@ const Page = () => {
   return (
     <Container maxW={1100} px={2} py={12}>
       <styled.h1 fontSize="4xl" fontWeight="black" mb={4}>
-        Privacy Policy
+        Cookie Privacy Policy
       </styled.h1>
       <styled.p>RCDrift UK</styled.p>
       <styled.p>info@rcdrift.uk</styled.p>
@@ -64,7 +64,7 @@ const Page = () => {
         We reserve the right to update this Privacy Policy at any time. The date
         of the latest revision will be indicated at the top of this page.
       </styled.p>
-      **Cookie Policy** ```html
+
       <styled.p>1. What are Cookies?</styled.p>
       <styled.p>
         Cookies are small pieces of data stored on your device when you visit a
