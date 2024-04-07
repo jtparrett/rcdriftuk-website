@@ -48,20 +48,32 @@ const getBattlePoints = (position: number) => {
 };
 
 export const loader = async () => {
-  const driverStandings = await prisma.driverBattleStandings.findMany({
-    orderBy: {
-      position: "asc",
-    },
-    include: {
-      driver: true,
-    },
-  });
+  const [drivers, driverStandings] = await prisma.$transaction([
+    prisma.driverBattleStandings.findMany({
+      distinct: "driverId",
+      include: {
+        driver: true,
+      },
+    }),
 
-  return driverStandings
+    prisma.driverBattleStandings.findMany({
+      orderBy: {
+        position: "asc",
+      },
+    }),
+  ]);
+
+  return drivers
     .map((driver) => {
+      const points = driverStandings
+        .filter((standing) => standing.driverId === driver.driverId)
+        .reduce((agg, i) => {
+          return agg + getBattlePoints(i.position) + i.qualiBonus;
+        }, 0);
+
       return {
-        driver,
-        points: getBattlePoints(driver.position) + driver.qualiBonus,
+        driver: driver.driver,
+        points,
       };
     })
     .sort((a, b) => b.points - a.points);
@@ -121,14 +133,12 @@ const Page = () => {
                     <styled.tr bgColor={bgColor} key={driver.driver.id}>
                       <styled.td p={2}>{i + 1}</styled.td>
                       <styled.td p={2}>
-                        {driver.driver.driver.name}{" "}
+                        {driver.driver.name}{" "}
                         <styled.span color="gray.600">
-                          #{driver.driver.driver.champNo}
+                          #{driver.driver.champNo}
                         </styled.span>
                       </styled.td>
-                      <styled.td p={2}>
-                        {driver.driver.driver.team ?? ""}
-                      </styled.td>
+                      <styled.td p={2}>{driver.driver.team ?? ""}</styled.td>
                       <styled.td p={2} textAlign="right">
                         {driver.points}
                       </styled.td>
