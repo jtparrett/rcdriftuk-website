@@ -52,7 +52,15 @@ export const loader = async () => {
     prisma.driverBattleStandings.findMany({
       distinct: "driverId",
       include: {
-        driver: true,
+        driver: {
+          include: {
+            battleStandings: {
+              orderBy: {
+                createdAt: "asc",
+              },
+            },
+          },
+        },
       },
     }),
 
@@ -99,7 +107,7 @@ const Page = () => {
           ]}
         />
 
-        <Box maxW={800}>
+        <Box>
           <styled.h1 fontSize="4xl" fontWeight="extrabold">
             Driver Standings
           </styled.h1>
@@ -123,9 +131,12 @@ const Page = () => {
                   <styled.th p={2} textAlign="left">
                     Driver
                   </styled.th>
-                  <styled.th p={2} textAlign="left">
-                    Team
-                  </styled.th>
+                  <styled.th>RD1</styled.th>
+                  <styled.th>RD2</styled.th>
+                  <styled.th>RD3</styled.th>
+                  <styled.th>RD4</styled.th>
+                  <styled.th>RD5</styled.th>
+                  <styled.th>RD6</styled.th>
                   <styled.th textAlign="right" p={2}>
                     Points
                   </styled.th>
@@ -134,16 +145,88 @@ const Page = () => {
               <styled.tbody>
                 {driverStandings.map((driver, i) => {
                   const bgColor = i % 2 === 0 ? "gray.900" : "transparent";
+
+                  const round1Standing = driver.driver.battleStandings.find(
+                    (t) => t.tournament === "2024-RD1"
+                  );
+                  const round2Standing = driver.driver.battleStandings.find(
+                    (t) => t.tournament === "2024-RD2"
+                  );
+                  const round3Standing = driver.driver.battleStandings.find(
+                    (t) => t.tournament === "2024-RD3"
+                  );
+                  const round4Standing = driver.driver.battleStandings.find(
+                    (t) => t.tournament === "2024-RD4"
+                  );
+                  const round5Standing = driver.driver.battleStandings.find(
+                    (t) => t.tournament === "2024-RD5"
+                  );
+                  const round6Standing = driver.driver.battleStandings.find(
+                    (t) => t.tournament === "2024-RD6"
+                  );
+
                   return (
                     <styled.tr bgColor={bgColor} key={driver.driver.id}>
                       <styled.td p={2}>{i + 1}</styled.td>
                       <styled.td p={2}>
-                        {driver.driver.name}{" "}
-                        <styled.span color="gray.600">
-                          #{driver.driver.champNo}
-                        </styled.span>
+                        <styled.p>
+                          {driver.driver.name}{" "}
+                          <styled.span color="gray.600">
+                            #{driver.driver.champNo}
+                          </styled.span>
+                        </styled.p>
+                        <styled.p fontSize="sm" color="gray.400">
+                          {driver.driver.team ?? ""}
+                        </styled.p>
                       </styled.td>
-                      <styled.td p={2}>{driver.driver.team ?? ""}</styled.td>
+                      <styled.td textAlign="center">
+                        {round1Standing
+                          ? getBattlePoints(round1Standing.position)
+                          : "-"}{" "}
+                        {round1Standing &&
+                          round1Standing?.qualiBonus > 0 &&
+                          `+${round1Standing?.qualiBonus}`}
+                      </styled.td>
+                      <styled.td textAlign="center">
+                        {round2Standing
+                          ? getBattlePoints(round2Standing.position)
+                          : "-"}
+                        {round2Standing &&
+                          round2Standing?.qualiBonus > 0 &&
+                          `+${round2Standing?.qualiBonus}`}
+                      </styled.td>
+                      <styled.td textAlign="center">
+                        {round3Standing
+                          ? getBattlePoints(round3Standing.position)
+                          : "-"}
+                        {round3Standing &&
+                          round3Standing?.qualiBonus > 0 &&
+                          `+${round3Standing?.qualiBonus}`}
+                      </styled.td>
+                      <styled.td textAlign="center">
+                        {round4Standing
+                          ? getBattlePoints(round4Standing.position)
+                          : "-"}
+                        {round4Standing &&
+                          round4Standing?.qualiBonus > 0 &&
+                          `+${round4Standing?.qualiBonus}`}
+                      </styled.td>
+                      <styled.td textAlign="center">
+                        {round5Standing
+                          ? getBattlePoints(round5Standing.position)
+                          : "-"}
+                        {round5Standing &&
+                          round5Standing?.qualiBonus > 0 &&
+                          `+${round5Standing?.qualiBonus}`}
+                      </styled.td>
+                      <styled.td textAlign="center">
+                        {round6Standing
+                          ? getBattlePoints(round6Standing.position)
+                          : "-"}
+                        {round6Standing &&
+                          round6Standing?.qualiBonus > 0 &&
+                          `+${round6Standing?.qualiBonus}`}
+                      </styled.td>
                       <styled.td p={2} textAlign="right">
                         {driver.points}
                       </styled.td>
