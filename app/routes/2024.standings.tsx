@@ -185,7 +185,7 @@ const Page = () => {
             rounded="xl"
             borderWidth={1}
             borderColor="gray.800"
-            overflow="hidden"
+            overflow="auto"
           >
             <styled.table w="full">
               <styled.thead>
