@@ -76,7 +76,12 @@ export const loader = async () => {
         points,
       };
     })
-    .sort((a, b) => b.points - a.points);
+    .sort(
+      (a, b) =>
+        b.points - a.points ||
+        Math.max(...(a.driver.qualiPositions ?? [])) -
+          Math.max(...(b.driver.qualiPositions ?? []))
+    );
 };
 
 const Page = () => {
