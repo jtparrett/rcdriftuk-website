@@ -71,7 +71,7 @@ export const loader = async () => {
     }),
   ]);
 
-  return drivers
+  const driverStandingsFinal = drivers
     .map((driver) => {
       const points = driverStandings
         .filter((standing) => standing.driverId === driver.driverId)
@@ -90,10 +90,75 @@ export const loader = async () => {
         Math.max(...(a.driver.qualiPositions ?? [])) -
           Math.max(...(b.driver.qualiPositions ?? []))
     );
+
+  const allDriverStandings = await prisma.driverBattleStandings.findMany({
+    orderBy: [
+      {
+        tournament: "asc",
+      },
+      { position: "asc" },
+    ],
+    include: {
+      driver: true,
+    },
+  });
+
+  return {
+    driverStandings: driverStandingsFinal,
+    allDriverStandings,
+  };
 };
 
 const Page = () => {
-  const driverStandings = useLoaderData<typeof loader>();
+  const { driverStandings, allDriverStandings } =
+    useLoaderData<typeof loader>();
+
+  const RoundStandingTable = ({ tournament }: { tournament: string }) => {
+    return (
+      <Box
+        rounded="xl"
+        borderWidth={1}
+        borderColor="gray.800"
+        overflow="hidden"
+      >
+        <styled.table w="full">
+          <styled.thead>
+            <styled.tr borderBottomWidth={1} borderColor="gray.800">
+              <styled.th p={2} textAlign="left" w={30}>
+                #
+              </styled.th>
+              <styled.th p={2} textAlign="left">
+                Driver
+              </styled.th>
+            </styled.tr>
+          </styled.thead>
+          <styled.tbody>
+            {allDriverStandings
+              .filter((s) => s.tournament === tournament)
+              .map((standing, i) => {
+                const bgColor = i % 2 === 0 ? "gray.900" : "transparent";
+                return (
+                  <styled.tr key={standing.id} bgColor={bgColor}>
+                    <styled.td p={2}>{standing.position}</styled.td>
+                    <styled.td p={2}>
+                      <styled.p>
+                        {standing.driver.name}{" "}
+                        <styled.span color="gray.600">
+                          #{standing.driver.champNo}
+                        </styled.span>
+                      </styled.p>
+                      <styled.p fontSize="sm" color="gray.400">
+                        {standing.driver.team ?? ""}
+                      </styled.p>
+                    </styled.td>
+                  </styled.tr>
+                );
+              })}
+          </styled.tbody>
+        </styled.table>
+      </Box>
+    );
+  };
 
   return (
     <styled.main>
@@ -109,7 +174,7 @@ const Page = () => {
 
         <Box>
           <styled.h1 fontSize="4xl" fontWeight="extrabold">
-            Driver Standings
+            Overall Standings
           </styled.h1>
           <styled.p mb={4} color="gray.500">
             See how the top drivers from accross the championship are ranking
@@ -236,6 +301,20 @@ const Page = () => {
               </styled.tbody>
             </styled.table>
           </Box>
+        </Box>
+
+        <Box mt={10}>
+          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+            Round 1 Standings
+          </styled.h1>
+          <RoundStandingTable tournament="2024-RD1" />
+        </Box>
+
+        <Box mt={10}>
+          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+            Round 2 Standings
+          </styled.h1>
+          <RoundStandingTable tournament="2024-RD2" />
         </Box>
       </Container>
     </styled.main>
