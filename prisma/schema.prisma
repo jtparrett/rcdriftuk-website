@@ -9,7 +9,6 @@ datasource db {
 
 model Events {
   name        String
-  description String?
   track       String?
   startDate   DateTime
   endDate     DateTime
@@ -19,14 +18,15 @@ model Events {
   id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   link        String?          @default("")
   trackId     String?          @db.Uuid
-  eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
+  description String?
   responses   EventResponses[]
+  eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
 }
 
 model EventResponses {
   id      String @id @default(dbgenerated("gen_random_uuid()"))
-  eventId String @db.Uuid
   userId  String
+  eventId String @db.Uuid
   event   Events @relation(fields: [eventId], references: [id])
   user    Users  @relation(fields: [userId], references: [id])
 
@@ -44,6 +44,7 @@ model Tracks {
   url         String
   slug        String        @default("")
   events      Events[]
+  Products    Products[]
   owners      TrackOwners[]
 }
 
@@ -51,12 +52,12 @@ model Drivers {
   id              String                  @id @default(dbgenerated("gen_random_uuid()"))
   createdAt       DateTime                @default(now())
   name            String
+  champNo         Int?
+  team            String?
+  qualiPositions  Int[]
   leftBattles     Battles[]               @relation("battleDriverLeft")
   rightBattles    Battles[]               @relation("battleDriverRight")
   battleStandings DriverBattleStandings[]
-  team            String?
-  champNo         Int?
-  qualiPositions  Int[]
 }
 
 model Battles {
@@ -76,9 +77,9 @@ model DriverBattleStandings {
   id         Int      @id @default(autoincrement())
   tournament String
   driverId   String
-  driver     Drivers  @relation(fields: [driverId], references: [id])
   position   Int
   qualiBonus Int      @default(0)
+  driver     Drivers  @relation(fields: [driverId], references: [id])
 }
 
 model Users {
@@ -86,10 +87,10 @@ model Users {
   updatedAt DateTime         @default(now()) @updatedAt
   id        String           @id
   firstName String?
-  lastName  String?
   image     String?
-  tracks    TrackOwners[]
+  lastName  String?
   events    EventResponses[]
+  tracks    TrackOwners[]
 }
 
 model TrackOwners {
@@ -98,8 +99,19 @@ model TrackOwners {
   updatedAt DateTime @default(now()) @updatedAt
   userId    String
   trackId   String   @db.Uuid
-  track     Tracks?  @relation(fields: [trackId], references: [id])
-  owner     Users?   @relation(fields: [userId], references: [id])
+  track     Tracks   @relation(fields: [trackId], references: [id])
+  owner     Users    @relation(fields: [userId], references: [id])
+}
+
+model Products {
+  slug        String  @id
+  title       String
+  image       String
+  description String
+  shop        Shops
+  url         String
+  trackId     String? @db.Uuid
+  Tracks      Tracks? @relation(fields: [trackId], references: [id])
 }
 
 enum TrackTypes {
@@ -107,15 +119,6 @@ enum TrackTypes {
   TRACKS
   CLUBS
   SHOPS
-}
-
-model Products {
-  slug        String @id
-  title       String
-  image       String
-  description String
-  shop        Shops
-  url         String
 }
 
 enum Shops {

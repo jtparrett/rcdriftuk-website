@@ -3,9 +3,8 @@ import { styled, Flex, Box, Spacer, Divider } from "~/styled-system/jsx";
 import { LinkButton } from "~/components/Button";
 import { getShopImage } from "~/utils/getShopImage";
 import { prisma } from "~/utils/prisma.server";
-import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { getShopName } from "~/utils/getShopName";
-import { RiLink, RiMapPinFill } from "react-icons/ri";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { RiLink } from "react-icons/ri";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -24,6 +23,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     where: {
       slug: params.slug,
     },
+    include: {
+      Tracks: true,
+    },
   });
 
   if (!product) {
@@ -41,7 +43,7 @@ const CatalogueListingPage = () => {
 
   return (
     <Box pt={4}>
-      <Flex flexDir={{ base: "column", md: "row" }}>
+      <Flex flexDir={{ base: "column", md: "row" }} alignItems="flex-start">
         <Box flex={1} overflow="hidden" rounded="lg">
           <styled.img src={product.image} w="full" />
         </Box>
@@ -52,30 +54,41 @@ const CatalogueListingPage = () => {
 
           <styled.p dangerouslySetInnerHTML={{ __html: product.description }} />
 
-          <Divider borderColor="gray.700" my={6} />
-
-          <Flex gap={4} alignItems="center">
+          <Flex
+            gap={4}
+            alignItems="center"
+            rounded="xl"
+            borderWidth={1}
+            p={4}
+            mt={6}
+            borderColor="gray.700"
+          >
             <Box w={12} h={12} rounded="full" overflow="hidden" pos="relative">
               <styled.img
-                src={getShopImage(product.shop)}
+                src={product.Tracks?.image ?? ""}
                 pos="absolute"
                 inset={0}
                 objectFit="cover"
               />
             </Box>
             <Box>
-              <Flex alignItems="center" gap={1}>
-                <styled.span>{getShopName(product.shop)}</styled.span>
-                <RiMapPinFill />
-              </Flex>
+              <styled.span fontWeight="bold">
+                {product.Tracks?.name}
+              </styled.span>
             </Box>
             <Spacer />
+            <LinkButton
+              to={`/calendar/${product.Tracks?.slug}`}
+              variant="outline"
+            >
+              Visit Shop
+            </LinkButton>
             <LinkButton
               to={product.url}
               target="_blank"
               data-splitbee-event="Clicked to Buy"
             >
-              Visit Shop <RiLink />
+              Buy Now <RiLink />
             </LinkButton>
           </Flex>
         </Box>
