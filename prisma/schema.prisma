@@ -125,6 +125,7 @@ enum TrackTypes {
 enum Shops {
   ASBO
   RCKITOUT
+  A0_RCKITOUT // For Sorting
   DRIFTMANJI
   SLIDEDYNAMICS
   RCPACE

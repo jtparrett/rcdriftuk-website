@@ -17,7 +17,6 @@ import {
   Center,
   AspectRatio,
 } from "~/styled-system/jsx";
-import { getShopImage } from "~/utils/getShopImage";
 import { prisma } from "~/utils/prisma.server";
 
 export const meta: MetaFunction = () => {
@@ -81,6 +80,12 @@ export const loader = async (params: LoaderFunctionArgs) => {
     }),
     take: 20,
     skip: 20 * (page - 1),
+    orderBy: {
+      shop: "asc",
+    },
+    include: {
+      Tracks: true,
+    },
   });
 };
 
@@ -161,7 +166,7 @@ const Page = () => {
                 <Flex alignItems="flex-start" gap={4}>
                   <Box w={12} h={12} rounded="full" overflow="hidden">
                     <styled.img
-                      src={getShopImage(product.shop)}
+                      src={product.Tracks?.image ?? ""}
                       w="full"
                       h="full"
                       objectFit="cover"
@@ -177,7 +182,7 @@ const Page = () => {
                       {product.title}
                     </styled.h1>
                     <Flex alignItems="center" gap={1} color="gray.400">
-                      <styled.p fontSize="sm">{product.shop}</styled.p>
+                      <styled.p fontSize="sm">{product.Tracks?.name}</styled.p>
                       <styled.span fontSize="sm">
                         <RiMapPinLine />
                       </styled.span>
