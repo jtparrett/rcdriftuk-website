@@ -104,14 +104,15 @@ model TrackOwners {
 }
 
 model Products {
-  slug        String  @id
+  slug        String        @id
   title       String
   image       String
   description String
   shop        Shops
   url         String
-  trackId     String? @db.Uuid
-  Tracks      Tracks? @relation(fields: [trackId], references: [id])
+  trackId     String?       @db.Uuid
+  status      ProductStatus @default(UNKNOWN)
+  Tracks      Tracks?       @relation(fields: [trackId], references: [id])
 }
 
 enum TrackTypes {
@@ -128,4 +129,11 @@ enum Shops {
   SLIDEDYNAMICS
   RCPACE
   MODELSHOPDIRECT
+}
+
+enum ProductStatus {
+  IN_STOCK
+  SOLD_OUT
+  BACKORDER
+  UNKNOWN
 }

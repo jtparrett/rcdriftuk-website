@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import {
   RiArrowLeftSLine,
@@ -8,6 +8,7 @@ import {
 } from "react-icons/ri";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
+import { ProductStatus } from "~/components/ProductStatus";
 import {
   styled,
   Box,
@@ -39,6 +40,7 @@ const LinkOverlay = styled(Link, {
       position: "absolute",
       inset: 0,
       display: "block",
+      zIndex: 3,
     },
   },
 });
@@ -134,21 +136,27 @@ const Page = () => {
               pb={4}
               pos="relative"
             >
-              <AspectRatio
-                w="full"
-                ratio={1.2}
-                pos="relative"
-                overflow="hidden"
-                rounded="md"
-                mb={4}
-              >
-                <styled.img
-                  src={product.image}
+              <Box pos="relative">
+                <Box pos="absolute" top={2} right={2} zIndex={1}>
+                  <ProductStatus status={product.status} />
+                </Box>
+
+                <AspectRatio
                   w="full"
-                  pos="absolute"
-                  inset={0}
-                />
-              </AspectRatio>
+                  ratio={1.2}
+                  pos="relative"
+                  overflow="hidden"
+                  rounded="md"
+                  mb={4}
+                >
+                  <styled.img
+                    src={product.image}
+                    w="full"
+                    pos="absolute"
+                    inset={0}
+                  />
+                </AspectRatio>
+              </Box>
               <LinkOverlay to={`/catalogue/${product.slug}`}>
                 <Flex alignItems="flex-start" gap={4}>
                   <Box w={12} h={12} rounded="full" overflow="hidden">
