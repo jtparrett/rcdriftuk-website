@@ -80,9 +80,14 @@ export const loader = async (params: LoaderFunctionArgs) => {
     }),
     take: 20,
     skip: 20 * (page - 1),
-    orderBy: {
-      shop: "asc",
-    },
+    orderBy: [
+      {
+        shop: "desc",
+      },
+      {
+        title: "asc",
+      },
+    ],
     include: {
       Tracks: true,
     },
