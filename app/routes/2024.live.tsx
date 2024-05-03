@@ -29,9 +29,9 @@ const Page = () => {
 
         <ins
           className="adsbygoogle"
-          style={{ display: "block" }}
+          style={{ display: "block !important" }}
           data-ad-client="ca-pub-8123266196289449"
-          data-ad-slot="9791201201"
+          data-ad-slot="9623572443"
           data-ad-format="auto"
           data-full-width-responsive="true"
         ></ins>
