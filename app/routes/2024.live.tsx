@@ -1,13 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ClientOnly } from "~/components/ClientOnly";
 import { styled, Box, Container } from "~/styled-system/jsx";
 
 const Page = () => {
+  const adRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     try {
       setTimeout(() => {
-        // @ts-ignore
-        (global.window.adsbygoogle = global.window.adsbygoogle || []).push({});
+        if (adRef.current) {
+          adRef.current.innerHTML = `
+          <ins
+          className="adsbygoogle"
+          style={{ display: "block !important" }}
+          data-ad-client="ca-pub-8123266196289449"
+          data-ad-slot="9623572443"
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+        `;
+
+          setTimeout(() => {
+            // @ts-ignore
+            (global.window.adsbygoogle = global.window.adsbygoogle || []).push(
+              {}
+            );
+          }, 1000);
+        }
       }, 2000);
     } catch (err) {
       console.error(err);
@@ -34,16 +53,7 @@ const Page = () => {
         </Box>
       </ClientOnly>
 
-      <div className="gad" style={{ width: "320px" }}>
-        <ins
-          className="adsbygoogle"
-          style={{ display: "block !important" }}
-          data-ad-client="ca-pub-8123266196289449"
-          data-ad-slot="9623572443"
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-        ></ins>
-      </div>
+      <div className="gad" style={{ width: "320px" }} ref={adRef}></div>
     </Container>
   );
 };
