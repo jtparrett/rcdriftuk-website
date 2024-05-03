@@ -5,8 +5,10 @@ import { styled, Box, Container } from "~/styled-system/jsx";
 const Page = () => {
   useEffect(() => {
     try {
-      // @ts-ignore
-      (global.window.adsbygoogle = global.window.adsbygoogle || []).push({});
+      setTimeout(() => {
+        // @ts-ignore
+        (global.window.adsbygoogle = global.window.adsbygoogle || []).push({});
+      }, 2000);
     } catch (err) {
       console.error(err);
     }
