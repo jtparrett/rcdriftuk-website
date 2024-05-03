@@ -15,9 +15,10 @@ import styles from "./index.css";
 import { Analytics } from "@vercel/analytics/react";
 import { Header } from "./components/Header";
 import { rootAuthLoader } from "@clerk/remix/ssr.server";
-import { ClerkApp, ClerkErrorBoundary } from "@clerk/remix";
+import { ClerkApp } from "@clerk/remix";
 import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
+import { ClientOnly } from "./components/ClientOnly";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -54,12 +55,13 @@ function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <script async src="https://cdn.splitbee.io/sb.js"></script>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
-          crossOrigin="anonymous"
-        ></script>
+        <ClientOnly>
+          <script src="https://cdn.splitbee.io/sb.js"></script>
+          <script
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
+            crossOrigin="anonymous"
+          ></script>
+        </ClientOnly>
       </head>
       <body>
         {!hideBanner && <CookieBanner />}
@@ -73,8 +75,6 @@ function App() {
     </html>
   );
 }
-
-export const ErrorBoundary = ClerkErrorBoundary();
 
 export default ClerkApp(App, {
   appearance: {
