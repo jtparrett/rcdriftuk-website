@@ -15,3 +15,20 @@
 .month:hover .dot {
   transform: scale(150%);
 }
+
+.gad {
+  width: 320px !important;
+  margin: 0 auto;
+}
+
+@media (min-width: 800px) {
+  .gad {
+    width: 700px !important;
+  }
+}
+
+@media (min-width: 1000px) {
+  .gad {
+    width: 980px !important;
+  }
+}
