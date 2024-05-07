@@ -179,7 +179,8 @@ const CalendarNewPage = () => {
         <Flex flexDir="column" maxW={500} gap={4}>
           <Box>
             <Label>Track</Label>
-            <Select name="trackId">
+            <Select name="trackId" required>
+              <option></option>
               {tracks.map((track) => (
                 <option key={track.id} value={track.id}>
                   {track.name}
