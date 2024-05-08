@@ -75,8 +75,13 @@ export const loader = async () => {
     .map((driver) => {
       const points = driverStandings
         .filter((standing) => standing.driverId === driver.driverId)
-        .reduce((agg, i) => {
-          return agg + getBattlePoints(i.position) + i.qualiBonus;
+        .map((i) => {
+          return getBattlePoints(i.position) + i.qualiBonus;
+        }, 0)
+        .sort((a, b) => b - a)
+        .slice(0, 3)
+        .reduce((agg, p) => {
+          return agg + p;
         }, 0);
 
       return {
