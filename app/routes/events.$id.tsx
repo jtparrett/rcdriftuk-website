@@ -4,6 +4,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import ReactMarkdown from "react-markdown";
 import {
   format,
   formatDuration,
@@ -14,6 +15,7 @@ import { useMemo } from "react";
 import {
   RiCheckboxCircleFill,
   RiCloseCircleFill,
+  RiLink,
   RiTicketFill,
 } from "react-icons/ri";
 import { z } from "zod";
@@ -191,14 +193,42 @@ const Page = () => {
           </styled.h1>
 
           {event.description && (
-            <styled.p
-              mb={4}
-              color="gray.500"
-              fontSize="sm"
-              whiteSpace="pre-line"
-            >
-              {event.description}
-            </styled.p>
+            <Box mb={4}>
+              <ReactMarkdown
+                components={{
+                  p({ children }) {
+                    return (
+                      <styled.p
+                        color="gray.400"
+                        fontSize="sm"
+                        whiteSpace="pre-line"
+                      >
+                        {children}
+                      </styled.p>
+                    );
+                  },
+                  a({ children, href }) {
+                    return (
+                      <styled.a
+                        display="inline-flex"
+                        flexWrap="wrap"
+                        gap={1}
+                        alignItems="center"
+                        color="brand.500"
+                        href={href}
+                        target="_blank"
+                        fontWeight="semibold"
+                      >
+                        {children}
+                        <RiLink />
+                      </styled.a>
+                    );
+                  },
+                }}
+              >
+                {event.description}
+              </ReactMarkdown>
+            </Box>
           )}
 
           <styled.p color="gray.500" fontSize="sm">
