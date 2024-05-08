@@ -202,6 +202,7 @@ const Page = () => {
                         color="gray.400"
                         fontSize="sm"
                         whiteSpace="pre-line"
+                        mb={2}
                       >
                         {children}
                       </styled.p>
