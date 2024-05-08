@@ -3,7 +3,7 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, redirect, useLoaderData } from "@remix-run/react";
 import ReactMarkdown from "react-markdown";
 import {
   format,
@@ -139,7 +139,7 @@ export const action = async (args: ActionFunctionArgs) => {
     });
   }
 
-  return null;
+  return redirect(`/events/${eventId}`);
 };
 
 const Page = () => {
