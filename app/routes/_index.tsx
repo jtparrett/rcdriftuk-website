@@ -2,6 +2,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
 import { RiMapPin2Fill, RiSearch2Line } from "react-icons/ri";
+import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
@@ -166,6 +167,8 @@ const Page = () => {
             <styled.img src="/2024-cover.jpg" w="full" />
           </Box>
         </Link>
+
+        <Advert />
       </Container>
 
       <Box

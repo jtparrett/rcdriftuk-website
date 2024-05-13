@@ -4,8 +4,12 @@ import { styled, Box, Container } from "~/styled-system/jsx";
 
 const Page = () => {
   useEffect(() => {
-    // @ts-ignore
-    (global.window.adsbygoogle = global.window.adsbygoogle || []).push({});
+    try {
+      // @ts-ignore
+      (global.window.adsbygoogle = global.window.adsbygoogle || []).push({});
+    } catch (err) {
+      console.log(err);
+    }
   }, []);
 
   return (
