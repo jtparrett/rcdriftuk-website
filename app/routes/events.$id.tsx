@@ -295,8 +295,7 @@ const Page = () => {
 
             <SignedIn>
               <Form method="post">
-                <input type="hidden" name="pointless" value="1234" />
-                <Button type="submit">
+                <Button type="submit" value="submit">
                   I'm {isAttending && "Not "}Going{" "}
                   {isAttending ? (
                     <RiCloseCircleFill />
