@@ -23,11 +23,11 @@ import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
 import { styled, Box, Container, Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import { getAuth } from "@clerk/remix/ssr.server";
 import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 import { getEventDate } from "~/utils/getEventDate";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
+import { getAuth } from "@clerk/remix/ssr.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -112,11 +112,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 };
 
 export const action = async (args: ActionFunctionArgs) => {
-  const eventId = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
   invariant(userId, "User is not signed in");
 
+  const eventId = z.string().parse(args.params.id);
   const userEventResponse = await prisma.eventResponses.findFirst({
     where: {
       userId,
