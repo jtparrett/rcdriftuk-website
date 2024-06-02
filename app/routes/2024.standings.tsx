@@ -328,6 +328,13 @@ const Page = () => {
           </styled.h1>
           <RoundStandingTable tournament="2024-RD3" />
         </Box>
+
+        <Box mt={10}>
+          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+            Round 4 Standings
+          </styled.h1>
+          <RoundStandingTable tournament="2024-RD4" />
+        </Box>
       </Container>
     </styled.main>
   );
