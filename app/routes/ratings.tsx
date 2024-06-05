@@ -46,7 +46,14 @@ const RatingsPage = () => {
           <styled.td fontFamily="mono" pl={2} borderTopLeftRadius="lg">
             {rank}
           </styled.td>
-          <td>{driver.name}</td>
+          <td>
+            <styled.span display="block" lineHeight={1.2}>
+              {driver.name}
+            </styled.span>
+            <styled.span fontSize="xs" color="gray.500" display="block">
+              {driver.team}
+            </styled.span>
+          </td>
           <styled.td textAlign="right" fontFamily="mono">
             {driver.points.toFixed(3)}
           </styled.td>

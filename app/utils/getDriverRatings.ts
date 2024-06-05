@@ -92,10 +92,12 @@ export const getDriverRatings = async () => {
 
   const drivers = Object.keys(driverElos)
     .map((id) => {
+      const driverInfo = allDrivers.find((driver) => driver.id === id);
       return {
         id,
         points: driverElos[id].elo,
-        name: allDrivers.find((driver) => driver.id === id)?.name,
+        name: driverInfo?.name,
+        team: driverInfo?.team,
         breakdown: driverElos[id].breakdown,
       };
     })
