@@ -55,22 +55,9 @@ model Drivers {
   champNo         Int?
   team            String?
   qualiPositions  Int[]
-  leftBattles     Battles[]               @relation("battleDriverLeft")
-  rightBattles    Battles[]               @relation("battleDriverRight")
   battleStandings DriverBattleStandings[]
   ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
   ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
-}
-
-model Battles {
-  createdAt     DateTime @default(now())
-  tournament    String
-  driverLeftId  String?
-  driverRightId String?
-  winnerId      String?
-  id            Int      @id @default(autoincrement())
-  driverLeft    Drivers? @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
-  driverRight   Drivers? @relation("battleDriverRight", fields: [driverRightId], references: [id])
 }
 
 model DriverRatingBattles {
