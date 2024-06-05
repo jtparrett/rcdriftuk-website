@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
 import {
   RiArrowLeftSLine,
   RiArrowRightSLine,
@@ -8,6 +8,7 @@ import {
 } from "react-icons/ri";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
+import { LinkOverlay } from "~/components/LinkOverlay";
 import { ProductStatus } from "~/components/ProductStatus";
 import {
   styled,
@@ -31,18 +32,6 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
-
-const LinkOverlay = styled(Link, {
-  base: {
-    _before: {
-      content: '""',
-      position: "absolute",
-      inset: 0,
-      display: "block",
-      zIndex: 3,
-    },
-  },
-});
 
 export const loader = async (params: LoaderFunctionArgs) => {
   const url = new URL(params.request.url);

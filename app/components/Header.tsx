@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import {
   RiCalendar2Line,
   RiFacebookFill,
+  RiFlagLine,
   RiHome2Line,
   RiInstagramFill,
   RiListOrdered2,
@@ -94,6 +95,15 @@ const Menu = () => {
           Drift Map
         </MenuLink>
         <MenuLink
+          to="/tracks"
+          active={location.pathname.includes("/tracks") ? "active" : "inactive"}
+        >
+          <MenuIcon>
+            <RiFlagLine />
+          </MenuIcon>
+          All Tracks
+        </MenuLink>
+        <MenuLink
           to={`/calendar/week/${today}`}
           active={
             location.pathname.includes("/calendar") ? "active" : "inactive"
@@ -102,7 +112,7 @@ const Menu = () => {
           <MenuIcon>
             <RiCalendar2Line />
           </MenuIcon>
-          Drift Calendar
+          Calendar
         </MenuLink>
         <MenuLink
           to="/catalogue"
