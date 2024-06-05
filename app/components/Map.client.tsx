@@ -91,7 +91,7 @@ export const Map = ({ tracks }: Props) => {
 
                       <Flex gap={1}>
                         <LinkButton
-                          to={`/calendar/${item.slug}`}
+                          to={`/tracks/${item.slug}`}
                           flex={1}
                           textTransform="capitalize"
                         >

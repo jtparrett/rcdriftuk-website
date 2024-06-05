@@ -397,7 +397,7 @@ const Page = () => {
               <LinkButton
                 mt={5}
                 w="full"
-                to={`/calendar/${event.eventTrack.slug}`}
+                to={`/tracks/${event.eventTrack.slug}`}
                 variant="secondary"
               >
                 See All Events

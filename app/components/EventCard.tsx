@@ -63,7 +63,7 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
           borderWidth={1}
           borderColor="gray.500"
         >
-          <Link to={`/calendar/${event.eventTrack.slug}`}>
+          <Link to={`/tracks/${event.eventTrack.slug}`}>
             <styled.img
               src={event.eventTrack.image}
               w="full"

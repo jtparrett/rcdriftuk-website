@@ -46,8 +46,8 @@ const CatalogueListingPage = () => {
   const buttonText = inStock
     ? "Buy Now"
     : backorder
-    ? "Backorder Now"
-    : "View Product";
+      ? "Backorder Now"
+      : "View Product";
 
   return (
     <Box pt={4}>
@@ -83,7 +83,7 @@ const CatalogueListingPage = () => {
             mt={6}
             borderColor="gray.700"
           >
-            <Link to={`/calendar/${product.Tracks?.slug}`}>
+            <Link to={`/tracks/${product.Tracks?.slug}`}>
               <Flex gap={2} alignItems="center">
                 <Box
                   w={12}
