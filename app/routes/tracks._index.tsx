@@ -1,7 +1,18 @@
+import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: `RC Drift UK | Tracks` },
+    {
+      name: "description",
+      content: "Here you can find a list of all the tracks from across the UK.",
+    },
+  ];
+};
 
 export const loader = async () => {
   const tracks = await prisma.tracks.findMany({

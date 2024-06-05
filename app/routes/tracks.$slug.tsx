@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
 import { RiFacebookFill, RiLink } from "react-icons/ri";
@@ -43,6 +43,17 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   }
 
   return track;
+};
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    { title: `RC Drift UK | Tracks | ${data?.name}` },
+    { name: "description", content: data?.description },
+    {
+      property: "og:image",
+      content: `https://rcdrift.uk/${data?.image}`,
+    },
+  ];
 };
 
 const TrackPage = () => {
