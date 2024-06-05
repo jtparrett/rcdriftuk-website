@@ -27,7 +27,7 @@ import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 import { getEventDate } from "~/utils/getEventDate";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
-import { getAuth } from "@clerk/remix/ssr.server";
+import { getAuth } from "~/utils/getAuth.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -111,25 +111,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
   };
 };
 
-const generateNewRequestForClerk = (request: Request) => {
-  const originalRequest = request.clone();
-  const newRequestInit = {
-    method: "GET", // Change the method to GET
-    headers: new Headers(originalRequest.headers), // Copy headers from the original request
-  };
-
-  // Remove content-type header as it's not needed for GET and may cause issues
-  newRequestInit.headers.delete("Content-Type");
-
-  // Instantiate the new request without the body attribute
-  return new Request(originalRequest.url, newRequestInit);
-};
-
 export const action = async (args: ActionFunctionArgs) => {
-  const { userId } = await getAuth({
-    ...args,
-    request: generateNewRequestForClerk(args.request),
-  });
+  const { userId } = await getAuth(args);
 
   invariant(userId, "User is not signed in");
 
