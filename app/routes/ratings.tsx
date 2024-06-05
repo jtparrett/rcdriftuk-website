@@ -70,9 +70,9 @@ const RatingsPage = () => {
               >
                 {driver.breakdown.map((item) => {
                   const [left, right] =
-                    item.battle.driverLeftId === driver.id
-                      ? [item.battle.driverLeft, item.battle.driverRight]
-                      : [item.battle.driverRight, item.battle.driverLeft];
+                    item.battle.winnerId === driver.id
+                      ? [item.battle.winner, item.battle.loser]
+                      : [item.battle.loser, item.battle.winner];
 
                   return (
                     <p key={item.battle.id}>

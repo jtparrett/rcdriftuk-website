@@ -58,6 +58,8 @@ model Drivers {
   leftBattles     Battles[]               @relation("battleDriverLeft")
   rightBattles    Battles[]               @relation("battleDriverRight")
   battleStandings DriverBattleStandings[]
+  ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
+  ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
 }
 
 model Battles {
@@ -69,6 +71,16 @@ model Battles {
   id            Int      @id @default(autoincrement())
   driverLeft    Drivers? @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
   driverRight   Drivers? @relation("battleDriverRight", fields: [driverRightId], references: [id])
+}
+
+model DriverRatingBattles {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  tournament String
+  loserId    String
+  winnerId   String
+  winner     Drivers  @relation("driverRatingsWins", fields: [winnerId], references: [id])
+  loser      Drivers  @relation("driverRatingsLosses", fields: [loserId], references: [id])
 }
 
 model DriverBattleStandings {
