@@ -113,14 +113,31 @@ const TrackPage = () => {
       </Box>
 
       <Box flex={1}>
+        {track.events.length > 0 && (
+          <Box
+            rounded="lg"
+            overflow="hidden"
+            borderWidth={3}
+            borderColor="brand.500"
+            bgColor="brand.500"
+            mb={4}
+          >
+            <Box py={1} px={4}>
+              <styled.h3 fontWeight="bold">Up Next</styled.h3>
+            </Box>
+
+            <EventCard event={track.events[0]} />
+          </Box>
+        )}
+
         <Box
-          rounded="xl"
+          rounded="lg"
           overflow="hidden"
           borderWidth={1}
           borderColor="gray.800"
         >
           <Box py={1} px={4} bgColor="gray.800">
-            <styled.h3 fontWeight="bold">Events</styled.h3>
+            <styled.h3 fontWeight="bold">All Events</styled.h3>
           </Box>
 
           <Flex flexDir="column" gap={2} p={4}>
