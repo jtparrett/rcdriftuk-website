@@ -20,6 +20,7 @@ model Events {
   trackId     String?          @db.Uuid
   description String?
   responses   EventResponses[]
+  type        EventTypes       @default(MEET)
   eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
 }
 
@@ -34,7 +35,7 @@ model EventResponses {
 }
 
 model Tracks {
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
   image       String
@@ -42,10 +43,10 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String        @default("")
+  slug        String       @default("")
   events      Events[]
   Products    Products[]
-  owners      TrackOwners[]
+  owners      Users[]
 }
 
 model Drivers {
@@ -58,6 +59,7 @@ model Drivers {
   battleStandings DriverBattleStandings[]
   ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
   ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
+  user            Users[]
 }
 
 model DriverRatingBattles {
@@ -88,18 +90,11 @@ model Users {
   firstName String?
   image     String?
   lastName  String?
+  trackId   String?          @db.Uuid
+  driverId  String?
   events    EventResponses[]
-  tracks    TrackOwners[]
-}
-
-model TrackOwners {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  userId    String
-  trackId   String   @db.Uuid
-  track     Tracks   @relation(fields: [trackId], references: [id])
-  owner     Users    @relation(fields: [userId], references: [id])
+  track     Tracks?          @relation(fields: [trackId], references: [id])
+  driver    Drivers?         @relation(fields: [driverId], references: [id])
 }
 
 model Products {
@@ -136,4 +131,9 @@ enum ProductStatus {
   SOLD_OUT
   BACKORDER
   UNKNOWN
+}
+
+enum EventTypes {
+  MEET
+  TOURNAMENT
 }
