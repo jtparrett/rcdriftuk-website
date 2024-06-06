@@ -92,7 +92,7 @@ const Menu = () => {
           <MenuIcon>
             <RiMapPin2Line />
           </MenuIcon>
-          Drift Map
+          Map
         </MenuLink>
         <MenuLink
           to="/tracks"
@@ -101,7 +101,7 @@ const Menu = () => {
           <MenuIcon>
             <RiFlagLine />
           </MenuIcon>
-          All Tracks
+          Tracks
         </MenuLink>
         <MenuLink
           to={`/calendar/week/${today}`}
@@ -123,7 +123,7 @@ const Menu = () => {
           <MenuIcon>
             <RiSearch2Line />
           </MenuIcon>
-          Shops Catalogue
+          Catalogue
         </MenuLink>
         <MenuLink
           to="/ratings"

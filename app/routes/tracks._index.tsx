@@ -30,10 +30,11 @@ const TracksPage = () => {
   return (
     <styled.main py={6} overflow="hidden">
       <styled.h1 fontSize="4xl" fontWeight="extrabold" lineHeight={1.2}>
-        All Tracks
+        Tracks
       </styled.h1>
       <styled.p color="gray.400" mb={8}>
-        Here you can find a list of all the tracks from across the UK.
+        Here you can find a list of all the tracks, clubs and shops from across
+        the UK.
       </styled.p>
 
       <Flex flexWrap="wrap" gap={4} mr={-4}>

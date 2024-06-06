@@ -8,6 +8,7 @@ datasource db {
 }
 
 model Events {
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   track       String?
   startDate   DateTime
@@ -15,13 +16,12 @@ model Events {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @default(now()) @updatedAt
   approved    Boolean          @default(false)
-  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   link        String?          @default("")
   trackId     String?          @db.Uuid
   description String?
   responses   EventResponses[]
-  type        EventTypes       @default(MEET)
   eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
+  tournament  Tournaments?
 }
 
 model EventResponses {
@@ -32,6 +32,29 @@ model EventResponses {
   user    Users  @relation(fields: [userId], references: [id])
 
   @@unique([eventId, userId])
+}
+
+model Tournaments {
+  id                  String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @default(now()) @updatedAt
+  nextBattleId        String?             @db.Uuid
+  nextQualifyingLapId String?             @db.Uuid
+  format              TournamentsFormat   @default(STANDARD)
+  qualifyingLaps      Int                 @default(1)
+  state               TournamentsState    @default(START)
+  eventId             String              @unique @db.Uuid
+  event               Events              @relation(fields: [eventId], references: [id])
+  drivers             TournamentDrivers[]
+}
+
+model TournamentDrivers {
+  id                 String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt          DateTime    @default(now())
+  tournamentId       String      @db.Uuid
+  tournament         Tournaments @relation(fields: [tournamentId], references: [id])
+  name               String
+  qualifyingPosition Int?
 }
 
 model Tracks {
@@ -133,7 +156,14 @@ enum ProductStatus {
   UNKNOWN
 }
 
-enum EventTypes {
-  MEET
-  TOURNAMENT
+enum TournamentsState {
+  START
+  QUALIFYING
+  BATTLES
+  END
+}
+
+enum TournamentsFormat {
+  STANDARD
+  DOUBLE_ELIMINATION
 }

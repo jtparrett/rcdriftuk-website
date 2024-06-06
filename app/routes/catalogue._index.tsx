@@ -94,7 +94,7 @@ const Page = () => {
 
   return (
     <>
-      <styled.h1 srOnly>Shops Catalogue</styled.h1>
+      <styled.h1 srOnly>Catalogue</styled.h1>
 
       <Box mt={4}>
         <Form action="/catalogue">
