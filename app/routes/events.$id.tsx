@@ -338,9 +338,10 @@ const Page = () => {
           {isTrackOwner && (
             <Box pt={2}>
               {!event.tournament && (
-                <LinkButton to="/tournaments/new">
-                  Start a Tournament
-                </LinkButton>
+                <Form method="post" action="/api/tournaments/new">
+                  <input type="hidden" name="eventId" value={event.id} />
+                  <Button type="submit">Start a Tournament</Button>
+                </Form>
               )}
 
               {event.tournament && (

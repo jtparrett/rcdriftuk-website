@@ -9,6 +9,15 @@ export const getTournament = (id: string) => {
       id: true,
       format: true,
       qualifyingLaps: true,
+      nextQualifyingLap: {
+        select: {
+          driver: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
       state: true,
       event: {
         select: {

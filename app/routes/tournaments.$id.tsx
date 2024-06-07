@@ -1,5 +1,5 @@
-import { TournamentsFormat, TournamentsState } from "@prisma/client";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { TournamentsState } from "@prisma/client";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { capitalCase } from "change-case";
 import invariant from "tiny-invariant";
@@ -9,8 +9,6 @@ import { TournamentStartForm } from "~/components/TournamentStartForm";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
-import { nameStringToArray } from "~/utils/nameStringToArray";
-import { prisma } from "~/utils/prisma.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -28,72 +26,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   return tournament;
-};
-
-export const action = async (args: ActionFunctionArgs) => {
-  const { userId } = await getAuth(args);
-  const id = z.string().parse(args.params.id);
-
-  invariant(userId);
-
-  const tournament = await prisma.tournaments.findFirst({
-    where: {
-      state: TournamentsState.START,
-      event: {
-        eventTrack: {
-          owners: {
-            some: {
-              id: userId,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  invariant(tournament);
-
-  const formData = await args.request.formData();
-  const drivers = z.string().parse(formData.get("drivers"));
-  const judges = z.string().parse(formData.get("judges"));
-  const qualifyingLaps = Math.max(
-    z.coerce.number().parse(formData.get("qualifyingLaps")),
-    1
-  );
-  const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
-
-  await prisma.$transaction([
-    prisma.tournamentDrivers.createMany({
-      data: nameStringToArray(drivers).map((name) => {
-        return {
-          name,
-          tournamentId: id,
-        };
-      }),
-    }),
-
-    prisma.tournamentJudges.createMany({
-      data: nameStringToArray(judges).map((name) => {
-        return {
-          name,
-          tournamentId: id,
-        };
-      }),
-    }),
-
-    prisma.tournaments.update({
-      where: {
-        id,
-      },
-      data: {
-        state: TournamentsState.QUALIFYING,
-        qualifyingLaps,
-        format,
-      },
-    }),
-  ]);
-
-  return null;
 };
 
 const TournamentPage = () => {
@@ -143,19 +75,9 @@ const TournamentPage = () => {
             </Button>
           </Flex>
 
-          <Box maxW={500} bgColor="gray.900" p={6} rounded="xl">
-            <styled.table w="full">
-              <styled.tbody>
-                {tournament.drivers.map((driver, i) => {
-                  return (
-                    <styled.tr key={driver.id}>
-                      <styled.td>{i + 1}</styled.td>
-                      <styled.td>{driver.name}</styled.td>
-                    </styled.tr>
-                  );
-                })}
-              </styled.tbody>
-            </styled.table>
+          <Box>
+            <styled.h2>Next Qualifying</styled.h2>
+            <styled.p>{tournament.nextQualifyingLap?.driver.name}</styled.p>
           </Box>
         </>
       )}

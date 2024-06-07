@@ -14,7 +14,7 @@ interface Props {
 
 export const TournamentStartForm = ({ tournament }: Props) => {
   return (
-    <Form method="post">
+    <Form method="post" action={`/api/tournaments/${tournament?.id}/start`}>
       <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
         <Flex gap={4}>
           <StepNumber value={1} />
