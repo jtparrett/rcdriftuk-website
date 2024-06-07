@@ -62,6 +62,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
           user: true,
         },
       },
+      tournament: true,
       eventTrack: {
         include: {
           _count: {
@@ -97,17 +98,27 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
+    const userData = await prisma.users.findFirst({
+      where: {
+        id: userId,
+        trackId: event.trackId,
+      },
+    });
+
     const isAttending = !!userEventResponse;
+    const isTrackOwner = !!userData;
 
     return {
       event,
       isAttending,
+      isTrackOwner,
     };
   }
 
   return {
     event,
     isAttending: false,
+    isTrackOwner: false,
   };
 };
 
@@ -143,7 +154,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending } = useLoaderData<typeof loader>();
+  const { event, isAttending, isTrackOwner } = useLoaderData<typeof loader>();
   const startDate = useMemo(
     () => dateWithoutTimezone(event.startDate),
     [event]
@@ -323,6 +334,22 @@ const Page = () => {
               </LinkButton>
             )}
           </Flex>
+
+          {isTrackOwner && (
+            <Box pt={2}>
+              {!event.tournament && (
+                <LinkButton to="/tournaments/new">
+                  Start a Tournament
+                </LinkButton>
+              )}
+
+              {event.tournament && (
+                <LinkButton to={`/tournaments/${event.tournament.id}`}>
+                  View Tournament
+                </LinkButton>
+              )}
+            </Box>
+          )}
         </Box>
 
         {event.eventTrack && (

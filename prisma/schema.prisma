@@ -46,6 +46,7 @@ model Tournaments {
   eventId             String              @unique @db.Uuid
   event               Events              @relation(fields: [eventId], references: [id])
   drivers             TournamentDrivers[]
+  judges              TournamentJudges[]
 }
 
 model TournamentDrivers {
@@ -55,6 +56,14 @@ model TournamentDrivers {
   tournament         Tournaments @relation(fields: [tournamentId], references: [id])
   name               String
   qualifyingPosition Int?
+}
+
+model TournamentJudges {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt    DateTime    @default(now())
+  name         String
+  tournamentId String      @db.Uuid
+  tournament   Tournaments @relation(fields: [tournamentId], references: [id])
 }
 
 model Tracks {
