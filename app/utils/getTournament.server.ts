@@ -9,28 +9,6 @@ export const getTournament = (id: string) => {
       id: true,
       format: true,
       qualifyingLaps: true,
-      nextQualifyingLap: {
-        select: {
-          driver: {
-            select: {
-              name: true,
-              laps: {
-                orderBy: {
-                  id: "asc",
-                },
-                select: {
-                  id: true,
-                  scores: {
-                    select: {
-                      score: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
       state: true,
       event: {
         select: {
