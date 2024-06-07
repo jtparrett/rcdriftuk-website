@@ -14,6 +14,19 @@ export const getTournament = (id: string) => {
           driver: {
             select: {
               name: true,
+              laps: {
+                orderBy: {
+                  id: "asc",
+                },
+                select: {
+                  id: true,
+                  scores: {
+                    select: {
+                      score: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },

@@ -57,7 +57,7 @@ model TournamentDrivers {
   tournament         Tournaments @relation(fields: [tournamentId], references: [id])
   name               String
   qualifyingPosition Int?
-  Laps               Laps[]
+  laps               Laps[]
 }
 
 model TournamentJudges {

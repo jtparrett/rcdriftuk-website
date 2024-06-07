@@ -54,32 +54,39 @@ const TournamentPage = () => {
         <TournamentStartForm tournament={tournament} />
       )}
 
-      {tournament.state === TournamentsState.QUALIFYING && (
-        <>
-          <Flex
-            bgColor="gray.900"
-            rounded="xl"
-            gap={1}
-            p={1}
-            display="inline-flex"
-            mb={4}
-          >
-            <Button size="xs" variant="secondary">
-              Info
-            </Button>
-            <Button variant="ghost" size="xs">
-              Qualifying
-            </Button>
-            <Button variant="ghost" size="xs">
-              Battles
-            </Button>
-          </Flex>
+      {tournament.state !== TournamentsState.START && (
+        <Flex
+          bgColor="gray.900"
+          rounded="xl"
+          gap={1}
+          p={1}
+          display="inline-flex"
+          mb={4}
+        >
+          <Button size="xs" variant="secondary">
+            Info
+          </Button>
+          <Button variant="ghost" size="xs">
+            Qualifying
+          </Button>
+          <Button variant="ghost" size="xs">
+            Battles
+          </Button>
+        </Flex>
+      )}
 
-          <Box>
-            <styled.h2>Next Qualifying</styled.h2>
-            <styled.p>{tournament.nextQualifyingLap?.driver.name}</styled.p>
-          </Box>
-        </>
+      {tournament.state === TournamentsState.QUALIFYING && (
+        <Box>
+          <styled.h2>Next Qualifying</styled.h2>
+          <styled.p>{tournament.nextQualifyingLap?.driver.name}</styled.p>
+          {tournament.nextQualifyingLap?.driver.laps.map((lap, i) => {
+            return (
+              <styled.p key={lap.id}>
+                Lap {i + 1} - {lap.scores.map((score) => score.score).join(",")}
+              </styled.p>
+            );
+          })}
+        </Box>
       )}
     </Container>
   );
