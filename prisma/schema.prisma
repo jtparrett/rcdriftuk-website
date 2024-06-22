@@ -175,6 +175,7 @@ enum Shops {
   SLIDEDYNAMICS
   RCPACE
   MODELSHOPDIRECT
+  SLIDEHOUSE
 }
 
 enum ProductStatus {
