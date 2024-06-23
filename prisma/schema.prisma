@@ -8,7 +8,6 @@ datasource db {
 }
 
 model Events {
-  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   track       String?
   startDate   DateTime
@@ -16,12 +15,13 @@ model Events {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @default(now()) @updatedAt
   approved    Boolean          @default(false)
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   link        String?          @default("")
   trackId     String?          @db.Uuid
   description String?
   responses   EventResponses[]
   eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
-  tournament  Tournaments?
+  Tournaments Tournaments?
 }
 
 model EventResponses {
@@ -32,57 +32,6 @@ model EventResponses {
   user    Users  @relation(fields: [userId], references: [id])
 
   @@unique([eventId, userId])
-}
-
-model Tournaments {
-  id                  String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @default(now()) @updatedAt
-  nextBattleId        String?             @db.Uuid
-  nextQualifyingLapId Int?                @unique
-  nextQualifyingLap   Laps?               @relation(fields: [nextQualifyingLapId], references: [id])
-  format              TournamentsFormat   @default(STANDARD)
-  qualifyingLaps      Int                 @default(1)
-  state               TournamentsState    @default(START)
-  eventId             String              @unique @db.Uuid
-  event               Events              @relation(fields: [eventId], references: [id])
-  drivers             TournamentDrivers[]
-  judges              TournamentJudges[]
-}
-
-model TournamentDrivers {
-  id                 Int         @id @default(autoincrement())
-  createdAt          DateTime    @default(now())
-  tournamentId       String      @db.Uuid
-  tournament         Tournaments @relation(fields: [tournamentId], references: [id])
-  name               String
-  qualifyingPosition Int?
-  laps               Laps[]
-}
-
-model TournamentJudges {
-  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt    DateTime    @default(now())
-  name         String
-  tournamentId String      @db.Uuid
-  tournament   Tournaments @relation(fields: [tournamentId], references: [id])
-}
-
-model Laps {
-  id                 Int               @id @default(autoincrement())
-  tournamentDriverId Int
-  scores             LapScores[]
-  driver             TournamentDrivers @relation(fields: [tournamentDriverId], references: [id])
-  tournament         Tournaments?
-}
-
-model LapScores {
-  score   Float
-  lapId   Int
-  judgeId String @db.Uuid
-  lap     Laps?  @relation(fields: [lapId], references: [id])
-
-  @@unique([judgeId, lapId])
 }
 
 model Tracks {
@@ -97,7 +46,7 @@ model Tracks {
   slug        String       @default("")
   events      Events[]
   Products    Products[]
-  owners      Users[]
+  Users       Users[]
 }
 
 model Drivers {
@@ -108,9 +57,9 @@ model Drivers {
   team            String?
   qualiPositions  Int[]
   battleStandings DriverBattleStandings[]
-  ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
   ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
-  user            Users[]
+  ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
+  Users           Users[]
 }
 
 model DriverRatingBattles {
@@ -119,8 +68,8 @@ model DriverRatingBattles {
   tournament String
   loserId    String
   winnerId   String
-  winner     Drivers  @relation("driverRatingsWins", fields: [winnerId], references: [id])
   loser      Drivers  @relation("driverRatingsLosses", fields: [loserId], references: [id])
+  winner     Drivers  @relation("driverRatingsWins", fields: [winnerId], references: [id])
 }
 
 model DriverBattleStandings {
@@ -141,11 +90,11 @@ model Users {
   firstName String?
   image     String?
   lastName  String?
-  trackId   String?          @db.Uuid
   driverId  String?
+  trackId   String?          @db.Uuid
   events    EventResponses[]
-  track     Tracks?          @relation(fields: [trackId], references: [id])
-  driver    Drivers?         @relation(fields: [driverId], references: [id])
+  Drivers   Drivers?         @relation(fields: [driverId], references: [id])
+  Tracks    Tracks?          @relation(fields: [trackId], references: [id])
 }
 
 model Products {
@@ -160,6 +109,57 @@ model Products {
   Tracks      Tracks?       @relation(fields: [trackId], references: [id])
 }
 
+model LapScores {
+  score   Float
+  lapId   Int
+  judgeId String @db.Uuid
+  Laps    Laps   @relation(fields: [lapId], references: [id])
+
+  @@unique([judgeId, lapId])
+}
+
+model Laps {
+  id                 Int               @id @default(autoincrement())
+  tournamentDriverId Int
+  LapScores          LapScores[]
+  TournamentDrivers  TournamentDrivers @relation(fields: [tournamentDriverId], references: [id])
+  Tournaments        Tournaments?
+}
+
+model TournamentDrivers {
+  id                 Int         @id @default(autoincrement())
+  createdAt          DateTime    @default(now())
+  tournamentId       String      @db.Uuid
+  name               String
+  qualifyingPosition Int?
+  Laps               Laps[]
+  Tournaments        Tournaments @relation(fields: [tournamentId], references: [id])
+}
+
+model TournamentJudges {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt    DateTime    @default(now())
+  name         String
+  tournamentId String      @db.Uuid
+  Tournaments  Tournaments @relation(fields: [tournamentId], references: [id])
+}
+
+model Tournaments {
+  id                  String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @default(now())
+  nextBattleId        String?             @db.Uuid
+  nextQualifyingLapId Int?                @unique
+  format              TournamentsFormat   @default(STANDARD)
+  qualifyingLaps      Int                 @default(1)
+  state               TournamentsState    @default(START)
+  eventId             String              @unique @db.Uuid
+  TournamentDrivers   TournamentDrivers[]
+  TournamentJudges    TournamentJudges[]
+  Events              Events              @relation(fields: [eventId], references: [id])
+  Laps                Laps?               @relation(fields: [nextQualifyingLapId], references: [id])
+}
+
 enum TrackTypes {
   ALL
   TRACKS
@@ -170,11 +170,11 @@ enum TrackTypes {
 enum Shops {
   ASBO
   RCKITOUT
-  A0_RCKITOUT // For Sorting
   DRIFTMANJI
   SLIDEDYNAMICS
   RCPACE
   MODELSHOPDIRECT
+  A0_RCKITOUT
   SLIDEHOUSE
 }
 
@@ -185,14 +185,14 @@ enum ProductStatus {
   UNKNOWN
 }
 
+enum TournamentsFormat {
+  STANDARD
+  DOUBLE_ELIMINATION
+}
+
 enum TournamentsState {
   START
   QUALIFYING
   BATTLES
   END
-}
-
-enum TournamentsFormat {
-  STANDARD
-  DOUBLE_ELIMINATION
 }
