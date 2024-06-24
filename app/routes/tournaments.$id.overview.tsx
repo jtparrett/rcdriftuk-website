@@ -24,7 +24,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return tournament;
 };
 
-const TournamentsStatusPage = () => {
+const TournamentsOverviewPage = () => {
   const tournament = useLoaderData<typeof loader>();
 
   return (
@@ -57,4 +57,4 @@ const TournamentsStatusPage = () => {
   );
 };
 
-export default TournamentsStatusPage;
+export default TournamentsOverviewPage;

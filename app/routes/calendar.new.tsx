@@ -22,43 +22,6 @@ import { styled, Box, Flex } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
-const sendEventToSlack = (text: string, id: string) => {
-  return fetch(
-    "https://hooks.slack.com/services/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",
-    {
-      method: "post",
-      body: JSON.stringify({
-        text: "New Event",
-
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text,
-            },
-          },
-          {
-            type: "actions",
-            elements: [
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Approve",
-                },
-                style: "primary",
-                action_id: "approve",
-                value: id,
-              },
-            ],
-          },
-        ],
-      }),
-    }
-  );
-};
-
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
@@ -148,32 +111,10 @@ export const action = async (args: ActionFunctionArgs) => {
         startDate: repeatStartDate,
         endDate: repeatEndDate,
         description: data.description,
+        approved: true,
       };
     }),
   });
-
-  const event = await prisma.events.findFirst({
-    where: {
-      trackId: userData.trackId,
-    },
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-      { startDate: "desc" },
-    ],
-    include: {
-      eventTrack: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-
-  if (event) {
-    await sendEventToSlack(JSON.stringify(event, null, 2), event.id);
-  }
 
   return redirect("/calendar/success");
 };

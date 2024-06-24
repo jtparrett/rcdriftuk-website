@@ -4,9 +4,9 @@ import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { capitalCase } from "change-case";
 import invariant from "tiny-invariant";
 import { z } from "zod";
-import { LinkButton } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { TournamentStartForm } from "~/components/TournamentStartForm";
-import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 
@@ -31,28 +31,52 @@ export const loader = async (args: LoaderFunctionArgs) => {
 const TournamentPage = () => {
   const tournament = useLoaderData<typeof loader>();
   const location = useLocation();
-  const isStatusTab = location.pathname.includes("status");
+  const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
 
   return (
     <Container pb={12} px={2} pt={8} maxW={1100}>
       <Box mb={4}>
-        <styled.p
-          rounded="md"
-          bgColor="green.300"
-          color="green.600"
-          fontWeight="semibold"
-          fontSize="sm"
-          display="inline-block"
-          px={2}
-          mb={2}
+        <Flex
+          alignItems="center"
+          px={4}
+          py={2}
+          rounded="xl"
+          bgColor="gray.900"
+          gap={2}
+          flexWrap={{ base: "wrap", sm: "nowrap" }}
         >
-          {capitalCase(tournament.state)}
-        </styled.p>
-        <styled.h1 fontSize="4xl" fontWeight="extrabold" lineHeight={1.2}>
-          {tournament.event.name}
-        </styled.h1>
+          <styled.h1
+            fontSize="2xl"
+            fontWeight="extrabold"
+            lineHeight={1}
+            maxW={{ sm: 300 }}
+            w={{ base: "full", sm: "auto" }}
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+          >
+            {tournament.event.name}
+          </styled.h1>
+          <styled.p
+            rounded="md"
+            bgColor="green.300"
+            color="green.600"
+            fontWeight="semibold"
+            fontSize="sm"
+            display="inline-block"
+            px={2}
+          >
+            {capitalCase(tournament.state)}
+          </styled.p>
+
+          <Spacer />
+
+          <Button variant="secondary" size="xs" whiteSpace="nowrap">
+            Open Judging Portal
+          </Button>
+        </Flex>
       </Box>
 
       {tournament.state === TournamentsState.START && (
@@ -61,7 +85,12 @@ const TournamentPage = () => {
 
       {tournament.state !== TournamentsState.START && (
         <>
-          <Box mb={4}>
+          <Flex
+            mb={4}
+            alignItems={{ sm: "center" }}
+            flexDir={{ base: "column-reverse", sm: "row" }}
+            gap={2}
+          >
             <Flex
               bgColor="gray.900"
               rounded="xl"
@@ -70,11 +99,11 @@ const TournamentPage = () => {
               display="inline-flex"
             >
               <LinkButton
-                to={`/tournaments/${tournament.id}/status`}
+                to={`/tournaments/${tournament.id}/overview`}
                 size="xs"
-                variant={isStatusTab ? "secondary" : "ghost"}
+                variant={isOverviewTab ? "secondary" : "ghost"}
               >
-                Status
+                Overview
               </LinkButton>
               <LinkButton
                 to={`/tournaments/${tournament.id}/qualifying`}
@@ -91,7 +120,13 @@ const TournamentPage = () => {
                 Battles
               </LinkButton>
             </Flex>
-          </Box>
+
+            <Spacer />
+
+            {tournament.state === TournamentsState.QUALIFYING && (
+              <Button>Start Next Lap</Button>
+            )}
+          </Flex>
 
           <Outlet />
         </>
