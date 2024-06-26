@@ -168,11 +168,7 @@ const Page = () => {
                     />
                   </Box>
                   <Box flex={1}>
-                    <styled.h1
-                      fontWeight="semibold"
-                      mb={1}
-                      lineBreak="anywhere"
-                    >
+                    <styled.h1 fontWeight="semibold" mb={1} textWrap="balance">
                       {product.title}
                     </styled.h1>
                     <Flex alignItems="center" gap={1} color="gray.400">
