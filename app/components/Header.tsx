@@ -11,6 +11,7 @@ import {
   RiListOrdered2,
   RiMapPin2Line,
   RiMenu2Line,
+  RiRocketLine,
   RiSearch2Line,
   RiTrophyLine,
 } from "react-icons/ri";
@@ -144,6 +145,19 @@ const Menu = () => {
             <RiTrophyLine />
           </MenuIcon>
           2024 Championship
+        </MenuLink>
+        <MenuLink
+          to="/getting-started"
+          active={
+            location.pathname.includes("/getting-started")
+              ? "active"
+              : "inactive"
+          }
+        >
+          <MenuIcon>
+            <RiRocketLine />
+          </MenuIcon>
+          Getting Started
         </MenuLink>
       </Flex>
     </Box>

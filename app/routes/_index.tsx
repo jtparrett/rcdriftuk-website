@@ -1,7 +1,7 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
-import { RiMapPin2Fill, RiSearch2Line } from "react-icons/ri";
+import { RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -103,11 +103,11 @@ const Page = () => {
           </styled.p>
 
           <Flex gap={4} justify="center">
-            <LinkButton to="/map/all">
-              <RiMapPin2Fill /> Find your local track
+            <LinkButton to="/getting-started">
+              <RiRocket2Line /> Getting Started
             </LinkButton>
-            <LinkButton to="/catalogue" variant="secondary">
-              <RiSearch2Line /> Find Parts
+            <LinkButton to="/map/all" variant="secondary">
+              <RiMapPin2Fill /> Find Your Local Track
             </LinkButton>
           </Flex>
         </Container>
