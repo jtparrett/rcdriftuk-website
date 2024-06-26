@@ -4,7 +4,6 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { Form, redirect, useLoaderData } from "@remix-run/react";
-import ReactMarkdown from "react-markdown";
 import {
   format,
   formatDuration,
@@ -15,7 +14,6 @@ import { useMemo } from "react";
 import {
   RiCheckboxCircleFill,
   RiCloseCircleFill,
-  RiLink,
   RiTicketFill,
 } from "react-icons/ri";
 import { z } from "zod";
@@ -28,6 +26,7 @@ import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 import { getEventDate } from "~/utils/getEventDate";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { getAuth } from "~/utils/getAuth.server";
+import { Markdown } from "~/components/Markdown";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -205,41 +204,7 @@ const Page = () => {
 
           {event.description && (
             <Box mb={4}>
-              <ReactMarkdown
-                components={{
-                  p({ children }) {
-                    return (
-                      <styled.p
-                        color="gray.400"
-                        fontSize="sm"
-                        whiteSpace="pre-line"
-                        mb={2}
-                      >
-                        {children}
-                      </styled.p>
-                    );
-                  },
-                  a({ children, href }) {
-                    return (
-                      <styled.a
-                        display="inline-flex"
-                        flexWrap="wrap"
-                        gap={1}
-                        alignItems="center"
-                        color="brand.500"
-                        href={href}
-                        target="_blank"
-                        fontWeight="semibold"
-                      >
-                        {children}
-                        <RiLink />
-                      </styled.a>
-                    );
-                  },
-                }}
-              >
-                {event.description}
-              </ReactMarkdown>
+              <Markdown>{event.description}</Markdown>
             </Box>
           )}
 
