@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLocation, useParams } from "@remix-run/react";
-import { format, isThisWeek } from "date-fns";
+import { format, isThisWeek, parse } from "date-fns";
 import { RiAddCircleFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { Tab } from "~/components/Tab";
@@ -10,7 +10,10 @@ import { Flex, Spacer, Container, Box } from "~/styled-system/jsx";
 export const meta: MetaFunction = ({ params }) => {
   const today = format(new Date(), "dd-MM-yy");
   const dateParam = params.date ?? today;
-  const thisWeek = isThisWeek(new Date(dateParam));
+  const date = parse(dateParam, "dd-MM-yy", new Date());
+  const thisWeek = isThisWeek(date, {
+    weekStartsOn: 1,
+  });
 
   return [
     { title: "RC Drift UK | Calendar" },
