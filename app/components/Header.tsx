@@ -18,7 +18,7 @@ import {
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
-import { SignedIn, SignedOut, UserButton } from "@clerk/remix";
+import { SignedIn, SignedOut, useUser } from "@clerk/remix";
 
 const today = format(new Date(), "dd-MM-yy");
 
@@ -164,12 +164,62 @@ const Menu = () => {
   );
 };
 
+const UserMenu = () => {
+  return (
+    <Box
+      bgColor="rgba(0, 0, 0, 0.8)"
+      backdropFilter="blur(10px)"
+      rounded="lg"
+      borderWidth={1}
+      borderColor="gray.800"
+      shadow="2xl"
+      mt={5}
+      p={{ base: 2, md: 4 }}
+    >
+      <Flex gap={1} flexDir="column">
+        <MenuLink
+          to="/user/track"
+          active={location.pathname === "/user/track" ? "active" : "inactive"}
+        >
+          My Track
+        </MenuLink>
+
+        <MenuLink
+          to="/user/events"
+          active={location.pathname === "/user/events" ? "active" : "inactive"}
+        >
+          My Events
+        </MenuLink>
+
+        <MenuLink
+          to="/user/tournaments"
+          active={
+            location.pathname === "/user/tournaments" ? "active" : "inactive"
+          }
+        >
+          My Tournaments
+        </MenuLink>
+
+        <MenuLink
+          to="/user/profile"
+          active={location.pathname === "/user/profile" ? "active" : "inactive"}
+        >
+          Account Settings
+        </MenuLink>
+      </Flex>
+    </Box>
+  );
+};
+
 export const Header = () => {
   const location = useLocation();
   const menu = useDisclosure();
+  const userMenu = useDisclosure();
+  const user = useUser();
 
   useEffect(() => {
     menu.onClose();
+    userMenu.onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
@@ -224,6 +274,7 @@ export const Header = () => {
               containerStyle={{
                 zIndex: "20",
               }}
+              onClickOutside={menu.onClose}
             >
               <Button
                 size="sm"
@@ -240,7 +291,28 @@ export const Header = () => {
           </Box>
 
           <SignedIn>
-            <UserButton />
+            <Popover
+              isOpen={userMenu.isOpen}
+              content={<UserMenu />}
+              positions={["bottom"]}
+              align="end"
+              containerStyle={{
+                zIndex: "20",
+              }}
+              onClickOutside={userMenu.onClose}
+            >
+              <styled.button
+                w={8}
+                h={8}
+                rounded="full"
+                overflow="hidden"
+                type="button"
+                cursor="pointer"
+                onClick={() => userMenu.toggle()}
+              >
+                <styled.img src={user.user?.imageUrl} w="full" />
+              </styled.button>
+            </Popover>
           </SignedIn>
 
           <SignedOut>
