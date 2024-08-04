@@ -187,7 +187,12 @@ const Page = () => {
             ahead of the final.
           </styled.p>
 
-          <Box
+          <styled.h2 color="red.500">PROCESSING</styled.h2>
+          <styled.h3 color="red.500">
+            Final standings will be released soon.
+          </styled.h3>
+
+          {/* <Box
             rounded="xl"
             borderWidth={1}
             borderColor="gray.800"
@@ -309,6 +314,7 @@ const Page = () => {
               </styled.tbody>
             </styled.table>
           </Box>
+          */}
         </Box>
 
         <Box mt={10}>
