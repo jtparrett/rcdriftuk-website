@@ -87,13 +87,14 @@ export const loader = async () => {
       return {
         driver: driver.driver,
         points,
+        qualiPositions: driver.driver.qualiPositions,
       };
     })
     .sort(
       (a, b) =>
         b.points - a.points ||
-        Math.max(...(a.driver.qualiPositions ?? [])) -
-          Math.max(...(b.driver.qualiPositions ?? []))
+        Math.min(...(a.driver.qualiPositions ?? [])) -
+          Math.min(...(b.driver.qualiPositions ?? []))
     );
 
   const allDriverStandings = await prisma.driverBattleStandings.findMany({
@@ -239,7 +240,9 @@ const Page = () => {
                     <styled.tr bgColor={bgColor} key={driver.driver.id}>
                       <styled.td p={2}>{i + 1}</styled.td>
                       <styled.td p={2}>
-                        <styled.p>
+                        <styled.p
+                          title={`Best Qualifying Position: ${Math.min(...driver.qualiPositions)}`}
+                        >
                           {driver.driver.name}{" "}
                           <styled.span color="gray.600">
                             #{driver.driver.champNo}
