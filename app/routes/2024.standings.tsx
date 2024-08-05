@@ -127,7 +127,7 @@ const Page = () => {
         borderColor="gray.800"
         overflow="hidden"
       >
-        <styled.table w="full">
+        <styled.table w="full" fontSize="11px">
           <styled.thead>
             <styled.tr borderBottomWidth={1} borderColor="gray.800">
               <styled.th p={2} textAlign="left" w={30}>
@@ -153,7 +153,7 @@ const Page = () => {
                           #{standing.driver.champNo}
                         </styled.span>
                       </styled.p>
-                      <styled.p fontSize="sm" color="gray.400">
+                      <styled.p fontSize="10px" color="gray.400">
                         {standing.driver.team ?? ""}
                       </styled.p>
                     </styled.td>
@@ -187,18 +187,13 @@ const Page = () => {
             ahead of the final.
           </styled.p>
 
-          <styled.h2 color="red.500">PROCESSING</styled.h2>
-          <styled.h3 color="red.500">
-            Final standings will be released soon.
-          </styled.h3>
-
-          {/* <Box
+          <Box
             rounded="xl"
             borderWidth={1}
             borderColor="gray.800"
             overflow="auto"
           >
-            <styled.table w="full">
+            <styled.table w="full" fontSize="11px">
               <styled.thead>
                 <styled.tr borderBottomWidth={1} borderColor="gray.800">
                   <styled.th p={2} textAlign="left">
@@ -207,14 +202,14 @@ const Page = () => {
                   <styled.th p={2} textAlign="left">
                     Driver
                   </styled.th>
-                  <styled.th>RD1</styled.th>
-                  <styled.th>RD2</styled.th>
-                  <styled.th>RD3</styled.th>
-                  <styled.th>RD4</styled.th>
-                  <styled.th>RD5</styled.th>
-                  <styled.th>RD6</styled.th>
+                  <styled.th>R1</styled.th>
+                  <styled.th>R2</styled.th>
+                  <styled.th>R3</styled.th>
+                  <styled.th>R4</styled.th>
+                  <styled.th>R5</styled.th>
+                  <styled.th>R6</styled.th>
                   <styled.th textAlign="right" p={2}>
-                    Points
+                    T
                   </styled.th>
                 </styled.tr>
               </styled.thead>
@@ -253,7 +248,7 @@ const Page = () => {
                             #{driver.driver.champNo}
                           </styled.span>
                         </styled.p>
-                        <styled.p fontSize="sm" color="gray.400">
+                        <styled.p fontSize="10px" color="gray.400">
                           {driver.driver.team ?? ""}
                         </styled.p>
                       </styled.td>
@@ -314,48 +309,47 @@ const Page = () => {
               </styled.tbody>
             </styled.table>
           </Box>
-          */}
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 1 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD1" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 2 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD2" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 3 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD3" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 4 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD4" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 5 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD5" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 6 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD6" />
         </Box>
       </Container>
