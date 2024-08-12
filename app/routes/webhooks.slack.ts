@@ -1,4 +1,4 @@
-import { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { prisma } from "~/utils/prisma.server";

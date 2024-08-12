@@ -23,7 +23,7 @@ import { prisma } from "~/utils/prisma.server";
 
 const sendEventToSlack = (text: string, id: string) => {
   return fetch(
-    "https://hooks.slack.com/services/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",
+    "https://hooks.slack.com/services/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",
     {
       method: "post",
       body: JSON.stringify({
