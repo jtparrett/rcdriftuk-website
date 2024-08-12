@@ -87,13 +87,14 @@ export const loader = async () => {
       return {
         driver: driver.driver,
         points,
+        qualiPositions: driver.driver.qualiPositions,
       };
     })
     .sort(
       (a, b) =>
         b.points - a.points ||
-        Math.max(...(a.driver.qualiPositions ?? [])) -
-          Math.max(...(b.driver.qualiPositions ?? []))
+        Math.min(...(a.driver.qualiPositions ?? [])) -
+          Math.min(...(b.driver.qualiPositions ?? []))
     );
 
   const allDriverStandings = await prisma.driverBattleStandings.findMany({
@@ -126,7 +127,7 @@ const Page = () => {
         borderColor="gray.800"
         overflow="hidden"
       >
-        <styled.table w="full">
+        <styled.table w="full" fontSize="11px">
           <styled.thead>
             <styled.tr borderBottomWidth={1} borderColor="gray.800">
               <styled.th p={2} textAlign="left" w={30}>
@@ -152,7 +153,7 @@ const Page = () => {
                           #{standing.driver.champNo}
                         </styled.span>
                       </styled.p>
-                      <styled.p fontSize="sm" color="gray.400">
+                      <styled.p fontSize="10px" color="gray.400">
                         {standing.driver.team ?? ""}
                       </styled.p>
                     </styled.td>
@@ -192,7 +193,7 @@ const Page = () => {
             borderColor="gray.800"
             overflow="auto"
           >
-            <styled.table w="full">
+            <styled.table w="full" fontSize="11px">
               <styled.thead>
                 <styled.tr borderBottomWidth={1} borderColor="gray.800">
                   <styled.th p={2} textAlign="left">
@@ -201,14 +202,14 @@ const Page = () => {
                   <styled.th p={2} textAlign="left">
                     Driver
                   </styled.th>
-                  <styled.th>RD1</styled.th>
-                  <styled.th>RD2</styled.th>
-                  <styled.th>RD3</styled.th>
-                  <styled.th>RD4</styled.th>
-                  <styled.th>RD5</styled.th>
-                  <styled.th>RD6</styled.th>
+                  <styled.th>R1</styled.th>
+                  <styled.th>R2</styled.th>
+                  <styled.th>R3</styled.th>
+                  <styled.th>R4</styled.th>
+                  <styled.th>R5</styled.th>
+                  <styled.th>R6</styled.th>
                   <styled.th textAlign="right" p={2}>
-                    Points
+                    T
                   </styled.th>
                 </styled.tr>
               </styled.thead>
@@ -239,13 +240,15 @@ const Page = () => {
                     <styled.tr bgColor={bgColor} key={driver.driver.id}>
                       <styled.td p={2}>{i + 1}</styled.td>
                       <styled.td p={2}>
-                        <styled.p>
+                        <styled.p
+                          title={`Best Qualifying Position: ${Math.min(...driver.qualiPositions)}`}
+                        >
                           {driver.driver.name}{" "}
                           <styled.span color="gray.600">
                             #{driver.driver.champNo}
                           </styled.span>
                         </styled.p>
-                        <styled.p fontSize="sm" color="gray.400">
+                        <styled.p fontSize="10px" color="gray.400">
                           {driver.driver.team ?? ""}
                         </styled.p>
                       </styled.td>
@@ -309,38 +312,45 @@ const Page = () => {
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 1 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD1" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 2 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD2" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 3 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD3" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 4 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD4" />
         </Box>
 
         <Box mt={10}>
-          <styled.h1 fontSize="4xl" fontWeight="extrabold">
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
             Round 5 Standings
-          </styled.h1>
+          </styled.h2>
           <RoundStandingTable tournament="2024-RD5" />
+        </Box>
+
+        <Box mt={10}>
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
+            Round 6 Standings
+          </styled.h2>
+          <RoundStandingTable tournament="2024-RD6" />
         </Box>
       </Container>
     </styled.main>

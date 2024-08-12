@@ -102,7 +102,11 @@ const Page = () => {
             Ratings and more.
           </styled.p>
 
-          <Flex gap={4} justify="center">
+          <Flex
+            gap={4}
+            justify="center"
+            flexDir={{ base: "column", sm: "row" }}
+          >
             <LinkButton to="/getting-started">
               <RiRocket2Line /> Getting Started
             </LinkButton>
