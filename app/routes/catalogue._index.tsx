@@ -71,10 +71,10 @@ export const loader = async (params: LoaderFunctionArgs) => {
     skip: 20 * (page - 1),
     orderBy: [
       {
-        shop: "desc",
+        title: "asc",
       },
       {
-        title: "asc",
+        shop: "asc",
       },
     ],
     include: {
