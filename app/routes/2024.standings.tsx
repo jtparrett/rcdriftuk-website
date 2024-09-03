@@ -414,6 +414,8 @@ const Page = () => {
                   "Krzysztof Jagielski",
                   "Adam Rowlands",
                   "Chris Flatt",
+                  "Keith Newton",
+                  "Matty Willsher",
                   "Dan Collins",
                   "Adam Gathercole",
                   "George Martin",
