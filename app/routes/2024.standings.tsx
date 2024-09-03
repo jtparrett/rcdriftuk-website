@@ -352,6 +352,77 @@ const Page = () => {
           </styled.h2>
           <RoundStandingTable tournament="2024-RD6" />
         </Box>
+
+        <Box mt={10}>
+          <styled.h2 fontSize="3xl" fontWeight="extrabold">
+            Final Standings
+          </styled.h2>
+
+          <Box
+            rounded="xl"
+            borderWidth={1}
+            borderColor="gray.800"
+            overflow="hidden"
+          >
+            <styled.table w="full" fontSize="11px">
+              <styled.thead>
+                <styled.tr borderBottomWidth={1} borderColor="gray.800">
+                  <styled.th p={2} textAlign="left" w={30}>
+                    #
+                  </styled.th>
+                  <styled.th p={2} textAlign="left">
+                    Driver
+                  </styled.th>
+                </styled.tr>
+              </styled.thead>
+              <styled.tbody>
+                {[
+                  "Dylan Campbell",
+                  "Timmy Woo",
+                  "Rory Edwards",
+                  "Sam Little",
+                  "Louie Greenwood",
+                  "Ryan Addis",
+                  "Dan R RC",
+                  "Ryan Jobling",
+                  "Darryl Peake",
+                  "Astin Burton",
+                  "Madison Lloyd",
+                  "Ashton Potter",
+                  "Scott Hill",
+                  "Jamie Cheshire",
+                  "Henry Ford",
+                  "Gareth Hemingway",
+                  "Tuba Wong",
+                  "Mitchell Ware",
+                  "Ben Clinton",
+                  "Jenson Robinson-Green",
+                  "Bullhead",
+                  "Sam Brown",
+                  "Slideshow Bob",
+                  "Tim Parnell",
+                  "Sam Burton",
+                  "Andy Kingstar",
+                  "Alex Whaites",
+                  "Kristians Butins",
+                  "James Nash",
+                  "Daniel McKernan",
+                  "James Renshaw",
+                ].map((driver, i) => {
+                  const bgColor = i % 2 === 0 ? "gray.900" : "transparent";
+                  return (
+                    <styled.tr key={driver} bgColor={bgColor}>
+                      <styled.td p={2}>{i + 1}</styled.td>
+                      <styled.td p={2}>
+                        <styled.p>{driver}</styled.p>
+                      </styled.td>
+                    </styled.tr>
+                  );
+                })}
+              </styled.tbody>
+            </styled.table>
+          </Box>
+        </Box>
       </Container>
     </styled.main>
   );
