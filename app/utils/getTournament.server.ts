@@ -21,6 +21,12 @@ export const getTournament = (id: string) => {
           name: true,
         },
       },
+      judges: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 };

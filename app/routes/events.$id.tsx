@@ -310,8 +310,8 @@ const Page = () => {
               )}
 
               {event.tournament && (
-                <LinkButton to={`/tournaments/${event.tournament.id}`}>
-                  View Tournament
+                <LinkButton to={`/tournaments/${event.tournament.id}/overview`}>
+                  Manage Tournament
                 </LinkButton>
               )}
             </Box>

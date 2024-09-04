@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Box, styled } from "~/styled-system/jsx";
+import { styled } from "~/styled-system/jsx";
 import QR from "qrcode";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   width?: number;
 }
 
-export const QRCode = ({ value, width = 90 }: Props) => {
+export const QRCode = ({ value, width = 100 }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export const QRCode = ({ value, width = 90 }: Props) => {
       {
         margin: 3,
         color: {
-          light: "#ec1a55",
+          light: "#000000",
           dark: "#ffffff",
         },
         width,
@@ -28,9 +28,5 @@ export const QRCode = ({ value, width = 90 }: Props) => {
     );
   }, [value, width]);
 
-  return (
-    <Box width={width + "px"} overflow="hidden" rounded="lg">
-      <styled.canvas ref={canvasRef} w="full" />
-    </Box>
-  );
+  return <styled.canvas ref={canvasRef} />;
 };

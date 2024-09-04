@@ -2,13 +2,19 @@ import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { capitalCase } from "change-case";
+import { useState } from "react";
+import { Popover } from "react-tiny-popover";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
+import { QRCode } from "~/components/QRCode";
+import { Select } from "~/components/Select";
 import { TournamentStartForm } from "~/components/TournamentStartForm";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
+import type { GetTournament } from "~/utils/getTournament.server";
 import { getTournament } from "~/utils/getTournament.server";
+import { useDisclosure } from "~/utils/useDisclosure";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -26,6 +32,56 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   return tournament;
+};
+
+const JudgingPortalButton = ({ tournament }: { tournament: GetTournament }) => {
+  const { isOpen, toggle, onClose } = useDisclosure();
+  const [selectedJudge, setSelectedJudge] = useState(tournament?.judges[0].id);
+
+  return (
+    <Popover
+      isOpen={isOpen}
+      positions={["bottom"]}
+      onClickOutside={onClose}
+      content={
+        <Box p={4} bgColor="brand.500" maxW={200} rounded="md" m={2}>
+          <styled.p fontSize="sm" fontWeight="semibold" mb={2}>
+            Scan the QR code to access the judging portal:
+          </styled.p>
+
+          <Select
+            mb={2}
+            onChange={(e) => setSelectedJudge(e.target.value)}
+            value={selectedJudge}
+          >
+            {tournament?.judges.map((judge) => {
+              return (
+                <option key={judge.id} value={judge.id}>
+                  {judge.name}
+                </option>
+              );
+            })}
+          </Select>
+
+          <QRCode
+            value={`https://rcdrift.uk/judge/${selectedJudge}`}
+            width={165}
+          />
+        </Box>
+      }
+    >
+      <Button
+        variant="secondary"
+        size="xs"
+        whiteSpace="nowrap"
+        onClick={() => {
+          toggle();
+        }}
+      >
+        Open Judging Portal
+      </Button>
+    </Popover>
+  );
 };
 
 const TournamentPage = () => {
@@ -51,7 +107,7 @@ const TournamentPage = () => {
             fontSize="2xl"
             fontWeight="extrabold"
             lineHeight={1}
-            maxW={{ sm: 300 }}
+            flexGrow={1}
             w={{ base: "full", sm: "auto" }}
             overflow="hidden"
             textOverflow="ellipsis"
@@ -71,11 +127,7 @@ const TournamentPage = () => {
             {capitalCase(tournament.state)}
           </styled.p>
 
-          <Spacer />
-
-          <Button variant="secondary" size="xs" whiteSpace="nowrap">
-            Open Judging Portal
-          </Button>
+          <JudgingPortalButton tournament={tournament} />
         </Flex>
       </Box>
 
