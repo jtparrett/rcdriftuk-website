@@ -1,6 +1,6 @@
 import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
+import { Form, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { capitalCase } from "change-case";
 import { useState } from "react";
 import { Popover } from "react-tiny-popover";
@@ -175,9 +175,17 @@ const TournamentPage = () => {
 
             <Spacer />
 
-            {tournament.state === TournamentsState.QUALIFYING && (
-              <Button>Start Next Lap</Button>
-            )}
+            {tournament.state === TournamentsState.QUALIFYING &&
+              tournament.nextQualifyingLap &&
+              tournament.nextQualifyingLap.scores.length ===
+                tournament.judges.length && (
+                <Form
+                  method="post"
+                  action={`/tournaments/${tournament.id}/start-next-lap`}
+                >
+                  <Button type="submit">Start Next Lap</Button>
+                </Form>
+              )}
           </Flex>
 
           <Outlet />
