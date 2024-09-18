@@ -113,7 +113,7 @@ const TournamentPage = () => {
             textOverflow="ellipsis"
             whiteSpace="nowrap"
           >
-            {tournament.event.name}
+            {tournament.name}
           </styled.h1>
           <styled.p
             rounded="md"

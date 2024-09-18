@@ -18,7 +18,8 @@ import {
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
-import { SignedIn, SignedOut, useUser } from "@clerk/remix";
+import { SignedOut, useUser } from "@clerk/remix";
+import type { GetUser } from "~/utils/getUser.sever";
 
 const today = format(new Date(), "dd-MM-yy");
 
@@ -164,7 +165,7 @@ const Menu = () => {
   );
 };
 
-const UserMenu = () => {
+const UserMenu = ({ user }: Props) => {
   return (
     <Box
       bgColor="rgba(0, 0, 0, 0.8)"
@@ -177,12 +178,11 @@ const UserMenu = () => {
       p={{ base: 2, md: 4 }}
     >
       <Flex gap={1} flexDir="column">
-        <MenuLink
-          to="/user/track"
-          active={location.pathname === "/user/track" ? "active" : "inactive"}
-        >
-          My Track
-        </MenuLink>
+        {user?.track && (
+          <MenuLink to={`/tracks/${user.track.slug}`} active="inactive">
+            My Track
+          </MenuLink>
+        )}
 
         <MenuLink
           to="/user/events"
@@ -211,11 +211,15 @@ const UserMenu = () => {
   );
 };
 
-export const Header = () => {
+interface Props {
+  user: GetUser | null;
+}
+
+export const Header = ({ user }: Props) => {
   const location = useLocation();
   const menu = useDisclosure();
   const userMenu = useDisclosure();
-  const user = useUser();
+  const clerkUser = useUser();
 
   useEffect(() => {
     menu.onClose();
@@ -290,10 +294,10 @@ export const Header = () => {
             </Popover>
           </Box>
 
-          <SignedIn>
+          {user !== null && (
             <Popover
               isOpen={userMenu.isOpen}
-              content={<UserMenu />}
+              content={<UserMenu user={user} />}
               positions={["bottom"]}
               align="end"
               containerStyle={{
@@ -310,10 +314,10 @@ export const Header = () => {
                 cursor="pointer"
                 onClick={() => userMenu.toggle()}
               >
-                <styled.img src={user.user?.imageUrl} w="full" />
+                <styled.img src={clerkUser.user?.imageUrl} w="full" />
               </styled.button>
             </Popover>
-          </SignedIn>
+          )}
 
           <SignedOut>
             <LinkButton variant="outline" size="sm" to="/sign-in">

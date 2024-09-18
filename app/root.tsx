@@ -23,6 +23,7 @@ import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { LinkButton } from "./components/Button";
 import { RiArrowLeftLine } from "react-icons/ri";
+import { getUser } from "./utils/getUser.sever";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -46,11 +47,21 @@ export const loader = (args: LoaderFunctionArgs) =>
     const cookieHeader = request.headers.get("Cookie");
     const cookie = (await userPrefs.parse(cookieHeader)) || {};
 
-    return { hideBanner: cookie.hideBanner };
+    const { userId } = request.auth;
+
+    if (userId) {
+      const user = await getUser(userId);
+      return { user, hideBanner: cookie.hideBanner };
+    }
+
+    return {
+      user: null,
+      hideBanner: cookie.hideBanner,
+    };
   });
 
 function App() {
-  const { hideBanner } = useLoaderData<typeof loader>();
+  const { hideBanner, user } = useLoaderData<typeof loader>();
 
   return (
     <html lang="en">
@@ -68,7 +79,7 @@ function App() {
       </head>
       <body>
         {!hideBanner && <CookieBanner />}
-        <Header />
+        <Header user={user} />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

@@ -30,7 +30,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       },
     },
     include: {
-      event: true,
       nextQualifyingLap: {
         include: {
           scores: {
@@ -264,7 +263,7 @@ const JudgePage = () => {
       <Flex p={4} textAlign="center" bgColor="gray.900" mb={4} rounded="lg">
         <styled.h1>{judge.name}</styled.h1>
         <Spacer />
-        <styled.h2>{tournament.event.name}</styled.h2>
+        <styled.h2>{tournament.name}</styled.h2>
       </Flex>
 
       {tournament.state === TournamentsState.QUALIFYING && <QualiForm />}

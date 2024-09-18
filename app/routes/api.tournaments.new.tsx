@@ -11,26 +11,12 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(userId);
 
   const formData = await args.request.formData();
-  const eventId = z.string().parse(formData.get("eventId"));
-
-  const event = await prisma.events.findFirst({
-    where: {
-      id: eventId,
-      eventTrack: {
-        owners: {
-          some: {
-            id: userId,
-          },
-        },
-      },
-    },
-  });
-
-  invariant(event);
+  const name = z.string().parse(formData.get("name"));
 
   const tournament = await prisma.tournaments.create({
     data: {
-      eventId,
+      name,
+      userId,
     },
   });
 

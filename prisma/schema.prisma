@@ -21,7 +21,6 @@ model Events {
   description String?
   responses   EventResponses[]
   eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
-  tournament  Tournaments?
 }
 
 model EventResponses {
@@ -36,17 +35,18 @@ model EventResponses {
 
 model Tournaments {
   id                  String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @default(now()) @updatedAt
   nextBattleId        String?             @db.Uuid
   format              TournamentsFormat   @default(STANDARD)
   qualifyingLaps      Int                 @default(1)
   state               TournamentsState    @default(START)
-  eventId             String              @unique @db.Uuid
+  userId              String
   nextQualifyingLapId Int?                @unique
   drivers             TournamentDrivers[]
   judges              TournamentJudges[]
-  event               Events              @relation(fields: [eventId], references: [id])
+  user                Users               @relation(fields: [userId], references: [id])
   nextQualifyingLap   Laps?               @relation(fields: [nextQualifyingLapId], references: [id])
 }
 
@@ -135,17 +135,18 @@ model DriverBattleStandings {
 }
 
 model Users {
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @default(now()) @updatedAt
-  id        String           @id
-  firstName String?
-  image     String?
-  lastName  String?
-  trackId   String?          @db.Uuid
-  driverId  String?
-  events    EventResponses[]
-  driver    Drivers?         @relation(fields: [driverId], references: [id])
-  track     Tracks?          @relation(fields: [trackId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now()) @updatedAt
+  id          String           @id
+  firstName   String?
+  image       String?
+  lastName    String?
+  trackId     String?          @db.Uuid
+  driverId    String?
+  events      EventResponses[]
+  driver      Drivers?         @relation(fields: [driverId], references: [id])
+  track       Tracks?          @relation(fields: [trackId], references: [id])
+  Tournaments Tournaments[]
 }
 
 model Products {

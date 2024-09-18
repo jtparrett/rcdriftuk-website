@@ -16,15 +16,6 @@ export const action = async (args: ActionFunctionArgs) => {
   const tournament = await prisma.tournaments.findFirst({
     where: {
       state: TournamentsState.START,
-      event: {
-        eventTrack: {
-          owners: {
-            some: {
-              id: userId,
-            },
-          },
-        },
-      },
     },
   });
 

@@ -7,17 +7,13 @@ export const getTournament = (id: string) => {
     },
     select: {
       id: true,
+      name: true,
       format: true,
       qualifyingLaps: true,
       state: true,
       nextQualifyingLap: {
         include: {
           scores: true,
-        },
-      },
-      event: {
-        select: {
-          name: true,
         },
       },
       drivers: {
