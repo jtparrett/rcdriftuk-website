@@ -18,7 +18,7 @@ import {
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
-import { SignedOut, useUser } from "@clerk/remix";
+import { SignedOut, useAuth, useSession, useUser } from "@clerk/remix";
 import type { GetUser } from "~/utils/getUser.sever";
 
 const today = format(new Date(), "dd-MM-yy");
@@ -166,6 +166,8 @@ const Menu = () => {
 };
 
 const UserMenu = ({ user }: Props) => {
+  const { signOut } = useAuth();
+
   return (
     <Box
       bgColor="rgba(0, 0, 0, 0.8)"
@@ -205,6 +207,16 @@ const UserMenu = ({ user }: Props) => {
           active={location.pathname === "/user/profile" ? "active" : "inactive"}
         >
           Account Settings
+        </MenuLink>
+
+        <MenuLink
+          to="/"
+          onClick={(e) => {
+            e.preventDefault();
+            signOut();
+          }}
+        >
+          Sign Out
         </MenuLink>
       </Flex>
     </Box>
