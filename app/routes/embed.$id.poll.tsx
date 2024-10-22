@@ -60,15 +60,29 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   const entryId = z.string().parse(formData.get("day"));
   const deviceId = z.string().parse(formData.get("deviceId"));
 
-  await prisma.pollEntries
-    .create({
+  const existingEntry = await prisma.pollEntries.findFirst({
+    where: {
+      entryId,
+      trackId: track.id,
+      deviceId,
+    },
+  });
+
+  if (existingEntry) {
+    await prisma.pollEntries.delete({
+      where: {
+        id: existingEntry.id,
+      },
+    });
+  } else {
+    await prisma.pollEntries.create({
       data: {
         entryId,
         trackId: track.id,
         deviceId,
       },
-    })
-    .catch(() => {});
+    });
+  }
 
   return redirect(`/embed/${params.id}/poll`);
 };
