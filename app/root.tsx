@@ -40,12 +40,14 @@ export const loader = (args: LoaderFunctionArgs) =>
   rootAuthLoader(args, async ({ request }) => {
     const cookieHeader = request.headers.get("Cookie");
     const cookie = (await userPrefs.parse(cookieHeader)) || {};
+    const { pathname } = new URL(request.url);
 
-    return { hideBanner: cookie.hideBanner };
+    return { hideBanner: cookie.hideBanner, pathname };
   });
 
 function App() {
-  const { hideBanner } = useLoaderData<typeof loader>();
+  const { hideBanner, pathname } = useLoaderData<typeof loader>();
+  const isEmbed = pathname.includes("/embed/");
 
   return (
     <html lang="en">
@@ -62,8 +64,8 @@ function App() {
         ></script>
       </head>
       <body>
-        {!hideBanner && <CookieBanner />}
-        <Header />
+        {!isEmbed && !hideBanner && <CookieBanner />}
+        {!isEmbed && <Header />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
