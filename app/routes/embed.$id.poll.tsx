@@ -148,7 +148,7 @@ const TrackEmbedPoll = () => {
                   bg="brand.500"
                   zIndex={-1}
                 />
-                {value}
+                {value} ({totalEntries})
               </styled.button>
             </form>
           );
