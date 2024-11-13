@@ -38,6 +38,9 @@ export default defineConfig({
           },
         },
         colors: {
+          black: {
+            value: "#0c0c0c",
+          },
           "brand.500": {
             value: brandColor,
           },
@@ -77,6 +80,13 @@ export default defineConfig({
           },
           "gray.950": {
             value: "#09090b",
+          },
+        },
+      },
+      keyframes: {
+        spin: {
+          "100%": {
+            transform: "rotate(360deg)",
           },
         },
       },

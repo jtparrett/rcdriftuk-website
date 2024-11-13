@@ -4,6 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 import { capitalCase } from "change-case";
 import invariant from "tiny-invariant";
 import { z } from "zod";
+import { Glow } from "~/components/Glow";
 import { Box, Center, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 
@@ -58,11 +59,14 @@ const TournamentsOverviewPage = () => {
           p={1}
           borderWidth={1}
           rounded="2xl"
-          borderColor="gray.800"
+          borderColor="brand.500"
           w={260}
           maxW="full"
-          shadow="0 6px 32px black"
+          shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
+          pos="relative"
+          zIndex={1}
         >
+          <Glow />
           <Box
             borderRadius="xl"
             borderWidth={1}
