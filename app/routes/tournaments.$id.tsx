@@ -1,7 +1,6 @@
 import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Outlet, useLoaderData, useLocation } from "@remix-run/react";
-import { capitalCase } from "change-case";
 import { useState } from "react";
 import { Popover } from "react-tiny-popover";
 import invariant from "tiny-invariant";
@@ -115,17 +114,6 @@ const TournamentPage = () => {
           >
             {tournament.name}
           </styled.h1>
-          <styled.p
-            rounded="md"
-            bgColor="green.300"
-            color="green.600"
-            fontWeight="semibold"
-            fontSize="sm"
-            display="inline-block"
-            px={2}
-          >
-            {capitalCase(tournament.state)}
-          </styled.p>
 
           {tournament.state !== TournamentsState.START && (
             <JudgingPortalButton tournament={tournament} />
@@ -188,6 +176,12 @@ const TournamentPage = () => {
                   <Button type="submit">Start Next Lap</Button>
                 </Form>
               )}
+
+            {tournament.state === TournamentsState.BATTLES && (
+              <Form method="post">
+                <Button type="submit">Start Next Battle</Button>
+              </Form>
+            )}
           </Flex>
 
           <Outlet />

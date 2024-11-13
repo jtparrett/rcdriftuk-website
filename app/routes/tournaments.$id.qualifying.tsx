@@ -88,167 +88,169 @@ const QualifyingPage = () => {
   const half = Math.ceil(tournament.drivers.length / 2);
 
   return (
-    <Flex
-      flexDir={{ base: "column", md: "row" }}
-      borderWidth={1}
-      borderColor="gray.800"
-      py={4}
-      rounded="xl"
-    >
-      <styled.table flex={1}>
-        <styled.thead>
-          <styled.tr>
-            <styled.th>#</styled.th>
-            <styled.th textAlign="left">Name</styled.th>
-            <styled.th>Best</styled.th>
-            {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => (
-              <styled.th key={i} whiteSpace="nowrap">
-                Lap {i + 1}
-              </styled.th>
-            ))}
-          </styled.tr>
-        </styled.thead>
-        <styled.tbody>
-          {[...tournament.drivers].slice(0, half).map((driver, i) => {
-            return (
-              <Fragment key={i}>
-                {i === qualifyingCutOff && (
-                  <styled.tr>
-                    <styled.td colSpan={7}>
-                      <Box w="full" h="1px" bgColor="red.500" />
+    <Box p={1} borderWidth={1} rounded="2xl" borderColor="gray.800">
+      <Flex
+        flexDir={{ base: "column", md: "row" }}
+        borderWidth={1}
+        borderColor="gray.800"
+        py={4}
+        rounded="xl"
+      >
+        <styled.table flex={1}>
+          <styled.thead>
+            <styled.tr>
+              <styled.th>#</styled.th>
+              <styled.th textAlign="left">Name</styled.th>
+              <styled.th>Best</styled.th>
+              {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => (
+                <styled.th key={i} whiteSpace="nowrap">
+                  Lap {i + 1}
+                </styled.th>
+              ))}
+            </styled.tr>
+          </styled.thead>
+          <styled.tbody>
+            {[...tournament.drivers].slice(0, half).map((driver, i) => {
+              return (
+                <Fragment key={i}>
+                  {i === qualifyingCutOff && (
+                    <styled.tr>
+                      <styled.td colSpan={7}>
+                        <Box w="full" h="1px" bgColor="red.500" />
+                      </styled.td>
+                    </styled.tr>
+                  )}
+                  <styled.tr key={driver.id}>
+                    <styled.td fontWeight="bold" w={16}>
+                      <Center
+                        borderRadius="sm"
+                        bgGradient="linear(to-b, red.400, red.700)"
+                      >
+                        <styled.span fontWeight="bold">{i + 1}</styled.span>
+                      </Center>
                     </styled.td>
-                  </styled.tr>
-                )}
-                <styled.tr key={driver.id}>
-                  <styled.td fontWeight="bold" w={16}>
-                    <Center
-                      borderRadius="sm"
-                      bgGradient="linear(to-b, red.400, red.700)"
+                    <styled.td
+                      fontWeight="bold"
+                      color={
+                        tournament.nextQualifyingDriver?.id === driver.id
+                          ? "green.400"
+                          : undefined
+                      }
+                      whiteSpace="nowrap"
                     >
-                      <styled.span fontWeight="bold">{i + 1}</styled.span>
-                    </Center>
-                  </styled.td>
-                  <styled.td
-                    fontWeight="bold"
-                    color={
-                      tournament.nextQualifyingDriver?.id === driver.id
-                        ? "green.400"
-                        : undefined
-                    }
-                    whiteSpace="nowrap"
-                  >
-                    {driver.name}
-                  </styled.td>
-
-                  <styled.td fontWeight="black">
-                    {driver.bestLapScore}
-                  </styled.td>
-
-                  {driver.lapScores.map((lapScore, i) => (
-                    <styled.td key={i} color="gray.400">
-                      {lapScore}
+                      {driver.name}
                     </styled.td>
-                  ))}
 
-                  {Array.from(
-                    new Array(
-                      Math.max(
-                        tournament.totalJudges - driver.lapScores.length - 1,
-                        0
+                    <styled.td fontWeight="black">
+                      {driver.bestLapScore}
+                    </styled.td>
+
+                    {driver.lapScores.map((lapScore, i) => (
+                      <styled.td key={i} color="gray.400">
+                        {lapScore}
+                      </styled.td>
+                    ))}
+
+                    {Array.from(
+                      new Array(
+                        Math.max(
+                          tournament.totalJudges - driver.lapScores.length - 1,
+                          0
+                        )
                       )
-                    )
-                  ).map((_, i) => (
-                    <styled.td key={i} />
-                  ))}
-                </styled.tr>
-              </Fragment>
-            );
-          })}
-        </styled.tbody>
-      </styled.table>
-
-      <Box
-        alignSelf="stretch"
-        w={0.5}
-        backgroundColor="gray.600"
-        display={{ base: "none", md: "block" }}
-        mx={8}
-      />
-
-      <styled.table flex={1}>
-        <styled.thead display={{ base: "none", md: "table-header-group" }}>
-          <styled.tr>
-            <styled.th>#</styled.th>
-            <styled.th textAlign="left">Name</styled.th>
-            <styled.th>Best</styled.th>
-            {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => (
-              <styled.th key={i} whiteSpace="nowrap">
-                Lap {i + 1}
-              </styled.th>
-            ))}
-          </styled.tr>
-        </styled.thead>
-        <styled.tbody>
-          {[...tournament.drivers].slice(half).map((driver, i) => {
-            return (
-              <Fragment key={i}>
-                {i + half === qualifyingCutOff && (
-                  <styled.tr>
-                    <styled.td colSpan={7}>
-                      <Box w="full" h="1px" bgColor="red.500" />
-                    </styled.td>
+                    ).map((_, i) => (
+                      <styled.td key={i} />
+                    ))}
                   </styled.tr>
-                )}
-                <styled.tr key={driver.id}>
-                  <styled.td fontWeight="bold" w={16}>
-                    <Center
-                      borderRadius="sm"
-                      bgGradient="linear(to-b, red.400, red.700)"
-                    >
-                      <styled.span fontWeight="bold">
-                        {i + 1 + half}
-                      </styled.span>
-                    </Center>
-                  </styled.td>
-                  <styled.td
-                    fontWeight="bold"
-                    color={
-                      tournament.nextQualifyingDriver?.id === driver.id
-                        ? "green.400"
-                        : undefined
-                    }
-                    whiteSpace="nowrap"
-                  >
-                    {driver.name}
-                  </styled.td>
+                </Fragment>
+              );
+            })}
+          </styled.tbody>
+        </styled.table>
 
-                  <styled.td fontWeight="black">
-                    {driver.bestLapScore}
-                  </styled.td>
+        <Box
+          alignSelf="stretch"
+          w={0.5}
+          backgroundColor="gray.600"
+          display={{ base: "none", md: "block" }}
+          mx={8}
+        />
 
-                  {driver.lapScores.map((lapScore, i) => (
-                    <styled.td key={i} color="gray.400">
-                      {lapScore}
+        <styled.table flex={1}>
+          <styled.thead display={{ base: "none", md: "table-header-group" }}>
+            <styled.tr>
+              <styled.th>#</styled.th>
+              <styled.th textAlign="left">Name</styled.th>
+              <styled.th>Best</styled.th>
+              {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => (
+                <styled.th key={i} whiteSpace="nowrap">
+                  Lap {i + 1}
+                </styled.th>
+              ))}
+            </styled.tr>
+          </styled.thead>
+          <styled.tbody>
+            {[...tournament.drivers].slice(half).map((driver, i) => {
+              return (
+                <Fragment key={i}>
+                  {i + half === qualifyingCutOff && (
+                    <styled.tr>
+                      <styled.td colSpan={7}>
+                        <Box w="full" h="1px" bgColor="red.500" />
+                      </styled.td>
+                    </styled.tr>
+                  )}
+                  <styled.tr key={driver.id}>
+                    <styled.td fontWeight="bold" w={16}>
+                      <Center
+                        borderRadius="sm"
+                        bgGradient="linear(to-b, red.400, red.700)"
+                      >
+                        <styled.span fontWeight="bold">
+                          {i + 1 + half}
+                        </styled.span>
+                      </Center>
                     </styled.td>
-                  ))}
+                    <styled.td
+                      fontWeight="bold"
+                      color={
+                        tournament.nextQualifyingDriver?.id === driver.id
+                          ? "green.400"
+                          : undefined
+                      }
+                      whiteSpace="nowrap"
+                    >
+                      {driver.name}
+                    </styled.td>
 
-                  {Array.from(
-                    new Array(
-                      Math.max(
-                        tournament.totalJudges - driver.lapScores.length - 1,
-                        0
+                    <styled.td fontWeight="black">
+                      {driver.bestLapScore}
+                    </styled.td>
+
+                    {driver.lapScores.map((lapScore, i) => (
+                      <styled.td key={i} color="gray.400">
+                        {lapScore}
+                      </styled.td>
+                    ))}
+
+                    {Array.from(
+                      new Array(
+                        Math.max(
+                          tournament.totalJudges - driver.lapScores.length - 1,
+                          0
+                        )
                       )
-                    )
-                  ).map((_, i) => (
-                    <styled.td key={i} />
-                  ))}
-                </styled.tr>
-              </Fragment>
-            );
-          })}
-        </styled.tbody>
-      </styled.table>
-    </Flex>
+                    ).map((_, i) => (
+                      <styled.td key={i} />
+                    ))}
+                  </styled.tr>
+                </Fragment>
+              );
+            })}
+          </styled.tbody>
+        </styled.table>
+      </Flex>
+    </Box>
   );
 };
 

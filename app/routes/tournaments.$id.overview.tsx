@@ -1,6 +1,8 @@
 import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { capitalCase } from "change-case";
+import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Box, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
@@ -27,33 +29,40 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 const TournamentsOverviewPage = () => {
   const tournament = useLoaderData<typeof loader>();
 
+  invariant(tournament);
+
   return (
-    <>
-      {tournament?.state === TournamentsState.QUALIFYING && (
-        <Box>
-          <Box
-            maxW={260}
-            borderRadius="md"
-            borderWidth={1}
-            borderColor="gray.800"
-            overflow="hidden"
-            mb={6}
-          >
-            <Box bgColor="gray.800" px={4} py={2}>
-              <styled.p fontWeight="semibold">Qualifying</styled.p>
-            </Box>
-            <styled.p
-              textAlign="center"
-              py={8}
-              fontSize="lg"
-              fontWeight="semibold"
-            >
-              {tournament?.nextQualifyingLap?.driver.name}
-            </styled.p>
-          </Box>
+    <Box p={1} borderWidth={1} rounded="2xl" borderColor="gray.800" maxW={260}>
+      <Box
+        borderRadius="xl"
+        borderWidth={1}
+        borderColor="gray.800"
+        overflow="hidden"
+      >
+        <Box
+          bgGradient="to-b"
+          gradientFrom="brand.500"
+          gradientTo="brand.700"
+          px={4}
+          py={2}
+          textAlign="center"
+        >
+          <styled.p fontWeight="semibold">
+            {capitalCase(tournament.state)}
+          </styled.p>
         </Box>
-      )}
-    </>
+        {tournament?.state === TournamentsState.QUALIFYING && (
+          <styled.p
+            textAlign="center"
+            py={8}
+            fontSize="lg"
+            fontWeight="semibold"
+          >
+            {tournament?.nextQualifyingLap?.driver.name}
+          </styled.p>
+        )}
+      </Box>
+    </Box>
   );
 };
 
