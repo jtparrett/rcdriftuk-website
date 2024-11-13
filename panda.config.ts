@@ -24,6 +24,11 @@ export default defineConfig({
   theme: {
     extend: {
       tokens: {
+        radii: {
+          "3xl": {
+            value: "1.3rem",
+          },
+        },
         fonts: {
           body: {
             value: '"Inter", sans-serif',
