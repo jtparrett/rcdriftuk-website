@@ -18,7 +18,7 @@ import {
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
-import { SignedOut, useAuth, useSession, useUser } from "@clerk/remix";
+import { SignedOut, useAuth, useUser } from "@clerk/remix";
 import type { GetUser } from "~/utils/getUser.sever";
 
 const today = format(new Date(), "dd-MM-yy");

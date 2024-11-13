@@ -86,7 +86,7 @@ model LapScores {
 }
 
 model Tracks {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
   image       String
@@ -94,10 +94,11 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String       @default("")
+  slug        String        @default("")
   events      Events[]
   Products    Products[]
   owners      Users[]
+  PollEntries PollEntries[]
 }
 
 model Drivers {
@@ -159,6 +160,18 @@ model Products {
   trackId     String?       @db.Uuid
   status      ProductStatus @default(UNKNOWN)
   Tracks      Tracks?       @relation(fields: [trackId], references: [id])
+}
+
+model PollEntries {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  entryId   String
+  deviceId  String
+  trackId   String   @db.Uuid
+  Tracks    Tracks   @relation(fields: [trackId], references: [id])
+
+  @@unique([entryId, deviceId, trackId])
 }
 
 enum TrackTypes {

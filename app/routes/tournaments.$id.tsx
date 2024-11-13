@@ -127,7 +127,9 @@ const TournamentPage = () => {
             {capitalCase(tournament.state)}
           </styled.p>
 
-          <JudgingPortalButton tournament={tournament} />
+          {tournament.state !== TournamentsState.START && (
+            <JudgingPortalButton tournament={tournament} />
+          )}
         </Flex>
       </Box>
 
