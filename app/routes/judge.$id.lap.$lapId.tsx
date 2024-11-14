@@ -14,13 +14,18 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData();
 
   const score = z.coerce.number().parse(formData.get("score"));
-  // const angle = z.coerce.number().parse(formData.get("angle"));
-  // const style = z.coerce.number().parse(formData.get("style"));
 
-  // const score = line + angle + style;
-
-  await prisma.lapScores.create({
-    data: {
+  await prisma.lapScores.upsert({
+    where: {
+      judgeId_lapId: {
+        judgeId,
+        lapId,
+      },
+    },
+    update: {
+      score,
+    },
+    create: {
       judgeId,
       lapId,
       score,

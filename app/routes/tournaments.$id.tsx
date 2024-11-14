@@ -190,7 +190,7 @@ const TournamentPage = () => {
                   method="post"
                   action={`/tournaments/${tournament.id}/start-next-lap`}
                 >
-                  <Button type="submit">Start Next Lap</Button>
+                  <Button type="submit">Start Next Run</Button>
                 </Form>
               )}
 

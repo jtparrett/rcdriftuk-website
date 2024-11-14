@@ -2,10 +2,8 @@ import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import pluralize from "pluralize";
-import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
-import { Button } from "~/components/Button";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
 import {
@@ -40,15 +38,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           },
           driver: {
             include: {
-              laps: {
-                where: {
-                  scores: {
-                    none: {
-                      judgeId,
-                    },
-                  },
-                },
-              },
+              laps: true,
             },
           },
         },
@@ -98,18 +88,13 @@ const QualiForm = () => {
   const { tournament, judge } = loaderData;
   const transition = useNavigation();
 
-  const [scoreValue, setScoreValue] = useState(100);
-
-  const lapIsJudged = (tournament.nextQualifyingLap?.scores.length ?? 0) > 0;
+  const scoreValue = tournament.nextQualifyingLap?.scores[0]?.score ?? 50;
+  const qualifyingRun =
+    tournament.nextQualifyingLap?.driver?.laps
+      ?.map((lap) => lap.id)
+      ?.indexOf(tournament.nextQualifyingLapId ?? 0) + 1;
 
   useReloader();
-
-  useEffect(() => {
-    if (transition.state === "submitting") {
-      setScoreValue(100);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transition]);
 
   return (
     <>
@@ -117,7 +102,7 @@ const QualiForm = () => {
         <p>Loading...</p>
       ) : (
         <>
-          {tournament.nextQualifyingLap !== null && !lapIsJudged ? (
+          {tournament.nextQualifyingLap !== null && (
             <>
               <Flex mb={6}>
                 <styled.p fontWeight="semibold">
@@ -129,10 +114,7 @@ const QualiForm = () => {
                 </styled.p>
                 <Spacer />
                 <styled.span color="brand.500" fontWeight="bold">
-                  Qualifying Lap{" "}
-                  {tournament.qualifyingLaps -
-                    (tournament.nextQualifyingLap.driver.laps.length ?? 0) +
-                    1}
+                  Qualifying Run {qualifyingRun}
                 </styled.span>
               </Flex>
 
@@ -150,7 +132,9 @@ const QualiForm = () => {
                       name="score"
                       aria-label="score-select"
                       value={scoreValue}
-                      onChange={(e) => setScoreValue(parseInt(e.target.value))}
+                      onChange={(e) => {
+                        e.target.form?.submit();
+                      }}
                     >
                       {Array.from(new Array(101)).map((_, i) => (
                         <option key={i} value={i}>
@@ -159,17 +143,9 @@ const QualiForm = () => {
                       ))}
                     </Select>
                   </Box>
-
-                  <Button type="submit" disabled={transition.state !== "idle"}>
-                    Submit
-                  </Button>
                 </VStack>
               </Form>
             </>
-          ) : (
-            <styled.h2 textAlign="center" fontSize="xl">
-              Waiting for next qualifying lap...
-            </styled.h2>
           )}
         </>
       )}
