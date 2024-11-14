@@ -68,7 +68,7 @@ const MenuLink = styled(Link, {
 const Menu = () => {
   return (
     <Box
-      bgColor="rgba(0, 0, 0, 0.8)"
+      bgColor="rgba(12, 12, 12, 0.8)"
       backdropFilter="blur(10px)"
       rounded="lg"
       borderWidth={1}
@@ -179,7 +179,7 @@ const UserMenu = ({ user }: Props) => {
 
   return (
     <Box
-      bgColor="rgba(0, 0, 0, 0.8)"
+      bgColor="rgba(12, 12, 12, 0.8)"
       backdropFilter="blur(10px)"
       rounded="lg"
       borderWidth={1}
@@ -256,7 +256,7 @@ export const Header = ({ user }: Props) => {
       pos="sticky"
       top={0}
       zIndex={10}
-      bgColor="rgba(0, 0, 0, 0.8)"
+      bgColor="rgba(12, 12, 12, 0.8)"
       backdropFilter="blur(10px)"
       shadow="2xl"
     >

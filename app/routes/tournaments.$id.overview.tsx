@@ -43,12 +43,19 @@ const TournamentsOverviewPage = () => {
   invariant(tournament);
 
   return (
-    <Box p={1} borderWidth={1} rounded="3xl" borderColor="gray.800">
+    <Box
+      p={1}
+      borderWidth={1}
+      rounded="3xl"
+      bgColor="gray.900"
+      borderColor="gray.800"
+    >
       <Center
         minH="60dvh"
+        bgColor="black"
         bgImage="url(/grid-bg.svg)"
         bgRepeat="repeat"
-        bgSize="50px"
+        bgSize="60px"
         bgPosition="center"
         borderWidth={1}
         rounded="2xl"
@@ -61,6 +68,7 @@ const TournamentsOverviewPage = () => {
           rounded="2xl"
           borderColor="brand.500"
           w={260}
+          mb={4}
           maxW="full"
           shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
           pos="relative"
@@ -87,11 +95,11 @@ const TournamentsOverviewPage = () => {
             </Box>
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
-                <Box textAlign="center" py={8}>
-                  <styled.p fontSize="lg" fontWeight="semibold">
+                <Box textAlign="center" py={8} px={4}>
+                  <styled.p fontSize="lg" fontWeight="black">
                     {tournament.nextQualifyingLap.driver.name}
                   </styled.p>
-                  <styled.p color="gray.500" fontSize="sm">
+                  <styled.p color="gray.500" fontSize="sm" fontWeight="medium">
                     Qualifying Lap:{" "}
                     {tournament.qualifyingLaps -
                       (tournament.nextQualifyingLap.driver.laps.length ?? 0) +

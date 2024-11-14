@@ -15,7 +15,7 @@ export const StepNumber = ({ value, isComplete = false }: Props) => {
       borderWidth={1}
       borderColor="brand.500"
       fontWeight="bold"
-      boxShadow="0 0 0 4px rgba(0, 0, 0, 0.03)"
+      boxShadow="0 0 0 4px rgba(12, 12, 12, 0.03)"
       color="white"
       bgColor="brand.500"
       fontSize="md"

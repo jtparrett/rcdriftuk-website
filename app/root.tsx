@@ -115,7 +115,7 @@ export function ErrorBoundary() {
           py={100}
           bgImage="url(/grid-bg.svg)"
           bgRepeat="repeat"
-          bgSize="100px"
+          bgSize="60px"
           bgPosition="center"
           borderBottomWidth={1}
           borderColor="gray.800"
