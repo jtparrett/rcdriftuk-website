@@ -66,6 +66,7 @@ model TournamentJudges {
   name         String
   tournamentId String      @db.Uuid
   tournament   Tournaments @relation(fields: [tournamentId], references: [id])
+  scores       LapScores[]
 }
 
 model Laps {
@@ -79,8 +80,9 @@ model Laps {
 model LapScores {
   score   Float
   lapId   Int
-  judgeId String @db.Uuid
-  lap     Laps   @relation(fields: [lapId], references: [id])
+  judgeId String           @db.Uuid
+  lap     Laps             @relation(fields: [lapId], references: [id])
+  judge   TournamentJudges @relation(fields: [judgeId], references: [id])
 
   @@unique([judgeId, lapId])
 }

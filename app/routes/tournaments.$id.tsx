@@ -1,6 +1,12 @@
 import { TournamentsState } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, Outlet, useLoaderData, useLocation } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import {
+  Form,
+  Link,
+  Outlet,
+  useLoaderData,
+  useLocation,
+} from "@remix-run/react";
 import { useState } from "react";
 import { Popover } from "react-tiny-popover";
 import invariant from "tiny-invariant";
@@ -14,6 +20,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { useDisclosure } from "~/utils/useDisclosure";
+import { useReloader } from "~/utils/useReloader";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -33,9 +40,15 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return tournament;
 };
 
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [{ title: `RC Drift UK | ${data?.name}` }];
+};
+
 const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
   const { isOpen, toggle, onClose } = useDisclosure();
   const [selectedJudge, setSelectedJudge] = useState(tournament?.judges[0].id);
+
+  useReloader();
 
   return (
     <Popover
@@ -66,6 +79,10 @@ const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
             value={`https://rcdrift.uk/judge/${selectedJudge}`}
             width={165}
           />
+
+          <Link to={`/judge/${selectedJudge}`} target="_blank">
+            Or Click Here
+          </Link>
         </Box>
       }
     >

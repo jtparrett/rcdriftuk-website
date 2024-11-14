@@ -17,6 +17,7 @@ import {
   Container,
 } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { useReloader } from "~/utils/useReloader";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);
@@ -100,6 +101,8 @@ const QualiForm = () => {
   const [scoreValue, setScoreValue] = useState(100);
 
   const lapIsJudged = (tournament.nextQualifyingLap?.scores.length ?? 0) > 0;
+
+  useReloader();
 
   useEffect(() => {
     if (transition.state === "submitting") {

@@ -5,9 +5,10 @@ import { capitalCase, sentenceCase } from "change-case";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
-import { Box, Center, styled } from "~/styled-system/jsx";
+import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import numberToWords from "number-to-words";
+import { sumScores } from "~/utils/sumScores";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -17,8 +18,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       id,
     },
     include: {
+      judges: true,
       nextQualifyingLap: {
         include: {
+          scores: {
+            include: {
+              judge: true,
+            },
+          },
           driver: {
             include: {
               laps: {
@@ -42,6 +49,10 @@ const TournamentsOverviewPage = () => {
   const tournament = useLoaderData<typeof loader>();
 
   invariant(tournament);
+
+  const judgingComplete =
+    (tournament.nextQualifyingLap?.scores.length ?? 0) ===
+    tournament.judges.length;
 
   return (
     <Box
@@ -81,6 +92,7 @@ const TournamentsOverviewPage = () => {
             borderWidth={1}
             borderColor="brand.700"
             overflow="hidden"
+            textAlign="center"
           >
             <Box
               bgGradient="to-b"
@@ -88,7 +100,6 @@ const TournamentsOverviewPage = () => {
               gradientTo="brand.700"
               px={4}
               py={2}
-              textAlign="center"
               borderTopRadius="11px"
               boxShadow="inset 0 1px rgba(255, 255, 255, 0.3)"
             >
@@ -98,22 +109,61 @@ const TournamentsOverviewPage = () => {
             </Box>
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
-                <Box textAlign="center" py={8} px={4}>
-                  <styled.p fontSize="lg" fontWeight="black">
-                    {tournament.nextQualifyingLap.driver.name}
-                  </styled.p>
-                  <styled.p color="gray.500" fontSize="sm" fontWeight="medium">
-                    {sentenceCase(
-                      numberToWords.toWordsOrdinal(
-                        tournament.qualifyingLaps -
-                          (tournament.nextQualifyingLap.driver.laps.length ??
-                            0) +
-                          1
-                      )
-                    )}{" "}
-                    qualifying run
-                  </styled.p>
-                </Box>
+                <>
+                  <Box pt={4} px={4}>
+                    <styled.p fontSize="lg" fontWeight="black">
+                      {tournament.nextQualifyingLap.driver.name}
+                    </styled.p>
+
+                    {!judgingComplete && (
+                      <styled.p
+                        color="gray.500"
+                        fontSize="sm"
+                        fontWeight="medium"
+                        pb={4}
+                      >
+                        {sentenceCase(
+                          numberToWords.toWordsOrdinal(
+                            tournament.qualifyingLaps -
+                              (tournament.nextQualifyingLap.driver.laps
+                                .length ?? 0) +
+                              1
+                          )
+                        )}{" "}
+                        qualifying run
+                      </styled.p>
+                    )}
+                  </Box>
+
+                  {judgingComplete && (
+                    <Box>
+                      <styled.p fontSize="6xl" fontWeight="black" pb={4}>
+                        {sumScores(
+                          tournament.nextQualifyingLap.scores,
+                          tournament.judges.length
+                        )}
+                      </styled.p>
+                      <Flex textAlign="center" gap="1px">
+                        {tournament.nextQualifyingLap.scores.map((score, i) => {
+                          return (
+                            <Box
+                              key={i}
+                              flex={1}
+                              lineHeight="1"
+                              py={2}
+                              bgColor="gray.900"
+                            >
+                              <styled.p fontSize="lg">{score.score}</styled.p>
+                              <styled.p fontSize="sm">
+                                {score.judge.name}
+                              </styled.p>
+                            </Box>
+                          );
+                        })}
+                      </Flex>
+                    </Box>
+                  )}
+                </>
               )}
           </Box>
         </Box>
