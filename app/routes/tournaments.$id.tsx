@@ -33,7 +33,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return tournament;
 };
 
-const JudgingPortalButton = ({ tournament }: { tournament: GetTournament }) => {
+const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
   const { isOpen, toggle, onClose } = useDisclosure();
   const [selectedJudge, setSelectedJudge] = useState(tournament?.judges[0].id);
 
@@ -45,7 +45,7 @@ const JudgingPortalButton = ({ tournament }: { tournament: GetTournament }) => {
       content={
         <Box p={4} bgColor="brand.500" maxW={200} rounded="md" m={2}>
           <styled.p fontSize="sm" fontWeight="semibold" mb={2}>
-            Scan the QR code to access the judging portal:
+            Scan the QR code to access the judges remote:
           </styled.p>
 
           <Select
@@ -77,7 +77,7 @@ const JudgingPortalButton = ({ tournament }: { tournament: GetTournament }) => {
           toggle();
         }}
       >
-        Open Judging Portal
+        Open Judging Remote
       </Button>
     </Popover>
   );
@@ -116,7 +116,7 @@ const TournamentPage = () => {
           </styled.h1>
 
           {tournament.state !== TournamentsState.START && (
-            <JudgingPortalButton tournament={tournament} />
+            <JudgingMenuButton tournament={tournament} />
           )}
         </Flex>
       </Box>

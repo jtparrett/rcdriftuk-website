@@ -1,12 +1,13 @@
 import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { capitalCase } from "change-case";
+import { capitalCase, sentenceCase } from "change-case";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
 import { Box, Center, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import numberToWords from "number-to-words";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -88,6 +89,8 @@ const TournamentsOverviewPage = () => {
               px={4}
               py={2}
               textAlign="center"
+              borderTopRadius="11px"
+              boxShadow="inset 0 1px rgba(255, 255, 255, 0.3)"
             >
               <styled.p fontWeight="semibold">
                 {capitalCase(tournament.state)}
@@ -100,10 +103,15 @@ const TournamentsOverviewPage = () => {
                     {tournament.nextQualifyingLap.driver.name}
                   </styled.p>
                   <styled.p color="gray.500" fontSize="sm" fontWeight="medium">
-                    Qualifying Lap:{" "}
-                    {tournament.qualifyingLaps -
-                      (tournament.nextQualifyingLap.driver.laps.length ?? 0) +
-                      1}
+                    {sentenceCase(
+                      numberToWords.toWordsOrdinal(
+                        tournament.qualifyingLaps -
+                          (tournament.nextQualifyingLap.driver.laps.length ??
+                            0) +
+                          1
+                      )
+                    )}{" "}
+                    qualifying run
                   </styled.p>
                 </Box>
               )}

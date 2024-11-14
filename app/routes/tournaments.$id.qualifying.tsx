@@ -7,6 +7,7 @@ import { z } from "zod";
 import { pow2Floor } from "~/utils/powFns";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
+import { Glow } from "~/components/Glow";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -88,18 +89,32 @@ const QualifyingPage = () => {
   const half = Math.ceil(tournament.drivers.length / 2);
 
   return (
-    <Box p={1} borderWidth={1} rounded="2xl" borderColor="gray.800">
+    <Box
+      p={1}
+      borderWidth={1}
+      bgColor="gray.900"
+      rounded="2xl"
+      borderColor="gray.800"
+      pos="relative"
+      zIndex={1}
+    >
+      <Glow />
       <Flex
+        bgColor="black"
         flexDir={{ base: "column", md: "row" }}
         borderWidth={1}
-        borderColor="gray.800"
-        py={4}
+        borderColor="brand.700"
         rounded="xl"
+        overflow="hidden"
       >
         <styled.table flex={1}>
           <styled.thead>
-            <styled.tr>
-              <styled.th>#</styled.th>
+            <styled.tr
+              bgGradient="to-b"
+              gradientFrom="brand.500"
+              gradientTo="brand.700"
+            >
+              <styled.th py={1}>#</styled.th>
               <styled.th textAlign="left">Name</styled.th>
               <styled.th>Best</styled.th>
               {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => (
@@ -116,7 +131,7 @@ const QualifyingPage = () => {
                   {i === qualifyingCutOff && (
                     <styled.tr>
                       <styled.td colSpan={7}>
-                        <Box w="full" h="1px" bgColor="red.500" />
+                        <Box w="full" h="1px" bgColor="brand.500" />
                       </styled.td>
                     </styled.tr>
                   )}
@@ -141,12 +156,12 @@ const QualifyingPage = () => {
                       {driver.name}
                     </styled.td>
 
-                    <styled.td fontWeight="black">
+                    <styled.td fontWeight="black" textAlign="center">
                       {driver.bestLapScore}
                     </styled.td>
 
                     {driver.lapScores.map((lapScore, i) => (
-                      <styled.td key={i} color="gray.400">
+                      <styled.td key={i} color="gray.400" textAlign="center">
                         {lapScore}
                       </styled.td>
                     ))}
@@ -170,16 +185,20 @@ const QualifyingPage = () => {
 
         <Box
           alignSelf="stretch"
-          w={0.5}
-          backgroundColor="gray.600"
+          w="1px"
+          backgroundColor="brand.700"
           display={{ base: "none", md: "block" }}
-          mx={8}
         />
 
         <styled.table flex={1}>
-          <styled.thead display={{ base: "none", md: "table-header-group" }}>
+          <styled.thead
+            display={{ base: "none", md: "table-header-group" }}
+            bgGradient="to-b"
+            gradientFrom="brand.500"
+            gradientTo="brand.700"
+          >
             <styled.tr>
-              <styled.th>#</styled.th>
+              <styled.th py={1}>#</styled.th>
               <styled.th textAlign="left">Name</styled.th>
               <styled.th>Best</styled.th>
               {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => (
@@ -196,7 +215,7 @@ const QualifyingPage = () => {
                   {i + half === qualifyingCutOff && (
                     <styled.tr>
                       <styled.td colSpan={7}>
-                        <Box w="full" h="1px" bgColor="red.500" />
+                        <Box w="full" h="1px" bgColor="brand.500" />
                       </styled.td>
                     </styled.tr>
                   )}
@@ -223,12 +242,12 @@ const QualifyingPage = () => {
                       {driver.name}
                     </styled.td>
 
-                    <styled.td fontWeight="black">
+                    <styled.td fontWeight="black" textAlign="center">
                       {driver.bestLapScore}
                     </styled.td>
 
                     {driver.lapScores.map((lapScore, i) => (
-                      <styled.td key={i} color="gray.400">
+                      <styled.td key={i} color="gray.400" textAlign="center">
                         {lapScore}
                       </styled.td>
                     ))}
