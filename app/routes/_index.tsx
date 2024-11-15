@@ -166,9 +166,9 @@ const Page = () => {
       </Box>
 
       <Container py={8} px={2} maxW={1100}>
-        <Link to="/2024/schedule">
-          <Box overflow="hidden" rounded="lg" mb={4}>
-            <styled.img src="/2024-cover.jpg" w="full" />
+        <Link to="/2025">
+          <Box overflow="hidden" rounded="lg" mb={8}>
+            <styled.img src="/rcdriftuk-as25-cover.jpg" w="full" />
           </Box>
         </Link>
 

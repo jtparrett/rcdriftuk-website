@@ -148,7 +148,7 @@ const Menu = () => {
           2024 Championship
         </MenuLink>
         <MenuLink
-          to="/2025/schedule"
+          to="/2025"
           active={location.pathname.includes("/2025") ? "active" : "inactive"}
         >
           <MenuIcon>
