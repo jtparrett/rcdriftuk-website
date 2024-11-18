@@ -4,6 +4,7 @@ import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
 import pluralize from "pluralize";
 import invariant from "tiny-invariant";
 import { z } from "zod";
+import { Button } from "~/components/Button";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
 import {
@@ -29,6 +30,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       },
     },
     include: {
+      judges: {
+        where: {
+          id: judgeId,
+        },
+      },
       nextQualifyingLap: {
         include: {
           scores: {
@@ -43,43 +49,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           },
         },
       },
-      // nextBattle: {
-      //   include: {
-      //     driverLeft: {
-      //       include: {
-      //         driver: true,
-      //       },
-      //     },
-      //     driverRight: {
-      //       include: {
-      //         driver: true,
-      //       },
-      //     },
-      //   },
-      // },
+      nextBattle: {
+        include: {
+          driverLeft: true,
+          driverRight: true,
+          BattleVotes: {
+            where: {
+              judgeId,
+            },
+          },
+        },
+      },
     },
   });
-
-  const judge = await prisma.tournamentJudges.findFirst({
-    where: {
-      id: judgeId,
-    },
-  });
-
-  // const battleVote = await prisma.battleVotes.findFirst({
-  //   where: {
-  //     battleId: tournament?.nextBattleId ?? undefined,
-  //     judgeId,
-  //   },
-  // });
 
   invariant(tournament);
-  invariant(judge, "No Judge Found");
+  invariant(tournament.judges.length > 0, "No judges found");
 
   return {
     tournament,
-    judge,
-    // battleVote
+    judge: tournament.judges[0],
   };
 };
 
@@ -120,6 +109,34 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     });
   }
 
+  if (
+    judge.tournament.state === TournamentsState.BATTLES &&
+    judge.tournament.nextBattleId
+  ) {
+    const formData = await request.formData();
+    const driverId = z.coerce.number().nullable().parse(formData.get("driver"));
+    const isOMT = z.coerce.boolean().parse(formData.get("omt"));
+
+    await prisma.tournamentBattleVotes.upsert({
+      where: {
+        judgeId_battleId: {
+          judgeId,
+          battleId: judge.tournament.nextBattleId,
+        },
+      },
+      create: {
+        judgeId,
+        battleId: judge.tournament.nextBattleId,
+        winnerId: driverId,
+        omt: isOMT,
+      },
+      update: {
+        winnerId: driverId,
+        omt: isOMT,
+      },
+    });
+  }
+
   return redirect(`/judge/${judgeId}`);
 };
 
@@ -135,139 +152,121 @@ const QualiForm = () => {
 
   useReloader();
 
+  if (tournament.nextQualifyingLap === null) {
+    return null;
+  }
+
   return (
     <>
       {transition.state !== "idle" ? (
         <p>Loading...</p>
       ) : (
         <>
-          {tournament.nextQualifyingLap !== null && (
-            <>
-              <Flex mb={6}>
-                <styled.p fontWeight="semibold">
-                  #
-                  {tournament.nextQualifyingLap.driver.id
-                    .toString()
-                    .padStart(2, "0")}{" "}
-                  {tournament.nextQualifyingLap.driver.name}
-                </styled.p>
-                <Spacer />
-                <styled.span color="brand.500" fontWeight="bold">
-                  Qualifying Run {qualifyingRun}
-                </styled.span>
-              </Flex>
+          <Flex mb={6}>
+            <styled.p fontWeight="semibold">
+              #
+              {tournament.nextQualifyingLap.driver.id
+                .toString()
+                .padStart(2, "0")}{" "}
+              {tournament.nextQualifyingLap.driver.name}
+            </styled.p>
+            <Spacer />
+            <styled.span color="brand.500" fontWeight="bold">
+              Qualifying Run {qualifyingRun}
+            </styled.span>
+          </Flex>
 
-              <Form method="post">
-                <VStack alignItems="stretch" gap={6}>
-                  <Box>
-                    <Label>
-                      Score ({scoreValue} {pluralize("point", scoreValue)})
-                    </Label>
+          <Form method="post">
+            <VStack alignItems="stretch" gap={6}>
+              <Box>
+                <Label>
+                  Score ({scoreValue} {pluralize("point", scoreValue)})
+                </Label>
 
-                    <Select
-                      name="score"
-                      aria-label="score-select"
-                      value={scoreValue}
-                      onChange={(e) => {
-                        e.target.form?.submit();
-                      }}
-                    >
-                      {Array.from(new Array(101)).map((_, i) => (
-                        <option key={i} value={i}>
-                          {i}
-                        </option>
-                      ))}
-                    </Select>
-                  </Box>
-                </VStack>
-              </Form>
-            </>
-          )}
+                <Select
+                  name="score"
+                  aria-label="score-select"
+                  value={scoreValue}
+                  onChange={(e) => {
+                    e.target.form?.submit();
+                  }}
+                >
+                  {Array.from(new Array(101)).map((_, i) => (
+                    <option key={i} value={i}>
+                      {i}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
+            </VStack>
+          </Form>
         </>
       )}
     </>
   );
 };
 
-// const BattleForm = () => {
-//   const loaderData = useLoaderData<typeof loader>();
-//   const { tournament, judge, battleVote, replay1, replay2 } = loaderData;
-//   const nextBattle = tournament.nextBattle;
+const BattleForm = () => {
+  const { tournament } = useLoaderData<typeof loader>();
+  const nextBattle = tournament.nextBattle;
+  const battleVote = nextBattle?.BattleVotes[0];
 
-//   return (
-//     <>
-//       {nextBattle?.winnerId !== null && (
-//         <Heading fontSize="xl" textAlign="center" py={20}>
-//           Waiting for next battle...
-//         </Heading>
-//       )}
+  return (
+    <>
+      {nextBattle?.winnerId !== null && (
+        <styled.h2 fontSize="xl" textAlign="center" py={20}>
+          Waiting for next battle...
+        </styled.h2>
+      )}
 
-//       {nextBattle !== null && nextBattle.winnerId === null && (
-//         <Form
-//           method="post"
-//           action={`/tournaments/${nextBattle.tournamentId}/judge/${judge.id}/battle`}
-//         >
-//           <VStack alignItems="stretch" py={20} spacing={6}>
-//             <Button
-//               w="full"
-//               isDisabled={nextBattle.driverLeft?.isBye}
-//               type="submit"
-//               name="driver"
-//               value={nextBattle.driverLeft?.id.toString()}
-//               colorScheme={
-//                 battleVote?.winnerId === nextBattle.driverLeftId
-//                   ? "blue"
-//                   : undefined
-//               }
-//             >
-//               {nextBattle.driverLeft?.driver.name}
-//             </Button>
+      {nextBattle !== null && nextBattle.winnerId === null && (
+        <Form method="post">
+          <Flex flexDir="column" gap={4}>
+            <Button
+              w="full"
+              disabled={nextBattle.driverLeft?.isBye}
+              type="submit"
+              name="driver"
+              value={nextBattle.driverLeft?.id.toString()}
+              variant={
+                battleVote?.winnerId === nextBattle.driverLeftId
+                  ? "primary"
+                  : "outline"
+              }
+            >
+              {nextBattle.driverLeft?.name}
+            </Button>
 
-//             <Button
-//               w="full"
-//               isDisabled={nextBattle.driverRight?.isBye}
-//               type="submit"
-//               name="driver"
-//               value={nextBattle.driverRight?.id.toString()}
-//               colorScheme={
-//                 battleVote?.winnerId === nextBattle.driverRightId
-//                   ? "blue"
-//                   : undefined
-//               }
-//             >
-//               {nextBattle.driverRight?.driver.name}
-//             </Button>
+            <Button
+              w="full"
+              disabled={nextBattle.driverRight?.isBye}
+              type="submit"
+              name="driver"
+              value={nextBattle.driverRight?.id.toString()}
+              variant={
+                battleVote?.winnerId === nextBattle.driverRightId
+                  ? "primary"
+                  : "outline"
+              }
+            >
+              {nextBattle.driverRight?.name}
+            </Button>
 
-//             <Button
-//               mt={4}
-//               w="full"
-//               type="submit"
-//               name="omt"
-//               value="true"
-//               colorScheme={battleVote?.omt ? "blue" : undefined}
-//             >
-//               OMT
-//             </Button>
-//           </VStack>
-//         </Form>
-//       )}
-
-//       <Divider mb={8} />
-
-//       {replay1 && (
-//         <Box mb={2}>
-//           <video src={`/replays/${replay1}`} controls muted />
-//         </Box>
-//       )}
-
-//       {replay2 && (
-//         <Box>
-//           <video src={`/replays/${replay2}`} controls muted />
-//         </Box>
-//       )}
-//     </>
-//   );
-// };
+            <Button
+              w="full"
+              type="submit"
+              name="omt"
+              value="true"
+              variant={battleVote?.omt ? "primary" : "outline"}
+            >
+              OMT
+            </Button>
+          </Flex>
+        </Form>
+      )}
+    </>
+  );
+};
 
 const JudgePage = () => {
   const { tournament, judge } = useLoaderData<typeof loader>();
@@ -281,7 +280,7 @@ const JudgePage = () => {
       </Flex>
 
       {tournament.state === TournamentsState.QUALIFYING && <QualiForm />}
-      {/* {tournament.state === TournamentsState.BATTLES && <BattleForm />} */}
+      {tournament.state === TournamentsState.BATTLES && <BattleForm />}
 
       {tournament.state === TournamentsState.END && (
         <styled.h2 textAlign="center" fontSize="xl">

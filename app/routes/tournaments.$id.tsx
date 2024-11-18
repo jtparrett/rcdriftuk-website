@@ -26,6 +26,7 @@ import type { GetTournament } from "~/utils/getTournament.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
+import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { useReloader } from "~/utils/useReloader";
 
@@ -106,6 +107,11 @@ export const action = async ({ params }: ActionFunctionArgs) => {
         nextQualifyingLapId: nextQualifyingLap?.id ?? null,
       },
     });
+  }
+
+  if (tournament.state === TournamentsState.BATTLES) {
+    await tournamentNextBattle(id);
+    return redirect(`/tournaments/${id}/battles`);
   }
 
   return redirect(`/tournaments/${id}/qualifying`);
