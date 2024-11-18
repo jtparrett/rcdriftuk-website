@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Box, Divider, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
 import { prisma } from "~/utils/prisma.server";
+import { Glow } from "~/components/Glow";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -48,10 +49,10 @@ const Spacer = () => <Box my={-6} flex={1} />;
 
 const Driver = ({
   driver,
-  isWinner,
+  winnerId,
 }: {
   driver: Battle["driverLeft"] | Battle["driverRight"];
-  isWinner: boolean;
+  winnerId: number | null;
 }) => {
   return (
     <Flex alignItems="center" py={0.5} h={6}>
@@ -71,7 +72,13 @@ const Driver = ({
         whiteSpace="nowrap"
         textOverflow="ellipsis"
         overflow="hidden"
-        color={isWinner ? "green.400" : undefined}
+        color={
+          winnerId === null
+            ? undefined
+            : winnerId === driver?.id
+              ? "green.500"
+              : "gray.600"
+        }
         pr={2}
       >
         {driver?.name ?? ""}
@@ -154,7 +161,7 @@ const TournamentBattlesPage = () => {
                     const isNextBattle = tournament.nextBattleId === battle?.id;
                     return (
                       <Fragment key={battle.id}>
-                        <Box position="relative" flex="none">
+                        <Box position="relative" flex="none" zIndex={1}>
                           <Divider
                             position="absolute"
                             borderBottomWidth={1}
@@ -171,18 +178,16 @@ const TournamentBattlesPage = () => {
                               isNextBattle ? "brand.500" : "gray.400"
                             }
                             position="relative"
-                            zIndex={2}
                             overflow="hidden"
                           >
+                            {isNextBattle && <Glow size="sm" />}
                             <Driver
                               driver={battle.driverLeft}
-                              isWinner={battle.winnerId === battle.driverLeftId}
+                              winnerId={battle.winnerId}
                             />
                             <Driver
                               driver={battle.driverRight}
-                              isWinner={
-                                battle.winnerId === battle.driverRightId
-                              }
+                              winnerId={battle.winnerId}
                             />
                           </Box>
                         </Box>

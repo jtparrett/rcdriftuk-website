@@ -32,4 +32,13 @@ export const Glow = styled("div", {
       animation: `spin 3s linear infinite`,
     },
   },
+  variants: {
+    size: {
+      sm: {
+        _before: {
+          inset: 0.5,
+        },
+      },
+    },
+  },
 });
