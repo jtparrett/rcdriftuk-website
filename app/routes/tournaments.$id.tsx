@@ -1,9 +1,14 @@
 import { TournamentsState } from "@prisma/client";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import {
   Form,
   Link,
   Outlet,
+  redirect,
   useLoaderData,
   useLocation,
 } from "@remix-run/react";
@@ -19,6 +24,7 @@ import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { getTournament } from "~/utils/getTournament.server";
+import { prisma } from "~/utils/prisma.server";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { useReloader } from "~/utils/useReloader";
 
@@ -38,6 +44,62 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   return tournament;
+};
+
+export const action = async ({ params }: ActionFunctionArgs) => {
+  const id = z.string().parse(params.id);
+
+  const tournament = await prisma.tournaments.findFirstOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      judges: true,
+      nextQualifyingLap: {
+        include: {
+          scores: true,
+        },
+      },
+    },
+  });
+
+  if (tournament.state === TournamentsState.QUALIFYING) {
+    invariant(
+      tournament?.judges.length ===
+        tournament?.nextQualifyingLap?.scores.length,
+      "Judging not complete for current lap"
+    );
+
+    const nextQualifyingLap = await prisma.laps.findFirst({
+      where: {
+        driver: {
+          tournamentId: id,
+        },
+        scores: {
+          none: {},
+        },
+      },
+      orderBy: [
+        {
+          driver: {
+            id: "asc",
+          },
+        },
+        { id: "asc" },
+      ],
+    });
+
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        nextQualifyingLapId: nextQualifyingLap?.id ?? null,
+      },
+    });
+  }
+
+  return redirect(`/tournaments/${id}/qualifying`);
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -186,10 +248,7 @@ const TournamentPage = () => {
               tournament.nextQualifyingLap &&
               tournament.nextQualifyingLap.scores.length ===
                 tournament.judges.length && (
-                <Form
-                  method="post"
-                  action={`/tournaments/${tournament.id}/start-next-lap`}
-                >
+                <Form method="post">
                   <Button type="submit">Start Next Run</Button>
                 </Form>
               )}
