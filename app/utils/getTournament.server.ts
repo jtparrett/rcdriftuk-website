@@ -16,6 +16,13 @@ export const getTournament = (id: string) => {
           scores: true,
         },
       },
+      nextBattle: {
+        select: {
+          BattleVotes: {
+            distinct: ["judgeId"],
+          },
+        },
+      },
       drivers: {
         select: {
           id: true,

@@ -25,6 +25,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { prisma } from "~/utils/prisma.server";
+import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { useReloader } from "~/utils/useReloader";
 
@@ -62,6 +63,14 @@ export const action = async ({ params }: ActionFunctionArgs) => {
       },
     },
   });
+
+  if (
+    tournament.state === TournamentsState.QUALIFYING &&
+    tournament.nextQualifyingLapId === null
+  ) {
+    await tournamentEndQualifying(id);
+    return redirect(`/tournaments/${id}/qualifying`);
+  }
 
   if (tournament.state === TournamentsState.QUALIFYING) {
     invariant(
@@ -247,17 +256,27 @@ const TournamentPage = () => {
             {tournament.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap &&
               tournament.nextQualifyingLap.scores.length ===
-                tournament.judges.length && (
+                tournament.judges.length &&
+              tournament.nextQualifyingLap && (
                 <Form method="post">
                   <Button type="submit">Start Next Run</Button>
                 </Form>
               )}
 
-            {tournament.state === TournamentsState.BATTLES && (
-              <Form method="post">
-                <Button type="submit">Start Next Battle</Button>
-              </Form>
-            )}
+            {tournament.state === TournamentsState.QUALIFYING &&
+              tournament.nextQualifyingLap === null && (
+                <Form method="post">
+                  <Button type="submit">End Qualifying</Button>
+                </Form>
+              )}
+
+            {tournament.state === TournamentsState.BATTLES &&
+              (tournament.nextBattle?.BattleVotes.length ?? 0) >=
+                tournament.judges.length && (
+                <Form method="post">
+                  <Button type="submit">Start Next Battle</Button>
+                </Form>
+              )}
           </Flex>
 
           <Outlet />

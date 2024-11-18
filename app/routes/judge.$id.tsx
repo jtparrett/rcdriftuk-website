@@ -210,7 +210,7 @@ const QualiForm = () => {
 //           <VStack alignItems="stretch" py={20} spacing={6}>
 //             <Button
 //               w="full"
-//               isDisabled={nextBattle.driverLeft?.isBuy}
+//               isDisabled={nextBattle.driverLeft?.isBye}
 //               type="submit"
 //               name="driver"
 //               value={nextBattle.driverLeft?.id.toString()}
@@ -225,7 +225,7 @@ const QualiForm = () => {
 
 //             <Button
 //               w="full"
-//               isDisabled={nextBattle.driverRight?.isBuy}
+//               isDisabled={nextBattle.driverRight?.isBye}
 //               type="submit"
 //               name="driver"
 //               value={nextBattle.driverRight?.id.toString()}
