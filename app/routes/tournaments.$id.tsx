@@ -199,7 +199,6 @@ const TournamentPage = () => {
           <styled.h1
             fontSize="2xl"
             fontWeight="extrabold"
-            lineHeight={1}
             flexGrow={1}
             w={{ base: "full", sm: "auto" }}
             overflow="hidden"

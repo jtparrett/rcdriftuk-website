@@ -5,6 +5,7 @@ import pluralize from "pluralize";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
+import { Glow } from "~/components/Glow";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
 import {
@@ -14,6 +15,7 @@ import {
   Box,
   VStack,
   Container,
+  Center,
 } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { useReloader } from "~/utils/useReloader";
@@ -272,22 +274,62 @@ const JudgePage = () => {
   const { tournament, judge } = useLoaderData<typeof loader>();
 
   return (
-    <Container px={4} maxW={500} py={4}>
-      <Flex p={4} textAlign="center" bgColor="gray.900" mb={4} rounded="lg">
-        <styled.h1>{judge.name}</styled.h1>
-        <Spacer />
-        <styled.h2>{tournament.name}</styled.h2>
-      </Flex>
+    <Center
+      minH="70dvh"
+      bgImage="url(/grid-bg.svg)"
+      bgRepeat="repeat"
+      bgSize="60px"
+      bgPosition="center"
+      pos="relative"
+      zIndex={1}
+      _before={{
+        content: '""',
+        pos: "absolute",
+        inset: 0,
+        bgGradient: "to-t",
+        gradientFrom: "black",
+        gradientVia: "rgba(0, 0, 0, 0)",
+        gradientTo: "rgba(0, 0, 0, 0)",
+        zIndex: -1,
+      }}
+    >
+      <Container w={500} maxW="full">
+        <Box
+          bgColor="black"
+          pos="relative"
+          zIndex={1}
+          p={1}
+          borderWidth={1}
+          borderColor="brand.700"
+          rounded="3xl"
+          shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
+        >
+          <Glow />
+          <Box borderWidth={1} borderColor="brand.700" rounded="2xl" p={4}>
+            <Flex
+              p={4}
+              textAlign="center"
+              bgColor="gray.900"
+              mb={4}
+              rounded="lg"
+            >
+              <styled.h1 fontWeight="extrabold">{judge.name}</styled.h1>
+              <Spacer />
+              <styled.h2 fontSize="sm">{tournament.name}</styled.h2>
+            </Flex>
 
-      {tournament.state === TournamentsState.QUALIFYING && <QualiForm />}
-      {tournament.state === TournamentsState.BATTLES && <BattleForm />}
+            {tournament.state === TournamentsState.QUALIFYING && <QualiForm />}
+            {tournament.state === TournamentsState.BATTLES && <BattleForm />}
 
-      {tournament.state === TournamentsState.END && (
-        <styled.h2 textAlign="center" fontSize="xl">
-          Competition Complete
-        </styled.h2>
-      )}
-    </Container>
+            {tournament.state === TournamentsState.END && (
+              <styled.h2 textAlign="center" fontSize="xl">
+                Tournament Complete
+              </styled.h2>
+            )}
+          </Box>
+        </Box>
+      </Container>
+    </Center>
   );
 };
 
