@@ -1,6 +1,6 @@
 import { TournamentsState } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
 import pluralize from "pluralize";
 import invariant from "tiny-invariant";
 import { z } from "zod";
@@ -83,16 +83,55 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   };
 };
 
+export const action = async ({ params, request }: ActionFunctionArgs) => {
+  const judgeId = z.coerce.string().parse(params.id);
+
+  const judge = await prisma.tournamentJudges.findFirstOrThrow({
+    where: {
+      id: judgeId,
+    },
+    include: {
+      tournament: true,
+    },
+  });
+
+  if (
+    judge.tournament.state === TournamentsState.QUALIFYING &&
+    judge.tournament.nextQualifyingLapId
+  ) {
+    const formData = await request.formData();
+    const score = z.coerce.number().parse(formData.get("score"));
+
+    await prisma.lapScores.upsert({
+      where: {
+        judgeId_lapId: {
+          judgeId,
+          lapId: judge.tournament.nextQualifyingLapId,
+        },
+      },
+      update: {
+        score,
+      },
+      create: {
+        judgeId,
+        lapId: judge.tournament.nextQualifyingLapId,
+        score,
+      },
+    });
+  }
+
+  return redirect(`/judge/${judgeId}`);
+};
+
 const QualiForm = () => {
-  const loaderData = useLoaderData<typeof loader>();
-  const { tournament, judge } = loaderData;
+  const { tournament } = useLoaderData<typeof loader>();
   const transition = useNavigation();
 
   const scoreValue = tournament.nextQualifyingLap?.scores[0]?.score ?? 50;
   const qualifyingRun =
-    tournament.nextQualifyingLap?.driver?.laps
-      ?.map((lap) => lap.id)
-      ?.indexOf(tournament.nextQualifyingLapId ?? 0) + 1;
+    (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
+      (lap) => lap.id === tournament.nextQualifyingLapId
+    ) ?? 0) + 1;
 
   useReloader();
 
@@ -118,10 +157,7 @@ const QualiForm = () => {
                 </styled.span>
               </Flex>
 
-              <Form
-                method="post"
-                action={`/judge/${judge.id}/lap/${tournament.nextQualifyingLapId}`}
-              >
+              <Form method="post">
                 <VStack alignItems="stretch" gap={6}>
                   <Box>
                     <Label>
@@ -234,8 +270,7 @@ const QualiForm = () => {
 // };
 
 const JudgePage = () => {
-  const loaderData = useLoaderData<typeof loader>();
-  const { tournament, judge } = loaderData;
+  const { tournament, judge } = useLoaderData<typeof loader>();
 
   return (
     <Container px={4} maxW={500} py={4}>
@@ -246,7 +281,6 @@ const JudgePage = () => {
       </Flex>
 
       {tournament.state === TournamentsState.QUALIFYING && <QualiForm />}
-
       {/* {tournament.state === TournamentsState.BATTLES && <BattleForm />} */}
 
       {tournament.state === TournamentsState.END && (
