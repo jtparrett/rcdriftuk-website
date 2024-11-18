@@ -1,4 +1,4 @@
-import { TournamentsState } from "@prisma/client";
+import { BattlesBracket, TournamentsState } from "@prisma/client";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -91,9 +91,7 @@ export const action = async ({ params }: ActionFunctionArgs) => {
       },
       orderBy: [
         {
-          driver: {
-            id: "asc",
-          },
+          tournamentDriverId: "asc",
         },
         { id: "asc" },
       ],
@@ -111,7 +109,22 @@ export const action = async ({ params }: ActionFunctionArgs) => {
 
   if (tournament.state === TournamentsState.BATTLES) {
     await tournamentNextBattle(id);
-    return redirect(`/tournaments/${id}/battles`);
+    const nextBattle = await prisma.tournaments.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        nextBattle: {
+          select: {
+            bracket: true,
+          },
+        },
+      },
+    });
+
+    return redirect(
+      `/tournaments/${id}/battles/${nextBattle?.nextBattle?.bracket}`
+    );
   }
 
   return redirect(`/tournaments/${id}/qualifying`);
@@ -132,6 +145,9 @@ const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
       isOpen={isOpen}
       positions={["bottom"]}
       onClickOutside={onClose}
+      containerStyle={{
+        zIndex: "1000",
+      }}
       content={
         <Box p={4} bgColor="brand.500" maxW={200} rounded="md" m={2}>
           <styled.p fontSize="sm" fontWeight="semibold" mb={2}>
@@ -248,7 +264,7 @@ const TournamentPage = () => {
                 Qualifying
               </LinkButton>
               <LinkButton
-                to={`/tournaments/${tournament.id}/battles`}
+                to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
                 variant={isBattlesTab ? "secondary" : "ghost"}
                 size="xs"
               >

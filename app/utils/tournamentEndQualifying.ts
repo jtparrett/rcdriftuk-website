@@ -3,7 +3,6 @@ import {
   TournamentsFormat,
   TournamentsState,
 } from "@prisma/client";
-import { redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
@@ -234,6 +233,4 @@ export const tournamentEndQualifying = async (id: string) => {
       nextBattleId: nextBattle?.id,
     },
   });
-
-  return redirect(`/tournaments/${id}`);
 };

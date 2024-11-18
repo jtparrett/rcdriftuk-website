@@ -196,13 +196,6 @@ const UserMenu = ({ user }: Props) => {
         )}
 
         <MenuLink
-          to="/user/events"
-          active={location.pathname === "/user/events" ? "active" : "inactive"}
-        >
-          My Events
-        </MenuLink>
-
-        <MenuLink
           to="/user/tournaments"
           active={
             location.pathname === "/user/tournaments" ? "active" : "inactive"

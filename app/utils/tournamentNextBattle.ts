@@ -1,5 +1,4 @@
 import { TournamentsFormat, TournamentsState } from "@prisma/client";
-import { redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import {
   advanceDoubleEliminationBattleWinner,
@@ -72,7 +71,7 @@ export const tournamentNextBattle = async (id: string) => {
   if (!tournament.nextBattleId || !tournament.nextBattle) {
     // End the comp!
     await advanceToNextBattle(id);
-    return redirect(`/tournaments/${id}`);
+    return null;
   }
 
   const totalVotes = await prisma.tournamentBattleVotes.findMany({
@@ -152,6 +151,4 @@ export const tournamentNextBattle = async (id: string) => {
 
     await advanceToNextBattle(id);
   }
-
-  return redirect(`/tournaments/${id}`);
 };

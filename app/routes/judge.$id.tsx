@@ -305,27 +305,35 @@ const JudgePage = () => {
           shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
         >
           <Glow />
-          <Box borderWidth={1} borderColor="brand.700" rounded="2xl" p={4}>
+          <Box
+            borderWidth={1}
+            borderColor="brand.700"
+            rounded="2xl"
+            overflow="hidden"
+          >
             <Flex
-              p={4}
-              textAlign="center"
-              bgColor="gray.900"
-              mb={4}
-              rounded="lg"
+              px={6}
+              py={3}
+              bgGradient="to-b"
+              gradientFrom="brand.500"
+              gradientTo="brand.700"
             >
               <styled.h1 fontWeight="extrabold">{judge.name}</styled.h1>
               <Spacer />
               <styled.h2 fontSize="sm">{tournament.name}</styled.h2>
             </Flex>
+            <Box p={4} pb={8}>
+              {tournament.state === TournamentsState.QUALIFYING && (
+                <QualiForm />
+              )}
+              {tournament.state === TournamentsState.BATTLES && <BattleForm />}
 
-            {tournament.state === TournamentsState.QUALIFYING && <QualiForm />}
-            {tournament.state === TournamentsState.BATTLES && <BattleForm />}
-
-            {tournament.state === TournamentsState.END && (
-              <styled.h2 textAlign="center" fontSize="xl">
-                Tournament Complete
-              </styled.h2>
-            )}
+              {tournament.state === TournamentsState.END && (
+                <styled.h2 textAlign="center" fontSize="xl">
+                  Tournament Complete
+                </styled.h2>
+              )}
+            </Box>
           </Box>
         </Box>
       </Container>

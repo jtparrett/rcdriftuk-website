@@ -51,15 +51,15 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   // Create laps
-  await prisma.laps.createMany({
-    data: tournamentDrivers.flatMap((driver) => {
-      return Array.from(new Array(tournament.qualifyingLaps)).map(() => {
-        return {
+  await prisma.$transaction(
+    tournamentDrivers.map((driver) => {
+      return prisma.laps.createMany({
+        data: Array.from(new Array(tournament.qualifyingLaps)).map(() => ({
           tournamentDriverId: driver.id,
-        };
+        })),
       });
-    }),
-  });
+    })
+  );
 
   // Get next qualifying lap
   const nextQualifyingLap = await prisma.laps.findFirst({
@@ -92,5 +92,5 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/tournaments/${id}`);
+  return redirect(`/tournaments/${id}/overview`);
 };
