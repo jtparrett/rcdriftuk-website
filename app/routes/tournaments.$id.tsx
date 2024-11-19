@@ -123,7 +123,7 @@ export const action = async ({ params }: ActionFunctionArgs) => {
     });
 
     return redirect(
-      `/tournaments/${id}/battles/${nextBattle?.nextBattle?.bracket}`
+      `/tournaments/${id}/battles/${nextBattle?.nextBattle?.bracket ?? BattlesBracket.UPPER}`
     );
   }
 
