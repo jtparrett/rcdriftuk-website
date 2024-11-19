@@ -8,5 +8,6 @@ export const Input = styled("input", {
     color: "white",
     w: "full",
     minH: "40px",
+    outline: "none",
   },
 });

@@ -1,9 +1,10 @@
 import { prisma } from "./prisma.server";
 
-export const getTournament = (id: string) => {
+export const getTournament = (id: string, userId: string) => {
   return prisma.tournaments.findFirst({
     where: {
       id,
+      userId,
     },
     select: {
       id: true,

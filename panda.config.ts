@@ -33,9 +33,6 @@ export default defineConfig({
           body: {
             value: '"Inter", sans-serif',
           },
-          heading: {
-            value: '"Bebas Neue", sans-serif',
-          },
         },
         colors: {
           black: {

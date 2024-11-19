@@ -30,6 +30,9 @@ export const action = async (args: ActionFunctionArgs) => {
   );
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
 
+  invariant(judges.length > 0, "Please add at least one judge");
+  invariant(drivers.length > 0, "Please add at least one driver");
+
   // Create judges
   await prisma.tournamentJudges.createMany({
     data: nameStringToArray(judges).map((name) => {

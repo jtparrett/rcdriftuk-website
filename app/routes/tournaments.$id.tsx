@@ -36,7 +36,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   invariant(userId);
 
-  const tournament = await getTournament(id);
+  const tournament = await getTournament(id, userId);
 
   if (!tournament) {
     throw new Response(null, {
