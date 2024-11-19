@@ -1,4 +1,4 @@
-import { getAuth } from "@clerk/remix/ssr.server";
+import { getAuth } from "~/utils/getAuth.server";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form, redirect } from "@remix-run/react";
 import invariant from "tiny-invariant";
