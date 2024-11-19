@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import {
   add,
   differenceInWeeks,
@@ -19,60 +19,45 @@ import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
 import { Textarea } from "~/components/Textarea";
 import { styled, Box, Flex } from "~/styled-system/jsx";
+import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
-const sendEventToSlack = (text: string, id: string) => {
-  return fetch(
-    "https://hooks.slack.com/services/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",
-    {
-      method: "post",
-      body: JSON.stringify({
-        text: "New Event",
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { userId } = await getAuth(args);
 
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text,
-            },
-          },
-          {
-            type: "actions",
-            elements: [
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Approve",
-                },
-                style: "primary",
-                action_id: "approve",
-                value: id,
-              },
-            ],
-          },
-        ],
-      }),
-    }
-  );
-};
+  if (!userId) {
+    throw redirect("/");
+  }
 
-export const loader = async () => {
-  const tracks = await prisma.tracks.findMany({
-    orderBy: {
-      name: "asc",
+  const userData = await prisma.users.findFirst({
+    where: {
+      id: userId,
     },
   });
 
-  return tracks;
+  if (!userData?.trackId) {
+    throw redirect("/");
+  }
+
+  return null;
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async (args: ActionFunctionArgs) => {
+  const { request } = args;
+  const { userId } = await getAuth(args);
   const body = await request.formData();
 
+  invariant(userId);
+
+  const userData = await prisma.users.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+
+  invariant(userData?.trackId, "User does not own a track");
+
   const name = body.get("name");
-  const trackId = body.get("trackId");
   const date = body.get("date");
   const startTime = body.get("startTime");
   const endTime = body.get("endTime");
@@ -83,7 +68,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = z
     .object({
       name: z.string(),
-      trackId: z.string(),
       date: z.coerce.date(),
       link: z.string().optional(),
       startTime: z.string(),
@@ -93,7 +77,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     })
     .parse({
       name,
-      trackId,
       date,
       startTime,
       endTime,
@@ -113,14 +96,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     parseInt(endMinutes)
   );
 
-  const track = await prisma.tracks.findFirst({
-    where: {
-      id: data.trackId,
-    },
-  });
-
-  invariant(track);
-
   const diff = differenceInWeeks(endOfYear(startDate), startDate);
   const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
 
@@ -131,64 +106,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
       return {
         name: data.name,
-        trackId: track.id,
+        trackId: userData.trackId,
         link: data.link,
         startDate: repeatStartDate,
         endDate: repeatEndDate,
         description: data.description,
+        approved: true,
       };
     }),
   });
-
-  const event = await prisma.events.findFirst({
-    where: {
-      trackId: track.id,
-    },
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-      { startDate: "desc" },
-    ],
-    include: {
-      eventTrack: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-
-  if (event) {
-    await sendEventToSlack(JSON.stringify(event, null, 2), event.id);
-  }
 
   return redirect("/calendar/success");
 };
 
 const CalendarNewPage = () => {
-  const tracks = useLoaderData<typeof loader>();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   return (
     <Box pb={12}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
-        Create Event
+        Create an event
       </styled.h1>
       <Form method="post">
         <Flex flexDir="column" maxW={500} gap={4}>
-          <Box>
-            <Label>Track</Label>
-            <Select name="trackId" required>
-              <option></option>
-              {tracks.map((track) => (
-                <option key={track.id} value={track.id}>
-                  {track.name}
-                </option>
-              ))}
-            </Select>
-          </Box>
-
           <Box>
             <Label>Date</Label>
             <Input

@@ -8,5 +8,6 @@ export const Select = styled("select", {
     color: "white",
     w: "full",
     minH: "40px",
+    outline: "none",
   },
 });

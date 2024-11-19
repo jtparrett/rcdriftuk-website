@@ -65,7 +65,7 @@ const Page = () => {
       <Box
         bgImage="url(/grid-bg.svg)"
         bgRepeat="repeat"
-        bgSize="100px"
+        bgSize="60px"
         bgPosition="center"
         pos="relative"
         zIndex={1}

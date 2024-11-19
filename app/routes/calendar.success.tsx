@@ -10,11 +10,10 @@ const CalendarSuccessPage = () => {
           <RiCheckboxCircleLine />
         </Center>
         <styled.h1 fontSize="3xl" fontWeight="bold">
-          Event Submitted
+          New Event Created
         </styled.h1>
         <styled.p mb={8}>
-          Thank you for your submission. Admins will review your event and share
-          on the calendar if appropriate.
+          Thank you for your submission. Your event is now live on the calendar.
         </styled.p>
         <LinkButton to="/">Go Home</LinkButton>
       </Box>

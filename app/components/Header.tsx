@@ -18,7 +18,8 @@ import {
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
-import { SignedIn, SignedOut, UserButton } from "@clerk/remix";
+import { SignedOut, useAuth, useUser } from "@clerk/remix";
+import type { GetUser } from "~/utils/getUser.sever";
 
 const today = format(new Date(), "dd-MM-yy");
 
@@ -67,7 +68,7 @@ const MenuLink = styled(Link, {
 const Menu = () => {
   return (
     <Box
-      bgColor="rgba(0, 0, 0, 0.8)"
+      bgColor="rgba(12, 12, 12, 0.8)"
       backdropFilter="blur(10px)"
       rounded="lg"
       borderWidth={1}
@@ -93,7 +94,7 @@ const Menu = () => {
           <MenuIcon>
             <RiMapPin2Line />
           </MenuIcon>
-          Drift Map
+          Map
         </MenuLink>
         <MenuLink
           to="/tracks"
@@ -102,7 +103,7 @@ const Menu = () => {
           <MenuIcon>
             <RiFlagLine />
           </MenuIcon>
-          All Tracks
+          Tracks
         </MenuLink>
         <MenuLink
           to={`/calendar/week/${today}`}
@@ -124,7 +125,7 @@ const Menu = () => {
           <MenuIcon>
             <RiSearch2Line />
           </MenuIcon>
-          Shops Catalogue
+          Catalogue
         </MenuLink>
         <MenuLink
           to="/ratings"
@@ -173,12 +174,70 @@ const Menu = () => {
   );
 };
 
-export const Header = () => {
+const UserMenu = ({ user }: Props) => {
+  const { signOut } = useAuth();
+
+  return (
+    <Box
+      bgColor="rgba(12, 12, 12, 0.8)"
+      backdropFilter="blur(10px)"
+      rounded="lg"
+      borderWidth={1}
+      borderColor="gray.800"
+      shadow="2xl"
+      mt={5}
+      p={{ base: 2, md: 4 }}
+    >
+      <Flex gap={1} flexDir="column">
+        {user?.track && (
+          <MenuLink to={`/tracks/${user.track.slug}`} active="inactive">
+            My Track
+          </MenuLink>
+        )}
+
+        <MenuLink
+          to="/user/tournaments"
+          active={
+            location.pathname === "/user/tournaments" ? "active" : "inactive"
+          }
+        >
+          My Tournaments
+        </MenuLink>
+
+        <MenuLink
+          to="/user/profile"
+          active={location.pathname === "/user/profile" ? "active" : "inactive"}
+        >
+          Account Settings
+        </MenuLink>
+
+        <MenuLink
+          to="/"
+          onClick={(e) => {
+            e.preventDefault();
+            signOut();
+          }}
+        >
+          Sign Out
+        </MenuLink>
+      </Flex>
+    </Box>
+  );
+};
+
+interface Props {
+  user: GetUser | null;
+}
+
+export const Header = ({ user }: Props) => {
   const location = useLocation();
   const menu = useDisclosure();
+  const userMenu = useDisclosure();
+  const clerkUser = useUser();
 
   useEffect(() => {
     menu.onClose();
+    userMenu.onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
@@ -190,7 +249,7 @@ export const Header = () => {
       pos="sticky"
       top={0}
       zIndex={10}
-      bgColor="rgba(0, 0, 0, 0.8)"
+      bgColor="rgba(12, 12, 12, 0.8)"
       backdropFilter="blur(10px)"
       shadow="2xl"
     >
@@ -233,6 +292,7 @@ export const Header = () => {
               containerStyle={{
                 zIndex: "20",
               }}
+              onClickOutside={menu.onClose}
             >
               <Button
                 size="sm"
@@ -248,9 +308,30 @@ export const Header = () => {
             </Popover>
           </Box>
 
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          {user !== null && (
+            <Popover
+              isOpen={userMenu.isOpen}
+              content={<UserMenu user={user} />}
+              positions={["bottom"]}
+              align="end"
+              containerStyle={{
+                zIndex: "20",
+              }}
+              onClickOutside={userMenu.onClose}
+            >
+              <styled.button
+                w={8}
+                h={8}
+                rounded="full"
+                overflow="hidden"
+                type="button"
+                cursor="pointer"
+                onClick={() => userMenu.toggle()}
+              >
+                <styled.img src={clerkUser.user?.imageUrl} w="full" />
+              </styled.button>
+            </Popover>
+          )}
 
           <SignedOut>
             <LinkButton variant="outline" size="sm" to="/sign-in">

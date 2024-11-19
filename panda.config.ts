@@ -24,15 +24,20 @@ export default defineConfig({
   theme: {
     extend: {
       tokens: {
+        radii: {
+          "3xl": {
+            value: "1.3rem",
+          },
+        },
         fonts: {
           body: {
             value: '"Inter", sans-serif',
           },
-          heading: {
-            value: '"Bebas Neue", sans-serif',
-          },
         },
         colors: {
+          black: {
+            value: "#0c0c0c",
+          },
           "brand.500": {
             value: brandColor,
           },
@@ -72,6 +77,13 @@ export default defineConfig({
           },
           "gray.950": {
             value: "#09090b",
+          },
+        },
+      },
+      keyframes: {
+        spin: {
+          "100%": {
+            transform: "rotate(360deg)",
           },
         },
       },

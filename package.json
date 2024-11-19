@@ -9,7 +9,8 @@
     "dev": "remix dev --manual",
     "start": "remix-serve ./build/index.js",
     "lint": "tsc",
-    "prepare": "panda codegen"
+    "prepare": "panda codegen",
+    "this-week": "tsx ./scripts/this-week-summary.ts"
   },
   "dependencies": {
     "@clerk/remix": "^4.0.12",
@@ -20,10 +21,14 @@
     "@remix-run/react": "^2.9.2",
     "@remix-run/serve": "^2.9.2",
     "@vercel/analytics": "^1.1.1",
+    "change-case": "^5.4.4",
     "date-fns": "^2.30.0",
     "isbot": "^3.6.8",
     "leaflet": "^1.9.4",
+    "motion": "^11.11.17",
+    "number-to-words": "^1.2.4",
     "pluralize": "^8.0.0",
+    "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
@@ -36,16 +41,19 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@pandacss/dev": "^0.38.0",
+    "@pandacss/dev": "^0.40.1",
     "@remix-run/dev": "^2.9.2",
     "@remix-run/eslint-config": "^2.9.2",
     "@types/leaflet": "^1.9.4",
+    "@types/number-to-words": "^1.2.3",
     "@types/pluralize": "^0.0.33",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^10.0.0",
     "eslint": "^8.38.0",
     "prisma": "^5.9.1",
+    "tsx": "^4.15.7",
     "typescript": "^5.1.6"
   }
 }
