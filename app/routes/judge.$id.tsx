@@ -152,8 +152,6 @@ const QualiForm = () => {
       (lap) => lap.id === tournament.nextQualifyingLapId
     ) ?? 0) + 1;
 
-  useReloader();
-
   if (tournament.nextQualifyingLap === null) {
     return null;
   }
@@ -272,6 +270,8 @@ const BattleForm = () => {
 
 const JudgePage = () => {
   const { tournament, judge } = useLoaderData<typeof loader>();
+
+  useReloader();
 
   return (
     <Center
