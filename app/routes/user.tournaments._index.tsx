@@ -51,7 +51,7 @@ const Page = () => {
           >
             <Flex p={4} rounded="lg" borderWidth="1px" borderColor="gray.800">
               <Box>
-                <Link to={`/tournaments/${tournament.id}`}>
+                <Link to={`/tournaments/${tournament.id}/overview`}>
                   <styled.span fontWeight="bold" fontSize="lg">
                     {tournament.name}
                   </styled.span>

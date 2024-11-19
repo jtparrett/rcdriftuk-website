@@ -25,6 +25,7 @@
     "date-fns": "^2.30.0",
     "isbot": "^3.6.8",
     "leaflet": "^1.9.4",
+    "motion": "^11.11.17",
     "number-to-words": "^1.2.4",
     "pluralize": "^8.0.0",
     "qrcode": "^1.5.3",

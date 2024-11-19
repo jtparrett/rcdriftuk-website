@@ -9,6 +9,7 @@ import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import numberToWords from "number-to-words";
 import { sumScores } from "~/utils/sumScores";
+import { motion } from "motion/react";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -19,6 +20,17 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
     include: {
       judges: true,
+      nextBattle: {
+        include: {
+          BattleVotes: {
+            include: {
+              judge: true,
+            },
+          },
+          driverLeft: true,
+          driverRight: true,
+        },
+      },
       nextQualifyingLap: {
         include: {
           scores: {
@@ -50,8 +62,12 @@ const TournamentsOverviewPage = () => {
 
   invariant(tournament);
 
-  const judgingComplete =
+  const qualiJudgingComplete =
     (tournament.nextQualifyingLap?.scores.length ?? 0) ===
+    tournament.judges.length;
+
+  const battleJudgingComplete =
+    (tournament.nextBattle?.BattleVotes.length ?? 0) >=
     tournament.judges.length;
 
   return (
@@ -79,7 +95,7 @@ const TournamentsOverviewPage = () => {
           borderWidth={1}
           rounded="2xl"
           borderColor="brand.500"
-          w={260}
+          minW={260}
           mb={4}
           maxW="full"
           shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
@@ -115,7 +131,7 @@ const TournamentsOverviewPage = () => {
                       {tournament.nextQualifyingLap.driver.name}
                     </styled.p>
 
-                    {!judgingComplete && (
+                    {!qualiJudgingComplete && (
                       <styled.p
                         color="gray.500"
                         fontSize="sm"
@@ -135,7 +151,7 @@ const TournamentsOverviewPage = () => {
                     )}
                   </Box>
 
-                  {judgingComplete && (
+                  {qualiJudgingComplete && (
                     <Box>
                       <styled.p fontSize="6xl" fontWeight="black" pb={4}>
                         {sumScores(
@@ -164,6 +180,93 @@ const TournamentsOverviewPage = () => {
                     </Box>
                   )}
                 </>
+              )}
+
+            {tournament?.state === TournamentsState.BATTLES &&
+              tournament.nextBattle && (
+                <Flex maxW={700}>
+                  <Box flex={1} borderRightWidth={1} borderColor="brand.500">
+                    <styled.img src="/blank-driver-left.jpg" w="full" />
+                    <styled.p
+                      w="full"
+                      textOverflow="ellipsis"
+                      overflow="hidden"
+                      whiteSpace="nowrap"
+                      fontSize="lg"
+                      fontWeight="black"
+                      py={2}
+                    >
+                      {tournament.nextBattle.driverLeft?.name}
+                    </styled.p>
+                  </Box>
+                  <Box flex={1.3} py={{ base: 8, md: 12 }}>
+                    {battleJudgingComplete && (
+                      <>
+                        {tournament.nextBattle.BattleVotes.map((vote, i) => {
+                          const winnerDirection =
+                            vote.winnerId === null
+                              ? "0%"
+                              : vote.winnerId ===
+                                  tournament.nextBattle?.driverLeftId
+                                ? "-25%"
+                                : "25%";
+
+                          return (
+                            <motion.div
+                              key={i}
+                              animate={{ x: winnerDirection }}
+                            >
+                              <Box
+                                rounded="xl"
+                                bgGradient="to-b"
+                                gradientFrom="brand.500"
+                                gradientTo="brand.700"
+                                w={{ base: "85px", md: "120px" }}
+                                mx="auto"
+                                mb={2}
+                                py={2}
+                                textAlign="center"
+                              >
+                                <styled.p
+                                  fontWeight="bold"
+                                  fontSize="xs"
+                                  w="full"
+                                  whiteSpace="nowrap"
+                                  textOverflow="ellipsis"
+                                  overflow="hidden"
+                                >
+                                  {vote.judge.name}
+                                </styled.p>
+                                <styled.p
+                                  lineHeight={1}
+                                  fontSize={{ base: "sm", md: "lg" }}
+                                  fontWeight="black"
+                                  textTransform="uppercase"
+                                >
+                                  {vote.omt ? "OMT" : "Advance"}
+                                </styled.p>
+                              </Box>
+                            </motion.div>
+                          );
+                        })}
+                      </>
+                    )}
+                  </Box>
+                  <Box flex={1} borderLeftWidth={1} borderColor="brand.500">
+                    <styled.img src="/blank-driver-right.jpg" w="full" />
+                    <styled.p
+                      w="full"
+                      textOverflow="ellipsis"
+                      overflow="hidden"
+                      whiteSpace="nowrap"
+                      fontSize="lg"
+                      fontWeight="black"
+                      py={2}
+                    >
+                      {tournament.nextBattle.driverRight?.name}
+                    </styled.p>
+                  </Box>
+                </Flex>
               )}
           </Box>
         </Box>
