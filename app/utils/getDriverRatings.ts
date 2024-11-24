@@ -53,6 +53,8 @@ export const getDriverRatings = async () => {
         opponentElo: number; // Opponents points after battle
         startingElo: number;
         startingOpponentElo: number;
+        totalBattles: number;
+        totalOpponentBattles: number;
       }[];
     }
   > = {};
@@ -71,9 +73,11 @@ export const getDriverRatings = async () => {
     const loserStartingElo =
       loser.name === "BYE" ? 1000 : driverElos[loserId].currentElo ?? 1000;
 
-    const winnersK =
-      (driverElos[winnerId]?.history?.length ?? 0) <= 5 ? 32 : 64;
-    const losersK = (driverElos[loserId]?.history?.length ?? 0) <= 5 ? 32 : 64;
+    const winnerTotalBattles = driverElos[winnerId]?.history?.length ?? 0;
+    const loserTotalBattles = driverElos[loserId]?.history?.length ?? 0;
+
+    const winnersK = winnerTotalBattles >= 5 ? 32 : 64;
+    const losersK = loserTotalBattles >= 5 ? 32 : 64;
 
     const { newRatingPlayer: winnerElo, newRatingOpponent: loserElo } =
       calculateElos(winnerStartingElo, loserStartingElo, winnersK, losersK);
@@ -89,6 +93,8 @@ export const getDriverRatings = async () => {
         opponentElo: loserElo,
         startingElo: winnerStartingElo,
         startingOpponentElo: loserStartingElo,
+        totalBattles: winnerTotalBattles,
+        totalOpponentBattles: loserTotalBattles,
       },
     ];
 
@@ -100,6 +106,8 @@ export const getDriverRatings = async () => {
         opponentElo: winnerElo,
         startingElo: loserStartingElo,
         startingOpponentElo: winnerStartingElo,
+        totalBattles: loserTotalBattles,
+        totalOpponentBattles: winnerTotalBattles,
       },
     ];
   }

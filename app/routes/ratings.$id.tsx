@@ -24,13 +24,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const ratings = await getDriverRatings();
 
-  return { driver, ratings };
+  const driverRatings = ratings.find((r) => r.id === driver.id);
+
+  return {
+    driver,
+    driverRatings,
+  };
 };
 
 const Page = () => {
-  const { driver, ratings } = useLoaderData<typeof loader>();
-
-  const driverRatings = ratings.find((r) => r.id === driver.id);
+  const { driver, driverRatings } = useLoaderData<typeof loader>();
 
   return (
     <Container maxW={1100} px={2}>
@@ -127,8 +130,17 @@ const Page = () => {
         )}
 
         {driverRatings?.history.map(
-          ({ battle, elo, opponentElo, startingElo, startingOpponentElo }) => {
+          ({
+            battle,
+            elo,
+            opponentElo,
+            startingElo,
+            startingOpponentElo,
+            totalBattles,
+            totalOpponentBattles,
+          }) => {
             const isWinner = battle.winnerId === driver.id;
+
             return (
               <VStack
                 key={battle.id}
@@ -148,18 +160,21 @@ const Page = () => {
                     </styled.span>
                   )}
                 </HStack>
+
                 <HStack>
-                  <styled.span>Winner elo - {elo.toFixed(3)}</styled.span>
+                  <styled.span>Starting: {startingElo.toFixed(3)}</styled.span>
                   <styled.span>
-                    Loser elo - {opponentElo.toFixed(3)}
+                    Starting opponent: {startingOpponentElo.toFixed(3)}
                   </styled.span>
                 </HStack>
                 <HStack>
+                  <styled.span>Winner: {elo.toFixed(3)}</styled.span>
+                  <styled.span>Loser: {opponentElo.toFixed(3)}</styled.span>
+                </HStack>
+                <HStack>
+                  <styled.span>Winner Battles: {totalBattles}</styled.span>
                   <styled.span>
-                    Starting elo - {startingElo.toFixed(3)}
-                  </styled.span>
-                  <styled.span>
-                    Starting opponent elo - {startingOpponentElo.toFixed(3)}
+                    Opponent Battles: {totalOpponentBattles}
                   </styled.span>
                 </HStack>
                 <HStack>
