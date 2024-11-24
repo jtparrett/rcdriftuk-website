@@ -38,7 +38,9 @@ const Page = () => {
   return (
     <Container maxW={1100} px={2}>
       <styled.div>
-        <styled.h1>{driver.name}</styled.h1>
+        <styled.h1 mb={4} fontSize="4xl" fontWeight="bold">
+          {driver.name}
+        </styled.h1>
 
         {driverRatings && driverRatings.history.length > 0 && (
           <ResponsiveContainer width="100%" height={300}>
@@ -161,31 +163,49 @@ const Page = () => {
                   )}
                 </HStack>
 
-                <HStack>
-                  <styled.span>Starting: {startingElo.toFixed(3)}</styled.span>
-                  <styled.span>
-                    Starting opponent: {startingOpponentElo.toFixed(3)}
-                  </styled.span>
-                </HStack>
-                <HStack>
-                  <styled.span>Winner: {elo.toFixed(3)}</styled.span>
-                  <styled.span>Loser: {opponentElo.toFixed(3)}</styled.span>
-                </HStack>
-                <HStack>
-                  <styled.span>Winner Battles: {totalBattles}</styled.span>
-                  <styled.span>
-                    Opponent Battles: {totalOpponentBattles}
-                  </styled.span>
-                </HStack>
-                <HStack>
-                  <styled.span>
-                    Winner Change: {(elo - startingElo).toFixed(3)}
-                  </styled.span>
-                  <styled.span>
-                    Loser Change:
-                    {(opponentElo - startingOpponentElo).toFixed(3)}
-                  </styled.span>
-                </HStack>
+                <styled.table borderWidth={1} borderColor="gray.800">
+                  <thead>
+                    <tr>
+                      <styled.th />
+                      <styled.th p={1}>Driver</styled.th>
+                      <styled.th p={1}>Opponent</styled.th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <styled.td p={1}>Tournament</styled.td>
+                      <styled.td colSpan={2} p={1} textAlign="center">
+                        {battle.tournament}
+                      </styled.td>
+                    </tr>
+                    <tr>
+                      <styled.td p={1}>Starting</styled.td>
+                      <styled.td p={1}>{startingElo.toFixed(3)}</styled.td>
+                      <styled.td p={1}>
+                        {startingOpponentElo.toFixed(3)}
+                      </styled.td>
+                    </tr>
+                    <tr>
+                      <styled.td p={1}>Elo</styled.td>
+                      <styled.td p={1}>{elo.toFixed(3)}</styled.td>
+                      <styled.td p={1}>{opponentElo.toFixed(3)}</styled.td>
+                    </tr>
+                    <tr>
+                      <styled.td p={1}>Battles</styled.td>
+                      <styled.td p={1}>{totalBattles}</styled.td>
+                      <styled.td p={1}>{totalOpponentBattles}</styled.td>
+                    </tr>
+                    <tr>
+                      <styled.td p={1}>Change</styled.td>
+                      <styled.td p={1}>
+                        {(elo - startingElo).toFixed(3)}
+                      </styled.td>
+                      <styled.td p={1}>
+                        {(opponentElo - startingOpponentElo).toFixed(3)}
+                      </styled.td>
+                    </tr>
+                  </tbody>
+                </styled.table>
               </VStack>
             );
           }
