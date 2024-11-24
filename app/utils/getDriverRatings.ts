@@ -76,8 +76,12 @@ export const getDriverRatings = async () => {
     const winnerTotalBattles = driverElos[winnerId]?.history?.length ?? 0;
     const loserTotalBattles = driverElos[loserId]?.history?.length ?? 0;
 
-    const winnersK = winnerTotalBattles >= 5 ? 32 : 64;
-    const losersK = 32;
+    let winnersK = winnerTotalBattles >= 5 ? 32 : 64;
+    let losersK = 32;
+
+    if (battle.tournament.includes("FINAL")) {
+      winnersK *= 2;
+    }
 
     const { newRatingPlayer: winnerElo, newRatingOpponent: loserElo } =
       calculateElos(winnerStartingElo, loserStartingElo, winnersK, losersK);

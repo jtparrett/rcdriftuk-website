@@ -76,31 +76,33 @@ const RatingsPage = () => {
 
       <Box
         mt={6}
+        p={1}
+        maxW={720}
+        rounded="2xl"
         borderWidth={1}
         borderColor="gray.800"
-        p={4}
-        maxW={720}
-        rounded="md"
       >
-        <styled.table w="full">
-          <thead>
-            <tr>
-              <styled.th textAlign="left" pl={2} w="50px">
-                #
-              </styled.th>
-              <styled.th textAlign="left">Name</styled.th>
-              <styled.th textAlign="right">Points</styled.th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {drivers
-              .filter((driver) => driver.name !== "BYE")
-              .map((driver, i) => {
-                return <Row key={driver.id} driver={driver} rank={i + 1} />;
-              })}
-          </tbody>
-        </styled.table>
+        <Box borderWidth={1} borderColor="gray.800" p={4} rounded="xl">
+          <styled.table w="full">
+            <thead>
+              <tr>
+                <styled.th textAlign="left" pl={2} w="50px">
+                  #
+                </styled.th>
+                <styled.th textAlign="left">Name</styled.th>
+                <styled.th textAlign="right">Points</styled.th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {drivers
+                .filter((driver) => driver.name !== "BYE")
+                .map((driver, i) => {
+                  return <Row key={driver.id} driver={driver} rank={i + 1} />;
+                })}
+            </tbody>
+          </styled.table>
+        </Box>
       </Box>
     </Container>
   );
