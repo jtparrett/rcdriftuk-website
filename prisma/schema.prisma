@@ -179,11 +179,11 @@ model Users {
   image       String?
   lastName    String?
   trackId     String?          @db.Uuid
-  driverId    String?
   events      EventResponses[]
-  driver      Drivers?         @relation(fields: [driverId], references: [id])
   track       Tracks?          @relation(fields: [trackId], references: [id])
   Tournaments Tournaments[]
+  Drivers     Drivers?         @relation(fields: [driversId], references: [id])
+  driversId   String?
 }
 
 model Products {
