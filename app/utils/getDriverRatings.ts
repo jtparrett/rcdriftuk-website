@@ -1,109 +1,121 @@
+import type { Drivers } from "@prisma/client";
 import { prisma } from "./prisma.server";
 
-function calculateElo(
+function calculateElos(
   ratingPlayer: number,
   ratingOpponent: number,
-  K: number,
-  isPlayerWin: boolean
+  winnersK: number,
+  losersK: number
 ) {
-  // Calculate expected score
-  let expectedScorePlayer =
+  const expectedScorePlayer =
     1 / (1 + Math.pow(10, (ratingOpponent - ratingPlayer) / 400));
 
-  // Calculate actual score
-  let actualScorePlayer = isPlayerWin ? 1 : 0; // assuming only win/lose, no draw
+  const expectedScoreOpponent = 1 - expectedScorePlayer;
 
-  // Calculate new rating
-  let newRatingPlayer =
-    ratingPlayer + K * (actualScorePlayer - expectedScorePlayer);
+  const newRatingPlayer = ratingPlayer + winnersK * (1 - expectedScorePlayer);
+  const newRatingOpponent =
+    ratingOpponent + losersK * (0 - expectedScoreOpponent);
 
-  return newRatingPlayer;
+  return { newRatingPlayer, newRatingOpponent };
 }
 
 export const getDriverRatings = async () => {
-  let K = 64; // K-factor
-
   const battles = await prisma.driverRatingBattles.findMany({
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    include: {
-      winner: true,
-      loser: true,
+    select: {
+      id: true,
+      winnerId: true,
+      loserId: true,
+      tournament: true,
+      winner: {
+        select: {
+          name: true,
+          team: true,
+        },
+      },
+      loser: {
+        select: {
+          name: true,
+          team: true,
+        },
+      },
     },
   });
 
   const driverElos: Record<
     string,
     {
-      elo: number;
-      breakdown: {
+      driver: Drivers;
+      currentElo: number;
+      history: {
         battle: (typeof battles)[number];
-        points: number;
+        elo: number; // Drivers boints after battle
+        opponentElo: number; // Opponents points after battle
+        startingElo: number;
+        startingOpponentElo: number;
       }[];
     }
   > = {};
 
   for (const battle of battles) {
-    const { winnerId, loserId } = battle;
+    const { winnerId, loserId, winner, loser } = battle;
 
-    driverElos[winnerId] = driverElos?.[winnerId] ?? {};
-    driverElos[loserId] = driverElos?.[loserId] ?? {};
+    driverElos[winnerId] = driverElos?.[winnerId] ?? {
+      driver: winner,
+    };
+    driverElos[loserId] = driverElos?.[loserId] ?? {
+      driver: loser,
+    };
 
-    const winnerElo = calculateElo(
-      driverElos[winnerId].elo ?? 1000,
-      driverElos[loserId].elo ?? 1000,
-      K,
-      true
-    );
+    const winnerStartingElo = driverElos[winnerId].currentElo ?? 1000;
+    const loserStartingElo =
+      loser.name === "BYE" ? 1000 : driverElos[loserId].currentElo ?? 1000;
 
-    const loserElo = calculateElo(
-      driverElos[loserId].elo ?? 1000,
-      driverElos[winnerId].elo ?? 1000,
-      K,
-      false
-    );
+    const winnersK =
+      (driverElos[winnerId]?.history?.length ?? 0) <= 5 ? 32 : 64;
+    const losersK = (driverElos[loserId]?.history?.length ?? 0) <= 5 ? 32 : 64;
 
-    driverElos[winnerId].elo = winnerElo;
-    driverElos[loserId].elo = loserElo;
+    const { newRatingPlayer: winnerElo, newRatingOpponent: loserElo } =
+      calculateElos(winnerStartingElo, loserStartingElo, winnersK, losersK);
 
-    driverElos[winnerId].breakdown = [
-      ...(driverElos[winnerId].breakdown ?? []),
+    driverElos[winnerId].currentElo = winnerElo;
+    driverElos[loserId].currentElo = loserElo;
+
+    driverElos[winnerId].history = [
+      ...(driverElos[winnerId].history ?? []),
       {
         battle: battle,
-        points: winnerElo,
+        elo: winnerElo,
+        opponentElo: loserElo,
+        startingElo: winnerStartingElo,
+        startingOpponentElo: loserStartingElo,
       },
     ];
 
-    driverElos[loserId].breakdown = [
-      ...(driverElos[loserId].breakdown ?? []),
+    driverElos[loserId].history = [
+      ...(driverElos[loserId].history ?? []),
       {
         battle: battle,
-        points: loserElo,
+        elo: loserElo,
+        opponentElo: winnerElo,
+        startingElo: loserStartingElo,
+        startingOpponentElo: winnerStartingElo,
       },
     ];
   }
 
-  const allDrivers = await prisma.drivers.findMany({
-    where: {
-      id: {
-        in: Object.keys(driverElos),
-      },
-    },
-  });
-
-  const drivers = Object.keys(driverElos)
-    .map((id) => {
-      const driverInfo = allDrivers.find((driver) => driver.id === id);
+  const drivers = Object.entries(driverElos)
+    .map(([id, item]) => {
       return {
         id,
-        points: driverElos[id].elo,
-        name: driverInfo?.name,
-        team: driverInfo?.team,
-        breakdown: driverElos[id].breakdown,
+        currentElo: item.currentElo,
+        name: item.driver.name,
+        team: item.driver.team,
+        history: item.history,
       };
     })
     .sort((a, b) => {
-      //@ts-ignore
-      return b.points - a.points;
+      return b.currentElo - a.currentElo;
     });
 
   return drivers;
