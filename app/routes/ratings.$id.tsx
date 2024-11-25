@@ -1,6 +1,8 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import {
+  Area,
+  AreaChart,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -44,7 +46,7 @@ const Page = () => {
 
         {driverRatings && driverRatings.history.length > 0 && (
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart
+            <AreaChart
               data={[
                 { date: "Initial", elo: 1000 },
                 ...driverRatings.history.map((item) => ({
@@ -56,6 +58,20 @@ const Page = () => {
               ]}
               margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
             >
+              <defs>
+                <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="rgba(236, 26, 85, 0.3)"
+                    stopOpacity={1}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="rgba(236, 26, 85, 0)"
+                    stopOpacity={1}
+                  />
+                </linearGradient>
+              </defs>
               <XAxis
                 dataKey="date"
                 angle={-45}
@@ -126,8 +142,13 @@ const Page = () => {
                   return null;
                 }}
               />
-              <Line type="monotone" dataKey="elo" stroke="#ec1a55" />
-            </LineChart>
+              <Area
+                type="monotone"
+                dataKey="elo"
+                stroke="#ec1a55"
+                fill="url(#colorElo)"
+              />
+            </AreaChart>
           </ResponsiveContainer>
         )}
 
