@@ -214,6 +214,8 @@ const Page = () => {
           {event._count.responses > 0 && (
             <Flex mt={1} flexWrap="wrap">
               {event.responses.map((response) => {
+                if (!response.user) return null;
+
                 return (
                   <Box
                     key={response.id}
