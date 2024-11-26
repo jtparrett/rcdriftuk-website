@@ -147,7 +147,6 @@ model Drivers {
   battleStandings DriverBattleStandings[]
   ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
   ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
-  user            Users[]
 }
 
 model DriverRatingBattles {
@@ -182,8 +181,6 @@ model Users {
   events      EventResponses[]
   track       Tracks?          @relation(fields: [trackId], references: [id])
   Tournaments Tournaments[]
-  Drivers     Drivers?         @relation(fields: [driversId], references: [id])
-  driversId   String?
 }
 
 model Products {
