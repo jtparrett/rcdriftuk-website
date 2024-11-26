@@ -6,6 +6,7 @@ import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
 
@@ -140,25 +141,47 @@ const Page = () => {
 
             <Card flex={1}>
               <styled.h1 fontWeight="bold" fontSize="lg" mb={2}>
-                The UK's Top Drivers
+                Top Driver Ratings
               </styled.h1>
 
-              {drivers.map((driver, i) => (
-                <Box
-                  key={driver.id}
-                  borderTopWidth={1}
-                  borderColor="gray.800"
-                  py={1}
-                >
-                  <styled.p>
-                    <styled.span fontWeight="semibold">#{i + 1}</styled.span>{" "}
-                    {driver.name}
-                  </styled.p>
-                </Box>
-              ))}
+              <styled.table w="full">
+                <styled.thead>
+                  <styled.tr>
+                    <styled.th textAlign="left" w="full" p={1}>
+                      Name
+                    </styled.th>
+                    <styled.th textAlign="right" p={1}>
+                      Points
+                    </styled.th>
+                    <styled.th textAlign="right" p={1}>
+                      Rank
+                    </styled.th>
+                  </styled.tr>
+                </styled.thead>
+                <styled.tbody>
+                  {drivers.map((driver, i) => (
+                    <styled.tr key={driver.id}>
+                      <styled.td px={1}>
+                        #{i + 1} {driver.name}
+                      </styled.td>
+                      <styled.td textAlign="right" px={1}>
+                        {driver.currentElo.toFixed(3)}
+                      </styled.td>
+                      <styled.td textAlign="center" px={1}>
+                        <styled.img
+                          w={8}
+                          display="inline-block"
+                          src={`/badges/${getDriverRank(driver.currentElo, driver.history.length)}.png`}
+                          alt={`${driver.name}'s rank badge`}
+                        />
+                      </styled.td>
+                    </styled.tr>
+                  ))}
+                </styled.tbody>
+              </styled.table>
 
               <LinkButton to="/ratings" variant="secondary" w="full" mt={4}>
-                See Driver Ratings
+                See All Driver Ratings
               </LinkButton>
             </Card>
           </Flex>
@@ -168,7 +191,7 @@ const Page = () => {
       <Container py={8} px={2} maxW={1100}>
         <Link to="/2025">
           <Box overflow="hidden" rounded="lg" mb={8}>
-            <styled.img src="/rcdriftuk-as25-cover.jpg" w="full" />
+            <styled.img src="/2025-cover.jpg" w="full" />
           </Box>
         </Link>
 
