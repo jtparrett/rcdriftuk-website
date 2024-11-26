@@ -3,8 +3,6 @@ import { useLoaderData } from "@remix-run/react";
 import {
   Area,
   AreaChart,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,6 +10,7 @@ import {
 } from "recharts";
 import { z } from "zod";
 import { Box, Container, HStack, styled, VStack } from "~/styled-system/jsx";
+import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
 
@@ -36,12 +35,31 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 const Page = () => {
   const { driver, driverRatings } = useLoaderData<typeof loader>();
+  const rank = driverRatings
+    ? getDriverRank(driverRatings.currentElo, driverRatings.history.length)
+    : RANKS.UNRANKED;
 
   return (
     <Container maxW={1100} px={2}>
       <styled.div>
         <styled.h1 mb={4} fontSize="4xl" fontWeight="bold">
-          {driver.name}
+          {driver.name}{" "}
+          {driverRatings && (
+            <Box
+              display="inline-block"
+              w={12}
+              h={12}
+              verticalAlign="middle"
+              perspective="200px"
+            >
+              <styled.img
+                src={`/badges/${rank}.png`}
+                w="full"
+                alt={rank}
+                animation="badge 2s linear infinite"
+              />
+            </Box>
+          )}
         </styled.h1>
 
         {driverRatings && driverRatings.history.length > 0 && (

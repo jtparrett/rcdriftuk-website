@@ -86,6 +86,11 @@ export default defineConfig({
             transform: "rotate(360deg)",
           },
         },
+        badge: {
+          "100%": {
+            transform: "rotateY(360deg)",
+          },
+        },
       },
     },
   },

@@ -1,6 +1,7 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { styled, Container, Box } from "~/styled-system/jsx";
+import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 
 export const meta: MetaFunction = () => {
@@ -33,6 +34,10 @@ const RatingsPage = () => {
     driver: Awaited<ReturnType<LoaderData>>[number];
     rank: number;
   }) => {
+    const rankTitle = driver
+      ? getDriverRank(driver.currentElo, driver.history.length)
+      : RANKS.UNRANKED;
+
     return (
       <styled.tr>
         <styled.td fontFamily="mono" pl={2} borderTopLeftRadius="lg">
@@ -56,6 +61,14 @@ const RatingsPage = () => {
         </styled.td>
         <styled.td textAlign="right" fontFamily="mono">
           {driver.currentElo.toFixed(3)}
+        </styled.td>
+        <styled.td textAlign="right" fontFamily="mono">
+          <styled.img
+            src={`/badges/${rankTitle}.png`}
+            w={8}
+            display="inline-block"
+            alt={rankTitle}
+          />
         </styled.td>
       </styled.tr>
     );
@@ -91,7 +104,7 @@ const RatingsPage = () => {
                 </styled.th>
                 <styled.th textAlign="left">Name</styled.th>
                 <styled.th textAlign="right">Points</styled.th>
-                <th />
+                <styled.th textAlign="right">Rank</styled.th>
               </tr>
             </thead>
             <tbody>
