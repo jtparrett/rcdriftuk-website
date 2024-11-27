@@ -139,13 +139,13 @@ const Menu = () => {
           Driver Ratings
         </MenuLink>
         <MenuLink
-          to="/championships"
+          to="/tournaments"
           active={location.pathname.includes("/2024") ? "active" : "inactive"}
         >
           <MenuIcon>
             <RiTrophyLine />
           </MenuIcon>
-          Championships
+          Tournaments
         </MenuLink>
         <MenuLink
           to="/getting-started"

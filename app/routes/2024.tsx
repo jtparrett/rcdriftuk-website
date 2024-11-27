@@ -12,7 +12,7 @@ import { styled, Box, Flex, Spacer, Container } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Championship" },
+    { title: "RC Drift UK | 2024 | Championship" },
     {
       name: "description",
       content: "Welcome to the RCDrift.uk 2024 championship",

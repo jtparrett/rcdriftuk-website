@@ -137,51 +137,44 @@ model Tracks {
   PollEntries PollEntries[]
 }
 
-model Drivers {
-  id              String                  @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt       DateTime                @default(now())
-  name            String
-  champNo         Int?
-  team            String?
-  qualiPositions  Int[]
-  battleStandings DriverBattleStandings[]
-  ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
-  ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
-}
-
 model DriverRatingBattles {
   id         Int      @id @default(autoincrement())
   createdAt  DateTime @default(now())
   tournament String
-  loserId    String
-  winnerId   String
-  loser      Drivers  @relation("driverRatingsLosses", fields: [loserId], references: [id])
-  winner     Drivers  @relation("driverRatingsWins", fields: [winnerId], references: [id])
+  loserId    Int
+  winnerId   Int
+  loser      Users    @relation("driverRatingsLosses", fields: [loserId], references: [driverId])
+  winner     Users    @relation("driverRatingsWins", fields: [winnerId], references: [driverId])
 }
 
+// 2024 shite
 model DriverBattleStandings {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
   id         Int      @id @default(autoincrement())
   tournament String
-  driverId   String
+  driverId   Int
   position   Int
   qualiBonus Int      @default(0)
-  driver     Drivers  @relation(fields: [driverId], references: [id])
+  driver     Users    @relation(fields: [driverId], references: [driverId])
 }
 
 model Users {
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @default(now()) @updatedAt
-  driverId    Int              @id @default(autoincrement())
-  id          String?          @unique
-  firstName   String?
-  image       String?
-  lastName    String?
-  trackId     String?          @db.Uuid
-  events      EventResponses[]
-  track       Tracks?          @relation(fields: [trackId], references: [id])
-  Tournaments Tournaments[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @default(now()) @updatedAt
+  driverId        Int                     @id @default(autoincrement())
+  id              String?                 @unique
+  firstName       String?
+  image           String?
+  lastName        String?
+  trackId         String?                 @db.Uuid
+  team            String?
+  events          EventResponses[]
+  track           Tracks?                 @relation(fields: [trackId], references: [id])
+  Tournaments     Tournaments[]
+  battleStandings DriverBattleStandings[]
+  ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
+  ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
 }
 
 model Products {
@@ -195,6 +188,8 @@ model Products {
   status      ProductStatus @default(UNKNOWN)
   Tracks      Tracks?       @relation(fields: [trackId], references: [id])
 }
+
+// ScaleDrift Shite
 
 model PollEntries {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

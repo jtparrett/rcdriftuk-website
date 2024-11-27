@@ -15,11 +15,11 @@ import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+  const driverId = z.coerce.number().parse(params.id);
 
-  const driver = await prisma.drivers.findFirstOrThrow({
+  const driver = await prisma.users.findFirstOrThrow({
     where: {
-      id,
+      driverId,
     },
   });
 
@@ -43,7 +43,7 @@ const Page = () => {
     <Container maxW={1100} px={2}>
       <styled.div>
         <styled.h1 mb={4} fontSize="4xl" fontWeight="bold">
-          {driver.name}{" "}
+          {driver.firstName} {driver.lastName}
           {driverRatings && (
             <Box
               display="inline-block"
@@ -180,7 +180,7 @@ const Page = () => {
             totalBattles,
             totalOpponentBattles,
           }) => {
-            const isWinner = battle.winnerId === driver.id;
+            const isWinner = battle.winnerId === driver.driverId;
 
             return (
               <VStack
@@ -193,11 +193,11 @@ const Page = () => {
                 <HStack>
                   {isWinner ? (
                     <styled.span color="green">
-                      ... VS {battle.loser.name}
+                      ... VS {battle.loser.firstName} {battle.loser.lastName}
                     </styled.span>
                   ) : (
                     <styled.span color="red">
-                      ... VS {battle.winner.name}
+                      ... VS {battle.winner.firstName} {battle.winner.lastName}
                     </styled.span>
                   )}
                 </HStack>

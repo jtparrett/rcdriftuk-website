@@ -12,7 +12,7 @@ import {
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
-import { Flex, styled } from "~/styled-system/jsx";
+import { Box, Center, styled } from "~/styled-system/jsx";
 
 import styles from "./index.css";
 import { Analytics } from "@vercel/analytics/react";
@@ -22,7 +22,7 @@ import { ClerkApp } from "@clerk/remix";
 import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { LinkButton } from "./components/Button";
-import { RiArrowLeftLine } from "react-icons/ri";
+import { RiHome2Line } from "react-icons/ri";
 import { getUser } from "./utils/getUser.sever";
 
 export const links: LinksFunction = () => [
@@ -108,11 +108,8 @@ export function ErrorBoundary() {
         <script async src="https://cdn.splitbee.io/sb.js"></script>
       </head>
       <body>
-        <Flex
-          flexDir="column"
-          alignItems="center"
-          gap={2}
-          py={100}
+        <Center
+          h="100vh"
           bgImage="url(/grid-bg.svg)"
           bgRepeat="repeat"
           bgSize="60px"
@@ -120,17 +117,27 @@ export function ErrorBoundary() {
           borderBottomWidth={1}
           borderColor="gray.800"
         >
-          <styled.h1 fontWeight="black">
-            {isRouteErrorResponse(error)
-              ? `${error.status} ${error.statusText}`
-              : error instanceof Error
-                ? error.message
-                : "Unknown Error"}
-          </styled.h1>
-          <LinkButton to="/">
-            <RiArrowLeftLine /> Go Home
-          </LinkButton>
-        </Flex>
+          <Box
+            p={8}
+            bg="gray.900"
+            borderRadius="lg"
+            borderWidth={1}
+            borderColor="gray.800"
+            shadow="lg"
+            textAlign="center"
+          >
+            <styled.h1 fontWeight="black" mb={4} fontSize="3xl">
+              {isRouteErrorResponse(error)
+                ? `${error.status} ${error.statusText}`
+                : error instanceof Error
+                  ? error.message
+                  : "Unknown Error"}
+            </styled.h1>
+            <LinkButton to="/">
+              Go Home <RiHome2Line />
+            </LinkButton>
+          </Box>
+        </Center>
 
         <Scripts />
         <Analytics />

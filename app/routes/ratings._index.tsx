@@ -52,7 +52,7 @@ const RatingsPage = () => {
               textOverflow="ellipsis"
               overflow="hidden"
             >
-              {driver.name}
+              {driver.firstName} {driver.lastName}
             </styled.span>
             <styled.span fontSize="xs" color="gray.500" display="block">
               {driver.team}
@@ -149,7 +149,7 @@ const RatingsPage = () => {
                 </thead>
                 <tbody>
                   {drivers
-                    .filter((driver) => driver.name !== "BYE")
+                    .filter((driver) => driver.driverId !== 0)
                     .map((driver, i) => {
                       return (
                         <Row key={driver.id} driver={driver} rank={i + 1} />
