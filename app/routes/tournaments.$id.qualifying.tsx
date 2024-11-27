@@ -137,10 +137,7 @@ const QualifyingPage = () => {
                   )}
                   <styled.tr key={driver.id}>
                     <styled.td fontWeight="bold" w={16}>
-                      <Center
-                        borderRadius="sm"
-                        bgGradient="linear(to-b, red.400, red.700)"
-                      >
+                      <Center>
                         <styled.span fontWeight="bold">{i + 1}</styled.span>
                       </Center>
                     </styled.td>
@@ -221,10 +218,7 @@ const QualifyingPage = () => {
                   )}
                   <styled.tr key={driver.id}>
                     <styled.td fontWeight="bold" w={16}>
-                      <Center
-                        borderRadius="sm"
-                        bgGradient="linear(to-b, red.400, red.700)"
-                      >
+                      <Center>
                         <styled.span fontWeight="bold">
                           {i + 1 + half}
                         </styled.span>

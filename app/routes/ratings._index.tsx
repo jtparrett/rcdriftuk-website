@@ -1,7 +1,7 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { styled, Container, Box } from "~/styled-system/jsx";
-import { getDriverRank, RANKS } from "~/utils/getDriverRank";
+import { styled, Container, Box, Flex } from "~/styled-system/jsx";
+import { getDriverRank, RANKS, RANKS_RULES } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 
 export const meta: MetaFunction = () => {
@@ -75,49 +75,111 @@ const RatingsPage = () => {
   };
 
   return (
-    <Container pb={12} px={2} pt={2} maxW={1100}>
-      <styled.h1 fontSize="4xl" fontWeight="extrabold">
-        Driver Ratings
-      </styled.h1>
+    <Box
+      pos="relative"
+      zIndex={1}
+      _after={{
+        content: '""',
+        pos: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        h: "100dvh",
+        bgImage: "url(/grid-bg.svg)",
+        bgSize: "60px",
+        bgPosition: "center",
+        bgRepeat: "repeat",
+        zIndex: -2,
+      }}
+      _before={{
+        content: '""',
+        pos: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        h: "100dvh",
+        bgGradient: "to-t",
+        gradientFrom: "black",
+        gradientTo: "rgba(12, 12, 12, 0)",
+        zIndex: -1,
+      }}
+    >
+      <Container pb={12} px={2} pt={2} maxW={1100}>
+        <Box textAlign="center" py={8}>
+          <styled.h1 fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black">
+            Driver Ratings
+          </styled.h1>
 
-      <styled.p mb={4} color="gray.500">
-        See where you rank amoungst some of the best drivers in the UK.
-        <br />
-        Calculated using driver battle progression at RCDrift.uk ran
-        tournaments.
-      </styled.p>
-
-      <Box
-        mt={6}
-        p={1}
-        maxW={720}
-        rounded="2xl"
-        borderWidth={1}
-        borderColor="gray.800"
-      >
-        <Box borderWidth={1} borderColor="gray.800" p={4} rounded="xl">
-          <styled.table w="full">
-            <thead>
-              <tr>
-                <styled.th textAlign="left" pl={2} w="50px">
-                  #
-                </styled.th>
-                <styled.th textAlign="left">Name</styled.th>
-                <styled.th textAlign="right">Points</styled.th>
-                <styled.th textAlign="right">Rank</styled.th>
-              </tr>
-            </thead>
-            <tbody>
-              {drivers
-                .filter((driver) => driver.name !== "BYE")
-                .map((driver, i) => {
-                  return <Row key={driver.id} driver={driver} rank={i + 1} />;
-                })}
-            </tbody>
-          </styled.table>
+          <styled.p
+            mb={4}
+            color="gray.500"
+            textWrap="balance"
+            maxW={300}
+            mx="auto"
+          >
+            Discover your ranking among the top drivers in the UK.
+          </styled.p>
         </Box>
-      </Box>
-    </Container>
+
+        <Flex
+          gap={4}
+          alignItems={{ md: "flex-start" }}
+          flexDirection={{ base: "column", md: "row" }}
+        >
+          <Box
+            p={1}
+            rounded="2xl"
+            borderWidth={1}
+            borderColor="gray.800"
+            maxW={720}
+            flex={1}
+            bgColor="black"
+          >
+            <Box borderWidth={1} borderColor="gray.800" p={4} rounded="xl">
+              <styled.table w="full">
+                <thead>
+                  <tr>
+                    <styled.th textAlign="left" pl={2} w="50px">
+                      #
+                    </styled.th>
+                    <styled.th textAlign="left">Name</styled.th>
+                    <styled.th textAlign="right">Points</styled.th>
+                    <styled.th textAlign="right">Rank</styled.th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {drivers
+                    .filter((driver) => driver.name !== "BYE")
+                    .map((driver, i) => {
+                      return (
+                        <Row key={driver.id} driver={driver} rank={i + 1} />
+                      );
+                    })}
+                </tbody>
+              </styled.table>
+            </Box>
+          </Box>
+
+          <Box
+            p={4}
+            borderWidth={1}
+            borderColor="gray.800"
+            rounded="xl"
+            flex="none"
+            pos="sticky"
+            top="90px"
+            bgColor="black"
+          >
+            {Object.values(RANKS).map((rank) => (
+              <Flex key={rank} gap={1} alignItems="center">
+                <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
+                <styled.p fontSize="xs">{RANKS_RULES[rank]}</styled.p>
+              </Flex>
+            ))}
+          </Box>
+        </Flex>
+      </Container>
+    </Box>
   );
 };
 

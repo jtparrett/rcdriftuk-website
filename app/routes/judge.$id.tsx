@@ -288,8 +288,8 @@ const JudgePage = () => {
         inset: 0,
         bgGradient: "to-t",
         gradientFrom: "black",
-        gradientVia: "rgba(0, 0, 0, 0)",
-        gradientTo: "rgba(0, 0, 0, 0)",
+        gradientVia: "rgba(12, 12, 12, 0)",
+        gradientTo: "rgba(12, 12, 12, 0)",
         zIndex: -1,
       }}
     >
