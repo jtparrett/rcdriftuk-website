@@ -539,6 +539,24 @@ const Page = () => {
               </Box>
             </CollapsibleCard>
 
+            <CollapsibleCard title="International Participation">
+              <P>
+                RCDrift.uk is proud to welcome drivers from all over the world
+                to compete in our events.
+              </P>
+              <P>
+                To qualify for the competition, unranked non-UK residential
+                drivers must complete two judged qualifying laps on Day 1 of the
+                main event.
+              </P>
+              <P>
+                A qualifying standing will then be produced using the RCDrift.uk
+                driver ratings combined with the international qualifying
+                results, and used to seed the competition's double-elimination
+                battle tree.
+              </P>
+            </CollapsibleCard>
+
             <CollapsibleCard title="General Information">
               <P>
                 RCDrift.uk will release a comprehensive judging criteria to be
