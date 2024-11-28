@@ -162,7 +162,7 @@ const Page = () => {
                   {drivers.map((driver, i) => (
                     <styled.tr key={driver.id}>
                       <styled.td px={1}>
-                        #{i + 1} {driver.name}
+                        #{i + 1} {driver.firstName} {driver.lastName}
                       </styled.td>
                       <styled.td textAlign="right" px={1}>
                         {driver.currentElo.toFixed(3)}
@@ -171,8 +171,11 @@ const Page = () => {
                         <styled.img
                           w={8}
                           display="inline-block"
-                          src={`/badges/${getDriverRank(driver.currentElo, driver.history.length)}.png`}
-                          alt={`${driver.name}'s rank badge`}
+                          src={`/badges/${getDriverRank(
+                            driver.currentElo,
+                            driver.history.length
+                          )}.png`}
+                          alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                         />
                       </styled.td>
                     </styled.tr>

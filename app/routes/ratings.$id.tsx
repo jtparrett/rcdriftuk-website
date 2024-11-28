@@ -9,20 +9,31 @@ import {
   YAxis,
 } from "recharts";
 import { z } from "zod";
-import { Box, Container, HStack, styled, VStack, Grid, Flex } from "~/styled-system/jsx";
+import {
+  Box,
+  Container,
+  styled,
+  VStack,
+  Grid,
+  Flex,
+} from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
 import { useState } from "react";
-import { RiArrowDownSLine, RiArrowUpSLine, RiArrowLeftLine } from "react-icons/ri";
+import {
+  RiArrowDownSLine,
+  RiArrowUpSLine,
+  RiArrowLeftLine,
+} from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+  const driverId = z.coerce.number().parse(params.id);
 
-  const driver = await prisma.drivers.findFirstOrThrow({
+  const driver = await prisma.users.findFirstOrThrow({
     where: {
-      id,
+      driverId,
     },
   });
 
@@ -35,21 +46,22 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     achievements: [
       "2023 National Championship Runner-up",
       "5x Tournament Winner",
-      "Perfect Score in Style Competition 2022"
+      "Perfect Score in Style Competition 2022",
     ],
     sponsors: ["RC Pro Shop", "Drift Tires Co.", "Power Electronics"],
-    team: "Team Drift Masters"
+    team: "Team Drift Masters",
   };
 
   return {
     driver,
     driverRatings,
-    driverDetails
+    driverDetails,
   };
 };
 
 const Page = () => {
-  const { driver, driverRatings, driverDetails } = useLoaderData<typeof loader>();
+  const { driver, driverRatings, driverDetails } =
+    useLoaderData<typeof loader>();
   const rank = driverRatings
     ? getDriverRank(driverRatings.currentElo, driverRatings.history.length)
     : RANKS.UNRANKED;
@@ -57,9 +69,9 @@ const Page = () => {
   const [expandedBattles, setExpandedBattles] = useState<string[]>([]);
 
   const toggleBattle = (battleId: string) => {
-    setExpandedBattles(prev => 
-      prev.includes(battleId) 
-        ? prev.filter(id => id !== battleId)
+    setExpandedBattles((prev) =>
+      prev.includes(battleId)
+        ? prev.filter((id) => id !== battleId)
         : [...prev, battleId]
     );
   };
@@ -84,17 +96,17 @@ const Page = () => {
           >
             <styled.img
               src="https://placehold.co/400x400"
-              alt={driver.name}
+              alt={`${driver.firstName} ${driver.lastName}`}
               w="full"
               h="full"
               objectFit="cover"
             />
           </Box>
-          
+
           <Box flex={1}>
             <Flex gap={4} alignItems="center">
               <styled.h1 fontSize="4xl" fontWeight="bold">
-                {driver.name}
+                {driver.firstName} {driver.lastName}
               </styled.h1>
               {driverRatings && (
                 <Box w={12} h={12} perspective="200px">
@@ -113,14 +125,21 @@ const Page = () => {
           </Box>
         </Flex>
 
-        <Grid gridTemplateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
+        <Grid
+          gridTemplateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
+          gap={6}
+        >
           <Box bg="gray.900" p={6} borderRadius="lg">
-            <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>About</styled.h2>
+            <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
+              About
+            </styled.h2>
             <styled.p color="gray.300" mb={6}>
               {driverDetails.bio}
             </styled.p>
-            
-            <styled.h2 fontSize="xl" fontWeight="bold" mb={2}>Sponsors</styled.h2>
+
+            <styled.h2 fontSize="xl" fontWeight="bold" mb={2}>
+              Sponsors
+            </styled.h2>
             <styled.ul listStyleType="none" pl={0}>
               {driverDetails.sponsors.map((sponsor) => (
                 <styled.li key={sponsor} color="gray.300" mb={1}>
@@ -188,7 +207,8 @@ const Page = () => {
               />
               <YAxis
                 domain={[
-                  (dataMin: number) => Math.min(1000, Math.floor(dataMin * 0.9)),
+                  (dataMin: number) =>
+                    Math.min(1000, Math.floor(dataMin * 0.9)),
                   (dataMax: number) => Math.ceil(dataMax * 1.1),
                 ]}
               />
@@ -221,8 +241,10 @@ const Page = () => {
                 totalBattles,
                 totalOpponentBattles,
               }) => {
-                const isWinner = battle.winnerId === driver.id;
-                const isExpanded = expandedBattles.includes(battle.id.toString());
+                const isWinner = battle.winnerId === driver.driverId;
+                const isExpanded = expandedBattles.includes(
+                  battle.id.toString()
+                );
                 const pointsChange = elo - startingElo;
 
                 return (
@@ -235,18 +257,26 @@ const Page = () => {
                     width="100%"
                     overflow="hidden"
                   >
-                    <Flex 
-                      p={4} 
-                      cursor="pointer" 
+                    <Flex
+                      p={4}
+                      cursor="pointer"
                       onClick={() => toggleBattle(battle.id.toString())}
-                      _hover={{ bg: 'gray.800' }}
+                      _hover={{ bg: "gray.800" }}
                       justifyContent="space-between"
                       alignItems="center"
                     >
-                      <Grid gridTemplateColumns="1fr 2fr 1fr 1fr" gap={6} flex={1}>
+                      <Grid
+                        gridTemplateColumns="1fr 2fr 1fr 1fr"
+                        gap={6}
+                        flex={1}
+                      >
                         {/* Tournament Info */}
                         <Box>
-                          <styled.h3 fontSize="lg" fontWeight="bold" color="gray.200">
+                          <styled.h3
+                            fontSize="lg"
+                            fontWeight="bold"
+                            color="gray.200"
+                          >
                             {battle.tournament}
                           </styled.h3>
                           <styled.span fontSize="sm" color="gray.400">
@@ -256,8 +286,18 @@ const Page = () => {
 
                         {/* Opponent Info */}
                         <Box>
-                          <styled.span fontSize="md" color={isWinner ? "green.400" : "red.400"}>
-                            {isWinner ? "Won vs" : "Lost to"} {isWinner ? battle.loser.name : battle.winner.name}
+                          <styled.span
+                            fontSize="md"
+                            color={isWinner ? "green.400" : "red.400"}
+                          >
+                            {isWinner ? "Won vs" : "Lost to"}{" "}
+                            {isWinner
+                              ? battle.loser.firstName +
+                                " " +
+                                battle.loser.lastName
+                              : battle.winner.firstName +
+                                " " +
+                                battle.winner.lastName}
                           </styled.span>
                           <styled.div fontSize="sm" color="gray.400">
                             Opponent Battles: {totalOpponentBattles}
@@ -266,20 +306,27 @@ const Page = () => {
 
                         {/* Starting ELO */}
                         <Box>
-                          <styled.div fontSize="sm" color="gray.400">Starting ELO</styled.div>
+                          <styled.div fontSize="sm" color="gray.400">
+                            Starting ELO
+                          </styled.div>
                           <styled.div fontSize="md" color="gray.200">
                             {startingElo.toFixed(0)}
                           </styled.div>
                         </Box>
 
                         {/* Points Change */}
-                        <Flex justifyContent="flex-end" alignItems="center" gap={2}>
-                          <styled.span 
-                            fontSize="xl" 
+                        <Flex
+                          justifyContent="flex-end"
+                          alignItems="center"
+                          gap={2}
+                        >
+                          <styled.span
+                            fontSize="xl"
                             fontWeight="bold"
                             color={pointsChange >= 0 ? "green.400" : "red.400"}
                           >
-                            {pointsChange > 0 ? "+" : ""}{pointsChange.toFixed(0)}
+                            {pointsChange > 0 ? "+" : ""}
+                            {pointsChange.toFixed(0)}
                           </styled.span>
                           {isExpanded ? (
                             <RiArrowUpSLine size={20} />
@@ -291,10 +338,24 @@ const Page = () => {
                     </Flex>
 
                     {isExpanded && (
-                      <Box p={4} pt={0} borderTop="1px solid" borderColor="gray.800">
-                        <Grid gridTemplateColumns="repeat(3, 1fr)" gap={6} mt={4}>
+                      <Box
+                        p={4}
+                        pt={0}
+                        borderTop="1px solid"
+                        borderColor="gray.800"
+                      >
+                        <Grid
+                          gridTemplateColumns="repeat(3, 1fr)"
+                          gap={6}
+                          mt={4}
+                        >
                           <Box>
-                            <styled.h4 fontSize="sm" fontWeight="bold" color="gray.400" mb={2}>
+                            <styled.h4
+                              fontSize="sm"
+                              fontWeight="bold"
+                              color="gray.400"
+                              mb={2}
+                            >
                               Your Stats
                             </styled.h4>
                             <styled.div fontSize="sm" color="gray.300">
@@ -303,16 +364,24 @@ const Page = () => {
                             <styled.div fontSize="sm" color="gray.300">
                               Final: {elo.toFixed(0)}
                             </styled.div>
-                            <styled.div 
-                              fontSize="sm" 
-                              color={pointsChange >= 0 ? "green.400" : "red.400"}
+                            <styled.div
+                              fontSize="sm"
+                              color={
+                                pointsChange >= 0 ? "green.400" : "red.400"
+                              }
                             >
-                              Change: {pointsChange > 0 ? "+" : ""}{pointsChange.toFixed(0)}
+                              Change: {pointsChange > 0 ? "+" : ""}
+                              {pointsChange.toFixed(0)}
                             </styled.div>
                           </Box>
 
                           <Box>
-                            <styled.h4 fontSize="sm" fontWeight="bold" color="gray.400" mb={2}>
+                            <styled.h4
+                              fontSize="sm"
+                              fontWeight="bold"
+                              color="gray.400"
+                              mb={2}
+                            >
                               Opponent Stats
                             </styled.h4>
                             <styled.div fontSize="sm" color="gray.300">
@@ -321,17 +390,27 @@ const Page = () => {
                             <styled.div fontSize="sm" color="gray.300">
                               Final: {opponentElo.toFixed(0)}
                             </styled.div>
-                            <styled.div 
-                              fontSize="sm" 
-                              color={(opponentElo - startingOpponentElo) >= 0 ? "green.400" : "red.400"}
+                            <styled.div
+                              fontSize="sm"
+                              color={
+                                opponentElo - startingOpponentElo >= 0
+                                  ? "green.400"
+                                  : "red.400"
+                              }
                             >
-                              Change: {(opponentElo - startingOpponentElo) > 0 ? "+" : ""}
+                              Change:{" "}
+                              {opponentElo - startingOpponentElo > 0 ? "+" : ""}
                               {(opponentElo - startingOpponentElo).toFixed(0)}
                             </styled.div>
                           </Box>
 
                           <Box>
-                            <styled.h4 fontSize="sm" fontWeight="bold" color="gray.400" mb={2}>
+                            <styled.h4
+                              fontSize="sm"
+                              fontWeight="bold"
+                              color="gray.400"
+                              mb={2}
+                            >
                               Battle Details
                             </styled.h4>
                             <styled.div fontSize="sm" color="gray.300">
@@ -340,7 +419,10 @@ const Page = () => {
                             <styled.div fontSize="sm" color="gray.300">
                               Opponent Battles: {totalOpponentBattles}
                             </styled.div>
-                            <styled.div fontSize="sm" color={isWinner ? "green.400" : "red.400"}>
+                            <styled.div
+                              fontSize="sm"
+                              color={isWinner ? "green.400" : "red.400"}
+                            >
                               Result: {isWinner ? "Victory" : "Defeat"}
                             </styled.div>
                           </Box>

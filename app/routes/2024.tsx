@@ -1,18 +1,13 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLocation } from "@remix-run/react";
-import {
-  RiFacebookFill,
-  RiInstagramFill,
-  RiRecordCircleFill,
-} from "react-icons/ri";
-import { LinkButton } from "~/components/Button";
+import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 import { Tab } from "~/components/Tab";
-import { styled, Box, Flex, Spacer, Container } from "~/styled-system/jsx";
+import { styled, Box, Flex, Container } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Championship" },
+    { title: "RC Drift UK | 2024 | Championship" },
     {
       name: "description",
       content: "Welcome to the RCDrift.uk 2024 championship",
@@ -57,13 +52,6 @@ const Page = () => {
             >
               Standings
             </Tab>
-
-            <Spacer />
-
-            <LinkButton to="/2024/live" size="sm">
-              <RiRecordCircleFill />
-              Watch Live
-            </LinkButton>
           </Flex>
         </Container>
       </Box>

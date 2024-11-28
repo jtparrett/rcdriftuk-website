@@ -1,7 +1,22 @@
 import { styled, Container, Box, Flex, Grid } from "~/styled-system/jsx";
 import { LinkButton } from "~/components/Button";
 import { RiMapPin2Fill, RiArrowDownSLine } from "react-icons/ri";
-import { useState } from "react";
+import { useDisclosure } from "~/utils/useDisclosure";
+import type { MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "RC Drift UK | 2025" },
+    {
+      name: "description",
+      content: "Welcome to RCDrift.uk 2025",
+    },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/2025-cover.jpg",
+    },
+  ];
+};
 
 const H1 = styled("h1", {
   base: {
@@ -16,7 +31,6 @@ const H2 = styled("h2", {
     fontSize: "2xl",
     fontWeight: "black",
     textWrap: "balance",
-    marginTop: 4,
   },
 });
 
@@ -109,22 +123,26 @@ interface CollapsibleCardProps {
   defaultOpen?: boolean;
 }
 
-const CollapsibleCard = ({ title, children, defaultOpen = false }: CollapsibleCardProps) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+const CollapsibleCard = ({
+  title,
+  children,
+  defaultOpen = false,
+}: CollapsibleCardProps) => {
+  const disclosure = useDisclosure(defaultOpen);
 
   return (
     <Card>
-      <CardHeader onClick={() => setIsOpen(!isOpen)}>
+      <CardHeader onClick={disclosure.toggle}>
         <H2 my={0}>{title}</H2>
         <Box
-          transform={isOpen ? "rotate(180deg)" : "none"}
+          transform={disclosure.isOpen ? "rotate(180deg)" : "none"}
           transition="transform 0.2s"
           color="gray.400"
         >
           <RiArrowDownSLine size={24} />
         </Box>
       </CardHeader>
-      {isOpen && <CardContent>{children}</CardContent>}
+      {disclosure.isOpen && <CardContent>{children}</CardContent>}
     </Card>
   );
 };
@@ -180,21 +198,23 @@ interface FAQItemProps {
 }
 
 const CollapsibleFAQ = ({ question, answer }: FAQItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const disclosure = useDisclosure(false);
 
   return (
     <FAQItem>
-      <FAQButton onClick={() => setIsOpen(!isOpen)}>
-        <P fontWeight="bold" textAlign="left">{question}</P>
+      <FAQButton onClick={disclosure.toggle}>
+        <P fontWeight="bold" textAlign="left">
+          {question}
+        </P>
         <Box
-          transform={isOpen ? "rotate(180deg)" : "none"}
+          transform={disclosure.isOpen ? "rotate(180deg)" : "none"}
           transition="transform 0.2s"
           color="inherit"
         >
           <RiArrowDownSLine size={24} />
         </Box>
       </FAQButton>
-      {isOpen && (
+      {disclosure.isOpen && (
         <Box py={4}>
           <P>{answer}</P>
         </Box>
@@ -236,21 +256,24 @@ const Page = () => {
           <Box textAlign="center" mb={12}>
             <ImageContainer>
               <styled.img
-                src="/2025/main-event-logo.jpg"
+                src="/2025-cover.jpg"
                 alt="RCDrift UK 2025 Main Event"
                 width="100%"
               />
             </ImageContainer>
             <H1>RCDrift UK 2025</H1>
             <P fontSize="lg" maxW={600} mx="auto" mt={4}>
-              After an amazing 2024 championship, we are proud to present "RCDrift.uk 2025".
-              For 2025, RCDrift.uk will be offering a new innovative format, allowing every
-              driver and track to take part in something amazing.
+              After an amazing 2024 championship, we are proud to present
+              "RCDrift.uk 2025". For 2025, RCDrift.uk will be offering a new
+              innovative format, allowing every driver and track to take part in
+              something amazing.
             </P>
 
             <SummaryGrid>
               <SummaryBox>
-                <styled.h3 fontSize="lg" fontWeight="bold" mb={2}>Main Event Details</styled.h3>
+                <styled.h3 fontSize="lg" fontWeight="bold" mb={2}>
+                  Main Event Details
+                </styled.h3>
                 <UL>
                   <styled.li>Two-day tournament format</styled.li>
                   <styled.li>Three dedicated tracks</styled.li>
@@ -261,7 +284,9 @@ const Page = () => {
                 </UL>
               </SummaryBox>
               <SummaryBox>
-                <styled.h3 fontSize="lg" fontWeight="bold" mb={2}>Feeder Rounds</styled.h3>
+                <styled.h3 fontSize="lg" fontWeight="bold" mb={2}>
+                  Feeder Rounds
+                </styled.h3>
                 <UL>
                   <styled.li>10 sanctioned tournaments</styled.li>
                   <styled.li>Hosted across the UK</styled.li>
@@ -276,7 +301,11 @@ const Page = () => {
 
           <Box mb={12}>
             <H2 textAlign="center">Tournament Structure</H2>
-            <P textAlign="center" mb={6}>How the 2025 Championship Works</P>
+            <P textAlign="center" mb={6} maxW={500} mx="auto">
+              Designed to provide an exciting and competitive experience for all
+              participants. The structure includes multiple stages, starting
+              with feeder rounds and culminating into the main event.
+            </P>
             <ImageContainer>
               <styled.img
                 src="/2025/tournament-structure.jpg"
@@ -289,10 +318,10 @@ const Page = () => {
           <Flex flexDir="column" gap={8}>
             <CollapsibleCard title="The Main Event" defaultOpen={true}>
               <P>
-                The main event will see a two day tournament hosted in the centre of
-                the U.K. on [DATE] at [VENUE].
+                The main event will see a two day tournament hosted in the
+                centre of the U.K. on [DATE] at [VENUE].
               </P>
-              
+
               <P>With 3 large tracks at a dedicated venue:</P>
               <UL>
                 <styled.li>One competition track</styled.li>
@@ -301,33 +330,35 @@ const Page = () => {
               </UL>
 
               <P>
-                Day 1 will consist of Practice Driving and International Qualifying.
-                Day 2 will consist of a Double Elimination Battles-Only Tournament.
+                Day 1 will consist of Practice Driving and International
+                Qualifying. Day 2 will consist of a Double Elimination
+                Battles-Only Tournament.
               </P>
 
               <P>
-                International qualifying will include any non-U.K residential drivers
-                completing two judged qualifying laps, with a maximum of 100 points
-                on offer for each run.
+                International qualifying will include any non-U.K residential
+                drivers completing two judged qualifying laps, with a maximum of
+                100 points on offer for each run.
               </P>
 
               <P>
                 A qualifying standing will then be produced using the RCDrift.uk
-                driver ratings combined with the international qualifying results,
-                and used to seed the tournament's double-elimination battle tree.
+                driver ratings combined with the international qualifying
+                results, and used to seed the tournament's double-elimination
+                battle tree.
               </P>
 
               <P>
-                RCDrift.uk will be running a high-end live stream production across
-                all social channels and on the RCDrift.uk website using their
-                real-time tournament results software and high-end production crew,
-                ensuring every moment of the action is captured in every detail and
-                shared with the world.
+                RCDrift.uk will be running a high-end live stream production
+                across all social channels and on the RCDrift.uk website using
+                their real-time tournament results software and high-end
+                production crew, ensuring every moment of the action is captured
+                in every detail and shared with the world.
               </P>
 
               <P>
-                The tournament winners will receive a large cash sum, prizes from
-                our sponsors, and the title of the RCDrift.uk 2025 Winner.
+                The tournament winners will receive a large cash sum, prizes
+                from our sponsors, and the title of the RCDrift.uk 2025 Winner.
               </P>
 
               <Box mt={4}>
@@ -349,10 +380,22 @@ const Page = () => {
               <UL>
                 <styled.li>The first tree is an upper bracket</styled.li>
                 <styled.li>The second is a lower bracket</styled.li>
-                <styled.li>Every driver starts in the upper bracket (positioned by qualifying standings)</styled.li>
-                <styled.li>Each driver that loses a battle then drops down into the lower bracket</styled.li>
-                <styled.li>In the final battle, the two finalists from both brackets battle head to head</styled.li>
-                <styled.li>If the upper bracket finalist loses the grand final, the battle will be reset and run again</styled.li>
+                <styled.li>
+                  Every driver starts in the upper bracket (positioned by
+                  qualifying standings)
+                </styled.li>
+                <styled.li>
+                  Each driver that loses a battle then drops down into the lower
+                  bracket
+                </styled.li>
+                <styled.li>
+                  In the final battle, the two finalists from both brackets
+                  battle head to head
+                </styled.li>
+                <styled.li>
+                  If the upper bracket finalist loses the grand final, the
+                  battle will be reset and run again
+                </styled.li>
               </UL>
               <P>
                 This format ensures that every driver has two opportunities to
@@ -362,13 +405,16 @@ const Page = () => {
 
             <CollapsibleCard title="Driver Ratings">
               <P>
-                Driver ratings are the calculation of drivers battle progression at
-                U.K run tournaments. They can be understood as an average of a
-                driver's overall performance.
+                Driver ratings are the calculation of drivers battle progression
+                at U.K run tournaments. They can be understood as an average of
+                a driver's overall performance.
               </P>
 
-              <P>Every driver starts with 1000 points. When battling other drivers,
-                points are exchanged based on the existing rating of each driver.</P>
+              <P>
+                Every driver starts with 1000 points. When battling other
+                drivers, points are exchanged based on the existing rating of
+                each driver.
+              </P>
 
               <Box
                 p={4}
@@ -397,9 +443,13 @@ const Page = () => {
 
               <P>The benefits of this rating system include:</P>
               <UL>
-                <styled.li>Ensures progression is always attainable for new drivers</styled.li>
+                <styled.li>
+                  Ensures progression is always attainable for new drivers
+                </styled.li>
                 <styled.li>Rewards consistency across competitions</styled.li>
-                <styled.li>Reduces the impact of inconsistent judging</styled.li>
+                <styled.li>
+                  Reduces the impact of inconsistent judging
+                </styled.li>
                 <styled.li>Provides fair scoring across many events</styled.li>
               </UL>
             </CollapsibleCard>
@@ -413,8 +463,8 @@ const Page = () => {
                 />
               </ImageContainer>
               <P>
-                Feeder rounds are RCDrift.uk sanctioned tournaments hosted at any
-                U.K track or club. They are organised in partnership with
+                Feeder rounds are RCDrift.uk sanctioned tournaments hosted at
+                any U.K track or club. They are organised in partnership with
                 RCDrift.uk, ensuring tracks have full control while receiving
                 support with:
               </P>
@@ -435,7 +485,10 @@ const Page = () => {
                 my={4}
               >
                 <P fontWeight="bold">Confirmed 2025 Feeder Rounds:</P>
-                <Grid gridTemplateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={4}>
+                <Grid
+                  gridTemplateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                  gap={4}
+                >
                   <Box>
                     <P>BBRC: April 6th</P>
                     <P>Lincoln: April 13th</P>
@@ -463,9 +516,9 @@ const Page = () => {
               </P>
 
               <P>
-                Our new free online tournament software allows any event's results
-                to be viewed online in real-time, functioning as a results-only
-                live stream.
+                Our new free online tournament software allows any event's
+                results to be viewed online in real-time, functioning as a
+                results-only live stream.
               </P>
 
               <P>
@@ -478,7 +531,9 @@ const Page = () => {
             <FAQSection>
               <FAQHeader>
                 <H2>Frequently Asked Questions</H2>
-                <P color="brand.500">Everything you need to know about RCDrift UK 2025</P>
+                <P color="brand.500">
+                  Everything you need to know about RCDrift UK 2025
+                </P>
               </FAQHeader>
 
               <CollapsibleFAQ
@@ -517,7 +572,7 @@ const Page = () => {
               />
 
               <CollapsibleFAQ
-                question="How can I participate in the 2025 championship?"
+                question="How can I participate in RCDrift.uk 2025?"
                 answer="You can participate by attending any of the Feeder Rounds happening between April and June 2025. Sign up for a driver profile on RCDrift.uk to track your ratings, ranks, and achievement badges throughout the championship."
               />
             </FAQSection>

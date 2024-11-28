@@ -2,7 +2,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { RiMapPin2Fill, RiSearch2Line, RiArrowDownSLine } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Flex, Box } from "~/styled-system/jsx";
-import { useState } from "react";
+import { useDisclosure } from "~/utils/useDisclosure";
 
 export const meta: MetaFunction = () => {
   return [
@@ -33,7 +33,6 @@ const H2 = styled("h2", {
     fontSize: "2xl",
     fontWeight: "black",
     textWrap: "balance",
-    marginTop: 4,
   },
 });
 
@@ -103,22 +102,26 @@ interface CollapsibleCardProps {
   defaultOpen?: boolean;
 }
 
-const CollapsibleCard = ({ title, children, defaultOpen = false }: CollapsibleCardProps) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+const CollapsibleCard = ({
+  title,
+  children,
+  defaultOpen = false,
+}: CollapsibleCardProps) => {
+  const disclosure = useDisclosure(defaultOpen);
 
   return (
     <Card>
-      <CardHeader onClick={() => setIsOpen(!isOpen)}>
+      <CardHeader onClick={disclosure.toggle}>
         <H2 my={0}>{title}</H2>
         <Box
-          transform={isOpen ? "rotate(180deg)" : "none"}
+          transform={disclosure.isOpen ? "rotate(180deg)" : "none"}
           transition="transform 0.2s"
           color="gray.400"
         >
           <RiArrowDownSLine size={24} />
         </Box>
       </CardHeader>
-      {isOpen && <CardContent>{children}</CardContent>}
+      {disclosure.isOpen && <CardContent>{children}</CardContent>}
     </Card>
   );
 };
@@ -158,26 +161,26 @@ const GettingStartedPage = () => {
             <P fontSize="lg" maxW={600} mx="auto" mt={4}>
               Welcome to the exciting world of RC drifting! At RCDrift.uk, we're
               here to help you start your drifting journey. Whether you're a
-              complete novice or have some RC experience, this guide will provide
-              you with everything you need to know to begin. RC drifting combines
-              skill, precision, and style, making it a thrilling and rewarding
-              hobby.
+              complete novice or have some RC experience, this guide will
+              provide you with everything you need to know to begin. RC drifting
+              combines skill, precision, and style, making it a thrilling and
+              rewarding hobby.
             </P>
           </Box>
 
           <Flex flexDir="column" gap={8}>
             <CollapsibleCard title="Step 1: Find Your Local Track" defaultOpen>
               <P>
-                The first and most crucial step in getting started with RC drifting
-                is to find your local track. This is where you'll practice, meet
-                fellow enthusiasts, and participate in events. Here's how to locate
-                your nearest track:
+                The first and most crucial step in getting started with RC
+                drifting is to find your local track. This is where you'll
+                practice, meet fellow enthusiasts, and participate in events.
+                Here's how to locate your nearest track:
               </P>
 
               <P>
                 <STRONG>Visit the RCDrift.uk map:</STRONG> Our website has a
-                comprehensive list of all the RC drifting events, tracks, clubs, and
-                shops across the UK.
+                comprehensive list of all the RC drifting events, tracks, clubs,
+                and shops across the UK.
               </P>
 
               <Box mt={4}>
@@ -187,26 +190,26 @@ const GettingStartedPage = () => {
               </Box>
 
               <P>
-                Once you find a local track, don't hesitate to talk to people there.
-                The RC drifting community is usually very welcoming and eager to
-                help newcomers. You can gain valuable insights, tips, and even
-                hands-on assistance with setting up your car.
+                Once you find a local track, don't hesitate to talk to people
+                there. The RC drifting community is usually very welcoming and
+                eager to help newcomers. You can gain valuable insights, tips,
+                and even hands-on assistance with setting up your car.
               </P>
             </CollapsibleCard>
 
             <CollapsibleCard title="Step 2: Choose Your Chassis">
               <P>
-                Your chassis is the foundation of your RC drift car. It holds all
-                the components together and affects how your car handles. Here are
-                some recommendations:
+                Your chassis is the foundation of your RC drift car. It holds
+                all the components together and affects how your car handles.
+                Here are some recommendations:
               </P>
               <UL>
                 <LI>
                   <STRONG>Budget-Friendly Options:</STRONG>
                   <UL>
                     <LI>
-                      <STRONG>3racing Sakura D5mr V2:</STRONG> £110 (A good starter,
-                      though not the best in terms of performance)
+                      <STRONG>3racing Sakura D5mr V2:</STRONG> £110 (A good
+                      starter, though not the best in terms of performance)
                     </LI>
                     <LI>
                       <STRONG>MST RMX 2.0 or 2.5 Classic:</STRONG> £130
@@ -240,9 +243,9 @@ const GettingStartedPage = () => {
 
             <CollapsibleCard title="Step 3: Select Your Electronic Speed Controller (ESC)">
               <P>
-                Your ESC controls the power and speed of your motor. It determines
-                how smooth and responsive your car's throttle is. Here are some
-                options based on your budget:
+                Your ESC controls the power and speed of your motor. It
+                determines how smooth and responsive your car's throttle is.
+                Here are some options based on your budget:
               </P>
               <UL>
                 <LI>
@@ -286,10 +289,10 @@ const GettingStartedPage = () => {
 
             <CollapsibleCard title="Step 4: Pick Your Motor">
               <P>
-                The motor is the heart of your RC car, providing the power needed
-                for drifting. A good motor ensures you have the right balance of
-                speed and torque. You'll need a sensored brushless motor, either
-                10.5t or 13.5t. Here are some options:
+                The motor is the heart of your RC car, providing the power
+                needed for drifting. A good motor ensures you have the right
+                balance of speed and torque. You'll need a sensored brushless
+                motor, either 10.5t or 13.5t. Here are some options:
               </P>
               <UL>
                 <LI>
@@ -330,8 +333,8 @@ const GettingStartedPage = () => {
             <CollapsibleCard title="Step 5: Choose Your Servo">
               <P>
                 The servo controls the steering of your car. A responsive and
-                precise servo is essential for maintaining control during drifts.
-                Here are some recommended options:
+                precise servo is essential for maintaining control during
+                drifts. Here are some recommended options:
               </P>
               <UL>
                 <LI>
@@ -404,9 +407,9 @@ const GettingStartedPage = () => {
             <CollapsibleCard title="Step 7: Choose Your Transmitter and Receiver (Tx/Rx)">
               <P>
                 Your Tx/Rx setup is crucial for controlling your car. A good
-                transmitter and receiver ensure precise and reliable communication
-                between you and your car. Here are some options based on your
-                budget:
+                transmitter and receiver ensure precise and reliable
+                communication between you and your car. Here are some options
+                based on your budget:
               </P>
               <UL>
                 <LI>
@@ -449,23 +452,24 @@ const GettingStartedPage = () => {
               <P>
                 You'll need a 7.4v hard case LiPo battery and a LiPo balance
                 charger. These ensure your car has enough power and that your
-                battery is charged safely. Also, don't forget a battery safe bag for
-                safe charging and storage.
+                battery is charged safely. Also, don't forget a battery safe bag
+                for safe charging and storage.
               </P>
             </CollapsibleCard>
 
             <CollapsibleCard title="Step 9: Customize with a Bodyshell">
               <P>
-                Finally, choose a bodyshell of your choice to personalize your RC
-                drift car. This is where you can get creative and make your car
-                stand out on the track.
+                Finally, choose a bodyshell of your choice to personalize your
+                RC drift car. This is where you can get creative and make your
+                car stand out on the track.
               </P>
             </CollapsibleCard>
 
             <CollapsibleCard title="Where to buy?">
               <P>
-                For all your RC drifting needs, check out our comprehensive online
-                catalogue featuring all of the major shops form across the UK:
+                For all your RC drifting needs, check out our comprehensive
+                online catalogue featuring all of the major shops form across
+                the UK:
               </P>
 
               <Box mt={4}>
@@ -477,12 +481,13 @@ const GettingStartedPage = () => {
 
             <CollapsibleCard title="Conclusion">
               <P>
-                Starting with RC drifting is an exciting journey. By finding your
-                local track first, you'll gain valuable insights and support from
-                the community. Talking to experienced drifters at the track can
-                provide you with tips, advice, and help with setting up your car.
-                From there, selecting the right equipment tailored to your budget
-                will help you get on track with ease. Happy drifting!
+                Starting with RC drifting is an exciting journey. By finding
+                your local track first, you'll gain valuable insights and
+                support from the community. Talking to experienced drifters at
+                the track can provide you with tips, advice, and help with
+                setting up your car. From there, selecting the right equipment
+                tailored to your budget will help you get on track with ease.
+                Happy drifting!
               </P>
 
               <P>
