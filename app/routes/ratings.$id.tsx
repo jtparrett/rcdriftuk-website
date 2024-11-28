@@ -28,6 +28,7 @@ import {
   RiArrowLeftLine,
 } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
+import { getDriverAchievements } from "./getDriverAchievements";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);
@@ -54,6 +55,7 @@ const Page = () => {
     : RANKS.UNRANKED;
 
   const [expandedBattles, setExpandedBattles] = useState<string[]>([]);
+  const achievements = getDriverAchievements(driverRatings);
 
   const toggleBattle = (battleId: string) => {
     setExpandedBattles((prev) =>
@@ -156,7 +158,18 @@ const Page = () => {
             <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
               Achievements
             </styled.h2>
-            <styled.ul pl={6}></styled.ul>
+
+            {achievements.length <= 0 && (
+              <styled.p color="gray.400">No achievements found...</styled.p>
+            )}
+
+            {achievements.map((achievement) => (
+              <styled.img
+                key={achievement}
+                src={`/badges/${achievement}`}
+                w={32}
+              />
+            ))}
           </Box>
         </Box>
 
