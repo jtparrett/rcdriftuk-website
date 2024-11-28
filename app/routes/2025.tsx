@@ -119,7 +119,7 @@ const CollapsibleCard = ({
   return (
     <Card>
       <CardHeader onClick={disclosure.toggle}>
-        <H2 my={0}>{title}</H2>
+        <H2>{title}</H2>
         <Box
           transform={disclosure.isOpen ? "rotate(180deg)" : "none"}
           transition="transform 0.2s"
@@ -236,21 +236,23 @@ const Page = () => {
         }}
       >
         <Container maxW={800} px={2} pt={8} pb={20}>
-          <Box textAlign="center" mb={12}>
-            <ImageContainer>
-              <styled.img
-                src="/2025-cover.jpg"
-                alt="RCDrift UK 2025 Main Event"
-                width="100%"
-              />
-            </ImageContainer>
-            <H1>RCDrift UK 2025</H1>
-            <P fontSize="lg" maxW={600} mx="auto" mt={4}>
-              After an amazing 2024 championship, we are proud to present
-              "RCDrift.uk 2025". For 2025, RCDrift.uk will be offering a new
-              innovative format, allowing every driver and track to take part in
-              something amazing.
-            </P>
+          <Box mb={12}>
+            <Box textAlign="center">
+              <ImageContainer>
+                <styled.img
+                  src="/2025-cover.jpg"
+                  alt="RCDrift UK 2025 Main Event"
+                  width="100%"
+                />
+              </ImageContainer>
+              <H1>RCDrift UK 2025</H1>
+              <P fontSize="lg" maxW={600} mx="auto" mt={4}>
+                After an amazing 2024 championship, we are proud to present
+                "RCDrift.uk 2025". For 2025, RCDrift.uk will be offering a new
+                innovative format, allowing every driver and track to take part
+                in something amazing.
+              </P>
+            </Box>
 
             <SummaryGrid>
               <SummaryBox>
