@@ -5,6 +5,7 @@ import { RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
+import { ImageContainer } from "~/components/ImageContainer";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
@@ -193,9 +194,9 @@ const Page = () => {
 
       <Container py={8} px={2} maxW={1100}>
         <Link to="/2025">
-          <Box overflow="hidden" rounded="lg" mb={8}>
+          <ImageContainer maxW="full" mb={8}>
             <styled.img src="/2025-cover.jpg" w="full" />
-          </Box>
+          </ImageContainer>
         </Link>
 
         <Advert />

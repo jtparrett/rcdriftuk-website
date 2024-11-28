@@ -112,7 +112,7 @@ const CollapsibleCard = ({
   return (
     <Card>
       <CardHeader onClick={disclosure.toggle}>
-        <H2 my={0}>{title}</H2>
+        <H2>{title}</H2>
         <Box
           transform={disclosure.isOpen ? "rotate(180deg)" : "none"}
           transition="transform 0.2s"

@@ -3,6 +3,7 @@ import { LinkButton } from "~/components/Button";
 import { RiMapPin2Fill, RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import type { MetaFunction } from "@remix-run/node";
+import { ImageContainer } from "~/components/ImageContainer";
 
 export const meta: MetaFunction = () => {
   return [
@@ -46,22 +47,6 @@ const UL = styled("ul", {
     listStyle: "initial",
     paddingLeft: 4,
     color: "gray.400",
-  },
-});
-
-const ImageContainer = styled("div", {
-  base: {
-    width: "full",
-    maxW: "800px",
-    mx: "auto",
-    my: 8,
-    p: 2,
-    borderWidth: "1px",
-    borderColor: "gray.800",
-    rounded: "xl",
-    bgColor: "gray.900",
-    shadow: "xl",
-    overflow: "hidden",
   },
 });
 
