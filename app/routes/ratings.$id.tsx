@@ -213,14 +213,21 @@ const Page = () => {
                   battle.id.toString()
                 );
                 const pointsChange = elo - startingElo;
+                const isByeRun = battle.loserId === 0;
 
                 return (
                   <Box
                     key={battle.id}
                     bg="gray.900"
-                    borderRadius="lg"
+                    borderRadius="xl"
                     border="1px solid"
-                    borderColor={isWinner ? "green.500" : "red.500"}
+                    borderColor={
+                      isByeRun
+                        ? "yellow.500"
+                        : isWinner
+                          ? "green.500"
+                          : "red.500"
+                    }
                     width="100%"
                     overflow="hidden"
                   >
@@ -253,19 +260,27 @@ const Page = () => {
 
                         {/* Opponent Info */}
                         <Box>
-                          <styled.span
-                            fontSize="md"
-                            color={isWinner ? "green.400" : "red.400"}
-                          >
-                            {isWinner ? "Won vs" : "Lost to"}{" "}
-                            {isWinner
-                              ? battle.loser.firstName +
-                                " " +
-                                battle.loser.lastName
-                              : battle.winner.firstName +
-                                " " +
-                                battle.winner.lastName}
-                          </styled.span>
+                          {!isByeRun && (
+                            <styled.span
+                              fontSize="md"
+                              color={isWinner ? "green.400" : "red.400"}
+                            >
+                              {isWinner ? "Won vs" : "Lost to"}{" "}
+                              {isWinner
+                                ? battle.loser.firstName +
+                                  " " +
+                                  battle.loser.lastName
+                                : battle.winner.firstName +
+                                  " " +
+                                  battle.winner.lastName}
+                            </styled.span>
+                          )}
+
+                          {isByeRun && (
+                            <styled.span fontSize="md" color="yellow.400">
+                              BYE RUN
+                            </styled.span>
+                          )}
                           <styled.div fontSize="sm" color="gray.400">
                             Opponent Battles: {totalOpponentBattles}
                           </styled.div>
