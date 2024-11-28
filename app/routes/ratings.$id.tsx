@@ -256,10 +256,10 @@ const Page = () => {
                   const pointsChange = elo - startingElo;
                   const isByeRun = battle.loserId === 0;
                   const color = isByeRun
-                    ? "yellow"
+                    ? "yellow.500"
                     : isWinner
-                      ? "green"
-                      : "red";
+                      ? "green.500"
+                      : "red.500";
 
                   return (
                     <Box
@@ -270,7 +270,7 @@ const Page = () => {
                       pos="relative"
                       zIndex={1}
                       borderWidth={1}
-                      borderColor={`${color}.500`}
+                      borderColor={color}
                     >
                       <Flex
                         p={4}
