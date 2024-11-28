@@ -211,7 +211,6 @@ const CollapsibleFAQ = ({ question, answer }: FAQItemProps) => {
 const Page = () => {
   return (
     <styled.main
-      bgColor="black"
       css={{
         background: `
           linear-gradient(180deg,
