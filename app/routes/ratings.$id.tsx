@@ -93,7 +93,7 @@ const Page = () => {
         zIndex: -1,
       }}
     >
-      <Container maxW={1100} px={4} py={6}>
+      <Container maxW={800} px={4} py={6}>
         <Flex alignItems="center">
           <LinkButton
             to="/ratings"
