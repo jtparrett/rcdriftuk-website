@@ -139,13 +139,15 @@ const Menu = () => {
           Driver Ratings
         </MenuLink>
         <MenuLink
-          to="/tournaments"
-          active={location.pathname.includes("/2024") ? "active" : "inactive"}
+          to="/competitions"
+          active={
+            location.pathname.includes("/competitions") ? "active" : "inactive"
+          }
         >
           <MenuIcon>
             <RiTrophyLine />
           </MenuIcon>
-          Tournaments
+          Competitions
         </MenuLink>
         <MenuLink
           to="/getting-started"
@@ -187,10 +189,8 @@ const UserMenu = ({ user }: Props) => {
         )}
 
         <MenuLink
-          to="/user/tournaments"
-          active={
-            location.pathname === "/user/tournaments" ? "active" : "inactive"
-          }
+          to="/tournaments"
+          active={location.pathname === "/tournaments" ? "active" : "inactive"}
         >
           My Tournaments
         </MenuLink>

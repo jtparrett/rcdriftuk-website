@@ -35,7 +35,7 @@ const Page = () => {
           My Tournaments
         </styled.h1>
         <Spacer />
-        <LinkButton to="/user/tournaments/new" size="xs">
+        <LinkButton to="/tournaments/new" size="xs">
           New Tournament <RiAddFill />
         </LinkButton>
       </Flex>

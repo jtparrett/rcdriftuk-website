@@ -152,24 +152,12 @@ const Page = () => {
             {driver.team && <styled.p color="gray.300">{driver.team}</styled.p>}
           </Flex>
 
-          <Grid
-            gridTemplateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-            gap={6}
-          >
-            <Box bg="gray.900" p={6} borderRadius="lg">
-              <styled.h2 fontSize="xl" fontWeight="bold" mb={2}>
-                Sponsors
-              </styled.h2>
-              <styled.ul listStyleType="none" pl={0}></styled.ul>
-            </Box>
-
-            <Box bg="gray.900" p={6} borderRadius="lg">
-              <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
-                Achievements
-              </styled.h2>
-              <styled.ul pl={6}></styled.ul>
-            </Box>
-          </Grid>
+          <Box bg="gray.900" p={6} borderRadius="lg">
+            <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
+              Achievements
+            </styled.h2>
+            <styled.ul pl={6}></styled.ul>
+          </Box>
         </Box>
 
         {/* ELO Graph Section */}

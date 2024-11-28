@@ -77,31 +77,6 @@ export default defineConfig({
           "gray.950": {
             value: "#09090b",
           },
-          // Rank colors
-          "blue.800": {
-            value: "#1e40af",
-          },
-          "blue.900": {
-            value: "#1e3a8a",
-          },
-          "yellow.800": {
-            value: "#854d0e",
-          },
-          "yellow.900": {
-            value: "#713f12",
-          },
-          "orange.800": {
-            value: "#9a3412",
-          },
-          "orange.900": {
-            value: "#7c2d12",
-          },
-          "whiteAlpha.100": {
-            value: "rgba(255, 255, 255, 0.06)",
-          },
-          "whiteAlpha.200": {
-            value: "rgba(255, 255, 255, 0.08)",
-          },
         },
       },
       keyframes: {

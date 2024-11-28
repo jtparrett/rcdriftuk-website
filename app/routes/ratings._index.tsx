@@ -27,41 +27,6 @@ export const loader = async () => {
 
 type LoaderData = typeof loader;
 
-const getRankColor = (rank: string) => {
-  switch (rank) {
-    case RANKS.PLATINUM:
-      return {
-        bg: "#0C2428",
-        hover: "#163B42",
-      };
-    case RANKS.DIAMOND:
-      return {
-        bg: "#162037",
-        hover: "#1F2E54",
-      };
-    case RANKS.GOLD:
-      return {
-        bg: "#3D2F0C",
-        hover: "#574511",
-      };
-    case RANKS.SILVER:
-      return {
-        bg: "gray.800",
-        hover: "gray.700",
-      };
-    case RANKS.BRONZE:
-      return {
-        bg: "#2C1810",
-        hover: "#462619",
-      };
-    default:
-      return {
-        bg: "gray.900",
-        hover: "gray.800",
-      };
-  }
-};
-
 const Row = ({
   driver,
   rank,
@@ -73,19 +38,17 @@ const Row = ({
     ? getDriverRank(driver.currentElo, driver.history.length)
     : RANKS.UNRANKED;
 
-  const colors = getRankColor(rankTitle);
+  const colors = "#ff8330";
 
   return (
     <styled.tr
       transition="all 0.2s"
-      _hover={{
-        backgroundColor: colors.hover,
-        transform: "scale(1.01)",
-      }}
-      backgroundColor={colors.bg}
-      bg={colors.bg}
       style={{
-        backgroundColor: colors.bg,
+        backgroundColor: colors,
+      }}
+      _hover={{
+        backgroundColor: colors,
+        transform: "scale(1.01)",
       }}
       role="link"
       borderWidth="1px"
