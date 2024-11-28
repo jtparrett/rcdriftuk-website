@@ -605,7 +605,7 @@ const Page = () => {
 
                 <CollapsibleFAQ
                   question="What happens during the two-day event?"
-                  answer="Day 1 is dedicated to practice driving and international qualifying. Day 2 features the double elimination battles competition. The venue provides three tracks: one for competition, one for practice, and one for casual driving."
+                  answer="Day 1 is dedicated to practice driving and international qualifying. Day 2 features the double elimination battles competition. The venue provides two tracks: one for competition, one for practice and casual driving."
                 />
 
                 <CollapsibleFAQ
