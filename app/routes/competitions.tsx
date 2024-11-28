@@ -13,7 +13,7 @@ const Page = () => {
   return (
     <Container maxW={1100} px={2} py={4} overflow="hidden">
       <styled.h1 fontWeight="black" fontSize="4xl" mb={2}>
-        Tournaments
+        Competitions
       </styled.h1>
       <Box h={1} bgColor="brand.500" w={32} mb={6} />
       <Flex flexWrap="wrap" mr={-4}>
