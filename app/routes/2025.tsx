@@ -487,6 +487,7 @@ const Page = () => {
                     <P>Pro-Tech Drift Lounge: May 10th</P>
                     <P>E-Drift Salisbury: May 17th</P>
                     <P>Kustom Kulture: June 7th</P>
+                    <P>DDRC: July 20th</P>
                   </Box>
                   <Box>
                     <P>Drift Essex: Date TBC</P>
