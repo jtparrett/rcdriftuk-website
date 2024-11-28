@@ -147,34 +147,21 @@ model DriverRatingBattles {
   winner     Users    @relation("driverRatingsWins", fields: [winnerId], references: [driverId])
 }
 
-// 2024 shite
-model DriverBattleStandings {
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-  id         Int      @id @default(autoincrement())
-  tournament String
-  driverId   Int
-  position   Int
-  qualiBonus Int      @default(0)
-  driver     Users    @relation(fields: [driverId], references: [driverId])
-}
-
 model Users {
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @default(now()) @updatedAt
-  driverId        Int                     @id @default(autoincrement())
-  id              String?                 @unique
-  firstName       String?
-  image           String?
-  lastName        String?
-  trackId         String?                 @db.Uuid
-  team            String?
-  events          EventResponses[]
-  track           Tracks?                 @relation(fields: [trackId], references: [id])
-  Tournaments     Tournaments[]
-  battleStandings DriverBattleStandings[]
-  ratingsLosses   DriverRatingBattles[]   @relation("driverRatingsLosses")
-  ratingsWins     DriverRatingBattles[]   @relation("driverRatingsWins")
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @default(now()) @updatedAt
+  driverId      Int                   @id @default(autoincrement())
+  id            String?               @unique
+  firstName     String?
+  image         String?
+  lastName      String?
+  trackId       String?               @db.Uuid
+  team          String?
+  events        EventResponses[]
+  track         Tracks?               @relation(fields: [trackId], references: [id])
+  Tournaments   Tournaments[]
+  ratingsLosses DriverRatingBattles[] @relation("driverRatingsLosses")
+  ratingsWins   DriverRatingBattles[] @relation("driverRatingsWins")
 }
 
 model Products {
