@@ -1,12 +1,16 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { styled, Container, Box, Flex } from "~/styled-system/jsx";
-import { getDriverRank, RANKS, RANKS_RULES } from "~/utils/getDriverRank";
+import {
+  getDriverRank,
+  getRankColor,
+  RANKS,
+  RANKS_RULES,
+} from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
-import type { Values } from "~/utils/values";
 
 export const meta: MetaFunction = () => {
   return [
@@ -111,25 +115,6 @@ const Row = ({
       </styled.td>
     </styled.tr>
   );
-};
-
-const getRankColor = (rank: Values<typeof RANKS>): [string, string] => {
-  switch (rank) {
-    case RANKS.UNRANKED:
-      return ["#12161D", "#0B0E13"];
-    case RANKS.BRONZE:
-      return ["#3E2A0B", "#2C1D07"];
-    case RANKS.SILVER:
-      return ["#262B32", "#1B1F24"];
-    case RANKS.GOLD:
-      return ["#48350F", "#32250B"];
-    case RANKS.DIAMOND:
-      return ["#102B45", "#0C1F31"];
-    case RANKS.PLATINUM:
-      return ["#353A40", "#26292D"];
-    default:
-      return ["#070809", "#050506"];
-  }
 };
 
 const RankSection = () => {
