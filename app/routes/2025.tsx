@@ -285,7 +285,7 @@ const Page = () => {
                   <styled.li>Two large tracks</styled.li>
                   <styled.li>Double elimination battles</styled.li>
                   <styled.li>Live stream production</styled.li>
-                  <styled.li>International qualifying</styled.li>
+                  <styled.li>International participation</styled.li>
                 </UL>
               </SummaryBox>
               <SummaryBox>
