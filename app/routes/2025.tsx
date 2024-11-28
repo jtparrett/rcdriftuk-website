@@ -496,8 +496,8 @@ const Page = () => {
               <P>
                 Feeder rounds are RCDrift.uk certified competitions hosted at
                 any U.K track or club. They are organised in partnership with
-                RCDrift.uk, ensuring tracks have full control while receiving
-                support with:
+                RCDrift.uk, ensuring tracks have control while receiving support
+                with:
               </P>
               <UL>
                 <styled.li>Prizes</styled.li>
