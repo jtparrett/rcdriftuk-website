@@ -26,7 +26,7 @@ const Page = () => {
               overflow="hidden"
             >
               <LinkOverlay to={`/${year}`} />
-              <AspectRatio ratio={16 / 9}>
+              <AspectRatio ratio={2.3}>
                 <styled.img src={`/${year}-cover.jpg`} w="full" alt={year} />
               </AspectRatio>
               <Box p={4}>
