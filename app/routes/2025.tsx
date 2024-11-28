@@ -273,7 +273,7 @@ const Page = () => {
                   Feeder Rounds
                 </styled.h3>
                 <UL>
-                  <styled.li>10 sanctioned tournaments</styled.li>
+                  <styled.li>10+ sanctioned tournaments</styled.li>
                   <styled.li>Hosted across the UK</styled.li>
                   <styled.li>April - June 2025</styled.li>
                   <styled.li>Official judging criteria</styled.li>
@@ -476,17 +476,17 @@ const Page = () => {
                 >
                   <Box>
                     <P>BBRC: April 6th</P>
-                    <P>Lincoln: April 13th</P>
-                    <P>Pro-Tech: May 10th</P>
-                    <P>Sailsbury: May 17th</P>
+                    <P>Drift Spot Lincoln: April 13th</P>
+                    <P>Pro-Tech Drift Lounge: May 10th</P>
+                    <P>E-Drift Salisbury: May 17th</P>
                     <P>Kustom Kulture: June 7th</P>
                   </Box>
                   <Box>
-                    <P>ESSEX - TBC</P>
-                    <P>ScaleDrift - TBC</P>
-                    <P>EYD - TBC</P>
-                    <P>Drift Knights - TBC</P>
-                    <P>SlideNation - TBC</P>
+                    <P>Drift Essex: Date TBC</P>
+                    <P>ScaleDrift: Date TBC</P>
+                    <P>EYD: Date TBC</P>
+                    <P>Drift Knights: Date TBC</P>
+                    <P>SlideNation: Date TBC</P>
                   </Box>
                 </Grid>
               </Box>
