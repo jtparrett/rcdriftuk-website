@@ -38,30 +38,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   });
 
   const ratings = await getDriverRatings();
-  const driverRatings = ratings.find((r) => r.id === driver.id);
-
-  // Placeholder data - this should come from your database
-  const driverDetails = {
-    bio: "Professional RC drift driver with a passion for precision and style. Competing since 2020.",
-    achievements: [
-      "2023 National Championship Runner-up",
-      "5x Tournament Winner",
-      "Perfect Score in Style Competition 2022",
-    ],
-    sponsors: ["RC Pro Shop", "Drift Tires Co.", "Power Electronics"],
-    team: "Team Drift Masters",
-  };
+  const driverRatings = ratings.find((r) => r.driverId === driver.driverId);
 
   return {
     driver,
     driverRatings,
-    driverDetails,
   };
 };
 
 const Page = () => {
-  const { driver, driverRatings, driverDetails } =
-    useLoaderData<typeof loader>();
+  const { driver, driverRatings } = useLoaderData<typeof loader>();
   const rank = driverRatings
     ? getDriverRank(driverRatings.currentElo, driverRatings.history.length)
     : RANKS.UNRANKED;
@@ -120,7 +106,7 @@ const Page = () => {
               )}
             </Flex>
             <styled.p color="gray.300" mt={2}>
-              {driverDetails.team}
+              {driver.team}
             </styled.p>
           </Box>
         </Flex>
@@ -130,36 +116,17 @@ const Page = () => {
           gap={6}
         >
           <Box bg="gray.900" p={6} borderRadius="lg">
-            <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
-              About
-            </styled.h2>
-            <styled.p color="gray.300" mb={6}>
-              {driverDetails.bio}
-            </styled.p>
-
             <styled.h2 fontSize="xl" fontWeight="bold" mb={2}>
               Sponsors
             </styled.h2>
-            <styled.ul listStyleType="none" pl={0}>
-              {driverDetails.sponsors.map((sponsor) => (
-                <styled.li key={sponsor} color="gray.300" mb={1}>
-                  {sponsor}
-                </styled.li>
-              ))}
-            </styled.ul>
+            <styled.ul listStyleType="none" pl={0}></styled.ul>
           </Box>
 
           <Box bg="gray.900" p={6} borderRadius="lg">
             <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
               Achievements
             </styled.h2>
-            <styled.ul pl={6}>
-              {driverDetails.achievements.map((achievement) => (
-                <styled.li key={achievement} color="gray.300" mb={2}>
-                  {achievement}
-                </styled.li>
-              ))}
-            </styled.ul>
+            <styled.ul pl={6}></styled.ul>
           </Box>
         </Grid>
       </Box>
