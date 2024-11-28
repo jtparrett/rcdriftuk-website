@@ -1,10 +1,11 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { styled, Container, Box, Flex } from "~/styled-system/jsx";
 import { getDriverRank, RANKS, RANKS_RULES } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const meta: MetaFunction = () => {
   return [
@@ -76,8 +77,8 @@ const Row = ({
 
   return (
     <styled.tr
-      cursor="pointer"
       transition="all 0.2s"
+      pos="relative"
       _hover={{
         backgroundColor: colors.hover,
         transform: "scale(1.01)",
@@ -99,25 +100,24 @@ const Row = ({
         {rank}
       </styled.td>
       <styled.td py={4}>
-        <Link to={`/ratings/${driver.driverId}`} style={{ display: "block" }}>
-          <Flex alignItems="center" gap={2}>
-            <Box flex={1}>
-              <styled.span
-                display="block"
-                lineHeight={1.2}
-                whiteSpace="nowrap"
-                textOverflow="ellipsis"
-                overflow="hidden"
-                fontWeight="semibold"
-              >
-                {driver.firstName} {driver.lastName}
-              </styled.span>
-              <styled.span fontSize="xs" color="gray.500" display="block">
-                {driver.team}
-              </styled.span>
-            </Box>
-          </Flex>
-        </Link>
+        <LinkOverlay to={`/ratings/${driver.driverId}`} />
+        <Flex alignItems="center" gap={2}>
+          <Box flex={1}>
+            <styled.span
+              display="block"
+              lineHeight={1.2}
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              fontWeight="semibold"
+            >
+              {driver.firstName} {driver.lastName}
+            </styled.span>
+            <styled.span fontSize="xs" color="gray.500" display="block">
+              {driver.team}
+            </styled.span>
+          </Box>
+        </Flex>
       </styled.td>
       <styled.td textAlign="right" py={4} fontFamily="mono">
         {driver.currentElo.toFixed(3)}
@@ -157,6 +157,7 @@ const RankSection = () => {
         borderColor="gray.900"
         rounded="xl"
         bgColor="gray.900"
+        overflow="hidden"
       >
         <Flex
           p={4}
