@@ -78,7 +78,6 @@ const Row = ({
   return (
     <styled.tr
       transition="all 0.2s"
-      pos="relative"
       _hover={{
         backgroundColor: colors.hover,
         transform: "scale(1.01)",
@@ -99,7 +98,7 @@ const Row = ({
       <styled.td fontFamily="mono" pl={4} py={4} borderLeftRadius="xl">
         {rank}
       </styled.td>
-      <styled.td py={4}>
+      <styled.td py={4} pos="relative" w="full" px={2}>
         <LinkOverlay to={`/ratings/${driver.driverId}`} />
         <Flex alignItems="center" gap={2}>
           <Box flex={1}>
@@ -119,7 +118,14 @@ const Row = ({
           </Box>
         </Flex>
       </styled.td>
-      <styled.td textAlign="right" py={4} fontFamily="mono">
+      <styled.td
+        textAlign="right"
+        py={4}
+        fontFamily="mono"
+        pos="relative"
+        px={2}
+      >
+        <LinkOverlay to={`/ratings/${driver.driverId}`} />
         {driver.currentElo.toFixed(3)}
       </styled.td>
       <styled.td
@@ -306,7 +312,7 @@ const RatingsPage = () => {
                       #
                     </styled.th>
                     <styled.th />
-                    <styled.th textAlign="right" color="gray.400">
+                    <styled.th textAlign="right" color="gray.400" px={2}>
                       Points
                     </styled.th>
                     <styled.th textAlign="right" color="gray.400" pr={4}>
