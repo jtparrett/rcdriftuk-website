@@ -30,7 +30,10 @@ const H1 = styled("h1", {
 
 const H2 = styled("h2", {
   base: {
-    fontSize: "2xl",
+    fontSize: {
+      base: "xl",
+      md: "2xl",
+    },
     fontWeight: "black",
     textWrap: "balance",
   },
@@ -119,7 +122,7 @@ const CollapsibleCard = ({
   return (
     <Card>
       <CardHeader onClick={disclosure.toggle}>
-        <H2>{title}</H2>
+        <H2 textAlign="left">{title}</H2>
         <Box
           transform={disclosure.isOpen ? "rotate(180deg)" : "none"}
           transition="transform 0.2s"
