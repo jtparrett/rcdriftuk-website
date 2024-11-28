@@ -4,6 +4,7 @@ import { RiMapPin2Fill, RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import type { MetaFunction } from "@remix-run/node";
 import { ImageContainer } from "~/components/ImageContainer";
+import { Glow } from "~/components/Glow";
 
 export const meta: MetaFunction = () => {
   return [
@@ -134,8 +135,6 @@ const CollapsibleCard = ({
 
 const FAQSection = styled("div", {
   base: {
-    mt: 20,
-    mb: 12,
     p: 8,
     rounded: "2xl",
     borderWidth: "1px",
@@ -315,8 +314,12 @@ const Page = () => {
 
               <P>
                 Day 1 will consist of Practice Driving and International
-                Qualifying. Day 2 will consist of a Double Elimination
-                Battles-Only Tournament.
+                Qualifying.
+              </P>
+
+              <P>
+                Day 2 will consist of a Double Elimination Battles-Only
+                Tournament.
               </P>
 
               <P>
@@ -512,54 +515,67 @@ const Page = () => {
               </P>
             </CollapsibleCard>
 
-            <FAQSection>
-              <FAQHeader>
-                <H2>Frequently Asked Questions</H2>
-                <P color="brand.500">
-                  Everything you need to know about RCDrift UK 2025
-                </P>
-              </FAQHeader>
+            <Box
+              pos="relative"
+              mt={20}
+              mb={12}
+              p={1}
+              zIndex={1}
+              rounded="3xl"
+              borderWidth={1}
+              borderColor="brand.500"
+            >
+              <Glow />
 
-              <CollapsibleFAQ
-                question="How does the double elimination format work?"
-                answer="The format consists of two battle trees - an upper and lower bracket. All drivers start in the upper bracket, and if they lose a battle, they drop to the lower bracket. A driver is only eliminated after losing twice. The grand final features winners from both brackets, with a potential reset battle if the upper bracket finalist loses."
-              />
+              <FAQSection>
+                <FAQHeader>
+                  <H2>Frequently Asked Questions</H2>
+                  <P color="brand.500">
+                    Everything you need to know about RCDrift UK 2025
+                  </P>
+                </FAQHeader>
 
-              <CollapsibleFAQ
-                question="What happens during the two-day event?"
-                answer="Day 1 is dedicated to practice driving and international qualifying. Day 2 features the double elimination battles tournament. The venue provides three tracks: one for competition, one for practice, and one for casual driving."
-              />
+                <CollapsibleFAQ
+                  question="How does the double elimination format work?"
+                  answer="The format consists of two battle trees - an upper and lower bracket. All drivers start in the upper bracket, and if they lose a battle, they drop to the lower bracket. A driver is only eliminated after losing twice. The grand final features winners from both brackets, with a potential reset battle if the upper bracket finalist loses."
+                />
 
-              <CollapsibleFAQ
-                question="How do driver ratings work?"
-                answer="Every driver starts with 1000 points. Points are exchanged based on battle outcomes, with the exchange amount varying depending on the rating difference between drivers. This system ensures fair progression and rewards consistency across competitions."
-              />
+                <CollapsibleFAQ
+                  question="What happens during the two-day event?"
+                  answer="Day 1 is dedicated to practice driving and international qualifying. Day 2 features the double elimination battles tournament. The venue provides three tracks: one for competition, one for practice, and one for casual driving."
+                />
 
-              <CollapsibleFAQ
-                question="What are Feeder Rounds?"
-                answer="Feeder Rounds are RCDrift.uk sanctioned tournaments hosted at various UK tracks and clubs. They run from April to June 2025, featuring official judging criteria, real-time results, and contribute to driver rating points. Tracks receive support with prizes, judges, tournament software, and promotional materials."
-              />
+                <CollapsibleFAQ
+                  question="How do driver ratings work?"
+                  answer="Every driver starts with 1000 points. Points are exchanged based on battle outcomes, with the exchange amount varying depending on the rating difference between drivers. This system ensures fair progression and rewards consistency across competitions."
+                />
 
-              <CollapsibleFAQ
-                question="How does international qualifying work?"
-                answer="Non-UK residential drivers complete two judged qualifying laps, with a maximum of 100 points available per run. These results are combined with RCDrift.uk driver ratings to create the tournament's qualifying standings, which determine seeding in the battle tree."
-              />
+                <CollapsibleFAQ
+                  question="What are Feeder Rounds?"
+                  answer="Feeder Rounds are RCDrift.uk sanctioned tournaments hosted at various UK tracks and clubs. They run from April to June 2025, featuring official judging criteria, real-time results, and contribute to driver rating points. Tracks receive support with prizes, judges, tournament software, and promotional materials."
+                />
 
-              <CollapsibleFAQ
-                question="What support is provided at Feeder Rounds?"
-                answer="RCDrift.uk provides comprehensive support including: prizes, assistance with sourcing qualified judges, tournament management software, standardized judging criteria, and promotional materials. Each track maintains control while benefiting from official sanctioning."
-              />
+                <CollapsibleFAQ
+                  question="How does international qualifying work?"
+                  answer="Non-UK residential drivers complete two judged qualifying laps, with a maximum of 100 points available per run. These results are combined with RCDrift.uk driver ratings to create the tournament's qualifying standings, which determine seeding in the battle tree."
+                />
 
-              <CollapsibleFAQ
-                question="How can I follow the tournament results?"
-                answer="RCDrift.uk provides a high-end live stream production across all social channels and the website. Additionally, our free online tournament software allows real-time viewing of event results, functioning as a results-only live stream."
-              />
+                <CollapsibleFAQ
+                  question="What support is provided at Feeder Rounds?"
+                  answer="RCDrift.uk provides comprehensive support including: prizes, assistance with sourcing qualified judges, tournament management software, standardized judging criteria, and promotional materials. Each track maintains control while benefiting from official sanctioning."
+                />
 
-              <CollapsibleFAQ
-                question="How can I participate in RCDrift.uk 2025?"
-                answer="You can participate by attending any of the Feeder Rounds happening between April and June 2025. Sign up for a driver profile on RCDrift.uk to track your ratings, ranks, and achievement badges throughout the championship."
-              />
-            </FAQSection>
+                <CollapsibleFAQ
+                  question="How can I follow the tournament results?"
+                  answer="RCDrift.uk provides a high-end live stream production across all social channels and the website. Additionally, our free online tournament software allows real-time viewing of event results, functioning as a results-only live stream."
+                />
+
+                <CollapsibleFAQ
+                  question="How can I participate in RCDrift.uk 2025?"
+                  answer="You can participate by attending any of the Feeder Rounds happening between April and June 2025. Sign up for a driver profile on RCDrift.uk to track your ratings, ranks, and achievement badges throughout the championship."
+                />
+              </FAQSection>
+            </Box>
           </Flex>
         </Container>
       </Box>
