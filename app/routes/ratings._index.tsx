@@ -6,6 +6,7 @@ import { getDriverRatings } from "~/utils/getDriverRatings";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
+import type { Values } from "~/utils/values";
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,16 +39,14 @@ const Row = ({
     ? getDriverRank(driver.currentElo, driver.history.length)
     : RANKS.UNRANKED;
 
-  const colors = "#ff8330";
+  const [bg, hover] = getRankColor(rankTitle);
 
   return (
     <styled.tr
       transition="all 0.2s"
-      style={{
-        backgroundColor: colors,
-      }}
+      bg="var(--row-bg)"
       _hover={{
-        backgroundColor: colors,
+        backgroundColor: "var(--row-hover)",
         transform: "scale(1.01)",
       }}
       role="link"
@@ -57,6 +56,11 @@ const Row = ({
         transform: "scale(0.99)",
       }}
       shadow="lg"
+      style={{
+        // @ts-ignore
+        "--row-bg": bg,
+        "--row-hover": hover,
+      }}
     >
       <styled.td fontFamily="mono" pl={4} py={4} borderLeftRadius="xl">
         {rank}
@@ -109,6 +113,25 @@ const Row = ({
   );
 };
 
+const getRankColor = (rank: Values<typeof RANKS>): [string, string] => {
+  switch (rank) {
+    case RANKS.UNRANKED:
+      return ["#12161D", "#0B0E13"];
+    case RANKS.BRONZE:
+      return ["#3E2A0B", "#2C1D07"];
+    case RANKS.SILVER:
+      return ["#262B32", "#1B1F24"];
+    case RANKS.GOLD:
+      return ["#48350F", "#32250B"];
+    case RANKS.DIAMOND:
+      return ["#102B45", "#0C1F31"];
+    case RANKS.PLATINUM:
+      return ["#353A40", "#26292D"];
+    default:
+      return ["#070809", "#050506"];
+  }
+};
+
 const RankSection = () => {
   const keyDisclosure = useDisclosure();
 
@@ -154,7 +177,8 @@ const RankSection = () => {
           <Box borderTopWidth={1} borderColor="gray.800" p={4}>
             <Flex gap={4} flexWrap="wrap" justifyContent="space-between">
               {Object.values(RANKS).map((rank) => {
-                const colors = getRankColor(rank);
+                const [bg] = getRankColor(rank);
+
                 return (
                   <Flex
                     key={rank}
@@ -166,10 +190,10 @@ const RankSection = () => {
                     borderWidth={1}
                     borderColor="gray.800"
                     rounded="lg"
-                    backgroundColor={colors.bg}
-                    bg={colors.bg}
+                    bgColor="var(--rank-bg)"
                     style={{
-                      backgroundColor: colors.bg,
+                      // @ts-ignore
+                      "--rank-bg": bg,
                     }}
                   >
                     <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
