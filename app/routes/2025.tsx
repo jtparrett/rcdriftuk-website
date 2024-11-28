@@ -208,7 +208,7 @@ const CollapsibleFAQ = ({ question, answer }: FAQItemProps) => {
   );
 };
 
-const Page = () => {
+const PageOLD = () => {
   return (
     <styled.main
       bgColor="black"
@@ -566,6 +566,10 @@ const Page = () => {
       </Box>
     </styled.main>
   );
+};
+
+const Page = () => {
+  return <Container textAlign="center">Coming Soon</Container>;
 };
 
 export default Page;
