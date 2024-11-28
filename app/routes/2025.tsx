@@ -308,7 +308,7 @@ const Page = () => {
             <P textAlign="center" mb={6} maxW={500} mx="auto">
               Designed to provide an exciting and competitive experience for all
               participants. The structure includes multiple stages, starting
-              with feeder rounds and culminating into the main event.
+              with Feeder Rounds and culminating into one Main Event.
             </P>
             <ImageContainer>
               <styled.img
@@ -344,13 +344,13 @@ const Page = () => {
                 <RiMapPin2Fill /> Tudor Grange Academy, Redditch, B98 7UH
               </styled.a>
 
-              <P mt={6}>With 2 large tracks at a dedicated venue:</P>
+              <P mt={6}>Housing two large tracks:</P>
               <UL>
                 <styled.li>One competition track</styled.li>
                 <styled.li>One practice/casual track</styled.li>
               </UL>
 
-              <H3>Day 1</H3>
+              <H3>Day 1 Agenda</H3>
               <UL>
                 <styled.li>Practice Driving</styled.li>
                 <styled.li>International Qualifying</styled.li>
@@ -359,7 +359,7 @@ const Page = () => {
                 <styled.li>Best chassis competition</styled.li>
               </UL>
 
-              <H3>Day 2</H3>
+              <H3>Day 2 Agenda</H3>
               <UL>
                 <styled.li>Double Elimination Battles</styled.li>
                 <styled.li>Full Live Stream Production</styled.li>
