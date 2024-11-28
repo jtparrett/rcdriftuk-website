@@ -208,7 +208,7 @@ const CollapsibleFAQ = ({ question, answer }: FAQItemProps) => {
   );
 };
 
-const Page = () => {
+const PageOld = () => {
   return (
     <styled.main
       bgColor="black"
@@ -565,6 +565,15 @@ const Page = () => {
         </Container>
       </Box>
     </styled.main>
+  );
+};
+
+const Page = () => {
+  return (
+    <Container maxW={800} px={2} pt={8} pb={20} textAlign="center">
+      <H1>RCDrift UK 2025</H1>
+      <styled.p color="gray.400">Coming Soon</styled.p>
+    </Container>
   );
 };
 
