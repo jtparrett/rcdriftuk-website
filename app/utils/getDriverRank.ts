@@ -2,8 +2,8 @@ import type { Values } from "./values";
 
 export const RANKS = {
   UNRANKED: "unranked",
-  BRONZE: "bronze",
   STEEL: "steel",
+  BRONZE: "bronze",
   SILVER: "silver",
   GOLD: "gold",
   DIAMOND: "diamond",
