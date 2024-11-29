@@ -47,73 +47,100 @@ const Row = ({
 
   return (
     <Box
-      rounded="xl"
-      py={4}
-      px={{ base: 2, md: 4 }}
-      transition="all 0.2s"
-      bg="var(--row-bg)"
-      _hover={{
-        backgroundColor: "var(--row-hover)",
-        transform: "scale(1.01)",
-      }}
-      borderWidth="1px"
-      borderColor="gray.800"
-      _active={{
-        transform: "scale(0.99)",
-      }}
-      shadow="lg"
       style={{
         // @ts-ignore
         "--row-bg": bg,
         "--row-hover": hover,
       }}
-      pos="relative"
-      overflow="hidden"
+      bg="var(--row-bg)"
+      p={1}
+      rounded="2xl"
+      transition="all 0.2s"
+      _hover={{
+        transform: "scale(1.01)",
+      }}
     >
-      <LinkOverlay to={`/ratings/${driver.driverId}`} />
-      <Flex gap={4} alignItems="center">
-        <styled.span fontFamily="mono" flex="none">
-          {rank}
-        </styled.span>
-        <Box flex={1} overflow="hidden">
-          <styled.p
-            whiteSpace="nowrap"
-            textOverflow="ellipsis"
-            overflow="hidden"
-            fontWeight="semibold"
-            w="full"
+      <Box
+        rounded="xl"
+        py={4}
+        px={{ base: 2, md: 4 }}
+        transition="all 0.2s"
+        bg="var(--row-bg)"
+        _hover={{
+          backgroundColor: "var(--row-hover)",
+          "&::after": {
+            transform: "skewX(-40deg) translateX(80px) scaleX(1.1)",
+            opacity: 1,
+          },
+        }}
+        borderWidth="1px"
+        borderColor="gray.800"
+        _active={{
+          transform: "scale(0.99)",
+        }}
+        shadow="lg"
+        pos="relative"
+        overflow="hidden"
+        _after={{
+          opacity: 0,
+          transition: "all 0.2s",
+          content: '""',
+          pos: "absolute",
+          top: 0,
+          left: "50%",
+          w: 3,
+          bg: "rgba(255, 255, 255, 0.2)",
+          h: "full",
+          transform: "skewX(-25deg) translateX(-300px)",
+          boxShadow:
+            "14px 0 0 rgba(255, 255, 255, 0.1), 28px 0 0 rgba(255, 255, 255, 0.05)",
+        }}
+      >
+        <LinkOverlay to={`/ratings/${driver.driverId}`} />
+        <Flex gap={4} alignItems="center">
+          <styled.span fontFamily="mono" flex="none">
+            {rank}
+          </styled.span>
+          <Box flex={1} overflow="hidden">
+            <styled.p
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              fontWeight="semibold"
+              w="full"
+              fontSize={{ base: "sm", md: "md" }}
+            >
+              {driver.firstName} {driver.lastName}
+            </styled.p>
+            <styled.p
+              fontSize="xs"
+              color="rgba(255, 255, 255, 0.5)"
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              w="full"
+            >
+              {driver.team}
+            </styled.p>
+          </Box>
+          <styled.span
+            flex="none"
+            textAlign="right"
+            fontFamily="mono"
             fontSize={{ base: "sm", md: "md" }}
           >
-            {driver.firstName} {driver.lastName}
-          </styled.p>
-          <styled.p
-            fontSize="xs"
-            color="rgba(255, 255, 255, 0.5)"
-            whiteSpace="nowrap"
-            textOverflow="ellipsis"
-            overflow="hidden"
-            w="full"
-          >
-            {driver.team}
-          </styled.p>
-        </Box>
-        <styled.span
-          flex="none"
-          textAlign="right"
-          fontFamily="mono"
-          fontSize={{ base: "sm", md: "md" }}
-        >
-          {driver.currentElo.toFixed(3)}
-        </styled.span>
-        <styled.span flex="none" textAlign="right">
-          <styled.img
-            src={`/badges/${rankTitle}.png`}
-            w={8}
-            display="inline-block"
-            alt={rankTitle}
-          />
-        </styled.span>
-      </Flex>
+            {driver.currentElo.toFixed(3)}
+          </styled.span>
+          <styled.span flex="none" textAlign="right">
+            <styled.img
+              src={`/badges/${rankTitle}.png`}
+              w={8}
+              display="inline-block"
+              alt={rankTitle}
+            />
+          </styled.span>
+        </Flex>
+      </Box>
     </Box>
   );
 };
