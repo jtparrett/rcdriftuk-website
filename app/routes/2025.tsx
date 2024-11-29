@@ -330,6 +330,7 @@ const Page = () => {
                 <RiCalendar2Fill />
                 Saturday, November 8th, 2025
               </P>
+
               <styled.a
                 color="brand.500"
                 display="flex"
@@ -397,6 +398,22 @@ const Page = () => {
                   <RiMapPin2Fill /> View Nearby Hotels
                 </LinkButton>
               </Box>
+
+              <ImageContainer>
+                <styled.img
+                  src="/2025/prize-pool.jpg"
+                  alt="RCDrift UK 2025 Prize Pool"
+                  width="full"
+                />
+              </ImageContainer>
+
+              <ImageContainer>
+                <styled.img
+                  src="/2025/rcdriftuk-map.jpg"
+                  alt="RCDrift UK 2025 Main Event Map"
+                  width="full"
+                />
+              </ImageContainer>
             </CollapsibleCard>
 
             <CollapsibleCard title="Double Elimination Format">
@@ -575,6 +592,13 @@ const Page = () => {
                 RCDrift.uk now offers online driver profiles showing ratings,
                 ranks, and achievement badges. Sign up and claim your profile
                 today!
+              </P>
+            </CollapsibleCard>
+
+            <CollapsibleCard title="Affiliations">
+              <P>
+                RCDrift.uk is proud to be affiliated with the following
+                organisations:
               </P>
             </CollapsibleCard>
 

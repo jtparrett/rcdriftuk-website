@@ -13,5 +13,8 @@ export const ImageContainer = styled("div", {
     bgColor: "gray.900",
     shadow: "xl",
     overflow: "hidden",
+    "& img": {
+      rounded: "lg",
+    },
   },
 });
