@@ -330,7 +330,7 @@ const Page = () => {
 
               <P color="brand.500" display="flex" alignItems="center" gap={2}>
                 <RiCalendar2Fill />
-                Saturday, November 8th, 2025
+                Saturday, November 8th - Sunday, November 9th, 2025
               </P>
 
               <styled.a
