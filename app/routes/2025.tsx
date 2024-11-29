@@ -664,6 +664,21 @@ const Page = () => {
                 </FAQHeader>
 
                 <CollapsibleFAQ
+                  question="Do drivers who attend more feeder rounds get more points?"
+                  answer="No, they have more opportunities to gain points, but to do so they have to battle drivers who have a higher rating."
+                />
+
+                <CollapsibleFAQ
+                  question="Is my rank my qualifying position at the main event?"
+                  answer="For UK ranked drivers, yes. For international drivers, no, they are qualified on Day 1 of the main event."
+                />
+
+                <CollapsibleFAQ
+                  question="Do international drivers have an advantage over UK drivers?"
+                  answer="No, when merging the international qualifying results with the RCDrift.uk driver ratings, the top UK ranked driver will be compared to 120 international qualifying points. Ensuring a fair distribution of effort."
+                />
+
+                <CollapsibleFAQ
                   question="How does the double elimination format work?"
                   answer="The format consists of two battle trees - an upper and lower bracket. All drivers start in the upper bracket, and if they lose a battle, they drop to the lower bracket. A driver is only eliminated after losing twice. The grand final features winners from both brackets, with a potential reset battle if the upper bracket finalist loses."
                 />
