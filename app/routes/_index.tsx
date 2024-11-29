@@ -1,12 +1,12 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
-import { RiArrowRightLine, RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
+import { RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { ImageContainer } from "~/components/ImageContainer";
-import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
