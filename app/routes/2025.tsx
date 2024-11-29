@@ -297,7 +297,8 @@ const Page = () => {
                   <styled.li>10+ certified competitions</styled.li>
                   <styled.li>Hosted across the UK</styled.li>
                   <styled.li>Real-time results system</styled.li>
-                  <styled.li>February - October 2025</styled.li>
+                  <styled.li>RCDrift.uk prizes</styled.li>
+                  <styled.li>Driver Rating contribution</styled.li>
                   <styled.li>Official judging criteria</styled.li>
                 </UL>
               </SummaryBox>
@@ -679,7 +680,7 @@ const Page = () => {
 
                 <CollapsibleFAQ
                   question="What are Feeder Rounds?"
-                  answer="Feeder Rounds are RCDrift.uk certified competitions hosted at various UK tracks and clubs. They run from April to June 2025, featuring official judging criteria, real-time results, and contribute to driver rating points. Tracks receive support with prizes, judges, tournament software, and promotional materials."
+                  answer="Feeder Rounds are RCDrift.uk certified competitions hosted across the UK, featuring official judging criteria, real-time results, and contribution to driver rating points. Tracks receive support with prizes, judges, tournament software, and promotional materials."
                 />
 
                 <CollapsibleFAQ
