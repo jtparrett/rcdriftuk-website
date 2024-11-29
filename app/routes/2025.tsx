@@ -562,7 +562,7 @@ const Page = () => {
                 to compete in our events.
               </P>
               <P>
-                To qualify for the competition, unranked non-UK residential
+                To qualify for the main event, unranked non-UK residential
                 drivers must complete two judged qualifying laps on Day 1 of the
                 main event.
               </P>
@@ -611,6 +611,7 @@ const Page = () => {
               rounded="3xl"
               borderWidth={1}
               borderColor="brand.500"
+              id="faq"
             >
               <Glow />
 
