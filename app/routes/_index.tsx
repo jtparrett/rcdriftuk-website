@@ -1,12 +1,12 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
-import { RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
+import { RiArrowRightLine, RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { ImageContainer } from "~/components/ImageContainer";
-import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
@@ -119,6 +119,14 @@ const Page = () => {
         </Container>
 
         <Container maxW={1100} px={2}>
+          <Link to="/2025">
+            <ImageContainer maxW="full" mt={0}>
+              <styled.img src="/2025/banner.jpg" w="full" />
+            </ImageContainer>
+          </Link>
+        </Container>
+
+        <Container maxW={1100} px={2}>
           <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
             <Card flex={1}>
               <styled.h1 fontWeight="bold" fontSize="lg" mb={2}>
@@ -192,7 +200,7 @@ const Page = () => {
         </Container>
       </Box>
 
-      <Container py={8} px={2} maxW={1100}>
+      <Container px={2} maxW={1100}>
         <Link to="/2025">
           <ImageContainer maxW="full" mb={8}>
             <styled.img src="/2025-cover.jpg" w="full" />
