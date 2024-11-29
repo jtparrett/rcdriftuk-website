@@ -700,7 +700,7 @@ const Page = () => {
 
                 <CollapsibleFAQ
                   question="How can I participate in RCDrift.uk 2025?"
-                  answer="You can participate by attending any of the Feeder Rounds happening between April and June 2025. Sign up for a driver profile on RCDrift.uk to track your ratings, ranks, and achievement badges throughout the championship."
+                  answer="You can participate by attending any of the Feeder Rounds happening across the UK. Sign up for a driver profile on RCDrift.uk to track your ratings, ranks, and achievement badges throughout the championship."
                 />
               </FAQSection>
             </Box>
