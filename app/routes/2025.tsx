@@ -9,6 +9,7 @@ import { useDisclosure } from "~/utils/useDisclosure";
 import type { MetaFunction } from "@remix-run/node";
 import { ImageContainer } from "~/components/ImageContainer";
 import { Glow } from "~/components/Glow";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -445,6 +446,16 @@ const Page = () => {
                   battle will be reset and run again
                 </styled.li>
               </UL>
+
+              <Link
+                to="https://en.wikipedia.org/wiki/Double-elimination_tournament"
+                target="_blank"
+              >
+                <styled.p color="brand.500" mt={4}>
+                  Find out more - Double elimination
+                </styled.p>
+              </Link>
+
               <P>
                 This format ensures that every driver has two opportunities to
                 battle before being eliminated from the competition.
@@ -582,24 +593,42 @@ const Page = () => {
                 discrepancies with judging.
               </P>
 
+              <styled.p color="brand.500" fontWeight="bold" mt={2}>
+                JUDGING CRITERIA COMING SOON
+              </styled.p>
+
               <P>
                 Our new free online tournament software allows any event's
                 results to be viewed online in real-time, functioning as a
                 results-only live stream.
               </P>
 
+              <styled.img src="/realtime-result-software.png" w="full" mt={4} />
+
               <P>
                 RCDrift.uk now offers online driver profiles showing ratings,
                 ranks, and achievement badges. Sign up and claim your profile
                 today!
               </P>
+
+              <styled.img src="/driver-profile.png" w="full" mt={4} />
             </CollapsibleCard>
 
             <CollapsibleCard title="Affiliations">
-              <P>
+              <P mb={4}>
                 RCDrift.uk is proud to be affiliated with the following
                 organisations:
               </P>
+
+              <Flex flexWrap="wrap" gap={4}>
+                <Link to="https://www.tiktok.com/@rcdrifttok" target="_blank">
+                  <styled.img
+                    src="/affiliates/rcdriftok.png"
+                    alt="RCDriftok"
+                    width={140}
+                  />
+                </Link>
+              </Flex>
             </CollapsibleCard>
 
             <Box
