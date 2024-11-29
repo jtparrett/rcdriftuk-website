@@ -625,7 +625,17 @@ const Page = () => {
                   <styled.img
                     src="/affiliates/rcdriftok.png"
                     alt="RCDriftok"
-                    width={140}
+                    height="40px"
+                    width="auto"
+                  />
+                </Link>
+
+                <Link to="https://www.sl1d3.com" target="_blank">
+                  <styled.img
+                    src="/affiliates/sl13de.png"
+                    alt="sl13de customs"
+                    height="40px"
+                    width="auto"
                   />
                 </Link>
               </Flex>
