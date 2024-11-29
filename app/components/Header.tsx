@@ -88,13 +88,35 @@ const Menu = () => {
           Home
         </MenuLink>
         <MenuLink
+          to="/ratings"
+          active={
+            location.pathname.includes("/ratings") ? "active" : "inactive"
+          }
+        >
+          <MenuIcon>
+            <RiListOrdered2 />
+          </MenuIcon>
+          Driver Ratings
+        </MenuLink>
+        <MenuLink
+          to="/competitions"
+          active={
+            location.pathname.includes("/competitions") ? "active" : "inactive"
+          }
+        >
+          <MenuIcon>
+            <RiTrophyLine />
+          </MenuIcon>
+          Competitions
+        </MenuLink>
+        <MenuLink
           to="/map/all"
           active={location.pathname.includes("/map") ? "active" : "inactive"}
         >
           <MenuIcon>
             <RiMapPin2Line />
           </MenuIcon>
-          Map
+          Drift Map
         </MenuLink>
         <MenuLink
           to="/tracks"
@@ -127,26 +149,7 @@ const Menu = () => {
           </MenuIcon>
           Catalogue
         </MenuLink>
-        <MenuLink
-          to="/ratings"
-          active={
-            location.pathname.includes("/ratings") ? "active" : "inactive"
-          }
-        >
-          <MenuIcon>
-            <RiListOrdered2 />
-          </MenuIcon>
-          Driver Ratings
-        </MenuLink>
-        <MenuLink
-          to="/championships"
-          active={location.pathname.includes("/2024") ? "active" : "inactive"}
-        >
-          <MenuIcon>
-            <RiTrophyLine />
-          </MenuIcon>
-          Championships
-        </MenuLink>
+
         <MenuLink
           to="/getting-started"
           active={
@@ -187,10 +190,8 @@ const UserMenu = ({ user }: Props) => {
         )}
 
         <MenuLink
-          to="/user/tournaments"
-          active={
-            location.pathname === "/user/tournaments" ? "active" : "inactive"
-          }
+          to="/tournaments"
+          active={location.pathname === "/tournaments" ? "active" : "inactive"}
         >
           My Tournaments
         </MenuLink>
@@ -258,7 +259,7 @@ export const Header = ({ user }: Props) => {
             fontSize="lg"
             target="_blank"
             variant="ghost"
-            to="https://www.facebook.com/RCDriftingUK/"
+            to="https://www.facebook.com/DriftRCUK/"
           >
             <RiFacebookFill />
           </LinkButton>

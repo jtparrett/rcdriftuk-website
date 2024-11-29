@@ -1,8 +1,16 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import { styled, Container, Box, Flex } from "~/styled-system/jsx";
-import { getDriverRank, RANKS, RANKS_RULES } from "~/utils/getDriverRank";
+import { useLoaderData } from "@remix-run/react";
+import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
+import {
+  getDriverRank,
+  getRankColor,
+  RANKS,
+  RANKS_RULES,
+} from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
+import { RiArrowDownSLine } from "react-icons/ri";
+import { useDisclosure } from "~/utils/useDisclosure";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const meta: MetaFunction = () => {
   return [
@@ -24,55 +32,200 @@ export const loader = async () => {
 
 type LoaderData = typeof loader;
 
-const RatingsPage = () => {
-  const drivers = useLoaderData<LoaderData>();
+const Row = ({
+  driver,
+  rank,
+}: {
+  driver: Awaited<ReturnType<LoaderData>>[number];
+  rank: number;
+}) => {
+  const rankTitle = driver
+    ? getDriverRank(driver.currentElo, driver.history.length)
+    : RANKS.UNRANKED;
 
-  const Row = ({
-    driver,
-    rank,
-  }: {
-    driver: Awaited<ReturnType<LoaderData>>[number];
-    rank: number;
-  }) => {
-    const rankTitle = driver
-      ? getDriverRank(driver.currentElo, driver.history.length)
-      : RANKS.UNRANKED;
+  const [bg, hover] = getRankColor(rankTitle);
 
-    return (
-      <styled.tr>
-        <styled.td fontFamily="mono" pl={2} borderTopLeftRadius="lg">
-          {rank}
-        </styled.td>
-        <styled.td h={11}>
-          <Link to={`/ratings/${driver.id}`}>
-            <styled.span
-              display="block"
-              lineHeight={1.2}
+  return (
+    <Box
+      style={{
+        // @ts-ignore
+        "--row-bg": bg,
+        "--row-hover": hover,
+      }}
+      bg="var(--row-bg)"
+      p={1}
+      rounded="2xl"
+      transition="all 0.2s"
+      _hover={{
+        transform: "scale(1.01)",
+      }}
+    >
+      <Box
+        rounded="xl"
+        py={4}
+        px={{ base: 2, md: 4 }}
+        transition="all 0.2s"
+        bg="var(--row-bg)"
+        _hover={{
+          backgroundColor: "var(--row-hover)",
+          "&::after": {
+            transform: "skewX(-40deg) translateX(80px) scaleX(1.1)",
+            opacity: 1,
+          },
+        }}
+        borderWidth="1px"
+        borderColor="gray.800"
+        _active={{
+          transform: "scale(0.99)",
+        }}
+        shadow="lg"
+        pos="relative"
+        overflow="hidden"
+        _after={{
+          opacity: 0,
+          transition: "all 0.2s",
+          content: '""',
+          pos: "absolute",
+          top: 0,
+          left: "50%",
+          w: 3,
+          bg: "rgba(255, 255, 255, 0.2)",
+          h: "full",
+          transform: "skewX(-25deg) translateX(-300px)",
+          boxShadow:
+            "14px 0 0 rgba(255, 255, 255, 0.1), 28px 0 0 rgba(255, 255, 255, 0.05)",
+        }}
+      >
+        <LinkOverlay to={`/ratings/${driver.driverId}`} />
+        <Flex gap={4} alignItems="center">
+          <styled.span fontFamily="mono" flex="none">
+            {rank}
+          </styled.span>
+          <Box flex={1} overflow="hidden">
+            <styled.p
               whiteSpace="nowrap"
               textOverflow="ellipsis"
               overflow="hidden"
+              fontWeight="semibold"
+              w="full"
+              fontSize={{ base: "sm", md: "md" }}
             >
-              {driver.name}
-            </styled.span>
-            <styled.span fontSize="xs" color="gray.500" display="block">
+              {driver.firstName} {driver.lastName}
+            </styled.p>
+            <styled.p
+              fontSize="xs"
+              color="rgba(255, 255, 255, 0.5)"
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              w="full"
+            >
               {driver.team}
-            </styled.span>
-          </Link>
-        </styled.td>
-        <styled.td textAlign="right" fontFamily="mono">
-          {driver.currentElo.toFixed(3)}
-        </styled.td>
-        <styled.td textAlign="right" fontFamily="mono">
-          <styled.img
-            src={`/badges/${rankTitle}.png`}
-            w={8}
-            display="inline-block"
-            alt={rankTitle}
-          />
-        </styled.td>
-      </styled.tr>
-    );
-  };
+            </styled.p>
+          </Box>
+          <styled.span
+            flex="none"
+            textAlign="right"
+            fontFamily="mono"
+            fontSize={{ base: "sm", md: "md" }}
+          >
+            {driver.currentElo.toFixed(3)}
+          </styled.span>
+          <styled.span flex="none" textAlign="right">
+            <styled.img
+              src={`/badges/${rankTitle}.png`}
+              w={8}
+              display="inline-block"
+              alt={rankTitle}
+            />
+          </styled.span>
+        </Flex>
+      </Box>
+    </Box>
+  );
+};
+
+const RankSection = () => {
+  const keyDisclosure = useDisclosure();
+
+  return (
+    <Box
+      p={1}
+      rounded="2xl"
+      borderWidth={1}
+      borderColor="gray.900"
+      w="full"
+      bgColor="black"
+    >
+      <Box
+        borderWidth={1}
+        borderColor="gray.900"
+        rounded="xl"
+        bgColor="gray.900"
+        overflow="hidden"
+      >
+        <Flex
+          p={4}
+          alignItems="center"
+          justifyContent="space-between"
+          cursor="pointer"
+          onClick={keyDisclosure.toggle}
+          _hover={{
+            bgColor: "gray.800",
+          }}
+        >
+          <styled.h2 fontSize="lg" fontWeight="semibold">
+            View Ranks
+          </styled.h2>
+          <Box
+            transform={keyDisclosure.isOpen ? "rotate(180deg)" : "none"}
+            transition="transform 0.2s"
+            color="gray.400"
+          >
+            <RiArrowDownSLine size={24} />
+          </Box>
+        </Flex>
+
+        {keyDisclosure.isOpen && (
+          <Box borderTopWidth={1} borderColor="gray.800" p={4}>
+            <Flex gap={4} flexWrap="wrap" justifyContent="space-between">
+              {Object.values(RANKS).map((rank) => {
+                const [bg] = getRankColor(rank);
+
+                return (
+                  <Flex
+                    key={rank}
+                    gap={3}
+                    alignItems="center"
+                    minW="150px"
+                    flex={1}
+                    p={2}
+                    borderWidth={1}
+                    borderColor="gray.800"
+                    rounded="lg"
+                    bgColor="var(--rank-bg)"
+                    style={{
+                      // @ts-ignore
+                      "--rank-bg": bg,
+                    }}
+                  >
+                    <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
+                    <styled.p fontSize="sm" fontWeight="medium">
+                      {RANKS_RULES[rank]}
+                    </styled.p>
+                  </Flex>
+                );
+              })}
+            </Flex>
+          </Box>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+const RatingsPage = () => {
+  const drivers = useLoaderData<LoaderData>();
 
   return (
     <Box
@@ -104,8 +257,8 @@ const RatingsPage = () => {
         zIndex: -1,
       }}
     >
-      <Container pb={12} px={2} pt={2} maxW={1100}>
-        <Box textAlign="center" py={8}>
+      <Container pb={12} px={2} pt={2} maxW={800}>
+        <Box textAlign="center" py={8} w="full">
           <styled.h1 fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black">
             Driver Ratings
           </styled.h1>
@@ -124,58 +277,49 @@ const RatingsPage = () => {
         <Flex
           gap={4}
           alignItems={{ md: "flex-start" }}
-          flexDirection={{ base: "column", md: "row" }}
+          flexDirection="column"
+          w="full"
         >
+          <RankSection />
+
           <Box
             p={1}
             rounded="2xl"
             borderWidth={1}
-            borderColor="gray.800"
-            maxW={720}
-            flex={1}
+            borderColor="gray.900"
+            w="full"
             bgColor="black"
           >
-            <Box borderWidth={1} borderColor="gray.800" p={4} rounded="xl">
-              <styled.table w="full">
-                <thead>
-                  <tr>
-                    <styled.th textAlign="left" pl={2} w="50px">
-                      #
-                    </styled.th>
-                    <styled.th textAlign="left">Name</styled.th>
-                    <styled.th textAlign="right">Points</styled.th>
-                    <styled.th textAlign="right">Rank</styled.th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {drivers
-                    .filter((driver) => driver.name !== "BYE")
-                    .map((driver, i) => {
-                      return (
-                        <Row key={driver.id} driver={driver} rank={i + 1} />
-                      );
-                    })}
-                </tbody>
-              </styled.table>
-            </Box>
-          </Box>
-
-          <Box
-            p={4}
-            borderWidth={1}
-            borderColor="gray.800"
-            rounded="xl"
-            flex="none"
-            pos="sticky"
-            top="90px"
-            bgColor="black"
-          >
-            {Object.values(RANKS).map((rank) => (
-              <Flex key={rank} gap={1} alignItems="center">
-                <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
-                <styled.p fontSize="xs">{RANKS_RULES[rank]}</styled.p>
+            <Box
+              borderWidth={1}
+              borderColor="gray.900"
+              p={4}
+              rounded="xl"
+              bgColor="gray.950"
+              w="full"
+              overflow="hidden"
+            >
+              <Flex
+                gap={4}
+                color="gray.400"
+                fontWeight="bold"
+                px={{ base: 2, md: 4 }}
+                pb={2}
+              >
+                <styled.p>#</styled.p>
+                <Spacer />
+                <styled.p>Points</styled.p>
+                <styled.p>Rank</styled.p>
               </Flex>
-            ))}
+
+              <Flex flexDirection="column" gap={2}>
+                {drivers
+                  .filter((driver) => driver.driverId !== 0)
+                  .map((driver, i) => {
+                    return <Row key={driver.id} driver={driver} rank={i + 1} />;
+                  })}
+              </Flex>
+            </Box>
           </Box>
         </Flex>
       </Container>

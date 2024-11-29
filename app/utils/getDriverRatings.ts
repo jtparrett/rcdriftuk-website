@@ -1,4 +1,4 @@
-import type { Drivers } from "@prisma/client";
+import type { Users } from "@prisma/client";
 import { prisma } from "./prisma.server";
 
 function calculateElos(
@@ -29,13 +29,17 @@ export const getDriverRatings = async () => {
       tournament: true,
       winner: {
         select: {
-          name: true,
+          driverId: true,
+          firstName: true,
+          lastName: true,
           team: true,
         },
       },
       loser: {
         select: {
-          name: true,
+          driverId: true,
+          firstName: true,
+          lastName: true,
           team: true,
         },
       },
@@ -45,7 +49,7 @@ export const getDriverRatings = async () => {
   const driverElos: Record<
     string,
     {
-      driver: Drivers;
+      driver: Users;
       currentElo: number;
       history: {
         battle: (typeof battles)[number];
@@ -70,8 +74,10 @@ export const getDriverRatings = async () => {
     };
 
     const winnerStartingElo = driverElos[winnerId].currentElo ?? 1000;
+
+    // Driver 0 is the "BYE" driver
     const loserStartingElo =
-      loser.name === "BYE" ? 1000 : driverElos[loserId].currentElo ?? 1000;
+      loser.driverId === 0 ? 1000 : driverElos[loserId].currentElo ?? 1000;
 
     const winnerTotalBattles = driverElos[winnerId]?.history?.length ?? 0;
     const loserTotalBattles = driverElos[loserId]?.history?.length ?? 0;
@@ -120,8 +126,10 @@ export const getDriverRatings = async () => {
     .map(([id, item]) => {
       return {
         id,
+        driverId: item.driver.driverId,
         currentElo: item.currentElo,
-        name: item.driver.name,
+        firstName: item.driver.firstName,
+        lastName: item.driver.lastName,
         team: item.driver.team,
         history: item.history,
       };

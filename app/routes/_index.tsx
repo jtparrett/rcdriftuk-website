@@ -5,6 +5,7 @@ import { RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
+import { ImageContainer } from "~/components/ImageContainer";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
@@ -118,6 +119,14 @@ const Page = () => {
         </Container>
 
         <Container maxW={1100} px={2}>
+          <Link to="/2025">
+            <ImageContainer maxW="full" mt={0}>
+              <styled.img src="/2025/banner.jpg" w="full" />
+            </ImageContainer>
+          </Link>
+        </Container>
+
+        <Container maxW={1100} px={2}>
           <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
             <Card flex={1}>
               <styled.h1 fontWeight="bold" fontSize="lg" mb={2}>
@@ -162,7 +171,7 @@ const Page = () => {
                   {drivers.map((driver, i) => (
                     <styled.tr key={driver.id}>
                       <styled.td px={1}>
-                        #{i + 1} {driver.name}
+                        #{i + 1} {driver.firstName} {driver.lastName}
                       </styled.td>
                       <styled.td textAlign="right" px={1}>
                         {driver.currentElo.toFixed(3)}
@@ -171,8 +180,11 @@ const Page = () => {
                         <styled.img
                           w={8}
                           display="inline-block"
-                          src={`/badges/${getDriverRank(driver.currentElo, driver.history.length)}.png`}
-                          alt={`${driver.name}'s rank badge`}
+                          src={`/badges/${getDriverRank(
+                            driver.currentElo,
+                            driver.history.length
+                          )}.png`}
+                          alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                         />
                       </styled.td>
                     </styled.tr>
@@ -188,11 +200,11 @@ const Page = () => {
         </Container>
       </Box>
 
-      <Container py={8} px={2} maxW={1100}>
+      <Container px={2} maxW={1100}>
         <Link to="/2025">
-          <Box overflow="hidden" rounded="lg" mb={8}>
+          <ImageContainer maxW="full" mb={8}>
             <styled.img src="/2025-cover.jpg" w="full" />
-          </Box>
+          </ImageContainer>
         </Link>
 
         <Advert />

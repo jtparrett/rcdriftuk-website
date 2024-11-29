@@ -9,23 +9,38 @@ import {
   YAxis,
 } from "recharts";
 import { z } from "zod";
-import { Box, Container, HStack, styled, VStack } from "~/styled-system/jsx";
+import {
+  Box,
+  Container,
+  styled,
+  VStack,
+  Grid,
+  Flex,
+  Spacer,
+} from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
+import { useState } from "react";
+import {
+  RiArrowDownSLine,
+  RiArrowUpSLine,
+  RiArrowLeftLine,
+} from "react-icons/ri";
+import { LinkButton } from "~/components/Button";
+import { getDriverAchievements } from "./getDriverAchievements";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+  const driverId = z.coerce.number().parse(params.id);
 
-  const driver = await prisma.drivers.findFirstOrThrow({
+  const driver = await prisma.users.findFirstOrThrow({
     where: {
-      id,
+      driverId,
     },
   });
 
   const ratings = await getDriverRatings();
-
-  const driverRatings = ratings.find((r) => r.id === driver.id);
+  const driverRatings = ratings.find((r) => r.driverId === driver.driverId);
 
   return {
     driver,
@@ -39,218 +54,418 @@ const Page = () => {
     ? getDriverRank(driverRatings.currentElo, driverRatings.history.length)
     : RANKS.UNRANKED;
 
+  const [expandedBattles, setExpandedBattles] = useState<string[]>([]);
+  const achievements = getDriverAchievements(driverRatings);
+
+  const toggleBattle = (battleId: string) => {
+    setExpandedBattles((prev) =>
+      prev.includes(battleId)
+        ? prev.filter((id) => id !== battleId)
+        : [...prev, battleId]
+    );
+  };
+
   return (
-    <Container maxW={1100} px={2}>
-      <styled.div>
-        <styled.h1 mb={4} fontSize="4xl" fontWeight="bold">
-          {driver.name}{" "}
+    <Box
+      pos="relative"
+      zIndex={1}
+      _after={{
+        content: '""',
+        pos: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        h: "100dvh",
+        bgImage: "url(/grid-bg.svg)",
+        bgSize: "60px",
+        bgPosition: "center",
+        bgRepeat: "repeat",
+        zIndex: -2,
+      }}
+      _before={{
+        content: '""',
+        pos: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        h: "100dvh",
+        bgGradient: "to-t",
+        gradientFrom: "black",
+        gradientTo: "rgba(12, 12, 12, 0)",
+        zIndex: -1,
+      }}
+    >
+      <Container maxW={800} px={4} py={6}>
+        <Flex alignItems="center">
+          <LinkButton
+            to="/ratings"
+            variant="outline"
+            size="sm"
+            bgColor="gray.800"
+          >
+            <RiArrowLeftLine /> Back to Ratings
+          </LinkButton>
+
+          <Spacer />
+
           {driverRatings && (
-            <Box
-              display="inline-block"
-              w={12}
-              h={12}
-              verticalAlign="middle"
-              perspective="200px"
-            >
-              <styled.img
-                src={`/badges/${rank}.png`}
-                w="full"
-                alt={rank}
-                animation="badge 2s linear infinite"
-              />
-            </Box>
+            <Flex alignItems="center" gap={2}>
+              <Box w={12} h={12} perspective="200px">
+                <styled.img
+                  src={`/badges/${rank}.png`}
+                  w="full"
+                  alt={rank}
+                  animation="badge 2s linear infinite"
+                />
+              </Box>
+              <styled.span fontSize="lg" fontWeight="bold">
+                {driverRatings.currentElo.toFixed(3)}
+              </styled.span>
+            </Flex>
           )}
-        </styled.h1>
+        </Flex>
 
-        {driverRatings && driverRatings.history.length > 0 && (
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart
-              data={[
-                { date: "Initial", elo: 1000 },
-                ...driverRatings.history.map((item) => ({
-                  date: item.battle.tournament,
-                  elo: item.elo,
-                  battle: item.battle,
-                  startingElo: item.startingElo,
-                })),
-              ]}
-              margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
+        {/* Header Section */}
+        <Box mb={8}>
+          <Flex textAlign="center" alignItems="center" flexDir="column" pb={12}>
+            <Box
+              p={4}
+              rounded="full"
+              bg="gray.900"
+              borderWidth={1}
+              borderColor="gray.700"
             >
-              <defs>
-                <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="rgba(236, 26, 85, 0.3)"
-                    stopOpacity={1}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="rgba(236, 26, 85, 0)"
-                    stopOpacity={1}
-                  />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="date"
-                angle={-45}
-                textAnchor="end"
-                height={80}
-                interval="preserveStartEnd"
-                tickFormatter={(value: any, index: number) => {
-                  if (value === "Initial") return value;
-                  const uniqueTournaments = new Set(
-                    driverRatings.history.map((item) => item.battle.tournament)
-                  );
-                  return uniqueTournaments.has(value) ? value : "";
-                }}
-                tick={{ fontSize: 10 }}
+              <Box rounded="full" overflow="hidden" bg="gray.800" w={32} h={32}>
+                <styled.img
+                  display="block"
+                  src={driver.image ?? "/blank-driver-right.jpg"}
+                  alt={`${driver.firstName} ${driver.lastName}`}
+                  w="full"
+                  h="full"
+                  objectFit="cover"
+                />
+              </Box>
+            </Box>
+
+            <styled.h1 fontSize="4xl" fontWeight="bold">
+              {driver.firstName} {driver.lastName}
+            </styled.h1>
+
+            {driver.team && <styled.p color="gray.300">{driver.team}</styled.p>}
+          </Flex>
+
+          <Box bg="gray.900" p={6} borderRadius="lg">
+            <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
+              Achievements
+            </styled.h2>
+
+            {achievements.length <= 0 && (
+              <styled.p color="gray.400">No achievements found...</styled.p>
+            )}
+
+            {achievements.map((achievement) => (
+              <styled.img
+                key={achievement}
+                src={`/badges/${achievement}`}
+                w={32}
               />
-              <YAxis
-                domain={[
-                  (dataMin: number) =>
-                    Math.min(1000, Math.floor(dataMin * 0.9)),
-                  (dataMax: number) => Math.ceil(dataMax * 1.1),
+            ))}
+          </Box>
+        </Box>
+
+        {/* ELO Graph Section */}
+        {driverRatings && driverRatings.history.length > 0 && (
+          <Box bg="gray.900" p={6} borderRadius="lg" mb={8}>
+            <styled.h2 fontSize="2xl" fontWeight="bold" mb={4}>
+              Rating History
+            </styled.h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart
+                data={[
+                  { date: "Initial", elo: 1000 },
+                  ...(driverRatings?.history || []).map((item) => ({
+                    date: item.battle.tournament,
+                    elo: item.elo,
+                    battle: item.battle,
+                    startingElo: item.startingElo,
+                  })),
                 ]}
-              />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-
-                    if (data.date === "Initial") {
-                      return (
-                        <div
-                          style={{
-                            backgroundColor: "rgba(255, 255, 255, 0.8)",
-                            padding: "10px",
-                            border: "1px solid #ccc",
-                          }}
-                        >
-                          <p>Initial Points: 1000</p>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <Box
-                        bg="black"
-                        color="white"
-                        p={3}
-                        borderRadius="md"
-                        boxShadow="md"
-                      >
-                        <styled.p fontSize="sm">
-                          Tournament: {data.date}
-                        </styled.p>
-                        <styled.p fontSize="sm">
-                          Total Points: {data.elo.toFixed(3)}
-                        </styled.p>
-                        <styled.p fontSize="sm">
-                          Change: {(data.elo - data.startingElo).toFixed(3)}
-                        </styled.p>
-                        <styled.p fontSize="sm">
-                          Winner: {data.battle.winner.name}
-                        </styled.p>
-                        <styled.p fontSize="sm">
-                          Loser: {data.battle.loser.name}
-                        </styled.p>
-                      </Box>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="elo"
-                stroke="#ec1a55"
-                fill="url(#colorElo)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        )}
-
-        {driverRatings?.history.map(
-          ({
-            battle,
-            elo,
-            opponentElo,
-            startingElo,
-            startingOpponentElo,
-            totalBattles,
-            totalOpponentBattles,
-          }) => {
-            const isWinner = battle.winnerId === driver.id;
-
-            return (
-              <VStack
-                key={battle.id}
-                bg="gray.900"
-                p={2}
-                borderRadius="md"
-                mb={2}
+                margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
               >
-                <HStack>
-                  {isWinner ? (
-                    <styled.span color="green">
-                      ... VS {battle.loser.name}
-                    </styled.span>
-                  ) : (
-                    <styled.span color="red">
-                      ... VS {battle.winner.name}
-                    </styled.span>
-                  )}
-                </HStack>
-
-                <styled.table borderWidth={1} borderColor="gray.800">
-                  <thead>
-                    <tr>
-                      <styled.th />
-                      <styled.th p={1}>Driver</styled.th>
-                      <styled.th p={1}>Opponent</styled.th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <styled.td p={1}>Tournament</styled.td>
-                      <styled.td colSpan={2} p={1} textAlign="center">
-                        {battle.tournament}
-                      </styled.td>
-                    </tr>
-                    <tr>
-                      <styled.td p={1}>Starting</styled.td>
-                      <styled.td p={1}>{startingElo.toFixed(3)}</styled.td>
-                      <styled.td p={1}>
-                        {startingOpponentElo.toFixed(3)}
-                      </styled.td>
-                    </tr>
-                    <tr>
-                      <styled.td p={1}>Elo</styled.td>
-                      <styled.td p={1}>{elo.toFixed(3)}</styled.td>
-                      <styled.td p={1}>{opponentElo.toFixed(3)}</styled.td>
-                    </tr>
-                    <tr>
-                      <styled.td p={1}>Battles</styled.td>
-                      <styled.td p={1}>{totalBattles}</styled.td>
-                      <styled.td p={1}>{totalOpponentBattles}</styled.td>
-                    </tr>
-                    <tr>
-                      <styled.td p={1}>Change</styled.td>
-                      <styled.td p={1}>
-                        {(elo - startingElo).toFixed(3)}
-                      </styled.td>
-                      <styled.td p={1}>
-                        {(opponentElo - startingOpponentElo).toFixed(3)}
-                      </styled.td>
-                    </tr>
-                  </tbody>
-                </styled.table>
-              </VStack>
-            );
-          }
+                <defs>
+                  <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="rgba(236, 26, 85, 0.3)"
+                      stopOpacity={1}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="rgba(236, 26, 85, 0)"
+                      stopOpacity={1}
+                    />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="date"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  interval="preserveStartEnd"
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis
+                  domain={[
+                    (dataMin: number) =>
+                      Math.min(1000, Math.floor(dataMin * 0.9)),
+                    (dataMax: number) => Math.ceil(dataMax * 1.1),
+                  ]}
+                />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="elo"
+                  stroke="#ec1a55"
+                  fill="url(#colorElo)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Box>
         )}
-      </styled.div>
-    </Container>
+
+        {/* Battle History Section */}
+        {driverRatings?.history && driverRatings.history.length > 0 && (
+          <Box>
+            <styled.h2 fontSize="2xl" fontWeight="bold" mb={4}>
+              Battle History
+            </styled.h2>
+            <VStack gap={4} width="100%">
+              {driverRatings.history.map(
+                ({
+                  battle,
+                  elo,
+                  opponentElo,
+                  startingElo,
+                  startingOpponentElo,
+                  totalBattles,
+                  totalOpponentBattles,
+                }) => {
+                  const isWinner = battle.winnerId === driver.driverId;
+                  const isExpanded = expandedBattles.includes(
+                    battle.id.toString()
+                  );
+                  const pointsChange = elo - startingElo;
+                  const isByeRun = battle.loserId === 0;
+                  const color = isByeRun
+                    ? "yellow.500"
+                    : isWinner
+                      ? "green.500"
+                      : "red.500";
+
+                  return (
+                    <Box
+                      key={battle.id}
+                      borderRadius="xl"
+                      width="full"
+                      overflow="hidden"
+                      pos="relative"
+                      zIndex={1}
+                      borderWidth={1}
+                      borderColor={color}
+                    >
+                      <Flex
+                        p={4}
+                        cursor="pointer"
+                        onClick={() => toggleBattle(battle.id.toString())}
+                        _hover={{ bg: "gray.800" }}
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Grid
+                          gridTemplateColumns="1fr 2fr 1fr 1fr"
+                          gap={6}
+                          flex={1}
+                        >
+                          {/* Tournament Info */}
+                          <Box>
+                            <styled.h3
+                              fontSize="lg"
+                              fontWeight="bold"
+                              color="gray.200"
+                            >
+                              {battle.tournament}
+                            </styled.h3>
+                            <styled.span fontSize="sm" color="gray.400">
+                              Battle #{totalBattles}
+                            </styled.span>
+                          </Box>
+
+                          {/* Opponent Info */}
+                          <Box>
+                            {!isByeRun && (
+                              <styled.span
+                                fontSize="md"
+                                color={isWinner ? "green.400" : "red.400"}
+                              >
+                                {isWinner ? "Won vs" : "Lost to"}{" "}
+                                {isWinner
+                                  ? battle.loser.firstName +
+                                    " " +
+                                    battle.loser.lastName
+                                  : battle.winner.firstName +
+                                    " " +
+                                    battle.winner.lastName}
+                              </styled.span>
+                            )}
+
+                            {isByeRun && (
+                              <styled.span fontSize="md" color="yellow.400">
+                                BYE RUN
+                              </styled.span>
+                            )}
+                            <styled.div fontSize="sm" color="gray.400">
+                              Opponent Battles: {totalOpponentBattles}
+                            </styled.div>
+                          </Box>
+
+                          {/* Starting ELO */}
+                          <Box>
+                            <styled.div fontSize="sm" color="gray.400">
+                              Starting ELO
+                            </styled.div>
+                            <styled.div fontSize="md" color="gray.200">
+                              {startingElo.toFixed(0)}
+                            </styled.div>
+                          </Box>
+
+                          {/* Points Change */}
+                          <Flex
+                            justifyContent="flex-end"
+                            alignItems="center"
+                            gap={2}
+                          >
+                            <styled.span
+                              fontSize="xl"
+                              fontWeight="bold"
+                              color={
+                                pointsChange >= 0 ? "green.400" : "red.400"
+                              }
+                            >
+                              {pointsChange > 0 ? "+" : ""}
+                              {pointsChange.toFixed(0)}
+                            </styled.span>
+                            {isExpanded ? (
+                              <RiArrowUpSLine size={20} />
+                            ) : (
+                              <RiArrowDownSLine size={20} />
+                            )}
+                          </Flex>
+                        </Grid>
+                      </Flex>
+
+                      {isExpanded && (
+                        <Box
+                          p={4}
+                          pt={0}
+                          borderTop="1px solid"
+                          borderColor="gray.800"
+                        >
+                          <Grid
+                            gridTemplateColumns="repeat(3, 1fr)"
+                            gap={6}
+                            mt={4}
+                          >
+                            <Box>
+                              <styled.h4
+                                fontSize="sm"
+                                fontWeight="bold"
+                                color="gray.400"
+                                mb={2}
+                              >
+                                Your Stats
+                              </styled.h4>
+                              <styled.div fontSize="sm" color="gray.300">
+                                Starting: {startingElo.toFixed(0)}
+                              </styled.div>
+                              <styled.div fontSize="sm" color="gray.300">
+                                Final: {elo.toFixed(0)}
+                              </styled.div>
+                              <styled.div
+                                fontSize="sm"
+                                color={
+                                  pointsChange >= 0 ? "green.400" : "red.400"
+                                }
+                              >
+                                Change: {pointsChange > 0 ? "+" : ""}
+                                {pointsChange.toFixed(0)}
+                              </styled.div>
+                            </Box>
+
+                            <Box>
+                              <styled.h4
+                                fontSize="sm"
+                                fontWeight="bold"
+                                color="gray.400"
+                                mb={2}
+                              >
+                                Opponent Stats
+                              </styled.h4>
+                              <styled.div fontSize="sm" color="gray.300">
+                                Starting: {startingOpponentElo.toFixed(0)}
+                              </styled.div>
+                              <styled.div fontSize="sm" color="gray.300">
+                                Final: {opponentElo.toFixed(0)}
+                              </styled.div>
+                              <styled.div
+                                fontSize="sm"
+                                color={
+                                  opponentElo - startingOpponentElo >= 0
+                                    ? "green.400"
+                                    : "red.400"
+                                }
+                              >
+                                Change:{" "}
+                                {opponentElo - startingOpponentElo > 0
+                                  ? "+"
+                                  : ""}
+                                {(opponentElo - startingOpponentElo).toFixed(0)}
+                              </styled.div>
+                            </Box>
+
+                            <Box>
+                              <styled.h4
+                                fontSize="sm"
+                                fontWeight="bold"
+                                color="gray.400"
+                                mb={2}
+                              >
+                                Battle Details
+                              </styled.h4>
+                              <styled.div fontSize="sm" color="gray.300">
+                                Your Total Battles: {totalBattles}
+                              </styled.div>
+                              <styled.div fontSize="sm" color="gray.300">
+                                Opponent Battles: {totalOpponentBattles}
+                              </styled.div>
+                              <styled.div
+                                fontSize="sm"
+                                color={isWinner ? "green.400" : "red.400"}
+                              >
+                                Result: {isWinner ? "Victory" : "Defeat"}
+                              </styled.div>
+                            </Box>
+                          </Grid>
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                }
+              )}
+            </VStack>
+          </Box>
+        )}
+      </Container>
+    </Box>
   );
 };
 

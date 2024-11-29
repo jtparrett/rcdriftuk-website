@@ -1,5 +1,8 @@
+import type { Values } from "./values";
+
 export const RANKS = {
   UNRANKED: "unranked",
+  STEEL: "steel",
   BRONZE: "bronze",
   SILVER: "silver",
   GOLD: "gold",
@@ -9,12 +12,34 @@ export const RANKS = {
 
 export const RANKS_RULES = {
   [RANKS.UNRANKED]: "Unranked = < 5 battles",
-  [RANKS.BRONZE]: "Bronze = < 1100 points",
+  [RANKS.STEEL]: "Steel <= 1050 points",
+  [RANKS.BRONZE]: "Bronze = 1050 - 1100 points",
   [RANKS.SILVER]: "Silver = 1100 - 1200 points",
-  [RANKS.GOLD]: "Gold - 1200 = 1300 points",
+  [RANKS.GOLD]: "Gold = 1200 = 1300 points",
   [RANKS.DIAMOND]: "Diamond = 1300 - 1400 points",
   [RANKS.PLATINUM]: "Platinum = 1400+ points",
 } as const;
+
+export const getRankColor = (rank: Values<typeof RANKS>): [string, string] => {
+  switch (rank) {
+    case RANKS.UNRANKED:
+      return ["#12161D", "#0B0E13"];
+    case RANKS.STEEL:
+      return ["#242D3A", "#151A23"];
+    case RANKS.BRONZE:
+      return ["#3E2A0B", "#2C1D07"];
+    case RANKS.SILVER:
+      return ["#3A4049", "#2A2F36"];
+    case RANKS.GOLD:
+      return ["#6B4F17", "#4A370F"];
+    case RANKS.DIAMOND:
+      return ["#102B45", "#0C1F31"];
+    case RANKS.PLATINUM:
+      return ["#2B3B4D", "#1E2A38"];
+    default:
+      return ["#070809", "#050506"];
+  }
+};
 
 export const getDriverRank = (currentElo: number, totalHistory: number) => {
   if (totalHistory < 5) {
@@ -37,5 +62,9 @@ export const getDriverRank = (currentElo: number, totalHistory: number) => {
     return RANKS.SILVER;
   }
 
-  return RANKS.BRONZE;
+  if (currentElo >= 1050) {
+    return RANKS.BRONZE;
+  }
+
+  return RANKS.STEEL;
 };

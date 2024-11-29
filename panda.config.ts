@@ -44,7 +44,6 @@ export default defineConfig({
           "brand.700": {
             value: "#a6143c",
           },
-
           "gray.50": {
             value: "#fafafa",
           },
