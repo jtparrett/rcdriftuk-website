@@ -645,7 +645,7 @@ const Page = () => {
                   target="_blank"
                 >
                   <styled.img
-                    src="/affiliates/fps.png"
+                    src="/affiliates/fps.jpg"
                     alt="FPS Drift"
                     height="40px"
                     width="auto"
