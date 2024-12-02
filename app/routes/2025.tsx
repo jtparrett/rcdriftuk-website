@@ -639,6 +639,18 @@ const Page = () => {
                     width="auto"
                   />
                 </Link>
+
+                <Link
+                  to="https://www.instagram.com/fps_rc_drift/"
+                  target="_blank"
+                >
+                  <styled.img
+                    src="/affiliates/fps.png"
+                    alt="FPS Drift"
+                    height="40px"
+                    width="auto"
+                  />
+                </Link>
               </Flex>
             </CollapsibleCard>
 
