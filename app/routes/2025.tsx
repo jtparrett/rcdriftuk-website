@@ -269,9 +269,9 @@ const Page = () => {
               </ImageContainer>
               <H1>RCDrift UK 2025</H1>
               <P fontSize="lg" maxW={600} mx="auto" mt={4}>
-                After an amazing 2024 championship, we are proud to present
-                "RCDrift.uk 2025". RCDrift.uk will be offering a new innovative
-                format, allowing every driver and track to take part.
+                We are thrilled to introduce "RCDrift.uk 2025," an innovative
+                platform that invites every driver and track to join the
+                excitement of a brand-new competitive format.
               </P>
             </Box>
 
