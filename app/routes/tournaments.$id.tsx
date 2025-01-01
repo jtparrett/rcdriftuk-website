@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/remix";
 import { BattlesBracket, TournamentsState } from "@prisma/client";
 import type {
   ActionFunctionArgs,
@@ -34,8 +35,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  invariant(userId);
-
   const tournament = await getTournament(id, userId);
 
   if (!tournament) {
@@ -48,12 +47,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return tournament;
 };
 
-export const action = async ({ params }: ActionFunctionArgs) => {
-  const id = z.string().parse(params.id);
+export const action = async (args: ActionFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
+
+  invariant(userId);
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
     where: {
       id,
+      userId,
     },
     include: {
       judges: true,
@@ -199,9 +202,16 @@ const TournamentPage = () => {
   const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
+  const { user } = useUser();
+
+  const isOwner = user?.id === tournament.userId;
 
   return (
     <Container pb={12} px={2} pt={8} maxW={1100}>
+      {/* <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
+        <styled.iframe src="https://www.youtube.com/embed/MQkZalwQ_XU?si=LMqIJ_Q96b6LUlRZ" />
+      </AspectRatio> */}
+
       <Box mb={4}>
         <Flex
           alignItems="center"
@@ -274,7 +284,8 @@ const TournamentPage = () => {
 
             <Spacer />
 
-            {tournament.state === TournamentsState.QUALIFYING &&
+            {isOwner &&
+              tournament.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap &&
               tournament.nextQualifyingLap.scores.length ===
                 tournament.judges.length &&
@@ -284,14 +295,16 @@ const TournamentPage = () => {
                 </Form>
               )}
 
-            {tournament.state === TournamentsState.QUALIFYING &&
+            {isOwner &&
+              tournament.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap === null && (
                 <Form method="post">
                   <Button type="submit">End Qualifying</Button>
                 </Form>
               )}
 
-            {tournament.state === TournamentsState.BATTLES &&
+            {isOwner &&
+              tournament.state === TournamentsState.BATTLES &&
               (tournament.nextBattle?.BattleVotes.length ?? 0) >=
                 tournament.judges.length && (
                 <Form method="post">

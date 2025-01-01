@@ -3,7 +3,6 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
 import { RiAddFill } from "react-icons/ri";
-import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
@@ -11,7 +10,12 @@ import { prisma } from "~/utils/prisma.server";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  invariant(userId);
+  if (!userId) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
 
   const tournaments = await prisma.tournaments.findMany({
     where: {

@@ -1,10 +1,20 @@
+import { TournamentsState } from "@prisma/client";
 import { prisma } from "./prisma.server";
 
-export const getTournament = (id: string, userId: string) => {
+export const getTournament = (id: string, userId: string | null) => {
   return prisma.tournaments.findFirst({
     where: {
       id,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          state: {
+            notIn: [TournamentsState.START],
+          },
+        },
+      ],
     },
     select: {
       id: true,
@@ -12,6 +22,7 @@ export const getTournament = (id: string, userId: string) => {
       format: true,
       qualifyingLaps: true,
       state: true,
+      userId: true,
       nextQualifyingLap: {
         include: {
           scores: true,
