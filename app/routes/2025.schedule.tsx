@@ -1,7 +1,6 @@
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
-import { Advert } from "~/components/Advert";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
@@ -58,7 +57,7 @@ const Page = () => {
 
   return (
     <Container px={2} maxW={1100}>
-      <styled.main pt={4}>
+      <styled.div pt={4} pb={12}>
         <styled.h1 fontSize="3xl" mb={1} fontWeight="black">
           2025 Schedule
         </styled.h1>
@@ -111,9 +110,7 @@ const Page = () => {
             })}
           </Flex>
         </Box>
-      </styled.main>
-
-      <Advert />
+      </styled.div>
     </Container>
   );
 };
