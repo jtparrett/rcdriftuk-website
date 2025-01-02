@@ -152,9 +152,11 @@ const TrackPage = () => {
           </Box>
 
           <Flex flexDir="column" gap={2} p={4}>
-            {track.events.length <= 0 && <styled.p>No Events...</styled.p>}
+            {track.events.length <= 0 && (
+              <styled.p>No events here yet...</styled.p>
+            )}
 
-            {track.events.map((event) => (
+            {track.events.slice(1).map((event) => (
               <EventCard event={event} key={event.id} />
             ))}
           </Flex>
