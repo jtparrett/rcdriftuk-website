@@ -1,11 +1,12 @@
 import { getAuth } from "~/utils/getAuth.server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
 import { RiAddFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -19,7 +20,29 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const tournaments = await prisma.tournaments.findMany({
     where: {
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          judges: {
+            some: {
+              user: {
+                id: userId,
+              },
+            },
+          },
+        },
+        {
+          drivers: {
+            some: {
+              user: {
+                id: userId,
+              },
+            },
+          },
+        },
+      ],
     },
     orderBy: {
       createdAt: "desc",
@@ -52,14 +75,16 @@ const Page = () => {
             rounded="xl"
             borderWidth="1px"
             borderColor="gray.700"
+            pos="relative"
+            overflow="hidden"
           >
+            <LinkOverlay to={`/tournaments/${tournament.id}/overview`} />
             <Flex p={4} rounded="lg" borderWidth="1px" borderColor="gray.800">
               <Box>
-                <Link to={`/tournaments/${tournament.id}/overview`}>
-                  <styled.span fontWeight="bold" fontSize="lg">
-                    {tournament.name}
-                  </styled.span>
-                </Link>
+                <styled.span fontWeight="bold" fontSize="lg">
+                  {tournament.name}
+                </styled.span>
+
                 <styled.p fontSize="sm" color="gray.500">
                   {format(new Date(tournament.createdAt), "MMM d, yyyy")}
                 </styled.p>
