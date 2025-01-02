@@ -28,7 +28,7 @@ import {
   RiArrowLeftLine,
 } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
-import { getDriverAchievements } from "./getDriverAchievements";
+import { getDriverAchievements } from "~/utils/getDriverAchievements";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);

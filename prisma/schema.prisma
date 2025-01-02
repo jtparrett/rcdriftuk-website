@@ -44,6 +44,7 @@ model Tournaments {
   state               TournamentsState    @default(START)
   userId              String?
   nextQualifyingLapId Int?                @unique
+  liveUrl             String?
   drivers             TournamentDrivers[]
   judges              TournamentJudges[]
   user                Users?              @relation(fields: [userId], references: [id])

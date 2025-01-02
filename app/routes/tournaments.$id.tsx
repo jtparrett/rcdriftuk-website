@@ -16,7 +16,14 @@ import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
 import { TournamentStartForm } from "~/components/TournamentStartForm";
-import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import {
+  AspectRatio,
+  Box,
+  Container,
+  Flex,
+  Spacer,
+  styled,
+} from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { getUsers } from "~/utils/getUsers.server";
@@ -153,9 +160,11 @@ const TournamentPage = () => {
 
   return (
     <Container pb={12} px={2} pt={8} maxW={1100}>
-      {/* <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
-        <styled.iframe src="https://www.youtube.com/embed/MQkZalwQ_XU?si=LMqIJ_Q96b6LUlRZ" />
-      </AspectRatio> */}
+      {tournament.liveUrl && (
+        <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
+          <styled.iframe src={tournament.liveUrl} />
+        </AspectRatio>
+      )}
 
       <Box mb={4}>
         <styled.h1
