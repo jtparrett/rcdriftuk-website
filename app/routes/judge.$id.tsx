@@ -178,7 +178,7 @@ const QualiForm = () => {
   const { tournament } = useLoaderData<typeof loader>();
   const transition = useNavigation();
 
-  const scoreValue = tournament.nextQualifyingLap?.scores[0]?.score ?? 50;
+  const scoreValue = tournament.nextQualifyingLap?.scores[0]?.score;
   const qualifyingRun =
     (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
       (lap) => lap.id === tournament.nextQualifyingLapId
@@ -219,11 +219,12 @@ const QualiForm = () => {
                 <Select
                   name="score"
                   aria-label="score-select"
-                  value={scoreValue}
+                  value={scoreValue ?? ""}
                   onChange={(e) => {
                     e.target.form?.submit();
                   }}
                 >
+                  <option value="">Select a value</option>
                   {Array.from(new Array(101)).map((_, i) => (
                     <option key={i} value={i}>
                       {i}
