@@ -1,8 +1,8 @@
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
-import { LinkButton } from "~/components/Button";
-import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { LinkOverlay } from "~/components/LinkOverlay";
+import { AspectRatio, Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 
 export function headers() {
@@ -45,6 +45,9 @@ export const loader = async () => {
         ],
       },
     },
+    include: {
+      eventTrack: true,
+    },
     orderBy: {
       startDate: "asc",
     },
@@ -80,8 +83,15 @@ const Page = () => {
                     bgColor="gray.900"
                     overflow="hidden"
                     rounded="lg"
+                    pos="relative"
                     w="full"
                   >
+                    <AspectRatio ratio={1.6}>
+                      <styled.img
+                        src={event.eventTrack?.image ?? "/2025-cover.jpg"}
+                        alt={event.eventTrack?.name}
+                      />
+                    </AspectRatio>
                     <Box p={4}>
                       <styled.h1
                         fontWeight="bold"
@@ -91,20 +101,13 @@ const Page = () => {
                         {event.name}
                       </styled.h1>
 
-                      <styled.p color="gray.400" fontSize="sm" mb={2}>
+                      <styled.p color="gray.400" fontSize="sm">
                         {format(startDate, "do MMMM")} from{" "}
                         {format(startDate, "HH:mm")} -{" "}
                         {format(new Date(event.endDate), "HH:mm")}
                       </styled.p>
-
-                      <LinkButton
-                        to={`/events/${event.id}`}
-                        variant="secondary"
-                        size="sm"
-                      >
-                        More Info
-                      </LinkButton>
                     </Box>
+                    <LinkOverlay to={`/events/${event.id}`} />
                   </styled.article>
                 </Flex>
               );
