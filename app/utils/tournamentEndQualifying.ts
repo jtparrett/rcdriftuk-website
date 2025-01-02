@@ -53,12 +53,18 @@ export const tournamentEndQualifying = async (id: string) => {
     const totalBuysToCreate = totalDriversWithBuys - tournament.drivers.length;
 
     // Create bye tournament drivers
+    const byeDriver = await prisma.users.findFirstOrThrow({
+      where: {
+        firstName: "BYE",
+      },
+    });
+
     const buyDrivers = await prisma.tournamentDrivers.createManyAndReturn({
       data: Array.from(new Array(totalBuysToCreate)).map(() => {
         return {
           isBye: true,
           tournamentId: tournament.id,
-          name: "BYE",
+          driverId: byeDriver.driverId,
         };
       }),
     });

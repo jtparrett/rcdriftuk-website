@@ -4,7 +4,6 @@ import { redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
-import { nameStringToArray } from "~/utils/nameStringToArray";
 import { prisma } from "~/utils/prisma.server";
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -22,8 +21,8 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(tournament);
 
   const formData = await args.request.formData();
-  const drivers = z.string().parse(formData.get("drivers"));
-  const judges = z.string().parse(formData.get("judges"));
+  const judges = z.array(z.string()).parse(formData.getAll("judges"));
+  const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
   const qualifyingLaps = Math.max(
     z.coerce.number().parse(formData.get("qualifyingLaps")),
     1
@@ -31,13 +30,13 @@ export const action = async (args: ActionFunctionArgs) => {
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
 
   invariant(judges.length > 0, "Please add at least one judge");
-  invariant(drivers.length > 0, "Please add at least one driver");
+  invariant(drivers.length > 1, "Please add at least 2 drivers");
 
   // Create judges
   await prisma.tournamentJudges.createMany({
-    data: nameStringToArray(judges).map((name) => {
+    data: judges.map((judgeId) => {
       return {
-        name,
+        driverId: Number(judgeId),
         tournamentId: id,
       };
     }),
@@ -45,9 +44,9 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create drivers
   const tournamentDrivers = await prisma.tournamentDrivers.createManyAndReturn({
-    data: nameStringToArray(drivers).map((name) => {
+    data: drivers.map((driverId) => {
       return {
-        name,
+        driverId: Number(driverId),
         tournamentId: id,
       };
     }),

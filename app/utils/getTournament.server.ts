@@ -38,13 +38,25 @@ export const getTournament = (id: string, userId: string | null) => {
       drivers: {
         select: {
           id: true,
-          name: true,
+          driverId: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       },
       judges: {
         select: {
           id: true,
-          name: true,
+          driverId: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       },
     },

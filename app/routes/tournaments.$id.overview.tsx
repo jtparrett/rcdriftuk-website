@@ -24,22 +24,64 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         include: {
           BattleVotes: {
             include: {
-              judge: true,
+              judge: {
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
-          driverLeft: true,
-          driverRight: true,
+          driverLeft: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+          driverRight: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
         },
       },
       nextQualifyingLap: {
         include: {
           scores: {
             include: {
-              judge: true,
+              judge: {
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
           driver: {
             include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
               laps: {
                 where: {
                   scores: {
@@ -128,7 +170,8 @@ const TournamentsOverviewPage = () => {
                 <>
                   <Box pt={4} px={4}>
                     <styled.p fontSize="lg" fontWeight="black">
-                      {tournament.nextQualifyingLap.driver.name}
+                      {tournament.nextQualifyingLap.driver.user.firstName}{" "}
+                      {tournament.nextQualifyingLap.driver.user.lastName}
                     </styled.p>
 
                     {!qualiJudgingComplete && (
@@ -171,7 +214,8 @@ const TournamentsOverviewPage = () => {
                             >
                               <styled.p fontSize="lg">{score.score}</styled.p>
                               <styled.p fontSize="sm">
-                                {score.judge.name}
+                                {score.judge.user.firstName}{" "}
+                                {score.judge.user.lastName}
                               </styled.p>
                             </Box>
                           );
@@ -196,7 +240,8 @@ const TournamentsOverviewPage = () => {
                       fontWeight="black"
                       py={2}
                     >
-                      {tournament.nextBattle.driverLeft?.name}
+                      {tournament.nextBattle.driverLeft?.user.firstName}{" "}
+                      {tournament.nextBattle.driverLeft?.user.lastName}
                     </styled.p>
                   </Box>
                   <Box flex={1.3} py={{ base: 8, md: 12 }}>
@@ -235,7 +280,8 @@ const TournamentsOverviewPage = () => {
                                   textOverflow="ellipsis"
                                   overflow="hidden"
                                 >
-                                  {vote.judge.name}
+                                  {vote.judge.user.firstName}{" "}
+                                  {vote.judge.user.lastName}
                                 </styled.p>
                                 <styled.p
                                   lineHeight={1}
@@ -263,7 +309,8 @@ const TournamentsOverviewPage = () => {
                       fontWeight="black"
                       py={2}
                     >
-                      {tournament.nextBattle.driverRight?.name}
+                      {tournament.nextBattle.driverRight?.user.firstName}{" "}
+                      {tournament.nextBattle.driverRight?.user.lastName}
                     </styled.p>
                   </Box>
                 </Flex>

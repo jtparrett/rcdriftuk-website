@@ -2,7 +2,8 @@ import { styled } from "~/styled-system/jsx";
 
 export const Textarea = styled("textarea", {
   base: {
-    p: 2,
+    py: 2,
+    px: 4,
     bgColor: "gray.800",
     rounded: "md",
     color: "white",

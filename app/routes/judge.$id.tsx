@@ -33,6 +33,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
     include: {
       judges: {
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
         where: {
           id: judgeId,
         },
@@ -46,6 +54,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           },
           driver: {
             include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
               laps: true,
             },
           },
@@ -53,8 +67,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       },
       nextBattle: {
         include: {
-          driverLeft: true,
-          driverRight: true,
+          driverLeft: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+          driverRight: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
           BattleVotes: {
             where: {
               judgeId,
@@ -168,7 +200,8 @@ const QualiForm = () => {
               {tournament.nextQualifyingLap.driver.id
                 .toString()
                 .padStart(2, "0")}{" "}
-              {tournament.nextQualifyingLap.driver.name}
+              {tournament.nextQualifyingLap.driver.user.firstName}{" "}
+              {tournament.nextQualifyingLap.driver.user.lastName}
             </styled.p>
             <Spacer />
             <styled.span color="brand.500" fontWeight="bold">
@@ -234,7 +267,8 @@ const BattleForm = () => {
                   : "outline"
               }
             >
-              {nextBattle.driverLeft?.name}
+              {nextBattle.driverLeft?.user.firstName}{" "}
+              {nextBattle.driverLeft?.user.lastName}
             </Button>
 
             <Button
@@ -249,7 +283,8 @@ const BattleForm = () => {
                   : "outline"
               }
             >
-              {nextBattle.driverRight?.name}
+              {nextBattle.driverRight?.user.firstName}{" "}
+              {nextBattle.driverRight?.user.lastName}
             </Button>
 
             <Button
@@ -318,7 +353,9 @@ const JudgePage = () => {
               gradientFrom="brand.500"
               gradientTo="brand.700"
             >
-              <styled.h1 fontWeight="extrabold">{judge.name}</styled.h1>
+              <styled.h1 fontWeight="extrabold">
+                {judge.user.firstName} {judge.user.lastName}
+              </styled.h1>
               <Spacer />
               <styled.h2 fontSize="sm">{tournament.name}</styled.h2>
             </Flex>

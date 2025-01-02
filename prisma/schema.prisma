@@ -56,8 +56,9 @@ model TournamentDrivers {
   tournamentId       String              @db.Uuid
   qualifyingPosition Int?
   createdAt          DateTime            @default(now())
-  name               String
   id                 Int                 @id @default(autoincrement())
+  driverId           Int
+  user               Users               @relation(fields: [driverId], references: [driverId])
   laps               Laps[]
   tournament         Tournaments         @relation(fields: [tournamentId], references: [id])
   leftBattles        TournamentBattles[] @relation("battleDriverLeft")
@@ -68,9 +69,10 @@ model TournamentDrivers {
 model TournamentJudges {
   id           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt    DateTime                @default(now())
-  name         String
   tournamentId String                  @db.Uuid
   tournament   Tournaments             @relation(fields: [tournamentId], references: [id])
+  driverId     Int
+  user         Users                   @relation(fields: [driverId], references: [driverId])
   scores       LapScores[]
   BattleVotes  TournamentBattleVotes[]
 }
@@ -148,20 +150,22 @@ model DriverRatingBattles {
 }
 
 model Users {
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @default(now()) @updatedAt
-  driverId      Int                   @id @default(autoincrement())
-  id            String?               @unique
-  firstName     String?
-  image         String?
-  lastName      String?
-  trackId       String?               @db.Uuid
-  team          String?
-  events        EventResponses[]
-  track         Tracks?               @relation(fields: [trackId], references: [id])
-  Tournaments   Tournaments[]
-  ratingsLosses DriverRatingBattles[] @relation("driverRatingsLosses")
-  ratingsWins   DriverRatingBattles[] @relation("driverRatingsWins")
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @default(now()) @updatedAt
+  driverId          Int                   @id @default(autoincrement())
+  id                String?               @unique
+  firstName         String?
+  image             String?
+  lastName          String?
+  trackId           String?               @db.Uuid
+  team              String?
+  events            EventResponses[]
+  track             Tracks?               @relation(fields: [trackId], references: [id])
+  Tournaments       Tournaments[]
+  ratingsLosses     DriverRatingBattles[] @relation("driverRatingsLosses")
+  ratingsWins       DriverRatingBattles[] @relation("driverRatingsWins")
+  TournamentJudges  TournamentJudges[]
+  TournamentDrivers TournamentDrivers[]
 }
 
 model Products {

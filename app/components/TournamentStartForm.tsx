@@ -7,12 +7,81 @@ import { Button } from "./Button";
 import { Select } from "./Select";
 import { TournamentsFormat } from "@prisma/client";
 import { capitalCase } from "change-case";
+import type { GetUsers } from "~/utils/getUsers.server";
+import { useState } from "react";
+import { RiDeleteBinFill } from "react-icons/ri";
 
 interface Props {
   tournament: GetTournament;
+  users: GetUsers;
 }
 
-export const TournamentStartForm = ({ tournament }: Props) => {
+const PeopleForm = ({
+  users,
+  defaultValue,
+  name,
+}: {
+  users: GetUsers;
+  defaultValue: number[];
+  name: string;
+}) => {
+  const [value, onChange] = useState(defaultValue);
+
+  return (
+    <Box bgColor="gray.900" rounded="lg" overflow="hidden">
+      {value.map((userId) => {
+        const user = users.find((user) => user.driverId === userId);
+        return (
+          <Flex
+            key={userId}
+            gap={1}
+            borderBottomWidth={1}
+            borderBottomColor="gray.700"
+          >
+            <input type="hidden" name={name} value={userId} />
+            <styled.p py={1} px={4} flex={1}>
+              {user?.firstName} {user?.lastName}
+            </styled.p>
+
+            <Box p={1}>
+              <Button
+                px={1}
+                size="xs"
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  onChange(value.filter((id) => id !== userId));
+                }}
+              >
+                <RiDeleteBinFill />
+              </Button>
+            </Box>
+          </Flex>
+        );
+      })}
+
+      <Select
+        rounded="none"
+        borderTopWidth={1}
+        borderTopColor="gray.900"
+        onChange={(e) => onChange([...value, Number(e.target.value)])}
+      >
+        <option>Select a person...</option>
+        {users
+          .filter((user) => !value.includes(user.driverId))
+          .map((user) => {
+            return (
+              <option key={user.driverId} value={user.driverId}>
+                {user.firstName} {user.lastName}
+              </option>
+            );
+          })}
+      </Select>
+    </Box>
+  );
+};
+
+export const TournamentStartForm = ({ tournament, users }: Props) => {
   return (
     <Form method="post" action={`/api/tournaments/${tournament?.id}/start`}>
       <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
@@ -41,6 +110,7 @@ export const TournamentStartForm = ({ tournament }: Props) => {
               How many qualifying laps?
             </styled.label>
             <Input
+              maxW={100}
               type="number"
               name="qualifyingLaps"
               defaultValue={tournament?.qualifyingLaps}
@@ -55,16 +125,13 @@ export const TournamentStartForm = ({ tournament }: Props) => {
               Who are your tournament judges?
             </styled.label>
 
-            <styled.textarea
-              w="full"
-              display="block"
-              minH={82}
-              bgColor="gray.800"
-              p={4}
-              rounded="lg"
-              placeholder="List your tournament judges seperated by a comma (,)"
+            <PeopleForm
+              users={users}
+              defaultValue={
+                tournament?.judges.map((judge) => judge.driverId) ?? []
+              }
               name="judges"
-            ></styled.textarea>
+            />
           </Box>
         </Flex>
 
@@ -75,16 +142,13 @@ export const TournamentStartForm = ({ tournament }: Props) => {
               Who are your tournament drivers?
             </styled.label>
 
-            <styled.textarea
-              w="full"
-              display="block"
-              minH={180}
-              bgColor="gray.800"
-              p={4}
-              rounded="lg"
-              placeholder="List your tournament drivers seperated by a comma (,)"
+            <PeopleForm
+              users={users}
+              defaultValue={
+                tournament?.drivers.map((driver) => driver.driverId) ?? []
+              }
               name="drivers"
-            ></styled.textarea>
+            />
           </Box>
         </Flex>
 

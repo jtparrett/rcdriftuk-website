@@ -24,7 +24,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       },
       nextQualifyingLap: {
         include: {
-          driver: true,
+          driver: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
         },
       },
       drivers: {
@@ -32,6 +41,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           id: "asc",
         },
         include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
           laps: {
             where: {
               scores: {
@@ -150,7 +165,7 @@ const QualifyingPage = () => {
                       }
                       whiteSpace="nowrap"
                     >
-                      {driver.name}
+                      {driver.user.firstName} {driver.user.lastName}
                     </styled.td>
 
                     <styled.td fontWeight="black" textAlign="center">
@@ -233,7 +248,7 @@ const QualifyingPage = () => {
                       }
                       whiteSpace="nowrap"
                     >
-                      {driver.name}
+                      {driver.user.firstName} {driver.user.lastName}
                     </styled.td>
 
                     <styled.td fontWeight="black" textAlign="center">

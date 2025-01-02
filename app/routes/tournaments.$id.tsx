@@ -25,6 +25,7 @@ import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { getTournament } from "~/utils/getTournament.server";
+import { getUsers } from "~/utils/getUsers.server";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
@@ -44,7 +45,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  return tournament;
+  const users = await getUsers();
+
+  return { tournament, users };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -134,7 +137,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: `RC Drift UK | ${data?.name}` }];
+  return [{ title: `RC Drift UK | ${data?.tournament.name}` }];
 };
 
 const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
@@ -165,7 +168,7 @@ const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
             {tournament?.judges.map((judge) => {
               return (
                 <option key={judge.id} value={judge.id}>
-                  {judge.name}
+                  {judge.user.firstName} {judge.user.lastName}
                 </option>
               );
             })}
@@ -197,7 +200,7 @@ const JudgingMenuButton = ({ tournament }: { tournament: GetTournament }) => {
 };
 
 const TournamentPage = () => {
-  const tournament = useLoaderData<typeof loader>();
+  const { tournament, users } = useLoaderData<typeof loader>();
   const location = useLocation();
   const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
@@ -241,7 +244,7 @@ const TournamentPage = () => {
       </Box>
 
       {tournament.state === TournamentsState.START && (
-        <TournamentStartForm tournament={tournament} />
+        <TournamentStartForm tournament={tournament} users={users} />
       )}
 
       {tournament.state !== TournamentsState.START && (

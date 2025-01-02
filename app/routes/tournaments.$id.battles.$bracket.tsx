@@ -22,8 +22,13 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
     include: {
       drivers: {
-        select: {
-          name: true,
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       },
       battles: {
@@ -38,8 +43,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           { id: "asc" },
         ],
         include: {
-          driverLeft: true,
-          driverRight: true,
+          driverLeft: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+          driverRight: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -91,7 +114,7 @@ const Driver = ({
         }
         pr={2}
       >
-        {driver?.name ?? ""}
+        {driver?.user.firstName} {driver?.user.lastName}
       </styled.p>
     </Flex>
   );

@@ -23,7 +23,7 @@ import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { LinkButton } from "./components/Button";
 import { RiHome2Line } from "react-icons/ri";
-import { getUser } from "./utils/getUser.sever";
+import { getUser } from "./utils/getUser.server";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
