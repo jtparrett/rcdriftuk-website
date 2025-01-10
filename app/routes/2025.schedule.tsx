@@ -42,6 +42,8 @@ export const loader = async () => {
           "a065c0c6-98eb-491a-b49b-3f1484936b91",
           "d17cd9d1-1eaf-48dd-a2a3-c8845fc74c26",
           "760859d8-2693-4cca-a38c-3af6be4885d7",
+          "6b147fbf-50d5-4f73-9085-f405095af2d4",
+          "7d468d79-950c-4f5d-9f47-379126430364",
         ],
       },
     },
