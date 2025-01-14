@@ -49,11 +49,19 @@ export const getTournament = (id: string, userId: string | null) => {
         },
       },
       judges: {
+        where: {
+          user: {
+            id: {
+              not: null,
+            },
+          },
+        },
         select: {
           id: true,
           driverId: true,
           user: {
             select: {
+              id: true,
               firstName: true,
               lastName: true,
             },

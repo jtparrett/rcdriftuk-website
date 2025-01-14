@@ -46,14 +46,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const users = await getUsers();
 
-  const tournamentJudge = await prisma.tournamentJudges.findFirst({
-    where: {
-      user: {
-        id: userId,
-      },
-      tournamentId: id,
-    },
-  });
+  const tournamentJudge = tournament.judges.find(
+    (judge) => judge.user.id === userId
+  );
 
   return { tournament, users, tournamentJudge };
 };
