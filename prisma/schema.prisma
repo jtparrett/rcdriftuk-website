@@ -38,6 +38,7 @@ model EventTickets {
   status    TicketStatus @default(PENDING)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @default(now()) @updatedAt
+  sessionId String?
 
   @@unique([eventId, userId])
 }
@@ -46,6 +47,7 @@ enum TicketStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  REFUNDED
 }
 
 model EventResponses {

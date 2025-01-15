@@ -65,7 +65,7 @@ export const action = async (args: ActionFunctionArgs) => {
       },
     ],
     mode: "payment",
-    success_url: `https://rcdrift.uk/events/${event.id}/ticket/success`,
+    success_url: `https://rcdrift.uk/events/${event.id}/ticket/success?ticketId=${ticket.id}`,
     cancel_url: `https://rcdrift.uk/events/${event.id}`,
     metadata: {
       userId,
@@ -74,6 +74,15 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   invariant(session.url, "Stripe session URL is not set");
+
+  await prisma.eventTickets.update({
+    where: {
+      id: ticket.id,
+    },
+    data: {
+      sessionId: session.id,
+    },
+  });
 
   return redirect(session.url);
 };
