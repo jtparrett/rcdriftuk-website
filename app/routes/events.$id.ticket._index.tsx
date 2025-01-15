@@ -1,10 +1,10 @@
 import { getAuth } from "@clerk/remix/ssr.server";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useParams } from "@remix-run/react";
-import { addMinutes } from "date-fns";
+import { Form, useLoaderData } from "@remix-run/react";
+import { addMinutes, format, isBefore } from "date-fns";
 import invariant from "tiny-invariant";
-import { Button } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { Box, Center, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
@@ -19,17 +19,22 @@ export const action = async (args: ActionFunctionArgs) => {
     where: {
       id: params.id,
     },
-    include: {
-      EventTickets: true,
+  });
+
+  const ticketsSold = await prisma.eventTickets.count({
+    where: {
+      eventId: event.id,
     },
   });
 
+  invariant(event.enableTicketing, "Event must have ticketing enabled");
+  invariant(event.ticketReleaseDate, "Event must have a ticket release date");
+
+  const isSoldOut = event.ticketCapacity && ticketsSold >= event.ticketCapacity;
+
   // Check if sold out
-  if (
-    event.ticketCapacity &&
-    event.EventTickets.length >= event.ticketCapacity
-  ) {
-    return;
+  if (isSoldOut || isBefore(new Date(event.ticketReleaseDate), new Date())) {
+    return { isSoldOut, event };
   }
 
   let ticket = await prisma.eventTickets.findUnique({
@@ -90,22 +95,38 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { id } = useParams();
+  const { isSoldOut, event } = useLoaderData<typeof action>();
+
+  if (isSoldOut) {
+    return (
+      <Center minH="50vh">
+        <Box textAlign="center">
+          <styled.span fontSize="5xl">😢</styled.span>
+          <styled.h1 fontSize="2xl" fontWeight="bold">
+            This event is sold out
+          </styled.h1>
+          <styled.p mb={4}>
+            Try again as more tickets may have been released.
+          </styled.p>
+          <Form method="post" action={`/events/${event.id}`}>
+            <Button type="submit">Try Again</Button>
+          </Form>
+        </Box>
+      </Center>
+    );
+  }
+
   return (
-    <Center minH="50vh">
-      <Box textAlign="center">
-        <styled.span fontSize="5xl">😢</styled.span>
-        <styled.h1 fontSize="2xl" fontWeight="bold">
-          This event is sold out
-        </styled.h1>
-        <styled.p mb={4}>
-          Try again as more tickets may have been released.
-        </styled.p>
-        <Form method="post" action={`/events/${id}/ticket`}>
-          <Button type="submit">Try Again</Button>
-        </Form>
-      </Box>
-    </Center>
+    <Box textAlign="center">
+      <styled.h1 fontSize="2xl" fontWeight="bold">
+        Tickets not yet released
+      </styled.h1>
+      <styled.p mb={4}>
+        Tickets will be released on{" "}
+        {format(new Date(event.ticketReleaseDate ?? ""), "PPP")}
+      </styled.p>
+      <LinkButton to={`/events/${event.id}`}>Back to Event</LinkButton>
+    </Box>
   );
 };
 
