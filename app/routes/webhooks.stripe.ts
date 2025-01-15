@@ -2,6 +2,7 @@ import { TicketStatus } from "@prisma/client";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { prisma } from "~/utils/prisma.server";
+import { sendEmail } from "~/utils/resend.server";
 import { stripe } from "~/utils/stripe.server";
 
 export async function action(args: ActionFunctionArgs) {
@@ -29,6 +30,10 @@ export async function action(args: ActionFunctionArgs) {
       const ticket = await prisma.eventTickets.findUniqueOrThrow({
         where: {
           id: Number(ticketId),
+        },
+        include: {
+          event: true,
+          user: true,
         },
       });
 
@@ -65,6 +70,8 @@ export async function action(args: ActionFunctionArgs) {
           status: TicketStatus.CONFIRMED,
         },
       });
+
+      // await sendEmail(ticket.user?.email ?? "", "Ticket Confirmed", "Ticket Confirmed");
     }
 
     if (event.type === "checkout.session.expired") {

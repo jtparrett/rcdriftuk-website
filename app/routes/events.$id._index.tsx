@@ -275,27 +275,27 @@ const Page = () => {
           )}
 
           <Flex gap={2} pt={2}>
-            {event.enableTicketing &&
-              !isSoldOut &&
-              (!ticket || ticket.status !== TicketStatus.CONFIRMED) && (
-                <LinkButton to={`/events/${event.id}/ticket`}>
-                  Buy Ticket <RiTicketFill />
+            <SignedIn>
+              {event.enableTicketing &&
+                !isSoldOut &&
+                (!ticket || ticket.status !== TicketStatus.CONFIRMED) && (
+                  <LinkButton to={`/events/${event.id}/ticket`}>
+                    Buy Ticket <RiTicketFill />
+                  </LinkButton>
+                )}
+
+              {ticket && ticket.status === TicketStatus.CONFIRMED && (
+                <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
+                  View Ticket <RiTicketFill />
                 </LinkButton>
               )}
 
-            {ticket && ticket.status === TicketStatus.CONFIRMED && (
-              <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
-                View Ticket <RiTicketFill />
-              </LinkButton>
-            )}
+              {isSoldOut && (
+                <Button disabled>
+                  Sold Out <RiTicketFill />
+                </Button>
+              )}
 
-            {isSoldOut && (
-              <Button disabled>
-                Sold Out <RiTicketFill />
-              </Button>
-            )}
-
-            <SignedIn>
               <Form method="post">
                 <Button type="submit" value="submit">
                   I'm {isAttending && "Not "}Going{" "}
@@ -308,6 +308,24 @@ const Page = () => {
               </Form>
             </SignedIn>
             <SignedOut>
+              {isSoldOut && (
+                <Button disabled>
+                  Sold Out <RiTicketFill />
+                </Button>
+              )}
+
+              {!isSoldOut && (
+                <Button
+                  onClick={() =>
+                    clerk.openSignIn({
+                      redirectUrl: `/events/${event.id}`,
+                    })
+                  }
+                >
+                  Buy Ticket <RiTicketFill />
+                </Button>
+              )}
+
               <Button
                 onClick={() =>
                   clerk.openSignIn({
