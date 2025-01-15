@@ -94,7 +94,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     where: {
       eventId: id,
       status: {
-        not: TicketStatus.CANCELLED,
+        notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
       },
     },
   });
