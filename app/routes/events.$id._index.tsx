@@ -28,7 +28,7 @@ import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
 import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
-import type { EventTickets } from "@prisma/client";
+import { TicketStatus, type EventTickets } from "@prisma/client";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -272,15 +272,17 @@ const Page = () => {
           )}
 
           <Flex gap={2} pt={2}>
-            {event.enableTicketing && !isSoldOut && !ticket && (
-              <Form method="post" action={`/events/${event.id}/ticket`}>
-                <Button type="submit" value="submit">
-                  Buy Ticket <RiTicketFill />
-                </Button>
-              </Form>
-            )}
+            {event.enableTicketing &&
+              !isSoldOut &&
+              (!ticket || ticket.status !== TicketStatus.CONFIRMED) && (
+                <Form method="post" action={`/events/${event.id}/ticket`}>
+                  <Button type="submit" value="submit">
+                    Buy Ticket <RiTicketFill />
+                  </Button>
+                </Form>
+              )}
 
-            {ticket && (
+            {ticket && ticket.status === TicketStatus.CONFIRMED && (
               <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
                 View Ticket <RiTicketFill />
               </LinkButton>
