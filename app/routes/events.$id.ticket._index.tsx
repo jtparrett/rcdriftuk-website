@@ -9,6 +9,8 @@ import { stripe } from "~/utils/stripe.server";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const { userId } = await getAuth(args);
+  const searchParams = new URLSearchParams(args.request.url);
+  const earlyAccessCode = searchParams.get("code");
 
   invariant(userId, "Unauthorized");
 
@@ -19,9 +21,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
       ticketPrice: {
         not: null,
       },
-      ticketReleaseDate: {
-        lte: new Date(),
-      },
+      OR: [
+        {
+          ticketReleaseDate: {
+            lte: new Date(),
+          },
+        },
+        {
+          earlyAccessCode,
+        },
+      ],
     },
     include: {
       _count: {
