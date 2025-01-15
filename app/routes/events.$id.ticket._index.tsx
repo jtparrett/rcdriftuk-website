@@ -1,11 +1,7 @@
 import { TicketStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { format, isBefore } from "date-fns";
 import invariant from "tiny-invariant";
-import { Button, LinkButton } from "~/components/Button";
-import { Box, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
@@ -16,29 +12,44 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   invariant(userId, "Unauthorized");
 
-  const event = await prisma.events.findUniqueOrThrow({
+  const event = await prisma.events.findUnique({
     where: {
       id: params.id,
+      enableTicketing: true,
+      ticketPrice: {
+        not: null,
+      },
+      ticketReleaseDate: {
+        lte: new Date(),
+      },
     },
-  });
-
-  const ticketsSold = await prisma.eventTickets.count({
-    where: {
-      eventId: event.id,
-      status: {
-        notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
+    include: {
+      _count: {
+        select: {
+          EventTickets: {
+            where: {
+              status: {
+                notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
+              },
+            },
+          },
+        },
       },
     },
   });
 
-  invariant(event.enableTicketing, "Event must have ticketing enabled");
-  invariant(event.ticketReleaseDate, "Event must have a ticket release date");
+  if (!event) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
 
-  const isSoldOut = event.ticketCapacity && ticketsSold >= event.ticketCapacity;
+  const isSoldOut = event._count.EventTickets >= (event.ticketCapacity ?? 0);
 
   // Check if sold out
-  if (isSoldOut || isBefore(new Date(), new Date(event.ticketReleaseDate))) {
-    return { isSoldOut, event };
+  if (isSoldOut) {
+    throw redirect(`/events/${event.id}`);
   }
 
   let ticket = await prisma.eventTickets.findUnique({
@@ -59,8 +70,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  invariant(event.ticketPrice, "Event must have a ticket price");
-
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
@@ -69,7 +78,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
           product_data: {
             name: event.name,
           },
-          unit_amount: Math.round(event.ticketPrice * 100),
+          unit_amount: Math.round((event.ticketPrice ?? 0) * 100),
         },
         quantity: 1,
       },
@@ -83,8 +92,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  invariant(session.url, "Stripe session URL is not set");
-
   await prisma.eventTickets.update({
     where: {
       id: ticket.id,
@@ -95,41 +102,5 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return redirect(session.url);
+  return redirect(session.url ?? `/events/${event.id}`);
 };
-
-const Page = () => {
-  const { isSoldOut, event } = useLoaderData<typeof loader>();
-
-  if (isSoldOut) {
-    return (
-      <Box textAlign="center" py={12}>
-        <styled.span fontSize="5xl">😢</styled.span>
-        <styled.h1 fontSize="2xl" fontWeight="bold">
-          This event is sold out
-        </styled.h1>
-        <styled.p mb={4}>
-          Try again as more tickets may have been released.
-        </styled.p>
-        <Form method="post" action={`/events/${event.id}/ticket`}>
-          <Button type="submit">Try Again</Button>
-        </Form>
-      </Box>
-    );
-  }
-
-  return (
-    <Box textAlign="center" py={12}>
-      <styled.h1 fontSize="2xl" fontWeight="bold">
-        Tickets not yet released
-      </styled.h1>
-      <styled.p mb={4}>
-        Tickets will be released on{" "}
-        {format(new Date(event.ticketReleaseDate ?? ""), "PPP")}
-      </styled.p>
-      <LinkButton to={`/events/${event.id}`}>Back to Event</LinkButton>
-    </Box>
-  );
-};
-
-export default Page;
