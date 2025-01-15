@@ -28,6 +28,7 @@ import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
 import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
+import type { EventTickets } from "@prisma/client";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -99,6 +100,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const { userId } = await getAuth(args);
   let isAttending = false;
+  let ticket: EventTickets | null = null;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -109,12 +111,20 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
 
     isAttending = !!userEventResponse;
+
+    ticket = await prisma.eventTickets.findFirst({
+      where: {
+        userId,
+        eventId: id,
+      },
+    });
   }
 
   return {
     isSoldOut,
     event,
     isAttending,
+    ticket,
   };
 };
 
@@ -150,7 +160,8 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending, isSoldOut } = useLoaderData<typeof loader>();
+  const { event, isAttending, isSoldOut, ticket } =
+    useLoaderData<typeof loader>();
   const startDate = useMemo(
     () => dateWithoutTimezone(event.startDate),
     [event]
@@ -261,12 +272,18 @@ const Page = () => {
           )}
 
           <Flex gap={2} pt={2}>
-            {event.enableTicketing && !isSoldOut && (
+            {event.enableTicketing && !isSoldOut && !ticket && (
               <Form method="post" action={`/events/${event.id}/ticket`}>
                 <Button type="submit" value="submit">
                   Buy Ticket <RiTicketFill />
                 </Button>
               </Form>
+            )}
+
+            {ticket && (
+              <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
+                View Ticket <RiTicketFill />
+              </LinkButton>
             )}
 
             {isSoldOut && (
