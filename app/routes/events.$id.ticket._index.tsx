@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { addMinutes, format, isBefore } from "date-fns";
@@ -9,7 +9,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
 
-export const action = async (args: ActionFunctionArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const { userId } = await getAuth(args);
 
@@ -95,7 +95,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { isSoldOut, event } = useLoaderData<typeof action>();
+  const { isSoldOut, event } = useLoaderData<typeof loader>();
 
   if (isSoldOut) {
     return (

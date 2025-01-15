@@ -275,7 +275,7 @@ const Page = () => {
             {event.enableTicketing &&
               !isSoldOut &&
               (!ticket || ticket.status !== TicketStatus.CONFIRMED) && (
-                <Form method="post" action={`/events/${event.id}/ticket`}>
+                <Form method="get" action={`/events/${event.id}/ticket`}>
                   <Button type="submit" value="submit">
                     Buy Ticket <RiTicketFill />
                   </Button>
