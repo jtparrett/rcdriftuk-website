@@ -8,6 +8,7 @@ import {
   format,
   formatDuration,
   intervalToDuration,
+  isAfter,
   startOfDay,
 } from "date-fns";
 import { useMemo } from "react";
@@ -275,27 +276,50 @@ const Page = () => {
           )}
 
           <Flex gap={2} pt={2}>
+            {event.ticketReleaseDate &&
+              event.enableTicketing &&
+              isAfter(new Date(), new Date(event.ticketReleaseDate)) && (
+                <>
+                  {isSoldOut && (
+                    <Button disabled>
+                      Sold Out <RiTicketFill />
+                    </Button>
+                  )}
+
+                  {!isSoldOut && (
+                    <>
+                      {(!ticket ||
+                        ticket.status !== TicketStatus.CONFIRMED) && (
+                        <SignedIn>
+                          <LinkButton to={`/events/${event.id}/ticket`}>
+                            Buy Ticket <RiTicketFill />
+                          </LinkButton>
+                        </SignedIn>
+                      )}
+
+                      <SignedOut>
+                        <Button
+                          onClick={() =>
+                            clerk.openSignIn({
+                              redirectUrl: `/events/${event.id}`,
+                            })
+                          }
+                        >
+                          Buy Ticket <RiTicketFill />
+                        </Button>
+                      </SignedOut>
+                    </>
+                  )}
+
+                  {ticket && ticket.status === TicketStatus.CONFIRMED && (
+                    <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
+                      View Ticket <RiTicketFill />
+                    </LinkButton>
+                  )}
+                </>
+              )}
+
             <SignedIn>
-              {event.enableTicketing &&
-                !isSoldOut &&
-                (!ticket || ticket.status !== TicketStatus.CONFIRMED) && (
-                  <LinkButton to={`/events/${event.id}/ticket`}>
-                    Buy Ticket <RiTicketFill />
-                  </LinkButton>
-                )}
-
-              {ticket && ticket.status === TicketStatus.CONFIRMED && (
-                <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
-                  View Ticket <RiTicketFill />
-                </LinkButton>
-              )}
-
-              {isSoldOut && (
-                <Button disabled>
-                  Sold Out <RiTicketFill />
-                </Button>
-              )}
-
               <Form method="post">
                 <Button type="submit" value="submit">
                   I'm {isAttending && "Not "}Going{" "}
@@ -308,24 +332,6 @@ const Page = () => {
               </Form>
             </SignedIn>
             <SignedOut>
-              {isSoldOut && (
-                <Button disabled>
-                  Sold Out <RiTicketFill />
-                </Button>
-              )}
-
-              {!isSoldOut && (
-                <Button
-                  onClick={() =>
-                    clerk.openSignIn({
-                      redirectUrl: `/events/${event.id}`,
-                    })
-                  }
-                >
-                  Buy Ticket <RiTicketFill />
-                </Button>
-              )}
-
               <Button
                 onClick={() =>
                   clerk.openSignIn({
