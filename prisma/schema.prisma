@@ -8,6 +8,7 @@ datasource db {
 }
 
 model Events {
+  cover             String?
   name              String
   track             String?
   startDate         DateTime

@@ -20,7 +20,7 @@ import {
 import { z } from "zod";
 import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
-import { styled, Box, Container, Flex } from "~/styled-system/jsx";
+import { styled, Box, Container, Flex, AspectRatio } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
@@ -181,174 +181,184 @@ const Page = () => {
           borderWidth={1}
           borderColor="gray.800"
           rounded="xl"
-          p={{ base: 8, md: 12 }}
+          overflow="hidden"
           flex={1}
           maxW={800}
         >
-          <Box
-            borderWidth={1}
-            borderColor="brand.500"
-            rounded="md"
-            overflow="hidden"
-            textAlign="center"
-            display="inline-block"
-          >
-            <Box h={3} bgColor="brand.500" />
-            <styled.span
-              fontWeight="black"
-              fontSize="3xl"
-              px={3}
-              py={1}
-              display="block"
+          {event.cover && (
+            <AspectRatio ratio={16 / 9}>
+              <styled.img src={event.cover} alt={event.name} />
+            </AspectRatio>
+          )}
+
+          <Box p={{ base: 8, md: 12 }}>
+            <Box
+              borderWidth={1}
+              borderColor="brand.500"
+              rounded="md"
+              overflow="hidden"
+              textAlign="center"
+              display="inline-block"
             >
-              {format(startDate, "dd")}
-            </styled.span>
-          </Box>
-
-          <styled.p color="brand.500" fontWeight="bold">
-            {getEventDate(startDate, endDate)}
-          </styled.p>
-
-          <styled.h1 fontSize="3xl" fontWeight="black">
-            {event.name}
-          </styled.h1>
-
-          {event.description && (
-            <Box mb={4}>
-              <Markdown>{event.description}</Markdown>
-            </Box>
-          )}
-
-          <styled.p color="gray.500" fontSize="sm">
-            Duration:{" "}
-            {formatDuration(
-              intervalToDuration({
-                start: startDate,
-                end: endDate,
-              })
-            )}
-          </styled.p>
-          <styled.p fontSize="sm" color="gray.500">
-            {event._count.responses}{" "}
-            {pluralize("people", event._count.responses)} responded
-          </styled.p>
-
-          {event._count.responses > 0 && (
-            <Flex mt={1} flexWrap="wrap">
-              {event.responses.map((response) => {
-                if (!response.user) return null;
-
-                return (
-                  <Box
-                    key={response.id}
-                    overflow="hidden"
-                    rounded="full"
-                    w="40px"
-                    h="40px"
-                    mr={-3}
-                    bgColor="gray.400"
-                  >
-                    <styled.img
-                      title={
-                        response.user.firstName + " " + response.user.lastName
-                      }
-                      src={response.user.image ?? ""}
-                      alt={`${response.user.firstName ?? ""} ${
-                        response.user.lastName ?? ""
-                      }`}
-                    />
-                  </Box>
-                );
-              })}
-            </Flex>
-          )}
-
-          <styled.span fontWeight="semibold" mt={4} display="block">
-            You are currently {isAttending ? "going" : "not going"} to this
-            event
-          </styled.span>
-
-          {!isAttending && (
-            <styled.span fontSize="sm" color="gray.500" display="block">
-              Let the host know you're interested in this event by responding
-              below:
-            </styled.span>
-          )}
-
-          <Flex gap={2} pt={2}>
-            {event.ticketReleaseDate &&
-              event.enableTicketing &&
-              isAfter(new Date(), new Date(event.ticketReleaseDate)) && (
-                <>
-                  {isSoldOut && (
-                    <Button disabled>
-                      Sold Out <RiTicketFill />
-                    </Button>
-                  )}
-
-                  {!isSoldOut && (
-                    <>
-                      {(!ticket ||
-                        ticket.status !== TicketStatus.CONFIRMED) && (
-                        <SignedIn>
-                          <LinkButton to={`/events/${event.id}/ticket`}>
-                            Buy Ticket <RiTicketFill />
-                          </LinkButton>
-                        </SignedIn>
-                      )}
-
-                      <SignedOut>
-                        <Button
-                          onClick={() =>
-                            clerk.openSignIn({
-                              redirectUrl: `/events/${event.id}`,
-                            })
-                          }
-                        >
-                          Buy Ticket <RiTicketFill />
-                        </Button>
-                      </SignedOut>
-                    </>
-                  )}
-
-                  {ticket && ticket.status === TicketStatus.CONFIRMED && (
-                    <LinkButton to={`/events/${event.id}/ticket/${ticket.id}`}>
-                      View Ticket <RiTicketFill />
-                    </LinkButton>
-                  )}
-                </>
-              )}
-
-            <SignedIn>
-              <Form method="post">
-                <Button type="submit" value="submit">
-                  I'm {isAttending && "Not "}Going{" "}
-                  {isAttending ? (
-                    <RiCloseCircleFill />
-                  ) : (
-                    <RiCheckboxCircleFill />
-                  )}
-                </Button>
-              </Form>
-            </SignedIn>
-            <SignedOut>
-              <Button
-                onClick={() =>
-                  clerk.openSignIn({
-                    redirectUrl: `/events/${event.id}`,
-                  })
-                }
+              <Box h={3} bgColor="brand.500" />
+              <styled.span
+                fontWeight="black"
+                fontSize="3xl"
+                px={3}
+                py={1}
+                display="block"
               >
-                I'm Going <RiCheckboxCircleFill />
-              </Button>
-            </SignedOut>
+                {format(startDate, "dd")}
+              </styled.span>
+            </Box>
 
-            {event.link && (
-              <LinkButton to={event.link} target="_blank" variant="secondary">
-                More Info
-              </LinkButton>
+            <styled.p color="brand.500" fontWeight="bold">
+              {getEventDate(startDate, endDate)}
+            </styled.p>
+
+            <styled.h1 fontSize="3xl" fontWeight="black">
+              {event.name}
+            </styled.h1>
+
+            {event.description && (
+              <Box mb={4}>
+                <Markdown>{event.description}</Markdown>
+              </Box>
             )}
-          </Flex>
+
+            <styled.p color="gray.500" fontSize="sm">
+              Duration:{" "}
+              {formatDuration(
+                intervalToDuration({
+                  start: startDate,
+                  end: endDate,
+                })
+              )}
+            </styled.p>
+            <styled.p fontSize="sm" color="gray.500">
+              {event._count.responses}{" "}
+              {pluralize("people", event._count.responses)} responded
+            </styled.p>
+
+            {event._count.responses > 0 && (
+              <Flex mt={1} flexWrap="wrap">
+                {event.responses.map((response) => {
+                  if (!response.user) return null;
+
+                  return (
+                    <Box
+                      key={response.id}
+                      overflow="hidden"
+                      rounded="full"
+                      w="40px"
+                      h="40px"
+                      mr={-3}
+                      bgColor="gray.400"
+                    >
+                      <styled.img
+                        title={
+                          response.user.firstName + " " + response.user.lastName
+                        }
+                        src={response.user.image ?? ""}
+                        alt={`${response.user.firstName ?? ""} ${
+                          response.user.lastName ?? ""
+                        }`}
+                      />
+                    </Box>
+                  );
+                })}
+              </Flex>
+            )}
+
+            <styled.span fontWeight="semibold" mt={4} display="block">
+              You are currently {isAttending ? "going" : "not going"} to this
+              event
+            </styled.span>
+
+            {!isAttending && (
+              <styled.span fontSize="sm" color="gray.500" display="block">
+                Let the host know you're interested in this event by responding
+                below:
+              </styled.span>
+            )}
+
+            <Flex gap={2} pt={2}>
+              {event.ticketReleaseDate &&
+                event.enableTicketing &&
+                isAfter(new Date(), new Date(event.ticketReleaseDate)) && (
+                  <>
+                    {isSoldOut && (
+                      <Button disabled>
+                        Sold Out <RiTicketFill />
+                      </Button>
+                    )}
+
+                    {!isSoldOut && (
+                      <>
+                        {(!ticket ||
+                          ticket.status !== TicketStatus.CONFIRMED) && (
+                          <SignedIn>
+                            <LinkButton to={`/events/${event.id}/ticket`}>
+                              Buy Ticket <RiTicketFill />
+                            </LinkButton>
+                          </SignedIn>
+                        )}
+
+                        <SignedOut>
+                          <Button
+                            onClick={() =>
+                              clerk.openSignIn({
+                                redirectUrl: `/events/${event.id}`,
+                              })
+                            }
+                          >
+                            Buy Ticket <RiTicketFill />
+                          </Button>
+                        </SignedOut>
+                      </>
+                    )}
+
+                    {ticket && ticket.status === TicketStatus.CONFIRMED && (
+                      <LinkButton
+                        to={`/events/${event.id}/ticket/${ticket.id}`}
+                      >
+                        View Ticket <RiTicketFill />
+                      </LinkButton>
+                    )}
+                  </>
+                )}
+
+              <SignedIn>
+                <Form method="post">
+                  <Button type="submit" value="submit">
+                    I'm {isAttending && "Not "}Going{" "}
+                    {isAttending ? (
+                      <RiCloseCircleFill />
+                    ) : (
+                      <RiCheckboxCircleFill />
+                    )}
+                  </Button>
+                </Form>
+              </SignedIn>
+              <SignedOut>
+                <Button
+                  onClick={() =>
+                    clerk.openSignIn({
+                      redirectUrl: `/events/${event.id}`,
+                    })
+                  }
+                >
+                  I'm Going <RiCheckboxCircleFill />
+                </Button>
+              </SignedOut>
+
+              {event.link && (
+                <LinkButton to={event.link} target="_blank" variant="secondary">
+                  More Info
+                </LinkButton>
+              )}
+            </Flex>
+          </Box>
         </Box>
 
         {event.eventTrack && (
