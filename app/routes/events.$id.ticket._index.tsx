@@ -2,7 +2,7 @@ import { TicketStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { addMinutes, format, isBefore } from "date-fns";
+import { format, isBefore } from "date-fns";
 import invariant from "tiny-invariant";
 import { Button, LinkButton } from "~/components/Button";
 import { Box, styled } from "~/styled-system/jsx";
@@ -77,7 +77,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     mode: "payment",
     success_url: `https://rcdrift.uk/events/${event.id}/ticket/success?ticketId=${ticket.id}`,
     cancel_url: `https://rcdrift.uk/events/${event.id}`,
-    expires_at: Math.floor(addMinutes(new Date(), 10).getTime() / 1000),
     metadata: {
       userId,
       ticketId: ticket.id,
