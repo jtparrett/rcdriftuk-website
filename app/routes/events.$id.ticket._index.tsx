@@ -90,6 +90,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       id: ticket.id,
     },
     data: {
+      status: TicketStatus.PENDING,
       sessionId: session.id,
     },
   });
