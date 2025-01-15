@@ -290,9 +290,9 @@ const Page = () => {
             )}
 
             {isSoldOut && (
-              <styled.span fontSize="sm" color="gray.500">
-                This event is sold out
-              </styled.span>
+              <Button disabled>
+                Sold Out <RiTicketFill />
+              </Button>
             )}
 
             <SignedIn>
