@@ -4,7 +4,7 @@ import { Form, useLoaderData } from "@remix-run/react";
 import { addMinutes, format, isBefore } from "date-fns";
 import invariant from "tiny-invariant";
 import { Button, LinkButton } from "~/components/Button";
-import { Box, Center, styled } from "~/styled-system/jsx";
+import { Box, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
@@ -33,7 +33,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const isSoldOut = event.ticketCapacity && ticketsSold >= event.ticketCapacity;
 
   // Check if sold out
-  if (isSoldOut || isBefore(new Date(event.ticketReleaseDate), new Date())) {
+  if (isSoldOut || isBefore(new Date(), new Date(event.ticketReleaseDate))) {
     return { isSoldOut, event };
   }
 
@@ -99,25 +99,23 @@ const Page = () => {
 
   if (isSoldOut) {
     return (
-      <Center minH="50vh">
-        <Box textAlign="center">
-          <styled.span fontSize="5xl">😢</styled.span>
-          <styled.h1 fontSize="2xl" fontWeight="bold">
-            This event is sold out
-          </styled.h1>
-          <styled.p mb={4}>
-            Try again as more tickets may have been released.
-          </styled.p>
-          <Form method="post" action={`/events/${event.id}`}>
-            <Button type="submit">Try Again</Button>
-          </Form>
-        </Box>
-      </Center>
+      <Box textAlign="center" py={12}>
+        <styled.span fontSize="5xl">😢</styled.span>
+        <styled.h1 fontSize="2xl" fontWeight="bold">
+          This event is sold out
+        </styled.h1>
+        <styled.p mb={4}>
+          Try again as more tickets may have been released.
+        </styled.p>
+        <Form method="post" action={`/events/${event.id}`}>
+          <Button type="submit">Try Again</Button>
+        </Form>
+      </Box>
     );
   }
 
   return (
-    <Box textAlign="center">
+    <Box textAlign="center" py={12}>
       <styled.h1 fontSize="2xl" fontWeight="bold">
         Tickets not yet released
       </styled.h1>
