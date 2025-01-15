@@ -8,19 +8,44 @@ datasource db {
 }
 
 model Events {
-  name        String
-  track       String?
-  startDate   DateTime
-  endDate     DateTime
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @default(now()) @updatedAt
-  approved    Boolean          @default(false)
-  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  link        String?          @default("")
-  trackId     String?          @db.Uuid
-  description String?
-  responses   EventResponses[]
-  eventTrack  Tracks?          @relation(fields: [trackId], references: [id])
+  name              String
+  track             String?
+  startDate         DateTime
+  endDate           DateTime
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now()) @updatedAt
+  approved          Boolean          @default(false)
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link              String?          @default("")
+  trackId           String?          @db.Uuid
+  description       String?
+  responses         EventResponses[]
+  eventTrack        Tracks?          @relation(fields: [trackId], references: [id])
+  enableTicketing   Boolean          @default(false)
+  ticketCapacity    Int?
+  EventTickets      EventTickets[]
+  ticketReleaseDate DateTime?
+  earlyAccessCode   String?
+  ticketPrice       Float?
+}
+
+model EventTickets {
+  id        Int          @id @default(autoincrement())
+  eventId   String       @db.Uuid
+  event     Events       @relation(fields: [eventId], references: [id])
+  userId    String?
+  user      Users?       @relation(fields: [userId], references: [id])
+  status    TicketStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now()) @updatedAt
+
+  @@unique([eventId, userId])
+}
+
+enum TicketStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
 }
 
 model EventResponses {
@@ -166,6 +191,7 @@ model Users {
   ratingsWins       DriverRatingBattles[] @relation("driverRatingsWins")
   TournamentJudges  TournamentJudges[]
   TournamentDrivers TournamentDrivers[]
+  EventTickets      EventTickets[]
 }
 
 model Products {

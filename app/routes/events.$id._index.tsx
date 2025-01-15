@@ -27,6 +27,7 @@ import { getEventDate } from "~/utils/getEventDate";
 import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
+import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -86,7 +87,18 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
+  await clearPendingTickets(event.id);
+
+  const ticketsSold = await prisma.eventTickets.count({
+    where: {
+      eventId: id,
+    },
+  });
+
+  const isSoldOut = event.ticketCapacity && ticketsSold >= event.ticketCapacity;
+
   const { userId } = await getAuth(args);
+  let isAttending = false;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -96,17 +108,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    const isAttending = !!userEventResponse;
-
-    return {
-      event,
-      isAttending,
-    };
+    isAttending = !!userEventResponse;
   }
 
   return {
+    isSoldOut,
     event,
-    isAttending: false,
+    isAttending,
   };
 };
 
@@ -142,13 +150,12 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending } = useLoaderData<typeof loader>();
+  const { event, isAttending, isSoldOut } = useLoaderData<typeof loader>();
   const startDate = useMemo(
     () => dateWithoutTimezone(event.startDate),
     [event]
   );
   const endDate = useMemo(() => dateWithoutTimezone(event.endDate), [event]);
-  const hasTicketLink = event.link?.includes("tickettailor") ?? false;
 
   const clerk = useClerk();
 
@@ -254,10 +261,18 @@ const Page = () => {
           )}
 
           <Flex gap={2} pt={2}>
-            {event.link && hasTicketLink && (
-              <LinkButton to={event.link} target="_blank">
-                Buy Tickets <RiTicketFill />
-              </LinkButton>
+            {event.enableTicketing && !isSoldOut && (
+              <Form method="post" action={`/events/${event.id}/ticket`}>
+                <Button type="submit" value="submit">
+                  Buy Ticket <RiTicketFill />
+                </Button>
+              </Form>
+            )}
+
+            {isSoldOut && (
+              <styled.span fontSize="sm" color="gray.500">
+                This event is sold out
+              </styled.span>
             )}
 
             <SignedIn>
@@ -284,7 +299,7 @@ const Page = () => {
               </Button>
             </SignedOut>
 
-            {event.link && !hasTicketLink && (
+            {event.link && (
               <LinkButton to={event.link} target="_blank" variant="secondary">
                 More Info
               </LinkButton>

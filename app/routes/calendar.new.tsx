@@ -1,23 +1,18 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import {
-  add,
-  differenceInWeeks,
-  endOfYear,
-  format,
-  setHours,
-  setMinutes,
-} from "date-fns";
-import { Fragment, useState } from "react";
+import { add, differenceInWeeks, endOfYear, sub } from "date-fns";
+import { useState } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { DatePicker } from "~/components/DatePicker";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
+import { MoneyInput } from "~/components/MoneyInput";
 import { Select } from "~/components/Select";
 import { Textarea } from "~/components/Textarea";
+import { TimePicker } from "~/components/TimePicker";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
@@ -58,51 +53,54 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(userData?.trackId, "User does not own a track");
 
   const name = body.get("name");
-  const date = body.get("date");
-  const startTime = body.get("startTime");
-  const endTime = body.get("endTime");
+  const startDate = body.get("startDate");
+  const endDate = body.get("endDate");
   const link = body.get("link");
   const repeatWeeks = body.get("repeatWeeks");
   const description = body.get("description");
+  const enableTicketing = body.get("enableTicketing");
+  const ticketCapacity = body.get("ticketCapacity");
+  const ticketReleaseDate = body.get("ticketReleaseDate");
+  const earlyAccessCode = body.get("earlyAccessCode");
+  const ticketPrice = body.get("ticketPrice");
 
   const data = z
     .object({
       name: z.string(),
-      date: z.coerce.date(),
+      startDate: z.coerce.date(),
+      endDate: z.coerce.date(),
       link: z.string().optional(),
-      startTime: z.string(),
-      endTime: z.string(),
       repeatWeeks: z.coerce.number(),
       description: z.string().optional(),
+      enableTicketing: z.coerce.boolean().optional(),
+      ticketCapacity: z.coerce.number().nullable(),
+      ticketReleaseDate: z.coerce.date().nullable(),
+      earlyAccessCode: z.string().nullable(),
+      ticketPrice: z.coerce.number().nullable(),
     })
     .parse({
       name,
-      date,
-      startTime,
-      endTime,
+      startDate,
+      endDate,
       link,
       repeatWeeks,
       description,
+      enableTicketing,
+      ticketCapacity,
+      ticketReleaseDate,
+      earlyAccessCode,
+      ticketPrice,
     });
 
-  const [startHours, startMinutes] = data.startTime.split(":");
-  const [endHours, endMinutes] = data.endTime.split(":");
-  const startDate = setMinutes(
-    setHours(data.date, parseInt(startHours)),
-    parseInt(startMinutes)
-  );
-  const endDate = setMinutes(
-    setHours(data.date, parseInt(endHours)),
-    parseInt(endMinutes)
-  );
-
-  const diff = differenceInWeeks(endOfYear(startDate), startDate);
+  const diff = differenceInWeeks(endOfYear(data.startDate), data.startDate);
   const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
 
   await prisma.events.createMany({
     data: Array.from({ length: arrayLength }).map((_, i) => {
-      const repeatStartDate = add(startDate, { weeks: i * data.repeatWeeks });
-      const repeatEndDate = add(endDate, { weeks: i * data.repeatWeeks });
+      const repeatStartDate = add(data.startDate, {
+        weeks: i * data.repeatWeeks,
+      });
+      const repeatEndDate = add(data.endDate, { weeks: i * data.repeatWeeks });
 
       return {
         name: data.name,
@@ -112,6 +110,11 @@ export const action = async (args: ActionFunctionArgs) => {
         endDate: repeatEndDate,
         description: data.description,
         approved: true,
+        enableTicketing: data.enableTicketing,
+        ticketCapacity: data.ticketCapacity,
+        ticketReleaseDate: data.ticketReleaseDate,
+        earlyAccessCode: data.earlyAccessCode,
+        ticketPrice: data.ticketPrice,
       };
     }),
   });
@@ -120,7 +123,10 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const CalendarNewPage = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(add(new Date(), { days: 1 }));
+  const [endDate, setEndDate] = useState(add(new Date(), { days: 1 }));
+  const [enableTicketing, setEnableTicketing] = useState(false);
+  const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
 
   return (
     <Box pb={12}>
@@ -131,50 +137,38 @@ const CalendarNewPage = () => {
         <Flex flexDir="column" maxW={500} gap={4}>
           <Box>
             <Label>Date</Label>
-            <Input
-              name="date"
-              type="hidden"
-              required
-              value={format(selectedDate, "MM/dd/yyyy")}
-            />
             <DatePicker
-              value={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
+              value={startDate}
+              onChange={(date) => {
+                setStartDate(date);
+                setEndDate(date);
+              }}
             />
           </Box>
 
-          <Box>
-            <Flex gap={2}>
-              <Box flex={1}>
-                <Label>Start Time (24hr)</Label>
-                <Select name="startTime" required>
-                  {Array.from({ length: 24 }).map((_, i) => {
-                    const hours = i.toString().padStart(2, "0");
-                    return (
-                      <Fragment key={i}>
-                        <option>{hours}:00</option>
-                        <option>{hours}:30</option>
-                      </Fragment>
-                    );
-                  })}
-                </Select>
-              </Box>
+          <Box flex={1}>
+            <Label>Start Time</Label>
+            <Input
+              type="hidden"
+              name="startDate"
+              required
+              value={startDate.toISOString()}
+            />
+            <TimePicker
+              value={startDate}
+              onChange={(date) => setStartDate(date)}
+            />
+          </Box>
 
-              <Box flex={1}>
-                <Label>End Time (24hr)</Label>
-                <Select name="endTime" required>
-                  {Array.from({ length: 24 }).map((_, i) => {
-                    const hours = i.toString().padStart(2, "0");
-                    return (
-                      <Fragment key={i}>
-                        <option>{hours}:00</option>
-                        <option>{hours}:30</option>
-                      </Fragment>
-                    );
-                  })}
-                </Select>
-              </Box>
-            </Flex>
+          <Box flex={1}>
+            <Label>End Time</Label>
+            <Input
+              type="hidden"
+              name="endDate"
+              required
+              value={endDate.toISOString()}
+            />
+            <TimePicker value={endDate} onChange={(date) => setEndDate(date)} />
           </Box>
 
           <Box>
@@ -200,6 +194,80 @@ const CalendarNewPage = () => {
             <Label>Event Description</Label>
             <Textarea name="description" />
           </Box>
+
+          <Box>
+            <Label>Enable Ticketing</Label>
+            <input
+              type="hidden"
+              name="enableTicketing"
+              value={enableTicketing ? "true" : "false"}
+            />
+            <Flex overflow="hidden" rounded="md">
+              <Button
+                rounded="none"
+                variant={enableTicketing ? "secondary" : "primary"}
+                flex={1}
+                onClick={() => setEnableTicketing(false)}
+              >
+                Disable
+              </Button>
+              <Button
+                rounded="none"
+                variant={enableTicketing ? "primary" : "secondary"}
+                flex={1}
+                onClick={() => setEnableTicketing(true)}
+              >
+                Enable
+              </Button>
+            </Flex>
+          </Box>
+
+          {enableTicketing && (
+            <>
+              <Box>
+                <Label>Ticket Capacity</Label>
+                <Input
+                  name="ticketCapacity"
+                  type="number"
+                  defaultValue={0}
+                  required
+                />
+              </Box>
+
+              <Box>
+                <Label>Ticket Price</Label>
+                <MoneyInput name="ticketPrice" required />
+              </Box>
+
+              <Box>
+                <Label>Ticket Release Date</Label>
+                <Input
+                  name="ticketReleaseDate"
+                  type="hidden"
+                  required
+                  value={ticketReleaseDate.toISOString()}
+                />
+                <DatePicker
+                  value={ticketReleaseDate}
+                  maxDate={sub(startDate, { days: 1 })}
+                  onChange={(date) => setTicketReleaseDate(date)}
+                />
+              </Box>
+
+              <Box>
+                <Label>Ticket Release Time</Label>
+                <TimePicker
+                  value={ticketReleaseDate}
+                  onChange={(date) => setTicketReleaseDate(date)}
+                />
+              </Box>
+
+              <Box>
+                <Label>Early Access Code</Label>
+                <Input name="earlyAccessCode" required />
+              </Box>
+            </>
+          )}
 
           <Button type="submit">List Event</Button>
         </Flex>

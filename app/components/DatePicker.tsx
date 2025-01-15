@@ -7,6 +7,7 @@ import {
   startOfMonth,
   startOfWeek,
   sub,
+  isAfter,
 } from "date-fns";
 import { useState } from "react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
@@ -15,9 +16,14 @@ import { Box, Flex, styled } from "~/styled-system/jsx";
 interface Props {
   value: Date;
   onChange: (date: Date) => void;
+  maxDate?: Date;
 }
 
-export const DatePicker = ({ value = new Date(), onChange }: Props) => {
+export const DatePicker = ({
+  value = new Date(),
+  onChange,
+  maxDate,
+}: Props) => {
   const [selectedMonth, setSelectedMonth] = useState(startOfMonth(value));
   const monthStartDate = startOfMonth(selectedMonth);
 
@@ -82,17 +88,20 @@ export const DatePicker = ({ value = new Date(), onChange }: Props) => {
           });
 
           const isSelected = isSameDay(day, value);
+          const isDisabled = maxDate && isAfter(day, maxDate);
 
           return (
             <styled.button
               key={i}
               type="button"
-              color="inherit"
+              color={isDisabled ? "gray.600" : "inherit"}
               w={`calc(${100 / 7}% - 1px)`}
               textAlign="center"
               py={2}
               bgColor={isSelected ? "brand.500" : "gray.900"}
-              onClick={() => onChange(day)}
+              onClick={() => !isDisabled && onChange(day)}
+              disabled={isDisabled}
+              cursor={isDisabled ? "not-allowed" : "pointer"}
             >
               {format(day, "do")}
             </styled.button>
