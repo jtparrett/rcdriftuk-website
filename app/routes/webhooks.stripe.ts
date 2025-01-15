@@ -71,7 +71,38 @@ export async function action(args: ActionFunctionArgs) {
         },
       });
 
-      // await sendEmail(ticket.user?.email ?? "", "Ticket Confirmed", "Ticket Confirmed");
+      await sendEmail(
+        session.customer_email ?? "",
+        `Your ticket for ${ticket.event.name}`,
+        `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #333; margin-bottom: 24px;">Ticket Confirmed! 🎉</h1>
+          
+          <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 16px;">
+            Great news! Your ticket for <strong>${ticket.event.name}</strong> has been confirmed and paid for.
+          </p>
+
+          <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 24px 0;">
+            <h2 style="color: #333; font-size: 18px; margin-bottom: 12px;">Event Details</h2>
+            <p style="color: #666; margin: 8px 0;">
+              <strong>Event:</strong> ${ticket.event.name}<br>
+              <strong>Date:</strong> ${new Date(ticket.event.startDate).toLocaleDateString()}<br>
+              ${ticket.event.track ? `<strong>Location:</strong> ${ticket.event.track}<br>` : ""}
+            </p>
+          </div>
+
+          <p style="color: #666; font-size: 16px; line-height: 1.5;">
+            We look forward to seeing you there! If you have any questions, please don't hesitate to contact us.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+          
+          <p style="color: #999; font-size: 14px;">
+            This is an automated message from RC Drift UK. Please do not reply to this email.
+          </p>
+        </div>
+        `
+      );
     }
 
     if (event.type === "checkout.session.expired") {
