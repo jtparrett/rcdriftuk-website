@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/remix/ssr.server";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useParams } from "@remix-run/react";
+import { addMinutes } from "date-fns";
 import invariant from "tiny-invariant";
 import { Button } from "~/components/Button";
 import { Box, Center, styled } from "~/styled-system/jsx";
@@ -67,6 +68,7 @@ export const action = async (args: ActionFunctionArgs) => {
     mode: "payment",
     success_url: `https://rcdrift.uk/events/${event.id}/ticket/success?ticketId=${ticket.id}`,
     cancel_url: `https://rcdrift.uk/events/${event.id}`,
+    expires_at: Math.floor(addMinutes(new Date(), 10).getTime() / 1000),
     metadata: {
       userId,
       ticketId: ticket.id,
