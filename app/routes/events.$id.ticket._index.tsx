@@ -111,7 +111,7 @@ const Page = () => {
         <styled.p mb={4}>
           Try again as more tickets may have been released.
         </styled.p>
-        <Form method="post" action={`/events/${event.id}`}>
+        <Form method="post" action={`/events/${event.id}/ticket`}>
           <Button type="submit">Try Again</Button>
         </Form>
       </Box>
