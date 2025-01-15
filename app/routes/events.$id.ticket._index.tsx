@@ -9,8 +9,8 @@ import { stripe } from "~/utils/stripe.server";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const { userId } = await getAuth(args);
-  const searchParams = new URLSearchParams(args.request.url);
-  const earlyAccessCode = searchParams.get("code");
+  const url = new URL(args.request.url);
+  const earlyAccessCode = url.searchParams.get("code");
 
   invariant(userId, "Unauthorized");
 
