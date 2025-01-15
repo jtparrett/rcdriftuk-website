@@ -1,4 +1,3 @@
-import { getAuth } from "@clerk/remix/ssr.server";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
@@ -6,6 +5,7 @@ import { addMinutes, format, isBefore } from "date-fns";
 import invariant from "tiny-invariant";
 import { Button, LinkButton } from "~/components/Button";
 import { Box, Center, styled } from "~/styled-system/jsx";
+import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
 
