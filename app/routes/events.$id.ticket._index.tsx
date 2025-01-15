@@ -1,3 +1,4 @@
+import { TicketStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
@@ -24,6 +25,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const ticketsSold = await prisma.eventTickets.count({
     where: {
       eventId: event.id,
+      status: {
+        not: TicketStatus.CANCELLED,
+      },
     },
   });
 

@@ -93,6 +93,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const ticketsSold = await prisma.eventTickets.count({
     where: {
       eventId: id,
+      status: {
+        not: TicketStatus.CANCELLED,
+      },
     },
   });
 
