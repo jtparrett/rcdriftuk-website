@@ -4,10 +4,11 @@ import {
   add,
   endOfWeek,
   format,
-  isSameDay,
   parse,
   startOfWeek,
   sub,
+  startOfDay,
+  endOfDay,
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { LoaderFunctionArgs } from "react-router";
@@ -28,14 +29,22 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const events = await prisma.events.findMany({
     where: {
       approved: true,
-      startDate: {
-        gte: startOfWeek(date, {
-          weekStartsOn: 1,
-        }),
-        lte: endOfWeek(date, {
-          weekStartsOn: 1,
-        }),
-      },
+      AND: [
+        {
+          startDate: {
+            lte: endOfWeek(date, {
+              weekStartsOn: 1,
+            }),
+          },
+        },
+        {
+          endDate: {
+            gte: startOfWeek(date, {
+              weekStartsOn: 1,
+            }),
+          },
+        },
+      ],
     },
     orderBy: {
       startDate: "asc",
@@ -96,8 +105,10 @@ const CalendarWeeksPage = () => {
       <Flex py={2} flexDir="column" gap={2}>
         {Array.from(new Array(7)).map((_, i) => {
           const day = add(startWeekDate, { days: i });
-          const dayEvents = events.filter((event) =>
-            isSameDay(new Date(event.startDate), day)
+          const dayEvents = events.filter(
+            (event) =>
+              startOfDay(new Date(event.endDate)) >= startOfDay(day) &&
+              startOfDay(new Date(event.startDate)) <= endOfDay(day)
           );
 
           return (

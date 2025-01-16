@@ -1,7 +1,8 @@
 import { useLoaderData, useParams } from "@remix-run/react";
 import { add, endOfDay, format, parse, startOfDay, sub } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import { LoaderFunctionArgs, redirect } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -19,10 +20,18 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const events = await prisma.events.findMany({
     where: {
       approved: true,
-      startDate: {
-        gte: startOfDay(date),
-        lte: endOfDay(date),
-      },
+      AND: [
+        {
+          startDate: {
+            lte: endOfDay(date),
+          },
+        },
+        {
+          endDate: {
+            gte: startOfDay(date),
+          },
+        },
+      ],
     },
     include: {
       eventTrack: true,

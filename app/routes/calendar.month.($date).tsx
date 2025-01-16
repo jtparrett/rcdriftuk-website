@@ -1,4 +1,5 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
 import {
   add,
@@ -6,10 +7,11 @@ import {
   endOfMonth,
   format,
   getDaysInMonth,
-  isSameDay,
   parse,
   startOfMonth,
   startOfWeek,
+  startOfDay,
+  endOfDay,
 } from "date-fns";
 import invariant from "tiny-invariant";
 import { styled, Box, Flex, Center } from "~/styled-system/jsx";
@@ -34,10 +36,18 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const events = await prisma.events.findMany({
     where: {
       approved: true,
-      startDate: {
-        gte: startOfMonth(date),
-        lte: endOfMonth(date),
-      },
+      AND: [
+        {
+          startDate: {
+            lte: endOfMonth(date),
+          },
+        },
+        {
+          endDate: {
+            gte: startOfMonth(date),
+          },
+        },
+      ],
     },
     include: {
       eventTrack: true,
@@ -76,8 +86,10 @@ const Page = () => {
           days: i,
         });
 
-        const dayEvents = events.filter((event) =>
-          isSameDay(new Date(event.startDate), day)
+        const dayEvents = events.filter(
+          (event) =>
+            startOfDay(new Date(event.endDate)) >= startOfDay(day) &&
+            startOfDay(new Date(event.startDate)) <= endOfDay(day)
         );
 
         return (
