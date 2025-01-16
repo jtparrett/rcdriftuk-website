@@ -588,7 +588,7 @@ const Page = () => {
               </P>
 
               <ImageContainer>
-                <styled.img src="/driver-profile.png" w="full" />
+                <styled.img src="/2025/rcdriftuk-ratings-promo.jpg" w="full" />
               </ImageContainer>
             </CollapsibleCard>
 
