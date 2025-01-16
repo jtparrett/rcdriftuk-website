@@ -10,6 +10,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
   useRouteError,
 } from "@remix-run/react";
 import { Box, Center, styled } from "~/styled-system/jsx";
@@ -24,6 +25,7 @@ import { userPrefs } from "./utils/cookiePolicy.server";
 import { LinkButton } from "./components/Button";
 import { RiHome2Line } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
+import { Footer } from "./components/Footer";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -46,7 +48,6 @@ export const loader = (args: LoaderFunctionArgs) =>
   rootAuthLoader(args, async ({ request }) => {
     const cookieHeader = request.headers.get("Cookie");
     const cookie = (await userPrefs.parse(cookieHeader)) || {};
-    const { pathname } = new URL(request.url);
 
     const { userId } = request.auth;
 
@@ -55,20 +56,19 @@ export const loader = (args: LoaderFunctionArgs) =>
       return {
         user,
         hideBanner: cookie.hideBanner,
-        pathname,
       };
     }
 
     return {
       user: null,
       hideBanner: cookie.hideBanner,
-      pathname,
     };
   });
 
 function App() {
-  const { hideBanner, user, pathname } = useLoaderData<typeof loader>();
-  const isEmbed = pathname.includes("/embed/");
+  const { hideBanner, user } = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const isMap = location.pathname.includes("/map");
 
   return (
     <html lang="en">
@@ -85,9 +85,10 @@ function App() {
         ></script>
       </head>
       <body>
-        {!isEmbed && !hideBanner && <CookieBanner />}
-        {!isEmbed && <Header user={user} />}
+        {!hideBanner && <CookieBanner />}
+        <Header user={user} />
         <Outlet />
+        {!isMap && <Footer />}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

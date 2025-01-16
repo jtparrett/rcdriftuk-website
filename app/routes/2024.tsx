@@ -1,9 +1,8 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLocation } from "@remix-run/react";
-import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 import { Tab } from "~/components/Tab";
-import { styled, Box, Flex, Container } from "~/styled-system/jsx";
+import { Box, Flex, Container } from "~/styled-system/jsx";
 
 export const meta: MetaFunction = () => {
   return [
@@ -57,33 +56,6 @@ const Page = () => {
       </Box>
 
       <Outlet />
-
-      <Box
-        borderTopWidth={1}
-        borderColor="gray.800"
-        py={8}
-        textAlign="center"
-        mt={4}
-      >
-        <Flex justifyContent="center" gap={4} pb={4}>
-          <styled.a
-            fontSize="2xl"
-            target="_blank"
-            href="https://www.facebook.com/RCDRIFTUK2024/"
-          >
-            <RiFacebookFill />
-          </styled.a>
-
-          <styled.a
-            target="_blank"
-            fontSize="2xl"
-            href="https://www.instagram.com/rcdriftuk"
-          >
-            <RiInstagramFill />
-          </styled.a>
-        </Flex>
-        <styled.p>&copy; RCDrift UK 2024</styled.p>
-      </Box>
     </>
   );
 };

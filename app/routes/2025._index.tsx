@@ -577,7 +577,9 @@ const Page = () => {
                 results-only live stream.
               </P>
 
-              <styled.img src="/realtime-result-software.png" w="full" mt={4} />
+              <ImageContainer>
+                <styled.img src="/2025/rcdriftuk-software-promo.jpg" w="full" />
+              </ImageContainer>
 
               <P>
                 RCDrift.uk now offers online driver profiles showing ratings,
@@ -585,7 +587,9 @@ const Page = () => {
                 today!
               </P>
 
-              <styled.img src="/driver-profile.png" w="full" mt={4} />
+              <ImageContainer>
+                <styled.img src="/driver-profile.png" w="full" />
+              </ImageContainer>
             </CollapsibleCard>
 
             <CollapsibleCard title="Affiliations">
@@ -630,7 +634,6 @@ const Page = () => {
             <Box
               pos="relative"
               mt={20}
-              mb={12}
               p={1}
               zIndex={1}
               rounded="3xl"

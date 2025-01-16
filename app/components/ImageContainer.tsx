@@ -10,8 +10,8 @@ export const ImageContainer = styled("div", {
     borderWidth: "1px",
     borderColor: "gray.800",
     rounded: "xl",
-    bgColor: "gray.900",
-    shadow: "xl",
+    bgColor: "gray.950",
+    shadow: "0 0 0 6px rgba(255, 255, 255, 0.04)",
     overflow: "hidden",
     "& img": {
       rounded: "lg",
