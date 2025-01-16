@@ -54,13 +54,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  const isSoldOut = event._count.EventTickets >= (event.ticketCapacity ?? 0);
-
-  // Check if sold out
-  if (isSoldOut) {
-    throw redirect(`/events/${event.id}`);
-  }
-
   let ticket = await prisma.eventTickets.findUnique({
     where: {
       eventId_userId: {
@@ -69,6 +62,18 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     },
   });
+
+  if (ticket?.status === TicketStatus.CONFIRMED) {
+    // Show ticket page
+    return ticket;
+  }
+
+  const isSoldOut = event._count.EventTickets >= (event.ticketCapacity ?? 0);
+
+  // Check if sold out
+  if (isSoldOut) {
+    throw redirect(`/events/${event.id}`);
+  }
 
   if (!ticket) {
     ticket = await prisma.eventTickets.create({
@@ -113,3 +118,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   return redirect(session.url ?? `/events/${event.id}`);
 };
+
+const Page = () => {
+  return <h1>Coming soon...</h1>;
+};
+
+export default Page;

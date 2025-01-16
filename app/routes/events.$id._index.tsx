@@ -319,9 +319,7 @@ const Page = () => {
                     )}
 
                     {ticket && ticket.status === TicketStatus.CONFIRMED && (
-                      <LinkButton
-                        to={`/events/${event.id}/ticket/${ticket.id}`}
-                      >
+                      <LinkButton to={`/events/${event.id}/ticket`}>
                         View Ticket <RiTicketFill />
                       </LinkButton>
                     )}
