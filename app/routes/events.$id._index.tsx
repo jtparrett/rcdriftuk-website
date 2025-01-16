@@ -228,7 +228,7 @@ const Page = () => {
               </styled.span>
             )}
 
-            <Flex gap={2} pt={2} alignItems="center">
+            <Box pt={2}>
               <EventTicketButton
                 event={{
                   ...event,
@@ -241,7 +241,9 @@ const Page = () => {
                 ticket={ticket}
                 isSoldOut={isSoldOut}
               />
+            </Box>
 
+            <Flex gap={2} pt={2}>
               <SignedIn>
                 <Form method="post">
                   <Button type="submit" value="submit">
