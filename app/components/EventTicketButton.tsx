@@ -26,7 +26,8 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   ) {
     return (
       <styled.p fontSize="sm" color="brand.500">
-        Tickets Released {format(new Date(event.ticketReleaseDate), "PP")}
+        Tickets Release{" "}
+        {format(new Date(event.ticketReleaseDate), "do MMM, yyyy h:mma")}
       </styled.p>
     );
   }
