@@ -19,6 +19,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const ticket = await prisma.eventTickets.findUnique({
     where: {
       id: Number(ticketId),
+      userId,
     },
     include: {
       event: true,

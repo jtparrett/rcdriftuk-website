@@ -3,6 +3,8 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { getAuth } from "~/utils/getAuth.server";
+import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
+import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
 
@@ -54,24 +56,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  let ticket = await prisma.eventTickets.findUnique({
-    where: {
-      eventId_userId: {
-        eventId: event.id,
-        userId,
-      },
-    },
-  });
+  let ticket = await getUserEventTicket(event.id, userId);
 
   if (ticket?.status === TicketStatus.CONFIRMED) {
     // Show ticket page
     return ticket;
   }
 
-  const isSoldOut = event._count.EventTickets >= (event.ticketCapacity ?? 0);
+  const isSoldOut = isEventSoldOut(event);
 
   // Check if sold out
-  if (isSoldOut) {
+  if (isSoldOut && ticket?.status !== TicketStatus.PENDING) {
     throw redirect(`/events/${event.id}`);
   }
 
@@ -113,6 +108,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     data: {
       status: TicketStatus.PENDING,
       sessionId: session.id,
+      createdAt: new Date(),
     },
   });
 

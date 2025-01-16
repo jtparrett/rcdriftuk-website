@@ -8,11 +8,15 @@ import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
 import { isPast } from "date-fns";
 
 interface QueriedEvent
-  extends Omit<Events, "startDate" | "endDate" | "createdAt" | "updatedAt"> {
+  extends Omit<
+    Events,
+    "startDate" | "endDate" | "createdAt" | "updatedAt" | "ticketReleaseDate"
+  > {
   startDate: string;
   endDate: string;
   createdAt: string;
   updatedAt: string;
+  ticketReleaseDate: string | null;
   eventTrack: Tracks | null;
 }
 

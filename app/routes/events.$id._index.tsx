@@ -4,19 +4,9 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { Form, redirect, useLoaderData } from "@remix-run/react";
-import {
-  format,
-  formatDuration,
-  intervalToDuration,
-  isAfter,
-  startOfDay,
-} from "date-fns";
+import { format, formatDuration, intervalToDuration } from "date-fns";
 import { useMemo } from "react";
-import {
-  RiCheckboxCircleFill,
-  RiCloseCircleFill,
-  RiTicketFill,
-} from "react-icons/ri";
+import { RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import { z } from "zod";
 import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
@@ -29,7 +19,11 @@ import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
 import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
-import { TicketStatus, type EventTickets } from "@prisma/client";
+import { getEvent } from "~/utils/getEvent.server";
+import { EventTicketButton } from "~/components/EventTicketButton";
+import { isEventSoldOut } from "~/utils/isEventSoldOut";
+import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
+import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -37,7 +31,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     { name: "description", content: data?.event.description },
     {
       property: "og:image",
-      content: `https://rcdrift.uk/${data?.event.eventTrack?.image}`,
+      content:
+        data?.event.cover ??
+        `https://rcdrift.uk/${data?.event.eventTrack?.image}`,
     },
   ];
 };
@@ -45,42 +41,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
 
-  const event = await prisma.events.findFirst({
-    where: {
-      id,
-    },
-    include: {
-      _count: {
-        select: {
-          responses: true,
-        },
-      },
-      responses: {
-        take: 8,
-        orderBy: {
-          id: "asc",
-        },
-        include: {
-          user: true,
-        },
-      },
-      eventTrack: {
-        include: {
-          _count: {
-            select: {
-              events: {
-                where: {
-                  endDate: {
-                    lte: startOfDay(new Date()),
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+  const event = await getEvent(id);
 
   if (!event) {
     throw new Response(null, {
@@ -91,20 +52,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   await clearPendingTickets(event.id);
 
-  const ticketsSold = await prisma.eventTickets.count({
-    where: {
-      eventId: id,
-      status: {
-        notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
-      },
-    },
-  });
-
-  const isSoldOut = event.ticketCapacity && ticketsSold >= event.ticketCapacity;
-
   const { userId } = await getAuth(args);
+  const isSoldOut = isEventSoldOut(event);
+
   let isAttending = false;
-  let ticket: EventTickets | null = null;
+  let ticket: GetUserEventTicket = null;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -116,19 +68,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
     isAttending = !!userEventResponse;
 
-    ticket = await prisma.eventTickets.findFirst({
-      where: {
-        userId,
-        eventId: id,
-      },
-    });
+    ticket = await getUserEventTicket(id, userId);
   }
 
   return {
-    isSoldOut,
     event,
     isAttending,
     ticket,
+    isSoldOut,
   };
 };
 
@@ -164,14 +111,13 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending, isSoldOut, ticket } =
+  const { event, isAttending, ticket, isSoldOut } =
     useLoaderData<typeof loader>();
   const startDate = useMemo(
     () => dateWithoutTimezone(event.startDate),
     [event]
   );
   const endDate = useMemo(() => dateWithoutTimezone(event.endDate), [event]);
-
   const clerk = useClerk();
 
   return (
@@ -283,48 +229,18 @@ const Page = () => {
             )}
 
             <Flex gap={2} pt={2}>
-              {event.ticketReleaseDate &&
-                event.enableTicketing &&
-                isAfter(new Date(), new Date(event.ticketReleaseDate)) && (
-                  <>
-                    {isSoldOut && (
-                      <Button disabled>
-                        Sold Out <RiTicketFill />
-                      </Button>
-                    )}
-
-                    {!isSoldOut && (
-                      <>
-                        {(!ticket ||
-                          ticket.status !== TicketStatus.CONFIRMED) && (
-                          <SignedIn>
-                            <LinkButton to={`/events/${event.id}/ticket`}>
-                              Buy Ticket <RiTicketFill />
-                            </LinkButton>
-                          </SignedIn>
-                        )}
-
-                        <SignedOut>
-                          <Button
-                            onClick={() =>
-                              clerk.openSignIn({
-                                redirectUrl: `/events/${event.id}`,
-                              })
-                            }
-                          >
-                            Buy Ticket <RiTicketFill />
-                          </Button>
-                        </SignedOut>
-                      </>
-                    )}
-
-                    {ticket && ticket.status === TicketStatus.CONFIRMED && (
-                      <LinkButton to={`/events/${event.id}/ticket`}>
-                        View Ticket <RiTicketFill />
-                      </LinkButton>
-                    )}
-                  </>
-                )}
+              <EventTicketButton
+                event={{
+                  ...event,
+                  startDate,
+                  endDate,
+                  ticketReleaseDate: event.ticketReleaseDate
+                    ? dateWithoutTimezone(event.ticketReleaseDate)
+                    : null,
+                }}
+                ticket={ticket}
+                isSoldOut={isSoldOut}
+              />
 
               <SignedIn>
                 <Form method="post">
