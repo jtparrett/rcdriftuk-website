@@ -14,14 +14,7 @@ import {
 import { z } from "zod";
 import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
-import {
-  styled,
-  Box,
-  Container,
-  Flex,
-  AspectRatio,
-  Divider,
-} from "~/styled-system/jsx";
+import { styled, Box, Container, Flex, Divider } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
@@ -143,9 +136,7 @@ const Page = () => {
           maxW={800}
         >
           {event.cover && (
-            <AspectRatio ratio={16 / 9}>
-              <styled.img src={event.cover} alt={event.name} />
-            </AspectRatio>
+            <styled.img src={event.cover} alt={event.name} w="full" />
           )}
 
           <Box p={{ base: 8, md: 12 }}>
