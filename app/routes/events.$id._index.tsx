@@ -217,18 +217,18 @@ const Page = () => {
             )}
 
             <styled.span fontWeight="semibold" mt={4} display="block">
-              You are currently {isAttending ? "going" : "not going"} to this
-              event
+              You are currently {isAttending ? "interested" : "not interested"}
+              in this event
             </styled.span>
 
             {!isAttending && (
               <styled.span fontSize="sm" color="gray.500" display="block">
                 Let the host know you're interested in this event by responding
-                below:
+                below
               </styled.span>
             )}
 
-            <Flex gap={2} pt={2}>
+            <Flex gap={2} pt={2} alignItems="center">
               <EventTicketButton
                 event={{
                   ...event,
@@ -245,7 +245,7 @@ const Page = () => {
               <SignedIn>
                 <Form method="post">
                   <Button type="submit" value="submit">
-                    I'm {isAttending && "Not "}Going{" "}
+                    I'm {isAttending && "Not "}Interested{" "}
                     {isAttending ? (
                       <RiCloseCircleFill />
                     ) : (
@@ -262,7 +262,7 @@ const Page = () => {
                     })
                   }
                 >
-                  I'm Going <RiCheckboxCircleFill />
+                  I'm Interested <RiCheckboxCircleFill />
                 </Button>
               </SignedOut>
 
