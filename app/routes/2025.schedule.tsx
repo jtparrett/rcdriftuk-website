@@ -3,7 +3,7 @@ import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { EventTicketStatus } from "~/components/EventTicketStatus";
 import { LinkOverlay } from "~/components/LinkOverlay";
-import { AspectRatio, Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getEventDate } from "~/utils/getEventDate";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
@@ -107,12 +107,11 @@ const Page = () => {
                     borderWidth={1}
                     borderColor="gray.800"
                   >
-                    <AspectRatio ratio={1.6}>
-                      <styled.img
-                        src={event.eventTrack?.image ?? "/2025-cover.jpg"}
-                        alt={event.eventTrack?.name}
-                      />
-                    </AspectRatio>
+                    <styled.img
+                      src={event.cover ?? "/2025-cover.jpg"}
+                      alt={event.name}
+                      w="full"
+                    />
                     <Box p={4}>
                       <styled.h1
                         fontWeight="bold"
