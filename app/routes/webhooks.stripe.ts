@@ -32,7 +32,11 @@ export async function action(args: ActionFunctionArgs) {
           id: Number(ticketId),
         },
         include: {
-          event: true,
+          event: {
+            include: {
+              eventTrack: true,
+            },
+          },
           user: true,
         },
       });
@@ -78,6 +82,8 @@ export async function action(args: ActionFunctionArgs) {
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #333; margin-bottom: 24px;">Ticket Confirmed! 🎉</h1>
           
+          ${ticket.event.cover ? `<img src="${ticket.event.cover}" alt="${ticket.event.name} cover" style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 24px;">` : ""}
+
           <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 16px;">
             Great news! Your ticket for <strong>${ticket.event.name}</strong> has been confirmed and paid for.
           </p>
@@ -87,7 +93,7 @@ export async function action(args: ActionFunctionArgs) {
             <p style="color: #666; margin: 8px 0;">
               <strong>Event:</strong> ${ticket.event.name}<br>
               <strong>Date:</strong> ${new Date(ticket.event.startDate).toLocaleDateString()}<br>
-              ${ticket.event.track ? `<strong>Location:</strong> ${ticket.event.track}<br>` : ""}
+              ${ticket.event.eventTrack ? `<strong>Location:</strong> ${ticket.event.eventTrack.name}<br>` : ""}
             </p>
           </div>
 
