@@ -24,6 +24,8 @@ const Page = () => {
               bgColor="gray.900"
               rounded="lg"
               overflow="hidden"
+              borderWidth={1}
+              borderColor="gray.800"
             >
               <LinkOverlay to={`/${year}`} />
               <AspectRatio ratio={2.3}>

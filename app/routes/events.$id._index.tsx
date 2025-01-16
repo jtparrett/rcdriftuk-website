@@ -6,11 +6,22 @@ import type {
 import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { format, formatDuration, intervalToDuration } from "date-fns";
 import { useMemo } from "react";
-import { RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
+import {
+  RiCheckboxCircleFill,
+  RiCloseCircleFill,
+  RiExternalLinkLine,
+} from "react-icons/ri";
 import { z } from "zod";
 import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
-import { styled, Box, Container, Flex, AspectRatio } from "~/styled-system/jsx";
+import {
+  styled,
+  Box,
+  Container,
+  Flex,
+  AspectRatio,
+  Divider,
+} from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
@@ -228,25 +239,10 @@ const Page = () => {
               </styled.span>
             )}
 
-            <Box pt={2}>
-              <EventTicketButton
-                event={{
-                  ...event,
-                  startDate,
-                  endDate,
-                  ticketReleaseDate: event.ticketReleaseDate
-                    ? dateWithoutTimezone(event.ticketReleaseDate)
-                    : null,
-                }}
-                ticket={ticket}
-                isSoldOut={isSoldOut}
-              />
-            </Box>
-
             <Flex gap={2} pt={2}>
               <SignedIn>
                 <Form method="post">
-                  <Button type="submit" value="submit">
+                  <Button type="submit" value="submit" variant="secondary">
                     I'm {isAttending && "Not "}Interested{" "}
                     {isAttending ? (
                       <RiCloseCircleFill />
@@ -269,11 +265,31 @@ const Page = () => {
               </SignedOut>
 
               {event.link && (
-                <LinkButton to={event.link} target="_blank" variant="secondary">
-                  More Info
+                <LinkButton to={event.link} target="_blank" variant="outline">
+                  More Info <RiExternalLinkLine />
                 </LinkButton>
               )}
             </Flex>
+
+            {event.enableTicketing && (
+              <>
+                <Divider mt={4} borderColor="gray.800" />
+                <Box pt={4}>
+                  <EventTicketButton
+                    event={{
+                      ...event,
+                      startDate,
+                      endDate,
+                      ticketReleaseDate: event.ticketReleaseDate
+                        ? dateWithoutTimezone(event.ticketReleaseDate)
+                        : null,
+                    }}
+                    ticket={ticket}
+                    isSoldOut={isSoldOut}
+                  />
+                </Box>
+              </>
+            )}
           </Box>
         </Box>
 

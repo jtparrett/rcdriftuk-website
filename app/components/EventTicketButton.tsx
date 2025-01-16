@@ -38,7 +38,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
       ticket.status === TicketStatus.PENDING)
   ) {
     return (
-      <LinkButton to={`/events/${event.id}/ticket`}>
+      <LinkButton to={`/events/${event.id}/ticket`} w="full">
         {ticket.status === TicketStatus.CONFIRMED
           ? "View Ticket"
           : "Continue With Ticket"}
@@ -49,7 +49,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
 
   if (isSoldOut) {
     return (
-      <Button disabled>
+      <Button disabled w="full">
         Sold out <RiTicketFill />
       </Button>
     );
@@ -58,7 +58,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   return (
     <>
       <SignedIn>
-        <LinkButton to={`/events/${event.id}/ticket`}>
+        <LinkButton to={`/events/${event.id}/ticket`} w="full">
           Buy Ticket <RiTicketFill />
         </LinkButton>
       </SignedIn>
@@ -70,6 +70,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
               redirectUrl: `/events/${event.id}/ticket`,
             })
           }
+          w="full"
         >
           Buy Ticket <RiTicketFill />
         </Button>

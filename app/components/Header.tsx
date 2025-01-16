@@ -248,7 +248,7 @@ export const Header = ({ user }: Props) => {
       <Container px={2} maxW={1100}>
         <Flex alignItems="center" py={5}>
           <Link to="/">
-            <styled.img w={140} src="/rcdriftuk.svg" />
+            <styled.img w={120} src="/rcdriftuk.svg" />
           </Link>
 
           <Spacer />
