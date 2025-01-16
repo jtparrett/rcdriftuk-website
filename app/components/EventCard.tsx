@@ -58,7 +58,7 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
         </styled.span>
       )}
 
-      {showAvatar && event.eventTrack?.image && (
+      {showAvatar && (event.cover || event.eventTrack?.image) && (
         <Box
           w={16}
           h={16}
@@ -67,9 +67,15 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
           borderWidth={1}
           borderColor="gray.500"
         >
-          <Link to={`/tracks/${event.eventTrack.slug}`}>
+          <Link
+            to={
+              event.eventTrack?.slug
+                ? `/tracks/${event.eventTrack.slug}`
+                : `/events/${event.id}`
+            }
+          >
             <styled.img
-              src={event.eventTrack.image}
+              src={event.cover || event.eventTrack?.image}
               w="full"
               h="full"
               objectFit="cover"

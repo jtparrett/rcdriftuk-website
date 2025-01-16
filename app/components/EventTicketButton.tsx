@@ -50,7 +50,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   if (isSoldOut) {
     return (
       <Button disabled>
-        Sold Out <RiTicketFill />
+        Sold out <RiTicketFill />
       </Button>
     );
   }

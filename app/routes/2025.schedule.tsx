@@ -1,8 +1,11 @@
+import { TicketStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
-import { format } from "date-fns";
+import { EventTicketStatus } from "~/components/EventTicketStatus";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { AspectRatio, Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { getEventDate } from "~/utils/getEventDate";
+import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
 
 export function headers() {
@@ -50,6 +53,17 @@ export const loader = async () => {
     },
     include: {
       eventTrack: true,
+      _count: {
+        select: {
+          EventTickets: {
+            where: {
+              status: {
+                notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
       startDate: "asc",
@@ -74,6 +88,8 @@ const Page = () => {
           <Flex flexWrap="wrap" ml={-4} mt={-4}>
             {events.map((event) => {
               const startDate = new Date(event.startDate);
+              const endDate = new Date(event.endDate);
+              const isSoldOut = isEventSoldOut(event);
 
               return (
                 <Flex
@@ -88,6 +104,8 @@ const Page = () => {
                     rounded="lg"
                     pos="relative"
                     w="full"
+                    borderWidth={1}
+                    borderColor="gray.800"
                   >
                     <AspectRatio ratio={1.6}>
                       <styled.img
@@ -105,10 +123,18 @@ const Page = () => {
                       </styled.h1>
 
                       <styled.p color="gray.400" fontSize="sm">
-                        {format(startDate, "do MMMM")} from{" "}
-                        {format(startDate, "HH:mm")} -{" "}
-                        {format(new Date(event.endDate), "HH:mm")}
+                        {getEventDate(startDate, endDate)}
                       </styled.p>
+
+                      <EventTicketStatus
+                        isSoldOut={isSoldOut}
+                        event={{
+                          ...event,
+                          ticketReleaseDate: event.ticketReleaseDate
+                            ? new Date(event.ticketReleaseDate)
+                            : null,
+                        }}
+                      />
                     </Box>
                     <LinkOverlay to={`/events/${event.id}`} />
                   </styled.article>
