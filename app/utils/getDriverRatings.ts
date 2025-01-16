@@ -33,6 +33,7 @@ export const getDriverRatings = async () => {
           firstName: true,
           lastName: true,
           team: true,
+          image: true,
         },
       },
       loser: {
@@ -41,6 +42,7 @@ export const getDriverRatings = async () => {
           firstName: true,
           lastName: true,
           team: true,
+          image: true,
         },
       },
     },
@@ -132,6 +134,7 @@ export const getDriverRatings = async () => {
         lastName: item.driver.lastName,
         team: item.driver.team,
         history: item.history,
+        image: item.driver.image,
       };
     })
     .sort((a, b) => {

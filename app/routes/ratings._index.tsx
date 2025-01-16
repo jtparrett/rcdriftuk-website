@@ -74,7 +74,7 @@ const Row = ({
           },
         }}
         borderWidth="1px"
-        borderColor="gray.800"
+        borderColor="rgba(0, 0, 0, 0.3)"
         _active={{
           transform: "scale(0.99)",
         }}
@@ -97,10 +97,26 @@ const Row = ({
         }}
       >
         <LinkOverlay to={`/ratings/${driver.driverId}`} />
-        <Flex gap={4} alignItems="center">
-          <styled.span fontFamily="mono" flex="none">
+        <Flex gap={2} alignItems="center">
+          <styled.span fontFamily="mono" flex="none" w={7} textAlign="center">
             {rank}
           </styled.span>
+          <Box
+            w={12}
+            h={12}
+            rounded="full"
+            overflow="hidden"
+            bgColor="rgba(255, 255, 255, 0.1)"
+            p={1}
+          >
+            <styled.img
+              rounded="full"
+              src={driver.image ?? "/blank-driver-right.jpg"}
+              w="full"
+              h="full"
+              objectFit="cover"
+            />
+          </Box>
           <Box flex={1} overflow="hidden">
             <styled.p
               whiteSpace="nowrap"
