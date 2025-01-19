@@ -69,7 +69,7 @@ const Row = ({
         _hover={{
           backgroundColor: "var(--row-hover)",
           "&::after": {
-            transform: "skewX(-40deg) translateX(80px) scaleX(1.1)",
+            transform: "translateX(80px) skewX(-40deg) scaleX(1.1)",
             opacity: 1,
           },
         }}
@@ -78,10 +78,11 @@ const Row = ({
         _active={{
           transform: "scale(0.99)",
         }}
-        shadow="lg"
+        shadow="inset 0 1px 0 rgba(255, 255, 255, 0.2)"
         pos="relative"
         overflow="hidden"
         _after={{
+          filter: "blur(3px)",
           opacity: 0,
           transition: "all 0.2s",
           content: '""',

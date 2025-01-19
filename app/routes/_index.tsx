@@ -121,40 +121,56 @@ const Page = () => {
         <Container maxW={1100} px={2} mb={4}>
           <Box
             p={1}
-            bgGradient="to-br"
-            gradientFrom="brand.500"
-            gradientTo="brand.700"
+            bgColor="rgba(255, 255, 255, 0.1)"
             rounded="xl"
             pos="relative"
             overflow="hidden"
           >
-            <LinkOverlay to="/2025" />
-            <Flex
+            <Box
+              bgColor="gray.950"
+              bgImage="url(/grid-bg.svg)"
+              bgRepeat="repeat"
+              bgSize="30px"
+              bgPosition="center"
               rounded="lg"
               borderWidth={1}
-              borderColor="brand.700"
-              px={4}
-              py={3}
-              alignItems="center"
-              gap={4}
-              shadow="inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+              borderColor="gray.700"
+              overflow="hidden"
             >
-              <styled.img src="/2025/2025-logo.png" w="60px" />
-              <styled.h2
-                textTransform="uppercase"
-                fontWeight="black"
-                fontStyle="italic"
-                fontSize={{ base: "xl", md: "2xl" }}
+              <LinkOverlay to="/2025" />
+              <Flex
+                bgGradient="to-tr"
+                gradientFrom="brand.950"
+                gradientVia="transparent"
+                gradientTo="transparent"
+                px={5}
+                py={3}
+                alignItems="center"
+                gap={4}
               >
-                Learn more about RC Drift.uk 2025
-              </styled.h2>
+                <styled.img src="/2025/2025-logo.png" w="60px" />
+                <Box>
+                  <styled.h2
+                    lineHeight={1.2}
+                    textTransform="uppercase"
+                    fontWeight="black"
+                    fontStyle="italic"
+                    fontSize={{ base: "xl", md: "2xl" }}
+                  >
+                    RC Drift.uk 2025
+                  </styled.h2>
+                  <styled.p fontSize="sm">
+                    The UK's biggest RC Drift series, learn more.
+                  </styled.p>
+                </Box>
 
-              <Spacer />
+                <Spacer />
 
-              <styled.span fontSize="2xl">
-                <RiArrowRightLine />
-              </styled.span>
-            </Flex>
+                <styled.span fontSize="2xl">
+                  <RiArrowRightLine />
+                </styled.span>
+              </Flex>
+            </Box>
           </Box>
         </Container>
 

@@ -39,34 +39,34 @@ export default defineConfig({
             value: "#0c0c0c",
           },
           "brand.50": {
-            value: "#fef2f5",
+            value: "#fef5f8",
           },
           "brand.100": {
-            value: "#fde6eb",
+            value: "#fcd7e1",
           },
           "brand.200": {
-            value: "#fbd0da",
+            value: "#f9b2c6",
           },
           "brand.300": {
-            value: "#f7b1c1",
+            value: "#f582a2",
           },
           "brand.400": {
-            value: "#f38399",
+            value: "#f2638b",
           },
           "brand.500": {
             value: brandColor,
           },
           "brand.600": {
-            value: "#ce1749",
+            value: "#ce164a",
           },
           "brand.700": {
-            value: "#a6143c",
+            value: "#a7123c",
           },
           "brand.800": {
-            value: "#b31541",
+            value: "#8e0f33",
           },
           "brand.900": {
-            value: "#981236",
+            value: "#680c26",
           },
           "brand.950": {
             value: "#7a0f2c",

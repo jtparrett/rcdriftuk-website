@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import {
   Area,
@@ -47,6 +47,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     driver,
     driverRatings,
   };
+};
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+
+  return [
+    {
+      title: `RC Drift UK | Driver Ratings | ${data.driver.firstName} ${data.driver.lastName}`,
+    },
+  ];
 };
 
 const TABS = {
@@ -135,20 +145,22 @@ const Page = () => {
         </Flex>
 
         <Flex textAlign="center" alignItems="center" flexDir="column" pb={12}>
-          <Box
-            p={4}
-            rounded="full"
-            bg="gray.900"
-            borderWidth={1}
-            borderColor="gray.700"
-          >
-            <Box rounded="full" overflow="hidden" bg="gray.800" w={32} h={32}>
+          <Box p={2} rounded="full" bg="rgba(255, 255, 255, 0.1)">
+            <Box
+              rounded="full"
+              overflow="hidden"
+              borderWidth={1}
+              borderColor="gray.700"
+              p={2}
+              bg="gray.950"
+            >
               <styled.img
                 display="block"
                 src={driver.image ?? "/blank-driver-right.jpg"}
                 alt={`${driver.firstName} ${driver.lastName}`}
-                w="full"
-                h="full"
+                w={32}
+                h={32}
+                rounded="full"
                 objectFit="cover"
               />
             </Box>
@@ -166,6 +178,7 @@ const Page = () => {
             flex={1}
             onClick={() => setTab(TABS.battleHistory)}
             variant={tab === TABS.battleHistory ? "secondary" : "ghost"}
+            px={0}
           >
             Battle History
           </Button>
@@ -173,6 +186,7 @@ const Page = () => {
             flex={1}
             onClick={() => setTab(TABS.ratingHistory)}
             variant={tab === TABS.ratingHistory ? "secondary" : "ghost"}
+            px={0}
           >
             Rating History
           </Button>
@@ -180,6 +194,7 @@ const Page = () => {
             flex={1}
             onClick={() => setTab(TABS.achievements)}
             variant={tab === TABS.achievements ? "secondary" : "ghost"}
+            px={0}
           >
             Achievements
           </Button>
