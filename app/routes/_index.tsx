@@ -1,12 +1,12 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
-import { RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
-import { Advert } from "~/components/Advert";
+import { RiArrowRightLine, RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { ImageContainer } from "~/components/ImageContainer";
-import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { LinkOverlay } from "~/components/LinkOverlay";
+import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
@@ -118,12 +118,44 @@ const Page = () => {
           </Flex>
         </Container>
 
-        <Container maxW={1100} px={2}>
-          <Link to="/2025">
-            <ImageContainer maxW="full" mt={0}>
-              <styled.img src="/2025/banner.jpg" w="full" />
-            </ImageContainer>
-          </Link>
+        <Container maxW={1100} px={2} mb={4}>
+          <Box
+            p={1}
+            bgGradient="to-br"
+            gradientFrom="brand.500"
+            gradientTo="brand.700"
+            rounded="xl"
+            pos="relative"
+            overflow="hidden"
+          >
+            <LinkOverlay to="/2025" />
+            <Flex
+              rounded="lg"
+              borderWidth={1}
+              borderColor="brand.700"
+              px={4}
+              py={3}
+              alignItems="center"
+              gap={4}
+              shadow="inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+            >
+              <styled.img src="/2025/2025-logo.png" w="60px" />
+              <styled.h2
+                textTransform="uppercase"
+                fontWeight="black"
+                fontStyle="italic"
+                fontSize={{ base: "xl", md: "2xl" }}
+              >
+                Learn more about RC Drift.uk 2025
+              </styled.h2>
+
+              <Spacer />
+
+              <styled.span fontSize="2xl">
+                <RiArrowRightLine />
+              </styled.span>
+            </Flex>
+          </Box>
         </Container>
 
         <Container maxW={1100} px={2}>
@@ -206,8 +238,6 @@ const Page = () => {
             <styled.img src="/2025-cover.jpg" w="full" />
           </ImageContainer>
         </Link>
-
-        <Advert />
       </Container>
     </>
   );
