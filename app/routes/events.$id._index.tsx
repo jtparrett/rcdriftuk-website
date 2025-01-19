@@ -10,6 +10,7 @@ import {
   RiCheckboxCircleFill,
   RiCloseCircleFill,
   RiExternalLinkLine,
+  RiDownloadLine,
 } from "react-icons/ri";
 import { z } from "zod";
 import pluralize from "pluralize";
@@ -44,6 +45,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
 
   const event = await getEvent(id);
 
@@ -56,11 +58,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   await clearPendingTickets(event.id);
 
-  const { userId } = await getAuth(args);
-  const isSoldOut = isEventSoldOut(event);
-
   let isAttending = false;
   let ticket: GetUserEventTicket = null;
+  let isTrackOwner = false;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -73,13 +73,30 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isAttending = !!userEventResponse;
 
     ticket = await getUserEventTicket(id, userId);
+
+    if (event.eventTrack) {
+      const trackOwner = await prisma.tracks.findFirst({
+        where: {
+          id: event.eventTrack.id,
+          owners: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+      });
+      isTrackOwner = !!trackOwner;
+    }
   }
+
+  const isSoldOut = isEventSoldOut(event);
 
   return {
     event,
     isAttending,
     ticket,
     isSoldOut,
+    isTrackOwner,
   };
 };
 
@@ -115,7 +132,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending, ticket, isSoldOut } =
+  const { event, isAttending, ticket, isSoldOut, isTrackOwner } =
     useLoaderData<typeof loader>();
   const startDate = useMemo(
     () => dateWithoutTimezone(event.startDate),
@@ -336,14 +353,30 @@ const Page = () => {
                 </styled.p>
               )}
 
-              <LinkButton
-                mt={5}
-                w="full"
-                to={`/tracks/${event.eventTrack.slug}`}
-                variant="secondary"
-              >
-                See All Events
-              </LinkButton>
+              <Flex w="full" flexDir="column" gap={2} mt={5}>
+                <LinkButton
+                  w="full"
+                  to={`/tracks/${event.eventTrack.slug}`}
+                  variant="secondary"
+                >
+                  See All Events
+                </LinkButton>
+
+                {isTrackOwner && event.enableTicketing && (
+                  <LinkButton
+                    w="full"
+                    to={`/events/${event.id}/export`}
+                    variant="outline"
+                    download={`${event.name} Tickets ${format(
+                      new Date(),
+                      "dd-MM-yyyy"
+                    )}.csv`}
+                    target="_blank"
+                  >
+                    Download CSV <RiDownloadLine />
+                  </LinkButton>
+                )}
+              </Flex>
             </Flex>
           </styled.article>
         )}

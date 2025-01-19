@@ -50,6 +50,10 @@ const MenuLink = styled(Link, {
     alignItems: "center",
     fontSize: "sm",
     fontWeight: "semibold",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    maxW: "full",
   },
   variants: {
     active: {
@@ -75,15 +79,15 @@ const Menu = ({ user }: Props) => {
     <Box
       bgColor="rgba(12, 12, 12, 0.8)"
       backdropFilter="blur(10px)"
-      rounded="lg"
+      rounded="xl"
       borderWidth={1}
       borderColor="gray.800"
       shadow="2xl"
       mt={5}
-      p={{ base: 2, md: 4 }}
+      overflow="hidden"
       w={{ base: "100vw", sm: "auto" }}
     >
-      <Flex gap={2}>
+      <Flex gap={2} p={{ base: 2, md: 4 }}>
         <Flex gap={1} flexDir="column" flex={1}>
           <MenuLink
             to="/"
@@ -178,7 +182,7 @@ const Menu = ({ user }: Props) => {
 
         <SignedIn>
           <Box w="1px" bgColor="gray.800" />
-          <Flex gap={2} flexDir="column" flex={1}>
+          <Flex gap={1} flexDir="column" flex={1}>
             {user?.track && (
               <MenuLink to={`/tracks/${user.track.slug}`} active="inactive">
                 <MenuIcon>
@@ -224,24 +228,25 @@ const Menu = ({ user }: Props) => {
               </MenuIcon>
               Sign Out
             </MenuLink>
-
-            <Spacer />
-
-            <styled.span
-              textAlign="center"
-              fontWeight="semibold"
-              fontSize="sm"
-              mb={3}
-              whiteSpace="nowrap"
-              textOverflow="ellipsis"
-              overflow="hidden"
-              maxW="full"
-            >
-              Hey {user?.firstName} {user?.lastName} 👋
-            </styled.span>
           </Flex>
         </SignedIn>
       </Flex>
+
+      <SignedIn>
+        <Box bgColor="gray.900" p={1} textAlign="center">
+          <styled.span
+            fontWeight="semibold"
+            fontSize="xs"
+            color="gray.500"
+            whiteSpace="nowrap"
+            textOverflow="ellipsis"
+            overflow="hidden"
+            maxW="full"
+          >
+            You're logged in as {user?.firstName ?? "..."} {user?.lastName}
+          </styled.span>
+        </Box>
+      </SignedIn>
     </Box>
   );
 };
