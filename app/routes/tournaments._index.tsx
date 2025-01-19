@@ -2,7 +2,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
-import { RiAddFill } from "react-icons/ri";
+import { RiAddFill, RiBookOpenFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
@@ -57,16 +57,28 @@ const Page = () => {
 
   return (
     <Container maxW={1100} px={2} py={4}>
-      <Flex alignItems="center" pb={2}>
-        <styled.h1 fontSize={{ base: "xl", md: "3xl" }} fontWeight="extrabold">
+      <Flex
+        alignItems={{ base: "stretch", md: "center" }}
+        pb={4}
+        gap={2}
+        flexDir={{ base: "column", md: "row" }}
+      >
+        <styled.h1 fontSize="3xl" fontWeight="black">
           My Tournaments
         </styled.h1>
         <Spacer />
-        <LinkButton to="/tournaments/new" size="xs">
+        <LinkButton to="/tournaments/new">
           New Tournament <RiAddFill />
         </LinkButton>
+        <LinkButton
+          to="/tournaments/user-guide"
+          variant="outline"
+          target="_blank"
+        >
+          User Guide <RiBookOpenFill />
+        </LinkButton>
       </Flex>
-      <Box h={1} bgColor="brand.500" w={32} mb={6} />
+
       <Flex flexDir="column" gap={2}>
         {tournaments.map((tournament) => (
           <Box
