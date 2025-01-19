@@ -2,9 +2,10 @@ import { TournamentsState } from "@prisma/client";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
 import pluralize from "pluralize";
+import { RiArrowLeftLine } from "react-icons/ri";
 import invariant from "tiny-invariant";
 import { z } from "zod";
-import { Button } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { Glow } from "~/components/Glow";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
@@ -310,72 +311,88 @@ const JudgePage = () => {
   useReloader();
 
   return (
-    <Center
-      minH="70dvh"
-      bgImage="url(/grid-bg.svg)"
-      bgRepeat="repeat"
-      bgSize="60px"
-      bgPosition="center"
-      pos="relative"
-      zIndex={1}
-      _before={{
-        content: '""',
-        pos: "absolute",
-        inset: 0,
-        bgGradient: "to-t",
-        gradientFrom: "black",
-        gradientVia: "rgba(12, 12, 12, 0)",
-        gradientTo: "rgba(12, 12, 12, 0)",
-        zIndex: -1,
-      }}
-    >
-      <Container w={500} maxW="full">
-        <Box
-          bgColor="black"
-          pos="relative"
-          zIndex={1}
-          p={1}
-          borderWidth={1}
-          borderColor="brand.700"
-          rounded="3xl"
-          shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
-        >
-          <Glow />
+    <>
+      <Box borderBottomWidth={1} borderColor="gray.800">
+        <Container maxW={1100} px={2}>
+          <LinkButton
+            py={3}
+            variant="ghost"
+            w="full"
+            to={`/tournaments/${tournament.id}`}
+          >
+            <RiArrowLeftLine /> Back to Tournament
+          </LinkButton>
+        </Container>
+      </Box>
+      <Center
+        minH="60dvh"
+        bgImage="url(/grid-bg.svg)"
+        bgRepeat="repeat"
+        bgSize="60px"
+        bgPosition="center"
+        pos="relative"
+        zIndex={1}
+        _before={{
+          content: '""',
+          pos: "absolute",
+          inset: 0,
+          bgGradient: "to-t",
+          gradientFrom: "black",
+          gradientVia: "rgba(12, 12, 12, 0)",
+          gradientTo: "rgba(12, 12, 12, 0)",
+          zIndex: -1,
+        }}
+      >
+        <Container w={500} maxW="full">
           <Box
+            bgColor="black"
+            pos="relative"
+            zIndex={1}
+            p={1}
             borderWidth={1}
             borderColor="brand.700"
-            rounded="2xl"
-            overflow="hidden"
+            rounded="3xl"
+            shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
           >
-            <Flex
-              px={6}
-              py={3}
-              bgGradient="to-b"
-              gradientFrom="brand.500"
-              gradientTo="brand.700"
+            <Glow />
+            <Box
+              borderWidth={1}
+              borderColor="brand.700"
+              rounded="2xl"
+              overflow="hidden"
             >
-              <styled.h1 fontWeight="extrabold">
-                {judge.user.firstName} {judge.user.lastName}
-              </styled.h1>
-              <Spacer />
-              <styled.h2 fontSize="sm">{tournament.name}</styled.h2>
-            </Flex>
-            <Box p={4} pb={8}>
-              {tournament.state === TournamentsState.QUALIFYING && (
-                <QualiForm />
-              )}
-              {tournament.state === TournamentsState.BATTLES && <BattleForm />}
+              <Flex
+                px={6}
+                py={3}
+                bgGradient="to-b"
+                gradientFrom="brand.500"
+                gradientTo="brand.700"
+              >
+                <styled.h1 fontWeight="extrabold">
+                  {judge.user.firstName} {judge.user.lastName}
+                </styled.h1>
+                <Spacer />
+                <styled.h2 fontSize="sm">{tournament.name}</styled.h2>
+              </Flex>
+              <Box p={4} pb={8}>
+                {tournament.state === TournamentsState.QUALIFYING && (
+                  <QualiForm />
+                )}
+                {tournament.state === TournamentsState.BATTLES && (
+                  <BattleForm />
+                )}
 
-              {tournament.state === TournamentsState.END && (
-                <styled.h2 textAlign="center" fontSize="xl">
-                  Tournament Complete
-                </styled.h2>
-              )}
+                {tournament.state === TournamentsState.END && (
+                  <styled.h2 textAlign="center" fontSize="xl">
+                    Tournament Complete
+                  </styled.h2>
+                )}
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Container>
-    </Center>
+        </Container>
+      </Center>
+    </>
   );
 };
 
