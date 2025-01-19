@@ -4,6 +4,7 @@ import { endOfDay, format, startOfDay } from "date-fns";
 import { RiArrowRightLine, RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
+import { Glow } from "~/components/Glow";
 import { ImageContainer } from "~/components/ImageContainer";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
@@ -126,6 +127,7 @@ const Page = () => {
             pos="relative"
             overflow="hidden"
           >
+            <Glow />
             <Box
               bgColor="gray.950"
               bgImage="url(/grid-bg.svg)"
@@ -154,7 +156,6 @@ const Page = () => {
                     lineHeight={1.2}
                     textTransform="uppercase"
                     fontWeight="black"
-                    fontStyle="italic"
                     fontSize={{ base: "xl", md: "2xl" }}
                   >
                     RC Drift.uk 2025
