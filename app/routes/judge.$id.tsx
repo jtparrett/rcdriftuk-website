@@ -1,6 +1,7 @@
 import { TournamentsState } from "@prisma/client";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
+import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
 import { RiArrowLeftLine } from "react-icons/ri";
 import invariant from "tiny-invariant";
@@ -18,7 +19,10 @@ import {
   Container,
   Center,
 } from "~/styled-system/jsx";
+import { ably as AblyServer } from "~/utils/ably.server";
+import { ably as AblyClient } from "~/utils/ably";
 import { prisma } from "~/utils/prisma.server";
+import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -119,6 +123,12 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     },
   });
 
+  const publishUpdate = () => {
+    AblyServer.channels
+      .get(judge.tournament.id)
+      .publish("update", new Date().toISOString());
+  };
+
   if (
     judge.tournament.state === TournamentsState.QUALIFYING &&
     judge.tournament.nextQualifyingLapId
@@ -171,6 +181,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
       },
     });
   }
+
+  publishUpdate();
 
   return redirect(`/judge/${judgeId}`);
 };
@@ -309,6 +321,7 @@ const JudgePage = () => {
   const { tournament, judge } = useLoaderData<typeof loader>();
 
   useReloader();
+  useAblyRealtimeReloader(tournament.id);
 
   return (
     <>
@@ -396,4 +409,14 @@ const JudgePage = () => {
   );
 };
 
-export default JudgePage;
+export default () => {
+  const { tournament } = useLoaderData<typeof loader>();
+
+  return (
+    <AblyProvider client={AblyClient}>
+      <ChannelProvider channelName={tournament.id}>
+        <JudgePage />
+      </ChannelProvider>
+    </AblyProvider>
+  );
+};

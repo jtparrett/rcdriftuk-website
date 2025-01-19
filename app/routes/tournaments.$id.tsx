@@ -12,6 +12,7 @@ import {
   useLoaderData,
   useLocation,
 } from "@remix-run/react";
+import { AblyProvider, ChannelProvider } from "ably/react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
@@ -24,12 +25,15 @@ import {
   Spacer,
   styled,
 } from "~/styled-system/jsx";
+import { ably as AblyServer } from "~/utils/ably.server";
+import { ably as AblyClient } from "~/utils/ably";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { getUsers } from "~/utils/getUsers.server";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
+import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -74,11 +78,18 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
+  const publishUpdate = () => {
+    AblyServer.channels
+      .get(tournament.id)
+      .publish("update", new Date().toISOString());
+  };
+
   if (
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
   ) {
     await tournamentEndQualifying(id);
+    publishUpdate();
     return redirect(`/tournaments/${id}/qualifying`);
   }
 
@@ -114,10 +125,15 @@ export const action = async (args: ActionFunctionArgs) => {
         nextQualifyingLapId: nextQualifyingLap?.id ?? null,
       },
     });
+
+    publishUpdate();
   }
 
   if (tournament.state === TournamentsState.BATTLES) {
     await tournamentNextBattle(id);
+
+    publishUpdate();
+
     const nextBattle = await prisma.tournaments.findFirst({
       where: {
         id,
@@ -152,6 +168,8 @@ const TournamentPage = () => {
   const { user } = useUser();
 
   const isOwner = user?.id === tournament.userId;
+
+  useAblyRealtimeReloader(tournament.id);
 
   return (
     <Container pb={12} px={2} pt={8} maxW={1100}>
@@ -248,4 +266,14 @@ const TournamentPage = () => {
   );
 };
 
-export default TournamentPage;
+export default () => {
+  const { tournament } = useLoaderData<typeof loader>();
+
+  return (
+    <AblyProvider client={AblyClient}>
+      <ChannelProvider channelName={tournament.id}>
+        <TournamentPage />
+      </ChannelProvider>
+    </AblyProvider>
+  );
+};
