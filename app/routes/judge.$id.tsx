@@ -318,7 +318,7 @@ const JudgePage = () => {
             py={3}
             variant="ghost"
             w="full"
-            to={`/tournaments/${tournament.id}`}
+            to={`/tournaments/${tournament.id}/overview`}
           >
             <RiArrowLeftLine /> Back to Tournament
           </LinkButton>
