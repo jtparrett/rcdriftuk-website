@@ -129,23 +129,12 @@ const CollapsibleCard = ({
 const Page = () => {
   return (
     <Container maxW={800} px={2} pt={8} pb={20}>
-      <Box mb={12}>
+      <Box mb={12} textAlign="center" maxW={600} mx="auto">
         <H1>My Tournaments - User Guide</H1>
         <P>
-          RCDrift.uk has developed an online tool designed to streamline the
-          management of Radio-Controlled Drifting tournaments and competitions.
+          RCDrift.uk have built a free online platform to help assist with
+          running Radio-Controlled Drifting tournaments and competitions.
         </P>
-
-        <P mt={4}>
-          This software is free to use and offers the following key features:
-        </P>
-
-        <UL mt={2}>
-          <styled.li>Conduct qualifying (scored from 0-100 points)</styled.li>
-          <styled.li>
-            Conduct "battles" in either standard or double elimination format
-          </styled.li>
-        </UL>
       </Box>
 
       <Flex flexDir="column" gap={8}>
