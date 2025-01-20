@@ -100,7 +100,7 @@ export const Map = ({ tracks }: Props) => {
 
                         <LinkButton
                           to={item.url}
-                          variant="secondary"
+                          variant="outline"
                           target="_blank"
                           size="sm"
                         >

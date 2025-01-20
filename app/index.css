@@ -12,6 +12,15 @@
   background-color: black;
 }
 
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: #0c0c0c !important;
+  color: white !important;
+}
+
+.leaflet-marker-icon {
+  object-fit: cover !important;
+}
+
 .month:hover .dot {
   transform: scale(150%);
 }
