@@ -20,7 +20,6 @@ import { prisma } from "~/utils/prisma.server";
 import invariant from "tiny-invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 import { getEventDate } from "~/utils/getEventDate";
-import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
 import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
@@ -134,11 +133,8 @@ export const action = async (args: ActionFunctionArgs) => {
 const Page = () => {
   const { event, isAttending, ticket, isSoldOut, isTrackOwner } =
     useLoaderData<typeof loader>();
-  const startDate = useMemo(
-    () => dateWithoutTimezone(event.startDate),
-    [event]
-  );
-  const endDate = useMemo(() => dateWithoutTimezone(event.endDate), [event]);
+  const startDate = useMemo(() => new Date(event.startDate), [event]);
+  const endDate = useMemo(() => new Date(event.endDate), [event]);
   const clerk = useClerk();
 
   return (
@@ -289,7 +285,7 @@ const Page = () => {
                       startDate,
                       endDate,
                       ticketReleaseDate: event.ticketReleaseDate
-                        ? dateWithoutTimezone(event.ticketReleaseDate)
+                        ? new Date(event.ticketReleaseDate)
                         : null,
                     }}
                     ticket={ticket}

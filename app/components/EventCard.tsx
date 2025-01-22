@@ -1,11 +1,11 @@
 import type { Events, Tracks } from "@prisma/client";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import { dateWithoutTimezone } from "~/utils/dateWithoutTimezone";
 import { Link } from "@remix-run/react";
 import { getEventDate } from "~/utils/getEventDate";
 import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
 import { isPast } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
 interface QueriedEvent
   extends Omit<
@@ -26,7 +26,7 @@ interface Props {
 }
 
 export const EventCard = ({ event, showAvatar = false }: Props) => {
-  const hasPast = isPast(dateWithoutTimezone(event.endDate));
+  const hasPast = isPast(toZonedTime(new Date(event.endDate), "UTC"));
 
   return (
     <Flex
@@ -100,8 +100,8 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
 
         <styled.p fontSize="sm" color="gray.300" fontWeight="semibold" mb={2}>
           {getEventDate(
-            dateWithoutTimezone(event.startDate),
-            dateWithoutTimezone(event.endDate)
+            toZonedTime(new Date(event.startDate), "UTC"),
+            toZonedTime(new Date(event.endDate), "UTC")
           )}
         </styled.p>
 

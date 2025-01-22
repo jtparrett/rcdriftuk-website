@@ -1,4 +1,5 @@
 import { format, isThisWeek, isSameDay, isToday, isSameMonth } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
 export const getEventDay = (startDate: Date, showDayOfWeek = true) => {
   if (isToday(startDate)) {
@@ -13,7 +14,10 @@ export const getEventDay = (startDate: Date, showDayOfWeek = true) => {
 };
 
 export const getEventTime = (startDate: Date, endDate: Date) => {
-  return `from ${format(startDate, "hh:mmaaa")}-${format(endDate, "hh:mmaaa")}`;
+  // Convert to UTC to ensure consistent display regardless of local timezone
+  const utcStart = toZonedTime(startDate, "UTC");
+  const utcEnd = toZonedTime(endDate, "UTC");
+  return `from ${format(utcStart, "h:mmaaa")}-${format(utcEnd, "h:mmaaa")}`;
 };
 
 export const getEventDate = (startDate: Date, endDate: Date) => {

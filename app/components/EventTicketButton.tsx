@@ -6,6 +6,7 @@ import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 import { format, isBefore } from "date-fns";
 import { styled } from "~/styled-system/jsx";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
+import { toZonedTime } from "date-fns-tz";
 
 interface Props {
   event: GetEvent;
@@ -15,19 +16,18 @@ interface Props {
 
 export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   const clerk = useClerk();
+  const releaseDate = event?.ticketReleaseDate
+    ? toZonedTime(new Date(event.ticketReleaseDate), "UTC")
+    : null;
 
   if (!event || !event.enableTicketing) {
     return null;
   }
 
-  if (
-    event.ticketReleaseDate &&
-    isBefore(new Date(), new Date(event.ticketReleaseDate))
-  ) {
+  if (releaseDate && isBefore(toZonedTime(new Date(), "UTC"), releaseDate)) {
     return (
       <styled.p fontSize="sm" color="brand.500" fontWeight="bold">
-        Tickets Release{" "}
-        {format(new Date(event.ticketReleaseDate), "do MMM, yyyy h:mma")}
+        Tickets Release {format(releaseDate, "do MMM, yyyy h:mma")}
       </styled.p>
     );
   }
