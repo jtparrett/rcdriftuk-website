@@ -112,7 +112,9 @@ const CardHeader = styled("button", {
     justifyContent: "space-between",
     cursor: "pointer",
     _hover: {
-      bgColor: "gray.800",
+      md: {
+        bgColor: "gray.800",
+      },
     },
   },
 });
@@ -193,7 +195,9 @@ const FAQButton = styled("button", {
     cursor: "pointer",
     color: "white",
     _hover: {
-      color: "brand.500",
+      md: {
+        color: "brand.500",
+      },
     },
   },
 });
@@ -341,7 +345,9 @@ const Page = () => {
                 href="https://maps.google.com/?q=Tudor+Grange+Academy+Redditch+B98+7UH"
                 target="_blank"
                 _hover={{
-                  textDecoration: "underline",
+                  md: {
+                    textDecoration: "underline",
+                  },
                 }}
               >
                 <RiMapPin2Fill /> Tudor Grange Academy, Redditch, B98 7UH

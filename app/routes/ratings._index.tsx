@@ -57,7 +57,9 @@ const Row = ({
       rounded="2xl"
       transition="all 0.2s"
       _hover={{
-        transform: "scale(1.01)",
+        md: {
+          transform: "scale(1.01)",
+        },
       }}
     >
       <Box
@@ -67,16 +69,20 @@ const Row = ({
         transition="all 0.2s"
         bg="var(--row-bg)"
         _hover={{
-          backgroundColor: "var(--row-hover)",
-          "&::after": {
-            transform: "translateX(80px) skewX(-40deg) scaleX(1.1)",
-            opacity: 1,
+          md: {
+            backgroundColor: "var(--row-hover)",
+            "&::after": {
+              transform: "translateX(80px) skewX(-40deg) scaleX(1.1)",
+              opacity: 1,
+            },
           },
         }}
         borderWidth="1px"
         borderColor="rgba(0, 0, 0, 0.3)"
         _active={{
-          transform: "scale(0.99)",
+          md: {
+            transform: "scale(0.99)",
+          },
         }}
         shadow="inset 0 1px 0 rgba(255, 255, 255, 0.2)"
         pos="relative"
@@ -188,7 +194,9 @@ const RankSection = () => {
           cursor="pointer"
           onClick={keyDisclosure.toggle}
           _hover={{
-            bgColor: "gray.800",
+            md: {
+              bgColor: "gray.800",
+            },
           }}
         >
           <styled.h2 fontSize="lg" fontWeight="semibold">

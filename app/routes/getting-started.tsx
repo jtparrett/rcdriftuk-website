@@ -83,7 +83,9 @@ const CardHeader = styled("button", {
     justifyContent: "space-between",
     cursor: "pointer",
     _hover: {
-      bgColor: "gray.800",
+      md: {
+        bgColor: "gray.800",
+      },
     },
   },
 });

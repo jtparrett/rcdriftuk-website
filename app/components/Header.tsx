@@ -59,7 +59,9 @@ const MenuLink = styled(Link, {
     active: {
       inactive: {
         _hover: {
-          bgColor: "gray.900",
+          md: {
+            bgColor: "gray.900",
+          },
         },
       },
       active: {

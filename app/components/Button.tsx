@@ -40,24 +40,30 @@ const ButtonStyles = cva({
         bg: "brand.500",
         borderColor: "brand.500",
         _hover: {
-          backgroundColor: "brand.700",
-          borderColor: "brand.700",
+          md: {
+            backgroundColor: "brand.700",
+            borderColor: "brand.700",
+          },
         },
       },
       secondary: {
         bg: "gray.800",
         borderColor: "gray.800",
         _hover: {
-          backgroundColor: "gray.700",
-          borderColor: "gray.700",
+          md: {
+            backgroundColor: "gray.700",
+            borderColor: "gray.700",
+          },
         },
       },
       ghost: {
         bg: "transparent",
         borderColor: "transparent",
         _hover: {
-          bgColor: "gray.800",
-          borderColor: "gray.800",
+          md: {
+            bgColor: "gray.800",
+            borderColor: "gray.800",
+          },
         },
       },
       outline: {
@@ -65,7 +71,9 @@ const ButtonStyles = cva({
         borderWidth: 1,
         borderColor: "gray.800",
         _hover: {
-          bgColor: "gray.800",
+          md: {
+            bgColor: "gray.800",
+          },
         },
       },
     },
