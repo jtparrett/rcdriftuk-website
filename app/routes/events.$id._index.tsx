@@ -3,7 +3,7 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { Form, redirect, useLoaderData } from "@remix-run/react";
+import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
 import { format, formatDuration, intervalToDuration } from "date-fns";
 import { useMemo } from "react";
 import {
@@ -28,6 +28,7 @@ import { EventTicketButton } from "~/components/EventTicketButton";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
+import { Spinner } from "~/components/Spinner";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -136,6 +137,8 @@ const Page = () => {
   const startDate = useMemo(() => new Date(event.startDate), [event]);
   const endDate = useMemo(() => new Date(event.endDate), [event]);
   const clerk = useClerk();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <Container maxW={1100} px={2} py={12}>
@@ -246,8 +249,28 @@ const Page = () => {
             <Flex gap={2} pt={2}>
               <SignedIn>
                 <Form method="post">
-                  <Button type="submit" value="submit" variant="secondary">
-                    I'm {isAttending && "Not "}Interested{" "}
+                  <Button
+                    type="submit"
+                    value="submit"
+                    variant="secondary"
+                    disabled={isSubmitting}
+                    color={isSubmitting ? "transparent" : undefined}
+                  >
+                    {isSubmitting && (
+                      <styled.span
+                        position="absolute"
+                        top={0}
+                        left={0}
+                        w="full"
+                        h="full"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Spinner />
+                      </styled.span>
+                    )}
+                    {isAttending && "Not "}Interested{" "}
                     {isAttending ? (
                       <RiCloseCircleFill />
                     ) : (

@@ -17,6 +17,7 @@ const ButtonStyles = cva({
     fontSize: "sm",
     color: "white !important",
     borderWidth: 1,
+    position: "relative",
     _disabled: {
       opacity: 0.5,
       cursor: "not-allowed",

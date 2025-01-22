@@ -117,6 +117,11 @@ export default defineConfig({
             transform: "rotateY(360deg)",
           },
         },
+        bounce: {
+          "50%": {
+            transform: "translateY(-8px)",
+          },
+        },
       },
     },
   },
