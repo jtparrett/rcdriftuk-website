@@ -141,7 +141,7 @@ const Page = () => {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <Container maxW={1100} px={2} py={12}>
+    <Container maxW={1100} px={2} pb={6}>
       <Flex flexDir={{ base: "column", md: "row" }} gap={4}>
         <Box
           borderWidth={1}

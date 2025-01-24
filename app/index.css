@@ -1,5 +1,10 @@
 @layer reset, base, tokens, recipes, utilities;
 
+.pull-up-header {
+  padding-top: 114px;
+  margin-top: -114px;
+}
+
 .leaflet-popup-content {
   margin: 0 !important;
 }

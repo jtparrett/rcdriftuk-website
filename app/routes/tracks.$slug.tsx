@@ -61,7 +61,6 @@ const TrackPage = () => {
 
   return (
     <Flex
-      py={8}
       gap={4}
       flexDir={{ base: "column", md: "row" }}
       alignItems={{ base: "stretch", md: "flex-start" }}

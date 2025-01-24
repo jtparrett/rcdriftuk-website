@@ -172,7 +172,7 @@ const TournamentPage = () => {
   useAblyRealtimeReloader(tournament.id);
 
   return (
-    <Container pb={12} px={2} pt={8} maxW={1100}>
+    <Container pb={12} px={2} maxW={1100}>
       {tournament.liveUrl && (
         <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
           <styled.iframe src={tournament.liveUrl} />
@@ -231,7 +231,9 @@ const TournamentPage = () => {
                 tournament.judges.length &&
               tournament.nextQualifyingLap && (
                 <Form method="post">
-                  <Button type="submit">Start Next Run</Button>
+                  <Button type="submit" w={{ base: "full", sm: "auto" }}>
+                    Start Next Run
+                  </Button>
                 </Form>
               )}
 
@@ -239,7 +241,9 @@ const TournamentPage = () => {
               tournament.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap === null && (
                 <Form method="post">
-                  <Button type="submit">End Qualifying</Button>
+                  <Button type="submit" w={{ base: "full", sm: "auto" }}>
+                    End Qualifying
+                  </Button>
                 </Form>
               )}
 
@@ -248,7 +252,9 @@ const TournamentPage = () => {
               (tournament.nextBattle?.BattleVotes.length ?? 0) >=
                 tournament.judges.length && (
                 <Form method="post">
-                  <Button type="submit">Start Next Battle</Button>
+                  <Button type="submit" w={{ base: "full", sm: "auto" }}>
+                    Start Next Battle
+                  </Button>
                 </Form>
               )}
 

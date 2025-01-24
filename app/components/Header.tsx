@@ -1,4 +1,4 @@
-import { styled, Flex, Spacer, Container, Box } from "~/styled-system/jsx";
+import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
 import { Link, useLocation } from "@remix-run/react";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
@@ -25,6 +25,8 @@ import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/remix";
 import type { GetUser } from "~/utils/getUser.server";
 
 const today = format(new Date(), "dd-MM-yy");
+
+export const HEADER_HEIGHT = 64;
 
 const MenuIcon = styled("span", {
   base: {
@@ -269,20 +271,26 @@ export const Header = ({ user }: Props) => {
 
   return (
     <Box
-      pt={{ base: 2, md: 0 }}
-      borderBottomWidth={1}
-      borderColor="gray.800"
       pos="sticky"
-      top={0}
+      top={2}
+      mt={6}
+      mb={6}
       zIndex={10}
-      bgColor="rgba(12, 12, 12, 0.8)"
-      backdropFilter="blur(10px)"
-      shadow="2xl"
+      maxW={1100}
+      mx="auto"
+      px={2}
     >
-      <Container px={2} maxW={1100}>
-        <Flex alignItems="center" py={5}>
+      <Box
+        bgColor="rgba(12, 12, 12, 0.8)"
+        backdropFilter="blur(10px)"
+        shadow="2xl"
+        rounded="full"
+        borderWidth={1}
+        borderColor="gray.800"
+      >
+        <Flex alignItems="center" px={4} h={HEADER_HEIGHT + "px"}>
           <Link to="/">
-            <styled.img w={120} src="/rcdriftuk.svg" />
+            <styled.img w={100} src="/rcdriftuk.svg" ml={3} />
           </Link>
 
           <Spacer />
@@ -341,12 +349,17 @@ export const Header = ({ user }: Props) => {
           </SignedIn>
 
           <SignedOut>
-            <LinkButton variant="outline" size="sm" to="/sign-in">
+            <LinkButton
+              variant="outline"
+              size="md"
+              to="/sign-in"
+              rounded="full"
+            >
               Sign In
             </LinkButton>
           </SignedOut>
         </Flex>
-      </Container>
+      </Box>
     </Box>
   );
 };

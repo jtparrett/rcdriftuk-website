@@ -9,9 +9,9 @@ const Page = () => {
   const tab = getTabParam(params.tab);
 
   return (
-    <Flex h="calc(100dvh - 90px)" flexDir="column">
+    <Flex h="calc(100dvh - 122px)" flexDir="column">
       <Container px={2} w="full" maxW={1100}>
-        <Flex gap={2} py={2}>
+        <Flex gap={0.5} py={3}>
           {Object.values(TrackTypes).map((item) => (
             <Tab
               key={item}
