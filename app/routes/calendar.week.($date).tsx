@@ -11,7 +11,7 @@ import {
   endOfDay,
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import { LoaderFunctionArgs } from "react-router";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
