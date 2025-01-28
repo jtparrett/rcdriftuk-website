@@ -578,6 +578,14 @@ const Page = () => {
               </styled.p>
 
               <P>
+                Rules and regulations can be viewed here:
+              </P>
+
+              <LinkButton to="/2025/rules" mt={4}>
+                View Rules
+              </LinkButton>
+
+              <P>
                 Our new free online tournament software allows any event's
                 results to be viewed online in real-time, functioning as a
                 results-only live stream.

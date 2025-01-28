@@ -7,6 +7,7 @@ import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getEventDate } from "~/utils/getEventDate";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
+import { format } from "date-fns";
 
 export function headers() {
   return {
@@ -76,6 +77,23 @@ export const loader = async () => {
 const Page = () => {
   const events = useLoaderData<typeof loader>();
 
+  // Group events by month
+  const eventsByMonth = events.reduce((acc, event) => {
+    const startDate = new Date(event.startDate);
+    const monthKey = format(startDate, "MMMM");
+    if (!acc[monthKey]) {
+      acc[monthKey] = [];
+    }
+    acc[monthKey].push(event);
+    return acc;
+  }, {} as Record<string, typeof events>);
+
+  // Find main event (November 8-9)
+  const mainEvent = events.find(event => {
+    const startDate = new Date(event.startDate);
+    return format(startDate, "MMMM d") === "November 8";
+  });
+
   return (
     <Container px={2} maxW={1100}>
       <styled.div pt={4} pb={12}>
@@ -84,64 +102,161 @@ const Page = () => {
         </styled.h1>
         <Box h={1} bgColor="brand.500" w={12} mb={4} />
 
-        <Box overflow="hidden">
-          <Flex flexWrap="wrap" ml={-4} mt={-4}>
-            {events.map((event) => {
-              const startDate = new Date(event.startDate);
-              const endDate = new Date(event.endDate);
-              const isSoldOut = isEventSoldOut(event);
-
-              return (
-                <Flex
-                  key={event.id}
-                  pt={4}
-                  pl={4}
-                  w={{ base: "50%", lg: "33.3333%" }}
-                >
+        {mainEvent && (
+          <>
+            <styled.h2 fontSize="xl" mb={4} fontWeight="bold">
+              Main Event
+            </styled.h2>
+            <Box overflow="hidden" mb={8}>
+              <Flex>
+                <Box w="full">
                   <styled.article
                     bgColor="gray.900"
                     overflow="hidden"
                     rounded="lg"
                     pos="relative"
                     w="full"
-                    borderWidth={1}
-                    borderColor="gray.800"
+                    borderWidth={2}
+                    borderColor="brand.500"
                   >
                     <styled.img
-                      src={event.cover ?? "/2025-cover.jpg"}
-                      alt={event.name}
+                      src={mainEvent.cover ?? "/2025-cover.jpg"}
+                      alt={mainEvent.name}
                       w="full"
+                      h="300px"
+                      objectFit="cover"
                     />
-                    <Box p={4}>
+                    <Box p={6}>
                       <styled.h1
-                        fontWeight="bold"
+                        fontWeight="black"
                         textWrap="balance"
-                        fontSize="lg"
+                        fontSize="2xl"
+                        mb={2}
                       >
-                        {event.name}
+                        {mainEvent.name}
                       </styled.h1>
 
-                      <styled.p color="gray.400" fontSize="sm">
-                        {getEventDate(startDate, endDate)}
+                      <styled.p color="gray.400" fontSize="lg" mb={4}>
+                        {getEventDate(new Date(mainEvent.startDate), new Date(mainEvent.endDate))}
                       </styled.p>
 
                       <EventTicketStatus
-                        isSoldOut={isSoldOut}
+                        isSoldOut={isEventSoldOut(mainEvent)}
                         event={{
-                          ...event,
-                          ticketReleaseDate: event.ticketReleaseDate
-                            ? new Date(event.ticketReleaseDate)
+                          ...mainEvent,
+                          ticketReleaseDate: mainEvent.ticketReleaseDate
+                            ? new Date(mainEvent.ticketReleaseDate)
                             : null,
                         }}
                       />
                     </Box>
-                    <LinkOverlay to={`/events/${event.id}`} />
+                    <LinkOverlay to={`/events/${mainEvent.id}`} />
                   </styled.article>
-                </Flex>
-              );
-            })}
-          </Flex>
-        </Box>
+                </Box>
+              </Flex>
+            </Box>
+          </>
+        )}
+
+        {Object.entries(eventsByMonth).map(([month, monthEvents]) => (
+          <Box 
+            key={month} 
+            mb={8}
+            p={6}
+            bgColor="gray.900"
+            borderWidth={1}
+            borderColor="gray.800"
+            rounded="xl"
+          >
+            <styled.h2 
+              fontSize="xl" 
+              mb={4} 
+              fontWeight="bold"
+              pb={2}
+              borderBottomWidth={1}
+              borderColor="gray.800"
+            >
+              {month}
+            </styled.h2>
+            <Box overflow="hidden">
+              <Flex flexWrap="wrap" ml={-4} mt={-4}>
+                {monthEvents.map(event => {
+                  const startDate = new Date(event.startDate);
+                  const endDate = new Date(event.endDate);
+                  const isSoldOut = isEventSoldOut(event);
+                  const isMainEvent = event.id === mainEvent?.id;
+
+                  return (
+                    <Flex
+                      key={event.id}
+                      pt={4}
+                      pl={4}
+                      w={{ base: "100%", md: "50%", lg: "33.3333%" }}
+                    >
+                      <styled.article
+                        bgColor="black"
+                        overflow="hidden"
+                        rounded="lg"
+                        pos="relative"
+                        w="full"
+                        borderWidth={isMainEvent ? 2 : 1}
+                        borderColor={isMainEvent ? "brand.500" : "gray.800"}
+                      >
+                        <styled.img
+                          src={event.cover ?? "/2025-cover.jpg"}
+                          alt={event.name}
+                          w="full"
+                          h={isMainEvent ? "200px" : "160px"}
+                          objectFit="cover"
+                        />
+                        <Box p={isMainEvent ? 5 : 4}>
+                          <styled.h1
+                            fontWeight={isMainEvent ? "black" : "bold"}
+                            textWrap="balance"
+                            fontSize={isMainEvent ? "xl" : "lg"}
+                          >
+                            {event.name}
+                            {isMainEvent && (
+                              <styled.span 
+                                ml={2} 
+                                color="brand.500" 
+                                fontSize="sm"
+                                fontWeight="bold"
+                              >
+                                MAIN EVENT
+                              </styled.span>
+                            )}
+                          </styled.h1>
+
+                          <styled.p 
+                            color="gray.400" 
+                            fontSize={isMainEvent ? "md" : "sm"}
+                            mt={1}
+                          >
+                            {getEventDate(startDate, endDate)}
+                          </styled.p>
+
+                          <Box mt={isMainEvent ? 4 : 2}>
+                            <EventTicketStatus
+                              isSoldOut={isSoldOut}
+                              event={{
+                                ...event,
+                                ticketReleaseDate: event.ticketReleaseDate
+                                  ? new Date(event.ticketReleaseDate)
+                                  : null,
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                        <LinkOverlay to={`/events/${event.id}`} />
+                      </styled.article>
+                    </Flex>
+                  );
+                })}
+              </Flex>
+            </Box>
+          </Box>
+        ))}
       </styled.div>
     </Container>
   );

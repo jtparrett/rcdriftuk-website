@@ -22,6 +22,12 @@ const Page = () => {
             >
               Schedule
             </Tab>
+            <Tab
+              to="/2025/rules"
+              isActive={location.pathname.startsWith("/2025/rules")}
+            >
+              Rules
+            </Tab>
           </Flex>
         </Container>
       </Box>
