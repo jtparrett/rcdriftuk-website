@@ -23,6 +23,7 @@ import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
 import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/remix";
 import type { GetUser } from "~/utils/getUser.server";
+import { Glow } from "~/components/Glow";
 
 const today = format(new Date(), "dd-MM-yy");
 
@@ -102,6 +103,20 @@ const Menu = ({ user }: Props) => {
             </MenuIcon>
             Home
           </MenuLink>
+
+          <Box pos="relative" rounded="lg" overflow="hidden">
+            <Glow intensity="bright" size="sm" />
+            <MenuLink
+              to="/2025"
+              active={location.pathname === "/2025" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiTrophyLine />
+              </MenuIcon>
+              2025 Tournament
+            </MenuLink>
+          </Box>
+
           <MenuLink
             to="/ratings"
             active={
@@ -292,6 +307,36 @@ export const Header = ({ user }: Props) => {
           <Link to="/">
             <styled.img w={100} src="/rcdriftuk.svg" ml={3} />
           </Link>
+
+          <Box 
+            display={{ base: "none", md: "block" }} 
+            ml={4} 
+            pos="relative"
+            rounded="full"
+            overflow="hidden"
+          >
+            <Glow size="sm" intensity="bright" />
+            <LinkButton
+              size="sm"
+              
+              to="/2025"
+              gap={2}
+              alignItems="center"
+              borderWidth={1}
+              rounded="full"
+              h={8}
+              bgColor="rgba(12, 12, 12, 0.8)"
+              fontSize="sm"
+              borderColor="rgba(236, 26, 85, 0.1)"
+              py={0}
+              _hover={{
+                bgColor: "rgba(236, 26, 85, 0.4)",
+              }}
+            >
+              <RiTrophyLine size={14} />
+              2025 Tournament
+            </LinkButton>
+          </Box>
 
           <Spacer />
 

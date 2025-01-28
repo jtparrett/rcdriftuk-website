@@ -60,7 +60,7 @@ export default function RulesPage() {
         </styled.h1>
 
         <P>
-          All competitors must adhere to the following rules at all times. Failure to comply may result in <Highlight>disqualification</Highlight>.
+          All competitors must adhere to the following rules at all times. Failure to comply may result in <Highlight>disqualification from the current event</Highlight>.
         </P>
 
         <Stack gap={4}>
@@ -68,7 +68,7 @@ export default function RulesPage() {
             <H3>Sportsmanship</H3>
             <UL>
               <styled.li>Be kind and courteous to fellow drivers, staff, and spectators</styled.li>
-              <styled.li>Unsportsmanlike behavior may result in <Highlight>immediate disqualification</Highlight></styled.li>
+              <styled.li>Unsportsmanlike behavior may result in <Highlight>immediate disqualification from the current event</Highlight></styled.li>
             </UL>
 
             <H3>Judges' Decisions</H3>
@@ -81,7 +81,7 @@ export default function RulesPage() {
               <styled.li><Highlight>No</Highlight> external devices emitting smoke, sound, or similarly distracting effects</styled.li>
               <styled.li>Cars must pose <Highlight>no danger</Highlight> to competitors, staff, or spectators</styled.li>
               <styled.li>Batteries must be handled <Highlight>responsibly</Highlight> (e.g., use a LiPo bag for charging)</styled.li>
-              <styled.li>Any car deemed unsafe will be <Highlight>disqualified</Highlight></styled.li>
+              <styled.li>Any car deemed unsafe will be <Highlight>disqualified from the current event</Highlight></styled.li>
             </UL>
           </CollapsibleCard>
 
@@ -96,7 +96,7 @@ export default function RulesPage() {
 
             <H3>Chassis</H3>
             <UL>
-              <styled.li><Highlight>RWD only</Highlight>, with an independently suspended, commercially available chassis</styled.li>
+              <styled.li><Highlight>Rear Wheel Drive (RWD) only</Highlight>, with an independent suspension. No solid axles. The chassis must be commercially available</styled.li>
               <styled.li><Highlight>No</Highlight> homemade or prototype chassis or parts</styled.li>
               <styled.li><Highlight>One chassis</Highlight> per driver (no spare "T-cars" unless explicitly allowed)</styled.li>
             </UL>
@@ -144,16 +144,10 @@ export default function RulesPage() {
           </CollapsibleCard>
 
           <CollapsibleCard title="3. Track Rules">
-            <H3>Boundaries</H3>
-            <UL>
-              <styled.li>Cars must stay <Highlight>within track boundaries</Highlight> at all times</styled.li>
-              <styled.li>Leaving the track may result in <Highlight>loss of all points</Highlight> for that run</styled.li>
-            </UL>
-
             <H3>Direction of Travel</H3>
             <UL>
               <styled.li>Follow the <Highlight>designated track layout</Highlight> and direction</styled.li>
-              <styled.li>Wrong direction driving may cause <Highlight>disqualification</Highlight></styled.li>
+              <styled.li>Wrong direction driving may cause <Highlight>disqualification from the current event</Highlight></styled.li>
             </UL>
 
             <P mt={4}>
@@ -162,27 +156,37 @@ export default function RulesPage() {
           </CollapsibleCard>
 
           <CollapsibleCard title="4. Competition Format">
-            <P>See Judging Criteria</P>
+            <P>
+              Event and track owners are responsible for defining and communicating the competition format and schedule for their respective events.
+            </P>
+
+            <H3>Schedule Compliance</H3>
+            <UL>
+              <styled.li>All drivers must <Highlight>strictly follow</Highlight> the defined format and schedule</styled.li>
+              <styled.li>Drivers must be <Highlight>ready to compete</Highlight> at their designated time</styled.li>
+              <styled.li>Failure to comply with schedules may result in <Highlight>penalties at judges' discretion</Highlight></styled.li>
+            </UL>
+
+            <P mt={4}>
+              The competition format and schedule will be communicated to all participants before the event. It is each driver's responsibility to be aware of and follow the timeline.
+            </P>
           </CollapsibleCard>
 
-          <CollapsibleCard title="5. Tandem Battle Rules">
-            <P>See Judging Criteria</P>
-          </CollapsibleCard>
-
-          <CollapsibleCard title="6. Penalties & Disqualifications">
+          <CollapsibleCard title="5. Penalties & Disqualifications">
             <H3>Vehicle Violations</H3>
             <UL>
-              <styled.li>Technical infractions may lead to <Highlight>disqualification</Highlight></styled.li>
+              <styled.li>Technical infractions may lead to <Highlight>disqualification from the current event</Highlight></styled.li>
             </UL>
 
             <H3>Behavioral Infractions</H3>
             <UL>
-              <styled.li>Unsportsmanlike conduct or disregard for safety: <Highlight>immediate disqualification</Highlight></styled.li>
+              <styled.li>Unsportsmanlike conduct or disregard for safety may result in <Highlight>immediate disqualification from the current event
+                </Highlight></styled.li>
               <styled.li>Verbal abuse is <Highlight>strictly prohibited</Highlight></styled.li>
             </UL>
           </CollapsibleCard>
 
-          <CollapsibleCard title="7. Additional Notes">
+          <CollapsibleCard title="6. Additional Notes">
             <UL>
               <styled.li><Highlight>No Protests</Highlight> - Judges' decisions are final</styled.li>
               <styled.li><Highlight>Compliance</Highlight> - Technical inspections may occur at any time</styled.li>
