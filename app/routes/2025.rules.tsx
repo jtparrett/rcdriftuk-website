@@ -73,7 +73,15 @@ export default function RulesPage() {
 
             <H3>Judges' Decisions</H3>
             <UL>
-              <styled.li>All judges' decisions are <Highlight>final</Highlight> and <Highlight>cannot be contested</Highlight></styled.li>
+              <styled.li>All judges' decisions are <Highlight>final</Highlight> unless <Highlight>immediately protested</Highlight></styled.li>
+            </UL>
+
+            <H3>Protests</H3>
+            <UL>
+              <styled.li>Protests must be submitted <Highlight>immediately</Highlight> after the run in question and before the next run begins</styled.li>
+              <styled.li>A protest fee equal to the <Highlight>event's entrance fee</Highlight> must be paid upfront when submitting a protest</styled.li>
+              <styled.li>If the protest is successful, the fee will be <Highlight>refunded in full</Highlight>. If denied, the fee is forfeited</styled.li>
+            
             </UL>
 
             <H3>Safety</H3>
