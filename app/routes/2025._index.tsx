@@ -1,4 +1,4 @@
-import { styled, Container, Box, Flex } from "~/styled-system/jsx";
+import { styled, Container, Box, Flex, Divider } from "~/styled-system/jsx";
 import { LinkButton } from "~/components/Button";
 import {
   RiMapPin2Fill,
@@ -573,9 +573,15 @@ const Page = () => {
                 link:
               </P>
 
-              <LinkButton to="/2025/rules" mb={4}>
+              <LinkButton to="/2025/rules">
                 View Rules &amp; Regulations <RiArrowRightLine />
               </LinkButton>
+
+              <ImageContainer>
+                <styled.img src="/2025/rcdriftuk-2025-rules.jpg" w="full" />
+              </ImageContainer>
+
+              <Divider borderColor="gray.700" />
 
               <P>
                 RCDrift.uk will release a comprehensive judging criteria to be
@@ -588,6 +594,8 @@ const Page = () => {
                 JUDGING CRITERIA COMING SOON
               </styled.p>
 
+              <Divider borderColor="gray.700" />
+
               <P>
                 Our new free online tournament software allows any event's
                 results to be viewed online in real-time, functioning as a
@@ -597,6 +605,8 @@ const Page = () => {
               <ImageContainer>
                 <styled.img src="/2025/rcdriftuk-software-promo.jpg" w="full" />
               </ImageContainer>
+
+              <Divider borderColor="gray.700" />
 
               <P>
                 RCDrift.uk now offers online driver profiles showing ratings,
