@@ -100,6 +100,8 @@ export default function RulesPage() {
               <styled.li>Wheelbase: <Highlight>253–275 mm</Highlight></styled.li>
               <styled.li>Width: <Highlight>Maximum 230 mm</Highlight> (measured at the widest point)</styled.li>
               <styled.li>Weight: <Highlight>1400–2000 g</Highlight> (including body)</styled.li>
+              <styled.li>Ride height at full weight: <Highlight>Minimum 5 mm</Highlight> from ground to chassis</styled.li>
+              <styled.li>Maximum height at full weight: <Highlight>150 mm</Highlight> for any aerodynamic components (wings, spoilers, side dams) measured with car at rest</styled.li>
             </UL>
 
             <H3>Chassis</H3>
@@ -137,6 +139,7 @@ export default function RulesPage() {
             <H3>Wheels & Tires</H3>
             <UL>
               <styled.li>Wheels: <Highlight>Plastic</Highlight>, commercially available (not homemade)</styled.li>
+              <styled.li>Wheels must be <Highlight>covered by body arches</Highlight> - the top of the wheel/tire cannot extend beyond the body when viewed from above</styled.li>
               <styled.li>Tires: Must be the <Highlight>specified control tire</Highlight> for the event/venue</styled.li>
               <styled.li>All four tires must <Highlight>match</Highlight> and be <Highlight>unmodified</Highlight></styled.li>
               <styled.li>Tires must be clean</styled.li>
@@ -147,6 +150,7 @@ export default function RulesPage() {
               <styled.li>Must have a <Highlight>realistic 1:1 car–inspired shell</Highlight></styled.li>
               <styled.li>Body shell must be painted and in good condition; <Highlight>clear windows</Highlight> (front at minimum)</styled.li>
               <styled.li>Aero parts allowed if within width and height limits</styled.li>
+              <styled.li>No part of the wing or body may extend more than <Highlight>25mm behind the rear bumper</Highlight></styled.li>
               <styled.li><Highlight>No</Highlight> strobe lights or distracting lighting</styled.li>
             </UL>
           </CollapsibleCard>
