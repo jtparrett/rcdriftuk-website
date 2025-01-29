@@ -83,7 +83,7 @@ export default function RulesPage() {
               By attending any RCDrift.uk-sanctioned event, all participants
               expressly acknowledge and agree to comply with the following rules
               and regulations. Any failure to adhere to these provisions may
-              result in immediate disqualification from the ongoing tournament,
+              result in immediate disqualification from any ongoing tournament,
               without the possibility of appeal.
             </styled.p>
           </Box>
@@ -104,7 +104,7 @@ export default function RulesPage() {
               </styled.li>
               <styled.li>
                 Any <Highlight>unsportsmanlike conduct</Highlight> shall result
-                in <Highlight>immediate disqualification</Highlight> from the{" "}
+                in <Highlight>immediate disqualification</Highlight> from any{" "}
                 <Highlight>ongoing tournament</Highlight> without the
                 possibility of appeal.
               </styled.li>
@@ -162,7 +162,7 @@ export default function RulesPage() {
               <styled.li>
                 Any vehicle deemed unsafe will result in the{" "}
                 <Highlight>disqualification</Highlight> of the competitor from
-                the ongoing event
+                any ongoing tournament
               </styled.li>
             </UL>
           </CollapsibleCard>
@@ -326,53 +326,56 @@ export default function RulesPage() {
           <CollapsibleCard title="3. Track Rules">
             <UL>
               <styled.li>
-                All competitors must{" "}
-                <Highlight>follow the designated track layout</Highlight> and{" "}
-                <Highlight>direction</Highlight>
+                All competitors are required to{" "}
+                <Highlight>adhere to the designated track layout</Highlight> and{" "}
+                <Highlight>direction</Highlight> at all times.
               </styled.li>
               <styled.li>
-                <Highlight>Driving in the wrong direction</Highlight> may result
-                in <Highlight>disqualification</Highlight> from the ongoing
-                event
+                <Highlight>Driving in the incorrect direction</Highlight> may
+                result in <Highlight>disqualification</Highlight> from any
+                ongoing tournament.
               </styled.li>
               <styled.li>
-                All existing <Highlight>track/venue rules</Highlight> for the
-                specific event will remain in effect and may be{" "}
-                <Highlight>
-                  enforced by the track owner or event organiser
-                </Highlight>{" "}
-                at their discretion
+                All existing <Highlight>track</Highlight> and{" "}
+                <Highlight>venue rules</Highlight> applicable to the specific
+                event shall remain in effect and may be enforced by the{" "}
+                <Highlight>track owner</Highlight> or{" "}
+                <Highlight>event organiser</Highlight> at their sole discretion.
               </styled.li>
             </UL>
           </CollapsibleCard>
 
           <CollapsibleCard title="4. Tournament Format">
             <P>
-              Event and track owners are responsible for defining and
-              communicating the tournament format and schedule for their
-              respective events.
+              Event and track owners are solely responsible for{" "}
+              <Highlight>defining</Highlight> and{" "}
+              <Highlight>communicating</Highlight> the tournament format and
+              schedule for their respective events.
             </P>
 
             <H3>Schedule Compliance</H3>
             <UL>
               <styled.li>
-                All drivers must <Highlight>strictly follow</Highlight> the
-                defined format and schedule
+                All drivers are required to{" "}
+                <Highlight>adhere strictly</Highlight> to the defined format and
+                schedule
               </styled.li>
               <styled.li>
-                Drivers must be <Highlight>ready to compete</Highlight> at their
-                designated time
+                Drivers must be <Highlight>prepared</Highlight> to compete at
+                their designated time
               </styled.li>
               <styled.li>
-                Failure to comply with schedules may result in{" "}
-                <Highlight>penalties at judges' discretion</Highlight>
+                Failure to comply with the established schedule may result in{" "}
+                <Highlight>penalties</Highlight> at the sole discretion of the
+                judges
               </styled.li>
             </UL>
 
-            <P mt={4}>
-              The tournament format and schedule will be communicated to all
-              participants before the event. It is each driver's responsibility
-              to be aware of and follow the timeline.
+            <P>
+              The tournament format and schedule will be{" "}
+              <Highlight>communicated</Highlight> to all participants prior to
+              the event. It is the responsibility of each driver to be fully
+              aware of and comply with the <Highlight>timeline</Highlight>.
             </P>
           </CollapsibleCard>
 
@@ -380,47 +383,51 @@ export default function RulesPage() {
             <H3>Vehicle Violations</H3>
             <UL>
               <styled.li>
-                Technical infractions may lead to{" "}
-                <Highlight>
-                  disqualification from the current event if not rectified
-                  before qualification/battles start
-                </Highlight>
+                Any <Highlight>technical infractions</Highlight> must be
+                rectified before the start of{" "}
+                <Highlight>qualification or battles</Highlight>. Failure to do
+                so may result in <Highlight>disqualification</Highlight> from
+                any ongoing tournament
               </styled.li>
             </UL>
 
             <H3>Behavioral Infractions</H3>
             <UL>
               <styled.li>
-                Unsportsmanlike conduct or disregard for safety may result in{" "}
-                <Highlight>
-                  immediate disqualification from the current event
-                </Highlight>
+                <Highlight>Unsportsmanlike conduct</Highlight> or disregard for
+                safety may result in{" "}
+                <Highlight>immediate disqualification</Highlight> from any
+                ongoing tournament
               </styled.li>
               <styled.li>
-                Verbal abuse is <Highlight>strictly prohibited</Highlight>
+                <Highlight>Verbal abuse</Highlight> is strictly prohibited and
+                will not be tolerated under any circumstances
               </styled.li>
             </UL>
           </CollapsibleCard>
 
           <CollapsibleCard title="6. Additional Notes">
+            <H3>Compliance</H3>
             <UL>
               <styled.li>
-                <Highlight>Compliance</Highlight> - Technical inspections may
-                occur at any time
+                <Highlight>Technical inspections</Highlight> may be conducted at
+                any time during the event to ensure adherence to the established{" "}
+                <Highlight>rules and regulations</Highlight>.
               </styled.li>
+            </UL>
+
+            <H3>Adaptation</H3>
+            <UL>
               <styled.li>
-                <Highlight>Adaptation</Highlight> - Rules may be amended to
-                ensure fairness and safety but an update will be published
-                alerting competitors
+                The rules may be <Highlight>amended</Highlight> as necessary to
+                ensure <Highlight>fairness</Highlight> and{" "}
+                <Highlight>safety</Highlight>. Any updates or changes will be{" "}
+                <Highlight>published promptly</Highlight> and all competitors
+                will be notified accordingly.
               </styled.li>
             </UL>
           </CollapsibleCard>
         </Stack>
-
-        <P textAlign="center" mt={8}>
-          Thank you for respecting the rules and contributing to a fair, fun,
-          and safe RC drift event in the UK!
-        </P>
       </Stack>
     </Container>
   );

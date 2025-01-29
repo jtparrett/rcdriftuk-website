@@ -281,7 +281,7 @@ export const Header = ({ user }: Props) => {
       borderBottomWidth={1}
       borderColor="gray.800"
     >
-      <Container maxW={1100} px={2}>
+      <Container maxW={1100} px={4}>
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"}>
           <Link to="/">
             <styled.img w={100} src="/rcdriftuk.svg" />
