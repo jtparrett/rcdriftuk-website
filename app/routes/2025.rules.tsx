@@ -200,9 +200,8 @@ export default function RulesPage() {
 
           <CollapsibleCard title="6. Additional Notes">
             <UL>
-              <styled.li><Highlight>No Protests</Highlight> - Judges' decisions are final</styled.li>
               <styled.li><Highlight>Compliance</Highlight> - Technical inspections may occur at any time</styled.li>
-              <styled.li><Highlight>Adaptation</Highlight> - Rules may be amended to ensure fairness and safety</styled.li>
+              <styled.li><Highlight>Adaptation</Highlight> - Rules may be amended to ensure fairness and safety but an update will be published alerting competitors</styled.li>
             </UL>
           </CollapsibleCard>
         </Stack>
