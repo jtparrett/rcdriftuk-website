@@ -187,7 +187,7 @@ export default function RulesPage() {
           <CollapsibleCard title="5. Penalties & Disqualifications">
             <H3>Vehicle Violations</H3>
             <UL>
-              <styled.li>Technical infractions may lead to <Highlight>disqualification from the current event</Highlight></styled.li>
+              <styled.li>Technical infractions may lead to <Highlight>disqualification from the current event if not rectified before qualification/battles start</Highlight></styled.li>
             </UL>
 
             <H3>Behavioral Infractions</H3>
