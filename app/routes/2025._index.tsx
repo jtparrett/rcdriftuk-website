@@ -4,6 +4,7 @@ import {
   RiMapPin2Fill,
   RiArrowDownSLine,
   RiCalendar2Fill,
+  RiArrowRightLine,
 } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import type { MetaFunction } from "@remix-run/node";
@@ -566,6 +567,16 @@ const Page = () => {
             </CollapsibleCard>
 
             <CollapsibleCard title="General Information">
+              <P mb={2}>
+                All rules and regulations governing RCDrift.uk-sanctioned
+                tournaments and events are available for review at the following
+                link:
+              </P>
+
+              <LinkButton to="/2025/rules" mb={4}>
+                View Rules &amp; Regulations <RiArrowRightLine />
+              </LinkButton>
+
               <P>
                 RCDrift.uk will release a comprehensive judging criteria to be
                 adhered to at every Feeder Round and at The Main Event. This
@@ -576,14 +587,6 @@ const Page = () => {
               <styled.p color="brand.500" fontWeight="bold" mt={2}>
                 JUDGING CRITERIA COMING SOON
               </styled.p>
-
-              <P>
-                Rules and regulations can be viewed here:
-              </P>
-
-              <LinkButton to="/2025/rules" mt={4}>
-                View Rules
-              </LinkButton>
 
               <P>
                 Our new free online tournament software allows any event's

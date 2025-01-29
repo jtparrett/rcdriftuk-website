@@ -40,20 +40,5 @@ export const Glow = styled("div", {
         },
       },
     },
-    intensity: {
-      bright: {
-        _after: {
-          width: "200px",
-          ml: "-100px",
-          bgGradient: "to-r",
-          gradientFrom: "rgba(236, 26, 85, 0.2)",
-          gradientVia: "rgba(236, 26, 85, 1)",
-          gradientTo: "rgba(236, 26, 85, 0.2)", 
-          opacity: 1,
-          filter: "blur(8px)",
-          animation: "spin 2s linear infinite",
-        },
-      },
-    },
   },
 });
