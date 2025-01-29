@@ -174,21 +174,22 @@ export default function RulesPage() {
                 Must be: <Highlight>1:10 scale</Highlight>
               </styled.li>
               <styled.li>
-                Wheelbase within: <Highlight>253–275 mm</Highlight>
+                Wheelbase within: <Highlight>253–275mm</Highlight>
               </styled.li>
               <styled.li>
-                Width: <Highlight>Maximum 230 mm</Highlight> (measured at the
+                Width: <Highlight>Maximum 230mm</Highlight> (measured at the
                 widest point)
               </styled.li>
               <styled.li>
-                Weight: <Highlight>1400–2000 g</Highlight> (including body)
+                Weight: <Highlight>1400–2000g</Highlight> (including body)
               </styled.li>
               <styled.li>
-                Ride height at full weight (including battery):{" "}
-                <Highlight>Minimum 5 mm</Highlight> from ground to chassis
+                Ride height at full weight (including battery and body):{" "}
+                <Highlight>Minimum 5mm</Highlight> from the ground to the bottom
+                of the chassis with vehicle at rest
               </styled.li>
               <styled.li>
-                Maximum height at full weight: <Highlight>150 mm</Highlight> for
+                Maximum height at full weight: <Highlight>150mm</Highlight> for
                 any aerodynamic components (wings, spoilers, side dams) measured
                 with vehicle at rest
               </styled.li>
