@@ -94,11 +94,11 @@ export default function RulesPage() {
             <H3>Sportsmanship</H3>
             <UL>
               <styled.li>
-                All <Highlight>event attendees</Highlight> are required to
-                conduct themselves in a{" "}
+                All <Highlight>participants</Highlight> are required to conduct
+                themselves in a{" "}
                 <Highlight>
-                  respectful, courteous, and professional manner toward drivers,
-                  event staff, and spectators
+                  respectful, courteous, and professional manner toward fellow
+                  participants
                 </Highlight>{" "}
                 at all times.
               </styled.li>
@@ -152,7 +152,7 @@ export default function RulesPage() {
               <styled.li>
                 All equipment, including but not limited to vehicles, must be
                 maintained in a manner that ensures{" "}
-                <Highlight>no risk or hazard</Highlight> to event attendees
+                <Highlight>no risk or hazard</Highlight> to fellow participants
               </styled.li>
               <styled.li>
                 Batteries must be handled <Highlight>responsibly</Highlight>,
@@ -212,8 +212,8 @@ export default function RulesPage() {
                 prohibited
               </styled.li>
               <styled.li>
-                <Highlight>One chassis</Highlight> per driver (no spare "T-cars"
-                unless explicitly allowed)
+                <Highlight>One chassis</Highlight> per competitor (no spare
+                "T-cars" unless explicitly allowed)
               </styled.li>
               <styled.li>
                 No <Highlight>loose parts</Highlight>, including{" "}
@@ -356,13 +356,13 @@ export default function RulesPage() {
             <H3>Schedule Compliance</H3>
             <UL>
               <styled.li>
-                All drivers are required to{" "}
+                All competitors are required to{" "}
                 <Highlight>adhere strictly</Highlight> to the defined format and
                 schedule
               </styled.li>
               <styled.li>
-                Drivers must be <Highlight>prepared</Highlight> to compete at
-                their designated time
+                Competitors must be <Highlight>prepared</Highlight> to compete
+                at their designated time
               </styled.li>
               <styled.li>
                 Failure to comply with the established schedule may result in{" "}
@@ -374,7 +374,7 @@ export default function RulesPage() {
             <P>
               The tournament format and schedule will be{" "}
               <Highlight>communicated</Highlight> to all participants prior to
-              the event. It is the responsibility of each driver to be fully
+              the event. It is the responsibility of each competitor to be fully
               aware of and comply with the <Highlight>timeline</Highlight>.
             </P>
           </CollapsibleCard>
