@@ -16,6 +16,7 @@ import {
   RiSearch2Line,
   RiSettings3Line,
   RiTrophyLine,
+  RiUserLine,
   RiVipCrown2Line,
 } from "react-icons/ri";
 import { useEffect } from "react";
@@ -194,6 +195,22 @@ const Menu = ({ user }: Props) => {
                   <RiFlagLine />
                 </MenuIcon>
                 My Track
+              </MenuLink>
+            )}
+
+            {user?.driverId && (
+              <MenuLink
+                to={`/ratings/${user.driverId}`}
+                active={
+                  location.pathname.includes(`/ratings/${user.driverId}`)
+                    ? "active"
+                    : "inactive"
+                }
+              >
+                <MenuIcon>
+                  <RiUserLine />
+                </MenuIcon>
+                My Driver Profile
               </MenuLink>
             )}
 
