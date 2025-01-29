@@ -55,19 +55,19 @@ export default function RulesPage() {
   return (
     <Container py={8} px={4} maxW={800}>
       <Stack gap={6}>
-        <Box textAlign="center">
+        <Box textAlign={{ md: "center" }}>
+          <styled.span fontSize="sm" color="gray.500">
+            Last updated: 29/01/2025
+          </styled.span>
+
           <styled.h1
             fontSize="4xl"
             fontWeight="extrabold"
             lineHeight={1.1}
-            mb={2}
+            mt={2}
           >
             Rules & Regulations
           </styled.h1>
-
-          <styled.span fontSize="sm" color="gray.500">
-            Last updated: 29/01/2025
-          </styled.span>
         </Box>
 
         <Box rounded="xl" bgColor="brand.900" p={1}>
@@ -83,7 +83,7 @@ export default function RulesPage() {
               By attending any RCDrift.uk-sanctioned event, all participants
               expressly acknowledge and agree to comply with the following rules
               and regulations. Any failure to adhere to these provisions may
-              result in immediate disqualification from the ongoing competition,
+              result in immediate disqualification from the ongoing tournament,
               without the possibility of appeal.
             </styled.p>
           </Box>
@@ -215,10 +215,25 @@ export default function RulesPage() {
                 <Highlight>One chassis</Highlight> per driver (no spare "T-cars"
                 unless explicitly allowed)
               </styled.li>
+              <styled.li>
+                No <Highlight>loose parts</Highlight>, including{" "}
+                <Highlight>screws</Highlight>, shall be permitted at any time
+                during the event. All components must be securely fastened.
+              </styled.li>
             </UL>
 
             <H3>Electronics Requirements</H3>
             <Stack gap={2}>
+              <P fontWeight="semibold">General:</P>
+              <UL>
+                <styled.li>
+                  All <Highlight>electronic components</Highlight> must be{" "}
+                  <Highlight>firmly and securely mounted</Highlight> to the{" "}
+                  <Highlight>chassis</Highlight> at all times, ensuring no
+                  movement or risk of detachment during the event.
+                </styled.li>
+              </UL>
+
               <P fontWeight="semibold">Battery:</P>
               <UL>
                 <styled.li>
@@ -281,22 +296,29 @@ export default function RulesPage() {
             <H3>Body Shell Requirements</H3>
             <UL>
               <styled.li>
-                Must have a{" "}
-                <Highlight>realistic 1:1 car–inspired body shell</Highlight>
+                The body shell must be{" "}
+                <Highlight>modeled after a realistic 1:1 car design</Highlight>
               </styled.li>
               <styled.li>
-                Body shell must be painted and in good condition;{" "}
-                <Highlight>clear windows</Highlight> (front at minimum)
+                The body shell must be <Highlight>properly painted</Highlight>{" "}
+                and maintained in <Highlight>good condition</Highlight>, with{" "}
+                <Highlight>clear windows</Highlight> (at a minimum, the front
+                window)
               </styled.li>
               <styled.li>
-                Aero parts allowed if within width and height limits
+                <Highlight>Aero components</Highlight> are permissible, provided
+                they comply with the specified <Highlight>width</Highlight> and{" "}
+                <Highlight>height</Highlight> limitations
               </styled.li>
               <styled.li>
-                No part of the wing or body may extend more than{" "}
-                <Highlight>25mm behind the rear bumper</Highlight>
+                No part of the <Highlight>wing</Highlight> or{" "}
+                <Highlight>body</Highlight> shall extend more than{" "}
+                <Highlight>25mm beyond the rear bumper</Highlight>
               </styled.li>
               <styled.li>
-                <Highlight>No strobe lights or distracting lighting</Highlight>
+                The use of <Highlight>strobe lights</Highlight> or any other
+                form of <Highlight>distracting lighting</Highlight> is strictly
+                prohibited
               </styled.li>
             </UL>
           </CollapsibleCard>
@@ -324,10 +346,10 @@ export default function RulesPage() {
             </UL>
           </CollapsibleCard>
 
-          <CollapsibleCard title="4. Competition Format">
+          <CollapsibleCard title="4. Tournament Format">
             <P>
               Event and track owners are responsible for defining and
-              communicating the competition format and schedule for their
+              communicating the tournament format and schedule for their
               respective events.
             </P>
 
@@ -348,7 +370,7 @@ export default function RulesPage() {
             </UL>
 
             <P mt={4}>
-              The competition format and schedule will be communicated to all
+              The tournament format and schedule will be communicated to all
               participants before the event. It is each driver's responsibility
               to be aware of and follow the timeline.
             </P>

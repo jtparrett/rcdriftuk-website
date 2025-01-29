@@ -132,7 +132,6 @@ const GettingStartedPage = () => {
   return (
     <styled.main
       bgColor="black"
-      className="pull-up-header"
       css={{
         background: `
           linear-gradient(180deg,

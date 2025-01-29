@@ -26,6 +26,7 @@ import { LinkButton } from "./components/Button";
 import { RiHome2Line } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
+import { AnnouncementBanner } from "./components/AnnouncementBanner";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -86,6 +87,7 @@ function App() {
       </head>
       <body>
         {!hideBanner && <CookieBanner />}
+        <AnnouncementBanner />
         <Header user={user} />
         <Outlet />
         {!isMap && <Footer />}

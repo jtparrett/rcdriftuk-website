@@ -64,6 +64,7 @@ const TrackPage = () => {
       gap={4}
       flexDir={{ base: "column", md: "row" }}
       alignItems={{ base: "stretch", md: "flex-start" }}
+      mt={4}
     >
       <Box
         borderWidth={1}

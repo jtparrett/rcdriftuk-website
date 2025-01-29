@@ -1,4 +1,4 @@
-import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
+import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
 import { Link, useLocation } from "@remix-run/react";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
@@ -273,38 +273,19 @@ export const Header = ({ user }: Props) => {
   return (
     <Box
       pos="sticky"
-      top={2}
-      mt={6}
-      mb={6}
+      top={0}
       zIndex={10}
-      maxW={1100}
-      mx="auto"
-      px={2}
+      bgColor="rgba(12, 12, 12, 0.8)"
+      backdropFilter="blur(10px)"
+      shadow="2xl"
+      borderBottomWidth={1}
+      borderColor="gray.800"
     >
-      <Box
-        bgColor="rgba(12, 12, 12, 0.8)"
-        backdropFilter="blur(10px)"
-        shadow="2xl"
-        rounded="full"
-        borderWidth={1}
-        borderColor="gray.800"
-      >
-        <Flex alignItems="center" px={4} h={HEADER_HEIGHT + "px"}>
+      <Container maxW={1100} px={2}>
+        <Flex alignItems="center" h={HEADER_HEIGHT + "px"}>
           <Link to="/">
-            <styled.img w={100} src="/rcdriftuk.svg" ml={3} />
+            <styled.img w={100} src="/rcdriftuk.svg" />
           </Link>
-
-          <LinkButton
-            ml={2}
-            size="sm"
-            to="/2025"
-            fontWeight="extrabold"
-            fontStyle="italic"
-            variant="ghost"
-            gap={0}
-          >
-            #RCD<styled.span color="brand.500">UK</styled.span>25
-          </LinkButton>
 
           <Spacer />
 
@@ -372,7 +353,7 @@ export const Header = ({ user }: Props) => {
             </LinkButton>
           </SignedOut>
         </Flex>
-      </Box>
+      </Container>
     </Box>
   );
 };

@@ -26,7 +26,7 @@ const Page = () => {
               to="/2025/rules"
               isActive={location.pathname.startsWith("/2025/rules")}
             >
-              Rules
+              Rules & Regs
             </Tab>
           </Flex>
         </Container>

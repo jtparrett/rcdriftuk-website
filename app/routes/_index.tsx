@@ -66,7 +66,6 @@ const Page = () => {
   return (
     <>
       <Box
-        className="pull-up-header"
         bgImage="url(/grid-bg.svg)"
         bgRepeat="repeat"
         bgSize="60px"

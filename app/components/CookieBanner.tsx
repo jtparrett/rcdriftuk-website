@@ -4,20 +4,28 @@ import { Form } from "@remix-run/react";
 
 export const CookieBanner = () => {
   return (
-    <Box bgColor="gray.900">
-      <Container px={2} maxW={1100} py={2}>
+    <Box
+      bgColor="gray.900"
+      pos="fixed"
+      bottom={0}
+      left={0}
+      w="100%"
+      zIndex={11}
+    >
+      <Container px={2} maxW={1100} py={4}>
         <Flex
-          alignItems="center"
+          alignItems={{ md: "center" }}
           flexDir={{ base: "column", md: "row" }}
           gap={2}
         >
           <styled.p fontSize="sm" flex={1}>
-            We use cookies to improve your experience on our website. By
-            browsing this website, you agree to our use of cookies.
+            We use cookies to improve your experience on our website.
+            <br /> By browsing this website, you agree to our use of cookies.
           </styled.p>
 
           <Flex gap={2}>
             <LinkButton
+              flexGrow={{ base: 1, md: "none" }}
               variant="secondary"
               size="xs"
               target="_blank"
@@ -27,6 +35,7 @@ export const CookieBanner = () => {
             </LinkButton>
 
             <LinkButton
+              flexGrow={{ base: 1, md: "none" }}
               whiteSpace="nowrap"
               size="xs"
               variant="secondary"
@@ -34,11 +43,14 @@ export const CookieBanner = () => {
             >
               More Info
             </LinkButton>
-            <Form method="post" action="/api/hide-banner">
-              <Button size="xs" type="submit">
-                Accept
-              </Button>
-            </Form>
+
+            <Box flexGrow={{ base: 1, md: "none" }}>
+              <Form method="post" action="/api/hide-banner">
+                <Button size="xs" type="submit" w="full">
+                  Accept
+                </Button>
+              </Form>
+            </Box>
           </Flex>
         </Flex>
       </Container>

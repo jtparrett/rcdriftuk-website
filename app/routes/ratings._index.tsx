@@ -256,7 +256,6 @@ const RatingsPage = () => {
     <Box
       pos="relative"
       zIndex={1}
-      className="pull-up-header"
       _after={{
         content: '""',
         pos: "absolute",
