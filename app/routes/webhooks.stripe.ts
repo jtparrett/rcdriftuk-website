@@ -75,12 +75,10 @@ export async function action(args: ActionFunctionArgs) {
         },
       });
 
-      console.log("Sending email to", session);
-
-      if (session.customer_email) {
-        console.log("Sending email to", session.customer_email);
+      if (session.customer_details?.email) {
+        console.log("Sending email to", session.customer_details.email);
         await sendEmail(
-          session.customer_email,
+          session.customer_details.email,
           `Your ticket for ${ticket.event.name}`,
           `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

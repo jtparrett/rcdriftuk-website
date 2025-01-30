@@ -25,7 +25,7 @@ import {
   Spacer,
   styled,
 } from "~/styled-system/jsx";
-import { ably as AblyServer } from "~/utils/ably.server";
+import { createAbly } from "~/utils/ably.server";
 import { ably as AblyClient } from "~/utils/ably";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
@@ -79,8 +79,8 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    AblyServer.channels
-      .get(tournament.id)
+    createAbly()
+      .channels.get(tournament.id)
       .publish("update", new Date().toISOString());
   };
 

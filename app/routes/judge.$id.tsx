@@ -19,7 +19,7 @@ import {
   Container,
   Center,
 } from "~/styled-system/jsx";
-import { ably as AblyServer } from "~/utils/ably.server";
+import { createAbly } from "~/utils/ably.server";
 import { ably as AblyClient } from "~/utils/ably";
 import { prisma } from "~/utils/prisma.server";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
@@ -124,8 +124,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    AblyServer.channels
-      .get(judge.tournament.id)
+    createAbly()
+      .channels.get(judge.tournament.id)
       .publish("update", new Date().toISOString());
   };
 

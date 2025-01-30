@@ -1,6 +1,6 @@
 import Ably from "ably";
 
 export const ably = new Ably.Realtime({
-  authUrl: "/api/ably/auth",
+  authUrl: "https://rcdrift.uk/api/ably/auth",
   authMethod: "GET",
 });
