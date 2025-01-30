@@ -75,10 +75,14 @@ export async function action(args: ActionFunctionArgs) {
         },
       });
 
-      await sendEmail(
-        session.customer_email ?? "",
-        `Your ticket for ${ticket.event.name}`,
-        `
+      console.log("Sending email to", session);
+
+      if (session.customer_email) {
+        console.log("Sending email to", session.customer_email);
+        await sendEmail(
+          session.customer_email,
+          `Your ticket for ${ticket.event.name}`,
+          `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #333; margin-bottom: 24px;">Ticket Confirmed! 🎉</h1>
           
@@ -108,7 +112,8 @@ export async function action(args: ActionFunctionArgs) {
           </p>
         </div>
         `
-      );
+        );
+      }
     }
 
     if (event.type === "checkout.session.expired") {
