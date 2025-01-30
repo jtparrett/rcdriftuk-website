@@ -99,6 +99,16 @@ export async function action(args: ActionFunctionArgs) {
             </p>
           </div>
 
+          <div style="background: #fff8dc; border: 1px solid #deb887; border-radius: 8px; padding: 16px; margin: 24px 0;">
+            <h2 style="color: #333; font-size: 18px; margin-bottom: 12px;">Important Notice</h2>
+            <p style="color: #666; font-size: 14px; line-height: 1.5;">
+              By purchasing this ticket and attending this RCDrift.uk event, you expressly acknowledge and agree to comply with all event rules and regulations. Failure to adhere to these rules may result in removal from the event and forfeiture of your ticket without refund.
+            </p>
+            <p style="color: #666; font-size: 14px; line-height: 1.5; margin-top: 12px;">
+              Please review our complete rules and regulations at <a href="https://rcdrift.uk/2025/rules" style="color: #0066cc; text-decoration: none;">https://rcdrift.uk/2025/rules</a>
+            </p>
+          </div>
+
           <p style="color: #666; font-size: 16px; line-height: 1.5;">
             We look forward to seeing you there! If you have any questions, please don't hesitate to contact us.
           </p>
