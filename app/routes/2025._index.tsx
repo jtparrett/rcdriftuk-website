@@ -5,6 +5,7 @@ import {
   RiArrowDownSLine,
   RiCalendar2Fill,
   RiArrowRightLine,
+  RiTicketFill,
 } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import type { MetaFunction } from "@remix-run/node";
@@ -278,6 +279,15 @@ const Page = () => {
                 platform that invites every driver and track to join the
                 excitement of a brand-new competitive format.
               </P>
+
+              <Box maxW={400} mx="auto" mt={6}>
+                <LinkButton 
+                  to={`/events/760859d8-2693-4cca-a38c-3af6be4885d7`} 
+                  w="full"
+                >
+                  Get Tickets <RiTicketFill />
+                </LinkButton>
+              </Box>
             </Box>
 
             <SummaryGrid>

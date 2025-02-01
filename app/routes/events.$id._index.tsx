@@ -142,14 +142,15 @@ const Page = () => {
 
   return (
     <Container maxW={1100} px={2} pb={6} mt={4}>
-      <Flex flexDir={{ base: "column", md: "row" }} gap={4}>
+      <Flex flexDir={{ base: "column", md: "row" }} gap={4} justifyContent={event.eventTrack ? "flex-start" : "center"}>
         <Box
           borderWidth={1}
           borderColor="gray.800"
           rounded="xl"
           overflow="hidden"
           flex={1}
-          maxW={800}
+          maxW={event.eventTrack ? 800 : 1000}
+          mx={event.eventTrack ? 0 : "auto"}
         >
           {event.cover && (
             <styled.img src={event.cover} alt={event.name} w="full" />
@@ -190,106 +191,114 @@ const Page = () => {
               </Box>
             )}
 
-            <styled.p color="gray.500" fontSize="sm">
-              Duration:{" "}
-              {formatDuration(
+            {!event.enableTicketing && (
+              <>
+                <styled.p color="gray.500" fontSize="sm">
+                  Duration:{" "}
+                  {formatDuration(
                 intervalToDuration({
                   start: startDate,
                   end: endDate,
                 })
-              )}
-            </styled.p>
-            <styled.p fontSize="sm" color="gray.500">
-              {event._count.responses}{" "}
-              {pluralize("people", event._count.responses)} responded
-            </styled.p>
+                  )}
+                </styled.p>
+                <styled.p fontSize="sm" color="gray.500">
+                  {event._count.responses}{" "}
+                  {pluralize("people", event._count.responses)} responded
+                </styled.p>
 
-            {event._count.responses > 0 && (
-              <Flex mt={1} flexWrap="wrap">
-                {event.responses.map((response) => {
-                  if (!response.user) return null;
+                {event._count.responses > 0 && (
+                  <Flex mt={1} flexWrap="wrap">
+                    {event.responses.map((response) => {
+                      if (!response.user) return null;
 
-                  return (
-                    <Box
-                      key={response.id}
-                      overflow="hidden"
-                      rounded="full"
-                      w="40px"
-                      h="40px"
-                      mr={-3}
-                      bgColor="gray.400"
-                    >
-                      <styled.img
-                        title={
-                          response.user.firstName + " " + response.user.lastName
-                        }
-                        src={response.user.image ?? ""}
-                        alt={`${response.user.firstName ?? ""} ${
-                          response.user.lastName ?? ""
-                        }`}
-                      />
-                    </Box>
-                  );
-                })}
-              </Flex>
-            )}
+                      return (
+                        <Box
+                          key={response.id}
+                          overflow="hidden"
+                          rounded="full"
+                          w="40px"
+                          h="40px"
+                          mr={-3}
+                          bgColor="gray.400"
+                        >
+                          <styled.img
+                            title={
+                              response.user.firstName + " " + response.user.lastName
+                            }
+                            src={response.user.image ?? ""}
+                            alt={`${response.user.firstName ?? ""} ${
+                              response.user.lastName ?? ""
+                            }`}
+                          />
+                        </Box>
+                      );
+                    })}
+                  </Flex>
+                )}
 
-            <styled.span fontWeight="semibold" mt={4} display="block">
-              You are currently {isAttending ? "interested" : "not interested"}
-              in this event
-            </styled.span>
+                <styled.span fontWeight="semibold" mt={4} display="block">
+                  You are currently {isAttending ? "interested" : "not interested"}
+                  in this event
+                </styled.span>
 
-            {!isAttending && (
-              <styled.span fontSize="sm" color="gray.500" display="block">
-                Let the host know you're interested in this event by responding
-                below
-              </styled.span>
+                {!isAttending && (
+                  <styled.span fontSize="sm" color="gray.500" display="block">
+                    Let the host know you're interested in this event by responding
+                    below
+                  </styled.span>
+                )}
+              </>
             )}
 
             <Flex gap={2} pt={2}>
-              <SignedIn>
-                <Form method="post">
+              {!event.enableTicketing && (
+                <>
+                  <SignedIn>
+                    <Form method="post">
+                      <Button
+                      type="submit"
+                      value="submit"
+                      variant="secondary"
+                      disabled={isSubmitting}
+                      color={isSubmitting ? "transparent" : undefined}
+                    >
+                      {isSubmitting && (
+                        <styled.span
+                          position="absolute"
+                          top={0}
+                          left={0}
+                          w="full"
+                          h="full"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Spinner />
+                        </styled.span>
+                      )}
+                      {isAttending && "Not "}Interested{" "}
+                      {isAttending ? (
+                        <RiCloseCircleFill />
+                      ) : (
+                        <RiCheckboxCircleFill />
+                      )}
+                    </Button>
+                  </Form>
+                </SignedIn>
+                <SignedOut>
                   <Button
-                    type="submit"
-                    value="submit"
-                    variant="secondary"
-                    disabled={isSubmitting}
-                    color={isSubmitting ? "transparent" : undefined}
+                    onClick={() =>
+                      clerk.openSignIn({
+                        redirectUrl: `/events/${event.id}`,
+                      })
+                    }
                   >
-                    {isSubmitting && (
-                      <styled.span
-                        position="absolute"
-                        top={0}
-                        left={0}
-                        w="full"
-                        h="full"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Spinner />
-                      </styled.span>
-                    )}
-                    {isAttending && "Not "}Interested{" "}
-                    {isAttending ? (
-                      <RiCloseCircleFill />
-                    ) : (
-                      <RiCheckboxCircleFill />
-                    )}
+                    I'm Interested <RiCheckboxCircleFill />
                   </Button>
-                </Form>
-              </SignedIn>
-              <SignedOut>
-                <Button
-                  onClick={() =>
-                    clerk.openSignIn({
-                      redirectUrl: `/events/${event.id}`,
-                    })
-                  }
-                >
-                  I'm Interested <RiCheckboxCircleFill />
-                </Button>
-              </SignedOut>
+                </SignedOut>
+              </>
+              )}
 
               {event.link && (
                 <LinkButton to={event.link} target="_blank" variant="outline">
