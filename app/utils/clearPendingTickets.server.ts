@@ -8,7 +8,7 @@ export const clearPendingTickets = async (eventId: string) => {
     where: {
       eventId,
       status: TicketStatus.PENDING,
-      createdAt: {
+      updatedAt: {
         lte: tenMinutesAgo,
       },
     },
