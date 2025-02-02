@@ -1,7 +1,6 @@
 import { TicketStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import invariant from "tiny-invariant";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
@@ -14,7 +13,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const url = new URL(args.request.url);
   const earlyAccessCode = url.searchParams.get("code");
 
-  invariant(userId, "Unauthorized");
+  if (!userId) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
 
   const event = await prisma.events.findUnique({
     where: {
