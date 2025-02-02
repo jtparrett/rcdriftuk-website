@@ -43,9 +43,13 @@ const Page = () => {
         <styled.h1 fontSize="2xl" fontWeight="bold" textWrap="balance">
           You're going to {ticket.event.name}
         </styled.h1>
-        <styled.p mb={4} textWrap="balance">
+        <styled.p mb={2} textWrap="balance">
           We'll send you a confirmation email shortly. Be sure to check any
           track/event rules prior to attending this event.
+        </styled.p>
+        <styled.p mb={4} textWrap="balance">
+          P.S check your spam folder if you don't see confirmation in your
+          inbox.
         </styled.p>
         <LinkButton to={`/events/${ticket.eventId}`}>Back to Event</LinkButton>
       </Box>
