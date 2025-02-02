@@ -207,6 +207,7 @@ const CalendarNewPage = () => {
                 rounded="none"
                 variant={enableTicketing ? "secondary" : "primary"}
                 flex={1}
+                type="button"
                 onClick={() => setEnableTicketing(false)}
               >
                 Disable
@@ -215,6 +216,7 @@ const CalendarNewPage = () => {
                 rounded="none"
                 variant={enableTicketing ? "primary" : "secondary"}
                 flex={1}
+                type="button"
                 onClick={() => setEnableTicketing(true)}
               >
                 Enable
