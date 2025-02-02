@@ -1,6 +1,7 @@
 import { TicketStatus } from "@prisma/client";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
+import { getEventDate } from "~/utils/getEventDate";
 import { prisma } from "~/utils/prisma.server";
 import { sendEmail } from "~/utils/resend.server";
 import { stripe } from "~/utils/stripe.server";
@@ -90,11 +91,11 @@ export async function action(args: ActionFunctionArgs) {
             Great news! Your ticket for <strong>${ticket.event.name}</strong> has been confirmed and paid for.
           </p>
 
-          <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 24px 0;">
-            <h2 style="color: #333; font-size: 18px; margin-bottom: 12px;">Event Details</h2>
+          <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 8px 0;">
+            <h2 style="color: #333; font-size: 18px; margin-bottom: 4px;">Event Details</h2>
             <p style="color: #666; margin: 8px 0;">
               <strong>Event:</strong> ${ticket.event.name}<br>
-              <strong>Date:</strong> ${new Date(ticket.event.startDate).toLocaleDateString()}<br>
+              <strong>Date:</strong> ${getEventDate(ticket.event.startDate, ticket.event.endDate)}<br>
               ${ticket.event.eventTrack ? `<strong>Location:</strong> ${ticket.event.eventTrack.name}<br>` : ""}
             </p>
           </div>
