@@ -9,6 +9,7 @@ import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { toZonedTime } from "date-fns-tz";
 import { useState, useEffect } from "react";
 import { ClientOnly } from "./ClientOnly";
+import { useRevalidator } from "@remix-run/react";
 
 interface Props {
   event: GetEvent;
@@ -17,6 +18,8 @@ interface Props {
 }
 
 const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
+  const revalidator = useRevalidator();
+
   const [timeUntilRelease, setTimeUntilRelease] = useState({
     days: 0,
     hours: 0,
@@ -34,18 +37,30 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
       // Convert months to days (approximate)
       const totalDays = (duration.months ?? 0) * 30 + (duration.days ?? 0);
 
-      setTimeUntilRelease({
+      const newTimeUntilRelease = {
         days: totalDays,
         hours: duration.hours ?? 0,
         minutes: duration.minutes ?? 0,
         seconds: duration.seconds ?? 0,
-      });
+      };
+
+      setTimeUntilRelease(newTimeUntilRelease);
+
+      // Check if countdown has reached 0
+      if (
+        newTimeUntilRelease.days <= 0 &&
+        newTimeUntilRelease.hours <= 0 &&
+        newTimeUntilRelease.minutes <= 0 &&
+        newTimeUntilRelease.seconds <= 0
+      ) {
+        revalidator.revalidate();
+      }
     };
 
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, [releaseDate]);
+  }, [releaseDate, revalidator]);
 
   const formatNumber = (num: number) => String(num).padStart(2, "0");
 
