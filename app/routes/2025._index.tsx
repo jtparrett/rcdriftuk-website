@@ -281,11 +281,11 @@ const Page = () => {
               </P>
 
               <Box maxW={400} mx="auto" mt={6}>
-                <LinkButton 
-                  to={`/events/760859d8-2693-4cca-a38c-3af6be4885d7`} 
+                <LinkButton
+                  to={`/events/760859d8-2693-4cca-a38c-3af6be4885d7`}
                   w="full"
                 >
-                  Get Tickets <RiTicketFill />
+                  Buy Ticket <RiTicketFill />
                 </LinkButton>
               </Box>
             </Box>
