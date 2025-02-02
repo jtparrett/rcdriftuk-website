@@ -15,6 +15,7 @@ import {
   RiRocketLine,
   RiSearch2Line,
   RiSettings3Line,
+  RiTicketLine,
   RiTrophyLine,
   RiUserLine,
   RiVipCrown2Line,
@@ -195,6 +196,15 @@ const Menu = ({ user }: Props) => {
                   <RiFlagLine />
                 </MenuIcon>
                 My Track
+              </MenuLink>
+            )}
+
+            {user && (
+              <MenuLink to={`/tickets`} active="inactive">
+                <MenuIcon>
+                  <RiTicketLine />
+                </MenuIcon>
+                My Tickets
               </MenuLink>
             )}
 
