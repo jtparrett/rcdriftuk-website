@@ -8,6 +8,7 @@ import { styled } from "~/styled-system/jsx";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { toZonedTime } from "date-fns-tz";
 import { useState, useEffect } from "react";
+import { ClientOnly } from "./ClientOnly";
 
 interface Props {
   event: GetEvent;
@@ -16,18 +17,18 @@ interface Props {
 }
 
 const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
-  const [timeUntilRelease, setTimeUntilRelease] = useState({ 
+  const [timeUntilRelease, setTimeUntilRelease] = useState({
     days: 0,
-    hours: 0, 
-    minutes: 0, 
-    seconds: 0 
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
   });
 
   useEffect(() => {
     const updateCountdown = () => {
       const duration = intervalToDuration({
         start: new Date(),
-        end: releaseDate
+        end: releaseDate,
       });
 
       // Convert months to days (approximate)
@@ -37,7 +38,7 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
         days: totalDays,
         hours: duration.hours ?? 0,
         minutes: duration.minutes ?? 0,
-        seconds: duration.seconds ?? 0
+        seconds: duration.seconds ?? 0,
       });
     };
 
@@ -46,13 +47,21 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
     return () => clearInterval(interval);
   }, [releaseDate]);
 
-  const formatNumber = (num: number) => String(num).padStart(2, '0');
+  const formatNumber = (num: number) => String(num).padStart(2, "0");
 
   return (
-    <styled.div textAlign="center" color="brand.500" fontFamily="mono" fontWeight="bold" mt={2}>
-      Tickets available in{" "}
+    <styled.div
+      textAlign="center"
+      color="brand.500"
+      fontFamily="mono"
+      fontWeight="semibold"
+      mt={2}
+    >
+      Tickets release in{" "}
       <styled.span fontSize="lg">
-        {timeUntilRelease.days}d {formatNumber(timeUntilRelease.hours)}:{formatNumber(timeUntilRelease.minutes)}:{formatNumber(timeUntilRelease.seconds)}
+        {timeUntilRelease.days}d {formatNumber(timeUntilRelease.hours)}:
+        {formatNumber(timeUntilRelease.minutes)}:
+        {formatNumber(timeUntilRelease.seconds)}
       </styled.span>
     </styled.div>
   );
@@ -60,13 +69,12 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
 
 export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   const clerk = useClerk();
-  const [isClient, setIsClient] = useState(false);
-  const releaseDate = event?.ticketReleaseDate ? toZonedTime(new Date(event.ticketReleaseDate), "UTC") : null;
-  const isBeforeRelease = releaseDate ? isBefore(toZonedTime(new Date(), "UTC"), releaseDate) : false;
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const releaseDate = event?.ticketReleaseDate
+    ? toZonedTime(new Date(event.ticketReleaseDate), "UTC")
+    : null;
+  const isBeforeRelease = releaseDate
+    ? isBefore(toZonedTime(new Date(), "UTC"), releaseDate)
+    : false;
 
   if (!event || !event.enableTicketing) {
     return null;
@@ -76,9 +84,13 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
     return (
       <>
         <Button disabled w="full" variant="secondary">
-          Buy Ticket
+          Buy Ticket <RiTicketFill />
         </Button>
-        {isClient && releaseDate && <CountdownDisplay releaseDate={releaseDate} />}
+        {releaseDate && (
+          <ClientOnly>
+            <CountdownDisplay releaseDate={releaseDate} />
+          </ClientOnly>
+        )}
       </>
     );
   }
