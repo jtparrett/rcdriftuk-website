@@ -132,6 +132,9 @@ export async function action(args: ActionFunctionArgs) {
       await prisma.eventTickets.update({
         where: {
           id: Number(ticketId),
+          status: {
+            not: TicketStatus.CONFIRMED,
+          },
         },
         data: {
           status: TicketStatus.CANCELLED,
