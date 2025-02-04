@@ -201,7 +201,7 @@ model Products {
   slug        String        @id
   title       String
   image       String
-  description String
+  description String?
   shop        Shops
   url         String
   trackId     String?       @db.Uuid

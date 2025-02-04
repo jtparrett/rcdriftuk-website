@@ -69,10 +69,12 @@ const CatalogueListingPage = () => {
             {product?.title}
           </styled.h1>
 
-          <styled.p
-            fontSize="sm"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
+          {product.description && (
+            <styled.p
+              fontSize="sm"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          )}
 
           <Flex
             gap={4}

@@ -13,6 +13,22 @@ export const getUserEventTicket = async (eventId: string, userId: string) => {
     select: {
       id: true,
       status: true,
+      sessionId: true,
+      event: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          cover: true,
+          startDate: true,
+          endDate: true,
+          eventTrack: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 };

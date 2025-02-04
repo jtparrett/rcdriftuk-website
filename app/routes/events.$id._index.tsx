@@ -142,7 +142,11 @@ const Page = () => {
 
   return (
     <Container maxW={1100} px={2} pb={6} mt={4}>
-      <Flex flexDir={{ base: "column", md: "row" }} gap={4} justifyContent={event.eventTrack ? "flex-start" : "center"}>
+      <Flex
+        flexDir={{ base: "column", md: "row" }}
+        gap={4}
+        justifyContent={event.eventTrack ? "flex-start" : "center"}
+      >
         <Box
           borderWidth={1}
           borderColor="gray.800"
@@ -196,10 +200,10 @@ const Page = () => {
                 <styled.p color="gray.500" fontSize="sm">
                   Duration:{" "}
                   {formatDuration(
-                intervalToDuration({
-                  start: startDate,
-                  end: endDate,
-                })
+                    intervalToDuration({
+                      start: startDate,
+                      end: endDate,
+                    })
                   )}
                 </styled.p>
                 <styled.p fontSize="sm" color="gray.500">
@@ -224,7 +228,9 @@ const Page = () => {
                         >
                           <styled.img
                             title={
-                              response.user.firstName + " " + response.user.lastName
+                              response.user.firstName +
+                              " " +
+                              response.user.lastName
                             }
                             src={response.user.image ?? ""}
                             alt={`${response.user.firstName ?? ""} ${
@@ -238,14 +244,15 @@ const Page = () => {
                 )}
 
                 <styled.span fontWeight="semibold" mt={4} display="block">
-                  You are currently {isAttending ? "interested" : "not interested"}
+                  You are currently{" "}
+                  {isAttending ? "interested" : "not interested"}
                   in this event
                 </styled.span>
 
                 {!isAttending && (
                   <styled.span fontSize="sm" color="gray.500" display="block">
-                    Let the host know you're interested in this event by responding
-                    below
+                    Let the host know you're interested in this event by
+                    responding below
                   </styled.span>
                 )}
               </>
@@ -257,47 +264,47 @@ const Page = () => {
                   <SignedIn>
                     <Form method="post">
                       <Button
-                      type="submit"
-                      value="submit"
-                      variant="secondary"
-                      disabled={isSubmitting}
-                      color={isSubmitting ? "transparent" : undefined}
+                        type="submit"
+                        value="submit"
+                        variant="secondary"
+                        disabled={isSubmitting}
+                        color={isSubmitting ? "transparent" : undefined}
+                      >
+                        {isSubmitting && (
+                          <styled.span
+                            position="absolute"
+                            top={0}
+                            left={0}
+                            w="full"
+                            h="full"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Spinner />
+                          </styled.span>
+                        )}
+                        {isAttending && "Not "}Interested{" "}
+                        {isAttending ? (
+                          <RiCloseCircleFill />
+                        ) : (
+                          <RiCheckboxCircleFill />
+                        )}
+                      </Button>
+                    </Form>
+                  </SignedIn>
+                  <SignedOut>
+                    <Button
+                      onClick={() =>
+                        clerk.openSignIn({
+                          redirectUrl: `/events/${event.id}`,
+                        })
+                      }
                     >
-                      {isSubmitting && (
-                        <styled.span
-                          position="absolute"
-                          top={0}
-                          left={0}
-                          w="full"
-                          h="full"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <Spinner />
-                        </styled.span>
-                      )}
-                      {isAttending && "Not "}Interested{" "}
-                      {isAttending ? (
-                        <RiCloseCircleFill />
-                      ) : (
-                        <RiCheckboxCircleFill />
-                      )}
+                      I'm Interested <RiCheckboxCircleFill />
                     </Button>
-                  </Form>
-                </SignedIn>
-                <SignedOut>
-                  <Button
-                    onClick={() =>
-                      clerk.openSignIn({
-                        redirectUrl: `/events/${event.id}`,
-                      })
-                    }
-                  >
-                    I'm Interested <RiCheckboxCircleFill />
-                  </Button>
-                </SignedOut>
-              </>
+                  </SignedOut>
+                </>
               )}
 
               {event.link && (
@@ -320,7 +327,18 @@ const Page = () => {
                         ? new Date(event.ticketReleaseDate)
                         : null,
                     }}
-                    ticket={ticket}
+                    ticket={
+                      ticket
+                        ? {
+                            ...ticket,
+                            event: {
+                              ...ticket.event,
+                              startDate,
+                              endDate,
+                            },
+                          }
+                        : null
+                    }
                     isSoldOut={isSoldOut}
                   />
                 </Box>

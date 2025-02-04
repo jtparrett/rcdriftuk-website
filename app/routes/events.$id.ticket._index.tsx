@@ -1,7 +1,11 @@
 import { TicketStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { LinkButton } from "~/components/Button";
+import { Box, Container, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
+import { getEventDate } from "~/utils/getEventDate";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
@@ -64,10 +68,61 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return ticket;
   }
 
+  if (ticket?.status === TicketStatus.PENDING && ticket?.sessionId) {
+    const session = await stripe.checkout.sessions.retrieve(ticket.sessionId);
+
+    if (session.status === "complete") {
+      ticket = await prisma.eventTickets.update({
+        where: { id: ticket.id },
+        data: { status: TicketStatus.CONFIRMED },
+        select: {
+          id: true,
+          status: true,
+          sessionId: true,
+          event: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              cover: true,
+              startDate: true,
+              endDate: true,
+              eventTrack: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return ticket;
+    }
+
+    if (session.status === "expired") {
+      await prisma.eventTickets.update({
+        where: { id: ticket.id },
+        data: { status: TicketStatus.CANCELLED },
+      });
+
+      throw redirect(`/events/${event.id}`);
+    }
+
+    throw redirect(session.url ?? `/events/${event.id}`);
+  }
+
   const isSoldOut = isEventSoldOut(event);
 
   // Check if sold out
   if (isSoldOut && ticket?.status !== TicketStatus.PENDING) {
+    if (ticket) {
+      await prisma.eventTickets.update({
+        where: { id: ticket.id },
+        data: { status: TicketStatus.CANCELLED },
+      });
+    }
+
     throw redirect(`/events/${event.id}`);
   }
 
@@ -76,6 +131,26 @@ export const loader = async (args: LoaderFunctionArgs) => {
       data: {
         eventId: event.id,
         userId,
+      },
+      select: {
+        id: true,
+        status: true,
+        sessionId: true,
+        event: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            cover: true,
+            startDate: true,
+            endDate: true,
+            eventTrack: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -113,11 +188,67 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return redirect(session.url ?? `/events/${event.id}`);
+  throw redirect(session.url ?? `/events/${event.id}`);
 };
 
 const Page = () => {
-  return <h1>Coming soon...</h1>;
+  const ticket = useLoaderData<typeof loader>();
+
+  return (
+    <Container maxW={500} px={2} py={8}>
+      <Box bgColor="white" color="gray.950" overflow="hidden" rounded="2xl">
+        {ticket.event.cover && (
+          <Box pos="relative">
+            <styled.img
+              src={ticket.event.cover}
+              alt={ticket.event.name}
+              w="full"
+            />
+            <Box
+              pos="absolute"
+              top="100%"
+              left={0}
+              w={12}
+              h={12}
+              rounded="full"
+              bg="gray.950"
+              mt={-6}
+              ml={-6}
+            />
+            <Box
+              pos="absolute"
+              top="100%"
+              right={0}
+              w={12}
+              h={12}
+              rounded="full"
+              bg="gray.950"
+              mt={-6}
+              mr={-6}
+            />
+          </Box>
+        )}
+        <Box p={10}>
+          <styled.h1 fontWeight="bold" fontSize="xl">
+            {ticket.event.name}
+          </styled.h1>
+          <styled.p fontSize="sm" color="gray.600">
+            {getEventDate(
+              new Date(ticket.event.startDate),
+              new Date(ticket.event.endDate)
+            )}
+          </styled.p>
+          <styled.p fontSize="sm" color="gray.500" mb={4}>
+            This ticket is valid for one person only
+          </styled.p>
+
+          <LinkButton to={`/events/${ticket.event.id}`} w="full">
+            View Event
+          </LinkButton>
+        </Box>
+      </Box>
+    </Container>
+  );
 };
 
 export default Page;
