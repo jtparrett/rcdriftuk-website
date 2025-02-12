@@ -27,6 +27,8 @@ interface Props {
 
 export const EventCard = ({ event, showAvatar = false }: Props) => {
   const hasPast = isPast(toZonedTime(new Date(event.endDate), "UTC"));
+  const startDate = toZonedTime(new Date(event.startDate), "UTC");
+  const endDate = toZonedTime(new Date(event.endDate), "UTC");
 
   return (
     <Flex
@@ -99,10 +101,7 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
         </styled.h3>
 
         <styled.p fontSize="sm" color="gray.300" fontWeight="semibold" mb={2}>
-          {getEventDate(
-            toZonedTime(new Date(event.startDate), "UTC"),
-            toZonedTime(new Date(event.endDate), "UTC")
-          )}
+          {getEventDate(startDate, endDate)}
         </styled.p>
 
         <LinkButton to={`/events/${event.id}`} variant="secondary" size="xs">

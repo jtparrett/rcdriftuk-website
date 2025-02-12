@@ -6,10 +6,10 @@ import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
 import { isBefore, intervalToDuration } from "date-fns";
 import { styled } from "~/styled-system/jsx";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
-import { toZonedTime } from "date-fns-tz";
 import { useState, useEffect } from "react";
 import { ClientOnly } from "./ClientOnly";
 import { useRevalidator } from "@remix-run/react";
+import { toZonedTime } from "date-fns-tz";
 
 interface Props {
   event: GetEvent;
@@ -30,7 +30,7 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
   useEffect(() => {
     const updateCountdown = () => {
       const duration = intervalToDuration({
-        start: new Date(),
+        start: toZonedTime(new Date(), "UTC"),
         end: releaseDate,
       });
 
@@ -87,6 +87,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   const releaseDate = event?.ticketReleaseDate
     ? toZonedTime(new Date(event.ticketReleaseDate), "UTC")
     : null;
+
   const isBeforeRelease = releaseDate
     ? isBefore(toZonedTime(new Date(), "UTC"), releaseDate)
     : false;

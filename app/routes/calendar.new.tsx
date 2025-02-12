@@ -16,6 +16,7 @@ import { TimePicker } from "~/components/TimePicker";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
+import { toZonedTime } from "date-fns-tz";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -72,7 +73,7 @@ export const action = async (args: ActionFunctionArgs) => {
       link: z.string().optional(),
       repeatWeeks: z.coerce.number(),
       description: z.string().optional(),
-      enableTicketing: z.coerce.boolean().optional(),
+      enableTicketing: z.string().optional(),
       ticketCapacity: z.coerce.number().nullable(),
       ticketReleaseDate: z.coerce.date().nullable(),
       earlyAccessCode: z.string().nullable(),
@@ -102,17 +103,23 @@ export const action = async (args: ActionFunctionArgs) => {
       });
       const repeatEndDate = add(data.endDate, { weeks: i * data.repeatWeeks });
 
+      // Convert dates to UTC using toZonedTime
+      const utcStartDate = toZonedTime(repeatStartDate, "UTC");
+      const utcEndDate = toZonedTime(repeatEndDate, "UTC");
+
       return {
         name: data.name,
         trackId: userData.trackId,
         link: data.link,
-        startDate: repeatStartDate,
-        endDate: repeatEndDate,
+        startDate: utcStartDate,
+        endDate: utcEndDate,
         description: data.description,
         approved: true,
-        enableTicketing: data.enableTicketing,
+        enableTicketing: data.enableTicketing === "true",
         ticketCapacity: data.ticketCapacity,
-        ticketReleaseDate: data.ticketReleaseDate,
+        ticketReleaseDate: data.ticketReleaseDate
+          ? toZonedTime(data.ticketReleaseDate, "UTC")
+          : null,
         earlyAccessCode: data.earlyAccessCode,
         ticketPrice: data.ticketPrice,
       };

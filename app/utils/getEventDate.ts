@@ -14,17 +14,22 @@ export const getEventDay = (startDate: Date, showDayOfWeek = true) => {
 };
 
 export const getEventTime = (startDate: Date, endDate: Date) => {
-  // Convert to UTC to ensure consistent display regardless of local timezone
+  // Ensure dates are in UTC
   const utcStart = toZonedTime(startDate, "UTC");
   const utcEnd = toZonedTime(endDate, "UTC");
+
   return `from ${format(utcStart, "h:mmaaa")}-${format(utcEnd, "h:mmaaa")}`;
 };
 
 export const getEventDate = (startDate: Date, endDate: Date) => {
-  if (isSameDay(startDate, endDate)) {
-    return `${getEventDay(startDate)} ${getEventTime(startDate, endDate)}`;
+  // Ensure dates are in UTC for comparison
+  const utcStart = toZonedTime(startDate, "UTC");
+  const utcEnd = toZonedTime(endDate, "UTC");
+
+  if (isSameDay(utcStart, utcEnd)) {
+    return `${getEventDay(utcStart)} ${getEventTime(utcStart, utcEnd)}`;
   }
 
-  const sameMonth = isSameMonth(startDate, endDate);
-  return `${format(startDate, "do")}${sameMonth ? "" : " MMMM"}-${format(endDate, "do MMMM")} ${getEventTime(startDate, endDate)}`;
+  const sameMonth = isSameMonth(utcStart, utcEnd);
+  return `${format(utcStart, "do")}${sameMonth ? "" : " MMMM"}-${format(utcEnd, "do MMMM")} ${getEventTime(utcStart, utcEnd)}`;
 };
