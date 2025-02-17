@@ -4,24 +4,19 @@ import { Select } from "~/components/Select";
 import { Box, Container, styled } from "~/styled-system/jsx";
 
 const CHASSIS_RATIOS = {
-  "Yokomo YD-2": 3.1,
-  "Yokomo MD1.0": 3.1,
-  "Yokomo MD2.0": 3.1,
-  "Yokomo SD1.0": 3.1,
-  "Yokomo RD2.0": 3.1,
-  "MST RMX 2.0": 3.5,
-  "MST RMX 2.5": 3.5,
-  "MST FMX 2.0": 3.5,
-  "MST FXX 2.0": 3.5,
-  "Reve D RDX": 3.1,
+  "Yokomo YD-2": 2.6,
+  "Yokomo MD1.0": 2.6,
+  "Yokomo MD2.0": 2.6,
+  "Yokomo SD1.0": 2.6,
+  "Yokomo RD2.0": 2.6,
+  "MST RMX 2.0": 3.08,
+  "MST RMX 2.5": 3.08,
+  "MST FMX 2.0": 3.08,
+  "MST FXX 2.0": 3.08,
+  "Reve D RDX": 2.6,
   "Team Associated DC10": 2.6,
-  "Rhino Racing Shark": 3.1,
-  "Tamiya TT-02": 2.6,
-  "Tamiya TT-01": 2.6,
-  "HPI Racing Sprint 2": 2.5,
-  "3Racing Sakura D4": 2.06,
-  "Overdose GALM": 2.5,
-  "Yokomo Drift Package": 2.5,
+  "Rhino Racing Shark": 2.6,
+  "Overdose GALM": 2.86,
 } as const;
 
 function calculateFDR(pinion: number, spur: number, internalRatio: number) {
