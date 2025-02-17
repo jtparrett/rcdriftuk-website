@@ -20,6 +20,7 @@ import {
   RiUserLine,
   RiVipCrown2Line,
 } from "react-icons/ri";
+import { GiCogLock } from "react-icons/gi";
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { Popover } from "react-tiny-popover";
@@ -170,6 +171,18 @@ const Menu = ({ user }: Props) => {
               <RiSearch2Line />
             </MenuIcon>
             Catalogue
+          </MenuLink>
+
+          <MenuLink
+            to="/fdr"
+            active={
+              location.pathname.includes("/catalogue") ? "active" : "inactive"
+            }
+          >
+            <MenuIcon>
+              <GiCogLock />
+            </MenuIcon>
+            FDR Calculator
           </MenuLink>
 
           <MenuLink
