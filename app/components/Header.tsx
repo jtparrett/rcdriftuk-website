@@ -175,9 +175,7 @@ const Menu = ({ user }: Props) => {
 
           <MenuLink
             to="/fdr"
-            active={
-              location.pathname.includes("/catalogue") ? "active" : "inactive"
-            }
+            active={location.pathname.includes("/fdr") ? "active" : "inactive"}
           >
             <MenuIcon>
               <GiCogLock />
