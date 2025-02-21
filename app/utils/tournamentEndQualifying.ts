@@ -123,14 +123,20 @@ export const tournamentEndQualifying = async (id: string) => {
       let rightDriver = sortedDrivers[i];
 
       // Convert non-qualified drivers into BYE runs
-      if (leftDriver.lapScores.every((score) => score === 0)) {
+      if (
+        !tournament.fullInclusion &&
+        leftDriver.lapScores.every((score) => score === 0)
+      ) {
         leftDriver = {
           id: byeTounamentDriver.id,
           lapScores: [],
         };
       }
 
-      if (rightDriver.lapScores.every((score) => score === 0)) {
+      if (
+        !tournament.fullInclusion &&
+        rightDriver.lapScores.every((score) => score === 0)
+      ) {
         rightDriver = {
           id: byeTounamentDriver.id,
           lapScores: [],
