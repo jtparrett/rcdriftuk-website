@@ -73,6 +73,7 @@ export const tournamentEndQualifying = async (id: string) => {
   const totalBuysToCreate = tournament.fullInclusion
     ? totalDrivers * 2 - tournament.drivers.length
     : 0;
+  const totalDriversWithBuys = tournament.drivers.length + totalBuysToCreate;
 
   const sortedDrivers = [
     ...tournament.drivers,
@@ -118,8 +119,8 @@ export const tournamentEndQualifying = async (id: string) => {
 
   // Pairs top and bottom qualifiers into battles
   const initialBattleDrivers = sortByInnerOuter(
-    Array.from(new Array(totalDrivers / 2)).map((_, i) => {
-      let leftDriver = sortedDrivers[totalDrivers - i - 1];
+    Array.from(new Array(totalDriversWithBuys / 2)).map((_, i) => {
+      let leftDriver = sortedDrivers[totalDriversWithBuys - i - 1];
       let rightDriver = sortedDrivers[i];
 
       // Convert non-qualified drivers into BYE runs
@@ -150,17 +151,20 @@ export const tournamentEndQualifying = async (id: string) => {
     })
   );
 
-  const upperBracket = Array.from(new Array(totalDrivers - 1)).map((_, i) => {
-    let round = Math.ceil(
-      Math.log2(totalDrivers) - Math.log2(totalDrivers - (i + 1))
-    );
+  const upperBracket = Array.from(new Array(totalDriversWithBuys - 1)).map(
+    (_, i) => {
+      let round = Math.ceil(
+        Math.log2(totalDriversWithBuys) -
+          Math.log2(totalDriversWithBuys - (i + 1))
+      );
 
-    return {
-      tournamentId: tournament.id,
-      round: round === Infinity ? totalDrivers : round,
-      bracket: BattlesBracket.UPPER,
-    };
-  });
+      return {
+        tournamentId: tournament.id,
+        round: round === Infinity ? totalDriversWithBuys : round,
+        bracket: BattlesBracket.UPPER,
+      };
+    }
+  );
 
   const rounds = [...new Set(upperBracket.map(({ round }) => round))];
 
