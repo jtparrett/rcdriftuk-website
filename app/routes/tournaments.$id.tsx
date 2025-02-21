@@ -34,6 +34,7 @@ import { prisma } from "~/utils/prisma.server";
 import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
+import { useReloader } from "~/utils/useReloader";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -169,6 +170,7 @@ const TournamentPage = () => {
 
   const isOwner = user?.id === tournament.userId;
 
+  useReloader();
   useAblyRealtimeReloader(tournament.id);
 
   return (
