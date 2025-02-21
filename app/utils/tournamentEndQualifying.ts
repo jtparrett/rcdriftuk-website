@@ -73,7 +73,9 @@ export const tournamentEndQualifying = async (id: string) => {
   const totalBuysToCreate = tournament.fullInclusion
     ? totalDrivers * 2 - tournament.drivers.length
     : 0;
-  const totalDriversWithBuys = tournament.drivers.length + totalBuysToCreate;
+  const totalDriversWithBuys = pow2Floor(
+    tournament.drivers.length + totalBuysToCreate
+  );
 
   const sortedDrivers = [
     ...tournament.drivers,

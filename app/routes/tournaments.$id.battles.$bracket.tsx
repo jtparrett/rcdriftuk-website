@@ -218,8 +218,7 @@ const TournamentBattlesPage = () => {
                   <Flex
                     flexDir="column"
                     style={{
-                      height:
-                        Math.ceil(tournament.drivers.length / 2) * 54 + "px",
+                      height: Math.ceil(battlesByRound[1].length) * 54 + "px",
                     }}
                   >
                     <Spacer />

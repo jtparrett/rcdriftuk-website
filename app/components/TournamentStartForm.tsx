@@ -82,6 +82,8 @@ const PeopleForm = ({
 };
 
 export const TournamentStartForm = ({ tournament, users }: Props) => {
+  const [fullInclusion, setFullInclusion] = useState(false);
+
   return (
     <Form method="post" action={`/api/tournaments/${tournament?.id}/start`}>
       <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
@@ -122,7 +124,7 @@ export const TournamentStartForm = ({ tournament, users }: Props) => {
           <StepNumber value={3} />
           <Box flex={1}>
             <styled.label mb={2} display="block">
-              Who are your tournament judges?
+              Who are the tournament judges?
             </styled.label>
 
             <PeopleForm
@@ -139,7 +141,7 @@ export const TournamentStartForm = ({ tournament, users }: Props) => {
           <StepNumber value={4} />
           <Box flex={1}>
             <styled.label mb={2} display="block">
-              Who are your tournament drivers?
+              Who are the tournament drivers?
             </styled.label>
 
             <PeopleForm
@@ -154,6 +156,54 @@ export const TournamentStartForm = ({ tournament, users }: Props) => {
 
         <Flex gap={4}>
           <StepNumber value={5} />
+          <Box flex={1}>
+            <styled.label display="block" mb={1}>
+              Should all drivers participate in battles?
+            </styled.label>
+            <styled.span
+              mb={2}
+              color="gray.500"
+              display="block"
+              textWrap="pretty"
+            >
+              Enabling this option will ensure the bracket is fully populated,
+              granting Bye-runs to the highest-qualified drivers where
+              necessary.
+            </styled.span>
+
+            <input
+              type="hidden"
+              name="fullInclusion"
+              value={fullInclusion ? "true" : "false"}
+            />
+
+            <Flex
+              gap={2}
+              p={1}
+              display="inline-flex"
+              bgColor="gray.800"
+              rounded="xl"
+            >
+              <Button
+                type="button"
+                variant={!fullInclusion ? "primary" : "ghost"}
+                onClick={() => setFullInclusion(false)}
+              >
+                No
+              </Button>
+              <Button
+                type="button"
+                variant={fullInclusion ? "primary" : "ghost"}
+                onClick={() => setFullInclusion(true)}
+              >
+                Yes
+              </Button>
+            </Flex>
+          </Box>
+        </Flex>
+
+        <Flex gap={4}>
+          <StepNumber value={6} />
           <Box flex={1}>
             <styled.label display="block" mb={2}>
               Are you ready to start this tournament?
