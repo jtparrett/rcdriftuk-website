@@ -68,6 +68,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(tournament);
 
   return {
+    fullInclusion: tournament.fullInclusion,
     totalJudges: tournament._count.judges,
     state: tournament.state,
     qualifyingLaps: tournament.qualifyingLaps,
@@ -99,9 +100,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 const QualifyingPage = () => {
   const tournament = useLoaderData<typeof loader>();
-  const qualifyingCutOff = pow2Floor(tournament.drivers.length);
 
-  const half = Math.ceil(tournament.drivers.length / 2);
+  const driversWithoutBuys = tournament.drivers.filter(
+    (driver) => !driver.isBye
+  );
+  const qualifyingCutOff = pow2Floor(driversWithoutBuys.length);
+  const half = Math.ceil(driversWithoutBuys.length / 2);
 
   return (
     <Box
@@ -140,10 +144,10 @@ const QualifyingPage = () => {
             </styled.tr>
           </styled.thead>
           <styled.tbody>
-            {[...tournament.drivers].slice(0, half).map((driver, i) => {
+            {[...driversWithoutBuys].slice(0, half).map((driver, i) => {
               return (
                 <Fragment key={i}>
-                  {i === qualifyingCutOff && (
+                  {i === qualifyingCutOff && !tournament.fullInclusion && (
                     <styled.tr>
                       <styled.td colSpan={7}>
                         <Box w="full" h="1px" bgColor="brand.500" />
@@ -221,16 +225,17 @@ const QualifyingPage = () => {
             </styled.tr>
           </styled.thead>
           <styled.tbody>
-            {[...tournament.drivers].slice(half).map((driver, i) => {
+            {[...driversWithoutBuys].slice(half).map((driver, i) => {
               return (
                 <Fragment key={i}>
-                  {i + half === qualifyingCutOff && (
-                    <styled.tr>
-                      <styled.td colSpan={7}>
-                        <Box w="full" h="1px" bgColor="brand.500" />
-                      </styled.td>
-                    </styled.tr>
-                  )}
+                  {i + half === qualifyingCutOff &&
+                    !tournament.fullInclusion && (
+                      <styled.tr>
+                        <styled.td colSpan={7}>
+                          <Box w="full" h="1px" bgColor="brand.500" />
+                        </styled.td>
+                      </styled.tr>
+                    )}
                   <styled.tr key={driver.id}>
                     <styled.td fontWeight="bold" w={16}>
                       <Center>

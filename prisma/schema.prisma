@@ -79,6 +79,7 @@ model Tournaments {
   nextQualifyingLap   Laps?               @relation(fields: [nextQualifyingLapId], references: [id])
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?  @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
+  fullInclusion       Boolean             @default(false)
 }
 
 model TournamentDrivers {

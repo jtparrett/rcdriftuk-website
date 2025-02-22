@@ -28,6 +28,8 @@ export const action = async (args: ActionFunctionArgs) => {
     1
   );
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
+  const fullInclusion =
+    z.string().parse(formData.get("fullInclusion")) === "true";
 
   invariant(judges.length > 0, "Please add at least one judge");
   invariant(drivers.length > 1, "Please add at least 2 drivers");
@@ -89,6 +91,7 @@ export const action = async (args: ActionFunctionArgs) => {
       nextQualifyingLapId: nextQualifyingLap?.id,
       qualifyingLaps,
       format,
+      fullInclusion,
     },
   });
 
