@@ -269,47 +269,80 @@ const BattleForm = () => {
       {nextBattle !== null && nextBattle.winnerId === null && (
         <Form method="post">
           <Flex flexDir="column" gap={4}>
-            <Button
-              w="full"
-              disabled={nextBattle.driverLeft?.isBye}
-              type="submit"
-              name="driver"
-              value={nextBattle.driverLeft?.id.toString()}
-              variant={
-                battleVote?.winnerId === nextBattle.driverLeftId
-                  ? "primary"
-                  : "outline"
-              }
-            >
-              {nextBattle.driverLeft?.user.firstName}{" "}
-              {nextBattle.driverLeft?.user.lastName}
-            </Button>
+            {(nextBattle.driverLeft?.isBye ||
+              nextBattle.driverRight?.isBye) && (
+              <styled.p
+                fontSize="md"
+                fontWeight="semibold"
+                color="gray.500"
+                textAlign="center"
+              >
+                Bye Run
+              </styled.p>
+            )}
 
-            <Button
-              w="full"
-              disabled={nextBattle.driverRight?.isBye}
-              type="submit"
-              name="driver"
-              value={nextBattle.driverRight?.id.toString()}
-              variant={
-                battleVote?.winnerId === nextBattle.driverRightId
-                  ? "primary"
-                  : "outline"
-              }
-            >
-              {nextBattle.driverRight?.user.firstName}{" "}
-              {nextBattle.driverRight?.user.lastName}
-            </Button>
+            {!nextBattle.driverLeft?.isBye && (
+              <Button
+                w="full"
+                type="submit"
+                name="driver"
+                value={nextBattle.driverLeft?.id.toString()}
+                variant={
+                  battleVote?.winnerId === nextBattle.driverLeftId
+                    ? "primary"
+                    : "outline"
+                }
+              >
+                {nextBattle.driverLeft?.user.firstName}{" "}
+                {nextBattle.driverLeft?.user.lastName}
+              </Button>
+            )}
 
-            <Button
-              w="full"
-              type="submit"
-              name="omt"
-              value="true"
-              variant={battleVote?.omt ? "primary" : "outline"}
-            >
-              OMT
-            </Button>
+            {!nextBattle.driverRight?.isBye && (
+              <Button
+                w="full"
+                type="submit"
+                name="driver"
+                value={nextBattle.driverRight?.id.toString()}
+                variant={
+                  battleVote?.winnerId === nextBattle.driverRightId
+                    ? "primary"
+                    : "outline"
+                }
+              >
+                {nextBattle.driverRight?.user.firstName}{" "}
+                {nextBattle.driverRight?.user.lastName}
+              </Button>
+            )}
+
+            {nextBattle.driverLeft?.isBye && nextBattle.driverRight?.isBye && (
+              <Button
+                w="full"
+                type="submit"
+                name="driver"
+                value={nextBattle.driverRight?.id.toString()}
+                variant={
+                  battleVote?.winnerId === nextBattle.driverRightId
+                    ? "primary"
+                    : "outline"
+                }
+              >
+                Click here to continue
+              </Button>
+            )}
+
+            {!nextBattle.driverLeft?.isBye &&
+              !nextBattle.driverRight?.isBye && (
+                <Button
+                  w="full"
+                  type="submit"
+                  name="omt"
+                  value="true"
+                  variant={battleVote?.omt ? "primary" : "outline"}
+                >
+                  OMT
+                </Button>
+              )}
           </Flex>
         </Form>
       )}

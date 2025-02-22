@@ -87,6 +87,21 @@ const Driver = ({
   driver: Battle["driverLeft"] | Battle["driverRight"];
   winnerId: number | null;
 }) => {
+  if (driver?.isBye) {
+    return (
+      <Flex h={6} alignItems="center" pl={6} bgColor="gray.800">
+        <styled.span
+          fontSize="xs"
+          display="block"
+          color="gray.500"
+          fontWeight="semibold"
+        >
+          Bye Run
+        </styled.span>
+      </Flex>
+    );
+  }
+
   return (
     <Flex alignItems="center" py={0.5} h={6}>
       <styled.span
