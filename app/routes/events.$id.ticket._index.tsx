@@ -18,7 +18,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const earlyAccessCode = url.searchParams.get("code");
 
   if (!userId) {
-    throw new Response("Unauthorized", { status: 401 });
+    throw redirect("/sign-in");
   }
 
   const event = await prisma.events.findUnique({
