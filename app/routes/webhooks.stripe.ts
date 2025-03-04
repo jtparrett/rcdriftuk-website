@@ -125,23 +125,6 @@ export async function action(args: ActionFunctionArgs) {
       }
     }
 
-    if (event.type === "checkout.session.expired") {
-      const session = event.data.object;
-      const ticketId = session.metadata?.ticketId;
-
-      await prisma.eventTickets.update({
-        where: {
-          id: Number(ticketId),
-          status: {
-            not: TicketStatus.CONFIRMED,
-          },
-        },
-        data: {
-          status: TicketStatus.CANCELLED,
-        },
-      });
-    }
-
     if (event.type === "charge.refunded") {
       const charge = event.data.object;
       const sessions = await stripe.checkout.sessions.list({
