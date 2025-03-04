@@ -142,6 +142,23 @@ export async function action(args: ActionFunctionArgs) {
       });
     }
 
+    if (event.type === "charge.refunded") {
+      const charge = event.data.object;
+      const sessions = await stripe.checkout.sessions.list({
+        payment_intent: charge.payment_intent as string,
+      });
+      const ticketId = sessions.data[0].metadata?.ticketId;
+
+      await prisma.eventTickets.update({
+        where: {
+          id: Number(ticketId),
+        },
+        data: {
+          status: TicketStatus.REFUNDED,
+        },
+      });
+    }
+
     return new Response("Webhook received", { status: 200 });
   } catch (err) {
     console.error(err);
