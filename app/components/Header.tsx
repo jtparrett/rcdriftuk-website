@@ -15,6 +15,7 @@ import {
   RiRocketLine,
   RiSearch2Line,
   RiSettings3Line,
+  RiShoppingBagLine,
   RiTicketLine,
   RiTrophyLine,
   RiUserLine,
@@ -161,6 +162,19 @@ const Menu = ({ user }: Props) => {
             </MenuIcon>
             Calendar
           </MenuLink>
+
+          <MenuLink
+            to="/merch"
+            active={
+              location.pathname.includes("/merch") ? "active" : "inactive"
+            }
+          >
+            <MenuIcon>
+              <RiShoppingBagLine />
+            </MenuIcon>
+            Merch
+          </MenuLink>
+
           <MenuLink
             to="/catalogue"
             active={
