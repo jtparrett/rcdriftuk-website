@@ -374,7 +374,7 @@ export default function JudgingCriteriaPage() {
               RCDrift.uk follows the common practice of limiting repeated OMT
               calls to keep the tournament moving – up to{" "}
               <Highlight>2 One-More-Time rematches</Highlight> can be called for
-              a pair of drivers. After <Highlight>three OMTs</Highlight> (which
+              a pair of drivers. After <Highlight>two OMTs</Highlight> (which
               would mean the drivers have run up to three sets of battles
               total), the judges must make a final decision on the winner, no
               matter how close. This rule ensures an endless loop of ties is
