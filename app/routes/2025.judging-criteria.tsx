@@ -97,15 +97,21 @@ export default function JudgingCriteriaPage() {
               specific criteria to ensure fairness and consistency.
             </P>
 
+            <P>
+              <Highlight>
+                Qualifying is optional and will be implemented at the discretion
+                of the tournament organizers.
+              </Highlight>
+            </P>
+
             <H3>Solo Run Scoring (100-Point Scale)</H3>
             <P>
-              Qualifying is optional and will be implemented at the discretion
-              of the tournament organizers. Each qualifying run is scored out of
-              a maximum of 100 points, divided into three key categories:{" "}
-              <Highlight>Line</Highlight>, <Highlight>Angle</Highlight>, and{" "}
-              <Highlight>Style</Highlight>. All drivers are judged by the same
-              criteria, ensuring a universal standard of evaluation. Judges will
-              brief competitors on the specific track layout, including the{" "}
+              Each qualifying run is scored out of a maximum of 100 points,
+              divided into three key categories: <Highlight>Line</Highlight>,{" "}
+              <Highlight>Angle</Highlight>, and <Highlight>Style</Highlight>.
+              All drivers are judged by the same criteria, ensuring a universal
+              standard of evaluation. Judges will brief competitors on the
+              specific track layout, including the{" "}
               <Highlight>designated drift line</Highlight> and{" "}
               <Highlight>clipping points/zones</Highlight>, before the
               tournament. Scoring starts at 100 points, and deductions are
