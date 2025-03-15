@@ -286,14 +286,12 @@ export default function JudgingCriteriaPage() {
               </styled.li>
               <styled.li>
                 <Highlight>Going Off Track</Highlight>: If the car leaves the
-                designated track boundaries (two or more wheels fully outside),
-                the run is scored as zero.
+                designated track boundaries (two or more wheels fully over any
+                track line), the run is scored as zero.
               </styled.li>
               <styled.li>
                 <Highlight>Wall Contact</Highlight>: Any contact with walls or
-                track barriers results in an automatic zero. Minor rubs may be
-                tolerated at the judges' discretion, but significant contact or
-                anything that disrupts the run leads to a zero.
+                track barriers results in an automatic zero.
               </styled.li>
               <styled.li>
                 <Highlight>Understeering or Straightening</Highlight>: If the
@@ -329,33 +327,7 @@ export default function JudgingCriteriaPage() {
             </P>
           </CollapsibleCard>
 
-          <CollapsibleCard title="5. Judging Panel and Roles">
-            <P>
-              Where possible, a <Highlight>three-judge panel</Highlight> will be
-              used, with each judge focusing on specific aspects:
-            </P>
-            <UL>
-              <styled.li>
-                <Highlight>Head Judge / Line Judge</Highlight>: Defines the
-                ideal drift line and clipping points, judges line accuracy.
-              </styled.li>
-              <styled.li>
-                <Highlight>Angle Judge</Highlight>: Evaluates drift angles and
-                transitions based on predefined standards.
-              </styled.li>
-              <styled.li>
-                <Highlight>Style Judge</Highlight>: Assesses initiation,
-                fluidity, and overall driving style.
-              </styled.li>
-            </UL>
-            <P>
-              If a full three-judge panel is not available, the tournament
-              organizers will adjust the judging process accordingly while
-              maintaining fairness and consistency.
-            </P>
-          </CollapsibleCard>
-
-          <CollapsibleCard title="6. Tie-Breaking Rules">
+          <CollapsibleCard title="5. Tie-Breaking Rules">
             <P>
               In the event that two drivers receive identical scores or a battle
               is too close to call,{" "}
@@ -402,7 +374,7 @@ export default function JudgingCriteriaPage() {
             </P>
           </CollapsibleCard>
 
-          <CollapsibleCard title="7. Additional Guidelines for Judges">
+          <CollapsibleCard title="6. Additional Guidelines for Judges">
             <UL>
               <styled.li>
                 Judges must apply standards <Highlight>consistently</Highlight>{" "}

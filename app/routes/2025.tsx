@@ -9,26 +9,36 @@ const Page = () => {
     <styled.main>
       <Box borderBottomWidth={1} borderColor="gray.800">
         <Container px={2} maxW={1100}>
-          <Flex gap={2} py={2} alignItems="center">
-            <Tab
-              to="/2025"
-              isActive={location.pathname.replaceAll(/\//g, "") === "2025"}
-            >
-              Overview
-            </Tab>
-            <Tab
-              to="/2025/schedule"
-              isActive={location.pathname.startsWith("/2025/schedule")}
-            >
-              Schedule
-            </Tab>
-            <Tab
-              to="/2025/rules"
-              isActive={location.pathname.startsWith("/2025/rules")}
-            >
-              Rules & Regs
-            </Tab>
-          </Flex>
+          <Box overflowX="auto" w="full">
+            <Flex gap={2} py={2} alignItems="center">
+              <Tab
+                to="/2025"
+                isActive={location.pathname.replaceAll(/\//g, "") === "2025"}
+              >
+                Overview
+              </Tab>
+              <Tab
+                to="/2025/schedule"
+                isActive={location.pathname.startsWith("/2025/schedule")}
+              >
+                Schedule
+              </Tab>
+              <Tab
+                to="/2025/rules"
+                isActive={location.pathname.startsWith("/2025/rules")}
+              >
+                Rules & Regs
+              </Tab>
+              <Tab
+                to="/2025/judging-criteria"
+                isActive={location.pathname.startsWith(
+                  "/2025/judging-criteria"
+                )}
+              >
+                Judging Criteria
+              </Tab>
+            </Flex>
+          </Box>
         </Container>
       </Box>
 

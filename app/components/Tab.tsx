@@ -22,6 +22,7 @@ export const Tab = ({ children, isActive, to }: Props) => {
       fontWeight="semibold"
       fontSize="sm"
       transition="background-color .3s"
+      whiteSpace="nowrap"
     >
       {children}
     </TabBase>
