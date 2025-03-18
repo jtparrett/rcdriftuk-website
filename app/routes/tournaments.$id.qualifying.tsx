@@ -1,6 +1,6 @@
 import { styled, Box, Center, Flex } from "~/styled-system/jsx";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { Fragment } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
@@ -68,6 +68,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(tournament);
 
   return {
+    id: tournament.id,
     fullInclusion: tournament.fullInclusion,
     totalJudges: tournament._count.judges,
     state: tournament.state,
@@ -178,7 +179,11 @@ const QualifyingPage = () => {
 
                     {driver.lapScores.map((lapScore, i) => (
                       <styled.td key={i} color="gray.400" textAlign="center">
-                        {lapScore}
+                        <Link
+                          to={`/tournaments/${tournament.id}/${driver.id}/${i}`}
+                        >
+                          {lapScore}
+                        </Link>
                       </styled.td>
                     ))}
 
@@ -262,7 +267,11 @@ const QualifyingPage = () => {
 
                     {driver.lapScores.map((lapScore, i) => (
                       <styled.td key={i} color="gray.400" textAlign="center">
-                        {lapScore}
+                        <Link
+                          to={`/tournaments/${tournament.id}/${driver.id}/${i}`}
+                        >
+                          {lapScore}
+                        </Link>
                       </styled.td>
                     ))}
 
