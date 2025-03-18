@@ -578,7 +578,7 @@ const Page = () => {
 
             <CollapsibleCard title="General Information">
               <P mb={2}>
-                All rules and regulations governing RCDrift.uk-sanctioned
+                All rules &amp; regulations governing RCDrift.uk-sanctioned
                 tournaments and events are available for review at the following
                 link:
               </P>
@@ -593,16 +593,19 @@ const Page = () => {
 
               <Divider borderColor="gray.700" />
 
-              <P>
-                RCDrift.uk will release a comprehensive judging criteria to be
-                adhered to at every Feeder Round and at The Main Event. This
-                uniform criteria will ensure consistency and help prevent
-                discrepancies with judging.
+              <P mb={2}>
+                Comprehensive judging criteria to be adhered to at every Feeder
+                Round and at The Main Event. This uniform criteria will ensure
+                consistency and help prevent discrepancies with judging.
               </P>
 
-              <styled.p color="brand.500" fontWeight="bold" mt={2}>
-                JUDGING CRITERIA COMING SOON
-              </styled.p>
+              <LinkButton to="/2025/judging-criteria">
+                View Judging Criteria <RiArrowRightLine />
+              </LinkButton>
+
+              <ImageContainer>
+                <styled.img src="/2025/rcdriftuk-2025-criteria.jpg" w="full" />
+              </ImageContainer>
 
               <Divider borderColor="gray.700" />
 
