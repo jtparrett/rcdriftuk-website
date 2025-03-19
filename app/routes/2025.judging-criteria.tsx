@@ -71,23 +71,6 @@ export default function JudgingCriteriaPage() {
           </styled.h1>
         </Box>
 
-        <Box rounded="xl" bgColor="brand.900" p={1}>
-          <Box
-            rounded="lg"
-            borderWidth={1}
-            borderColor="brand.700"
-            borderStyle="dashed"
-            px={4}
-            py={3}
-          >
-            <styled.p color="brand.400" fontSize="sm">
-              The following judging criteria ensures fair and consistent
-              evaluation across all RCDrift.uk events. Judges will apply these
-              standards uniformly to maintain the integrity of competition.
-            </styled.p>
-          </Box>
-        </Box>
-
         <Stack gap={4}>
           <CollapsibleCard title="1. Scoring System" defaultOpen={true}>
             <P>

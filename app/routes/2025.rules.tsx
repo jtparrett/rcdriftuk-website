@@ -70,25 +70,6 @@ export default function RulesPage() {
           </styled.h1>
         </Box>
 
-        <Box rounded="xl" bgColor="brand.900" p={1}>
-          <Box
-            rounded="lg"
-            borderWidth={1}
-            borderColor="brand.700"
-            borderStyle="dashed"
-            px={4}
-            py={3}
-          >
-            <styled.p color="brand.400" fontSize="sm">
-              By attending any RCDrift.uk-sanctioned event, all participants
-              expressly acknowledge and agree to comply with the following rules
-              and regulations. Any failure to adhere to these provisions may
-              result in immediate disqualification from any ongoing tournament,
-              without the possibility of appeal.
-            </styled.p>
-          </Box>
-        </Box>
-
         <Stack gap={4}>
           <CollapsibleCard title="1. General Conduct" defaultOpen={true}>
             <H3>Sportsmanship</H3>

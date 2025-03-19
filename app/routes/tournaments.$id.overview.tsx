@@ -1,13 +1,12 @@
 import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { capitalCase, sentenceCase } from "change-case";
+import { capitalCase } from "change-case";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import numberToWords from "number-to-words";
 import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
 
@@ -173,25 +172,6 @@ const TournamentsOverviewPage = () => {
                       {tournament.nextQualifyingLap.driver.user.firstName}{" "}
                       {tournament.nextQualifyingLap.driver.user.lastName}
                     </styled.p>
-
-                    {!qualiJudgingComplete && (
-                      <styled.p
-                        color="gray.500"
-                        fontSize="sm"
-                        fontWeight="medium"
-                        pb={4}
-                      >
-                        {sentenceCase(
-                          numberToWords.toWordsOrdinal(
-                            tournament.qualifyingLaps -
-                              (tournament.nextQualifyingLap.driver.laps
-                                .length ?? 0) +
-                              1
-                          )
-                        )}{" "}
-                        qualifying run
-                      </styled.p>
-                    )}
                   </Box>
 
                   {qualiJudgingComplete && (
