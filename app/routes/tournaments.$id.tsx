@@ -35,7 +35,6 @@ import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
-import { DriverImportForm } from "~/components/DriverImportForm";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -195,10 +194,7 @@ const TournamentPage = () => {
       </Box>
 
       {tournament.state === TournamentsState.START && (
-        <>
-          <TournamentStartForm tournament={tournament} users={users} />
-          <DriverImportForm tournamentId={tournament.id} />
-        </>
+        <TournamentStartForm tournament={tournament} users={users} />
       )}
 
       {tournament.state !== TournamentsState.START && (
