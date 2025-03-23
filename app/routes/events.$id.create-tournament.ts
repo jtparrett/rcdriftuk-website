@@ -1,3 +1,4 @@
+import { TicketStatus } from "@prisma/client";
 import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { getAuth } from "~/utils/getAuth.server";
@@ -14,6 +15,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     include: {
       eventTrack: true,
       EventTickets: {
+        where: {
+          status: TicketStatus.CONFIRMED,
+        },
         include: {
           user: {
             select: {
