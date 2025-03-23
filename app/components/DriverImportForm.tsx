@@ -21,7 +21,7 @@ export const DriverImportForm = ({
     >
       <Form
         method="post"
-        action={`/api/tournaments/${tournamentId}/drivers/import`}
+        action={`/tournaments/${tournamentId}/drivers/import`}
       >
         <styled.h3 mb={2} fontWeight="bold" fontSize="lg">
           Psst... want to import drivers via CSV?
