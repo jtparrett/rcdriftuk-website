@@ -4,9 +4,9 @@ import invariant from "tiny-invariant";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-  const { id } = params;
-  const { userId } = await getAuth({ request, params } as ActionFunctionArgs);
+export const action = async (args: ActionFunctionArgs) => {
+  const { id } = args.params;
+  const { userId } = await getAuth(args);
 
   invariant(userId, "User must be logged in");
   invariant(id, "Tournament ID is required");
@@ -23,7 +23,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     throw new Response("Unauthorized", { status: 401 });
   }
 
-  const formData = await request.formData();
+  const formData = await args.request.formData();
   const csvFile = formData.get("csv") as File;
 
   if (!csvFile) {
