@@ -4,7 +4,13 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
-import { format, formatDuration, intervalToDuration } from "date-fns";
+import {
+  format,
+  formatDuration,
+  intervalToDuration,
+  isAfter,
+  isBefore,
+} from "date-fns";
 import { useMemo } from "react";
 import {
   RiCheckboxCircleFill,
@@ -314,34 +320,49 @@ const Page = () => {
               )}
             </Flex>
 
-            {event.enableTicketing && (
+            {event.enableTicketing &&
+              isBefore(new Date(), new Date(event.startDate)) && (
+                <>
+                  <Divider mt={4} borderColor="gray.800" />
+                  <Box pt={4}>
+                    <EventTicketButton
+                      event={{
+                        ...event,
+                        startDate,
+                        endDate,
+                        ticketReleaseDate: event.ticketReleaseDate
+                          ? new Date(event.ticketReleaseDate)
+                          : null,
+                      }}
+                      ticket={
+                        ticket
+                          ? {
+                              ...ticket,
+                              event: {
+                                ...ticket.event,
+                                startDate,
+                                endDate,
+                              },
+                            }
+                          : null
+                      }
+                      isSoldOut={isSoldOut}
+                    />
+                  </Box>
+                </>
+              )}
+
+            {isAfter(new Date(), new Date(event.endDate)) && (
               <>
                 <Divider mt={4} borderColor="gray.800" />
-                <Box pt={4}>
-                  <EventTicketButton
-                    event={{
-                      ...event,
-                      startDate,
-                      endDate,
-                      ticketReleaseDate: event.ticketReleaseDate
-                        ? new Date(event.ticketReleaseDate)
-                        : null,
-                    }}
-                    ticket={
-                      ticket
-                        ? {
-                            ...ticket,
-                            event: {
-                              ...ticket.event,
-                              startDate,
-                              endDate,
-                            },
-                          }
-                        : null
-                    }
-                    isSoldOut={isSoldOut}
-                  />
-                </Box>
+                <styled.p
+                  color="brand.500"
+                  fontWeight="semibold"
+                  py={2}
+                  textAlign="center"
+                >
+                  This event has ended.
+                </styled.p>
               </>
             )}
           </Box>

@@ -7,7 +7,7 @@ import { AspectRatio, Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getEventDate } from "~/utils/getEventDate";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
-import { format } from "date-fns";
+import { format, isAfter, isBefore } from "date-fns";
 
 export function headers() {
   return {
@@ -93,68 +93,12 @@ const Page = () => {
     {} as Record<string, typeof events>
   );
 
-  const mainEvent = events.find((event) => event.id === MAIN_EVENT_ID);
-
   return (
     <Container px={2} maxW={1100}>
       <styled.div pt={4} pb={12}>
-        <styled.h1 fontSize="3xl" mb={1} fontWeight="black">
-          Schedule
+        <styled.h1 fontSize="3xl" mb={2} fontWeight="black">
+          2025 Schedule
         </styled.h1>
-
-        {mainEvent && (
-          <Box w="full" mb={8}>
-            <styled.article
-              bgColor="gray.900"
-              overflow="hidden"
-              rounded="lg"
-              pos="relative"
-              w="full"
-              borderWidth={1}
-              borderColor="gray.800"
-            >
-              <AspectRatio ratio={16 / 7}>
-                <styled.img
-                  src={mainEvent.cover ?? "/2025-cover.jpg"}
-                  alt={mainEvent.name}
-                  w="full"
-                />
-              </AspectRatio>
-              <Box p={6}>
-                <styled.h1
-                  fontWeight="black"
-                  textWrap="balance"
-                  fontSize={{ base: "xl", md: "2xl" }}
-                  mb={2}
-                >
-                  {mainEvent.name}
-                </styled.h1>
-
-                <styled.p
-                  color="gray.400"
-                  fontSize={{ base: "sm", md: "lg" }}
-                  mb={4}
-                >
-                  {getEventDate(
-                    new Date(mainEvent.startDate),
-                    new Date(mainEvent.endDate)
-                  )}
-                </styled.p>
-
-                <EventTicketStatus
-                  isSoldOut={isEventSoldOut(mainEvent)}
-                  event={{
-                    ...mainEvent,
-                    ticketReleaseDate: mainEvent.ticketReleaseDate
-                      ? new Date(mainEvent.ticketReleaseDate)
-                      : null,
-                  }}
-                />
-              </Box>
-              <LinkOverlay to={`/events/${mainEvent.id}`} />
-            </styled.article>
-          </Box>
-        )}
 
         {Object.entries(eventsByMonth).map(([month, monthEvents]) => (
           <Box
@@ -219,17 +163,27 @@ const Page = () => {
                             {getEventDate(startDate, endDate)}
                           </styled.p>
 
-                          <Box mt={2}>
-                            <EventTicketStatus
-                              isSoldOut={isSoldOut}
-                              event={{
-                                ...event,
-                                ticketReleaseDate: event.ticketReleaseDate
-                                  ? new Date(event.ticketReleaseDate)
-                                  : null,
-                              }}
-                            />
-                          </Box>
+                          {isBefore(new Date(), new Date(event.startDate)) && (
+                            <Box mt={2}>
+                              <EventTicketStatus
+                                isSoldOut={isSoldOut}
+                                event={{
+                                  ...event,
+                                  ticketReleaseDate: event.ticketReleaseDate
+                                    ? new Date(event.ticketReleaseDate)
+                                    : null,
+                                }}
+                              />
+                            </Box>
+                          )}
+
+                          {isAfter(new Date(), new Date(event.endDate)) && (
+                            <Box mt={2}>
+                              <styled.p color="gray.500" fontSize="sm">
+                                This event has ended.
+                              </styled.p>
+                            </Box>
+                          )}
                         </Box>
                         <LinkOverlay to={`/events/${event.id}`} />
                       </styled.article>

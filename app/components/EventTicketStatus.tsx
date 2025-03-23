@@ -15,7 +15,7 @@ export const EventTicketStatus = ({ event, isSoldOut }: Props) => {
 
   if (isSoldOut) {
     return (
-      <styled.p color="red.500" fontWeight="semibold" fontSize="sm">
+      <styled.p color="brand.500" fontWeight="semibold" fontSize="sm">
         Sold out
       </styled.p>
     );
