@@ -51,6 +51,8 @@ export const advanceSingleEliminationBattleWinner = async ({
     ],
   });
 
+  const queries = [];
+
   // Split into 3rd/4th and 1st/2nd battles
   if (emptyBattles.length === 2) {
     const finalB = emptyBattles[0];
@@ -62,47 +64,59 @@ export const advanceSingleEliminationBattleWinner = async ({
 
     // Update left side of final battles
     if (finalB.driverLeftId === null) {
-      await prisma.tournamentBattles.update({
-        where: {
-          id: finalB.id,
-        },
-        data: {
-          driverLeftId: thisLoserId,
-        },
-      });
+      queries.push(
+        prisma.tournamentBattles.update({
+          where: {
+            id: finalB.id,
+          },
+          data: {
+            driverLeftId: thisLoserId,
+          },
+        })
+      );
 
-      await prisma.tournamentBattles.update({
-        where: {
-          id: finalA.id,
-        },
-        data: {
-          driverLeftId: winnerId,
-        },
-      });
+      queries.push(
+        prisma.tournamentBattles.update({
+          where: {
+            id: finalA.id,
+          },
+          data: {
+            driverLeftId: winnerId,
+          },
+        })
+      );
+
+      await prisma.$transaction(queries);
 
       return null;
     }
 
     // Update right side of final battles
     if (finalB.driverRightId === null) {
-      await prisma.tournamentBattles.update({
-        where: {
-          id: finalB.id,
-        },
-        data: {
-          driverRightId: thisLoserId,
-        },
-      });
+      queries.push(
+        prisma.tournamentBattles.update({
+          where: {
+            id: finalB.id,
+          },
+          data: {
+            driverRightId: thisLoserId,
+          },
+        })
+      );
 
-      await prisma.tournamentBattles.update({
-        where: {
-          id: finalA.id,
-        },
-        data: {
-          driverRightId: winnerId,
-        },
-      });
+      queries.push(
+        prisma.tournamentBattles.update({
+          where: {
+            id: finalA.id,
+          },
+          data: {
+            driverRightId: winnerId,
+          },
+        })
+      );
     }
+
+    await prisma.$transaction(queries);
 
     return null;
   }
@@ -115,14 +129,18 @@ export const advanceSingleEliminationBattleWinner = async ({
     const emptySide =
       nextBattle?.driverLeftId === null ? "driverLeftId" : "driverRightId";
 
-    await prisma.tournamentBattles.update({
-      where: {
-        id: nextBattle.id,
-      },
-      data: {
-        [emptySide]: winnerId,
-      },
-    });
+    queries.push(
+      prisma.tournamentBattles.update({
+        where: {
+          id: nextBattle.id,
+        },
+        data: {
+          [emptySide]: winnerId,
+        },
+      })
+    );
+
+    await prisma.$transaction(queries);
 
     return null;
   }

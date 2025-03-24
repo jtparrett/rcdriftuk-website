@@ -11,6 +11,7 @@ import {
   redirect,
   useLoaderData,
   useLocation,
+  useNavigation,
 } from "@remix-run/react";
 import { AblyProvider, ChannelProvider } from "ably/react";
 import invariant from "tiny-invariant";
@@ -198,6 +199,9 @@ const TournamentPage = () => {
   const { tournament, users, tournamentJudge, eventDrivers } =
     useLoaderData<typeof loader>();
   const location = useLocation();
+  const transition = useNavigation();
+  const isLoading =
+    transition.state === "submitting" || transition.state === "loading";
   const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
@@ -272,7 +276,11 @@ const TournamentPage = () => {
                 tournament.judges.length &&
               tournament.nextQualifyingLap && (
                 <Form method="post">
-                  <Button type="submit" w={{ base: "full", sm: "auto" }}>
+                  <Button
+                    type="submit"
+                    w={{ base: "full", sm: "auto" }}
+                    disabled={isLoading}
+                  >
                     Start Next Run
                   </Button>
                 </Form>
@@ -282,7 +290,11 @@ const TournamentPage = () => {
               tournament.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap === null && (
                 <Form method="post">
-                  <Button type="submit" w={{ base: "full", sm: "auto" }}>
+                  <Button
+                    type="submit"
+                    w={{ base: "full", sm: "auto" }}
+                    disabled={isLoading}
+                  >
                     End Qualifying
                   </Button>
                 </Form>
@@ -293,7 +305,11 @@ const TournamentPage = () => {
               (tournament.nextBattle?.BattleVotes.length ?? 0) >=
                 tournament.judges.length && (
                 <Form method="post">
-                  <Button type="submit" w={{ base: "full", sm: "auto" }}>
+                  <Button
+                    type="submit"
+                    w={{ base: "full", sm: "auto" }}
+                    disabled={isLoading}
+                  >
                     Start Next Battle
                   </Button>
                 </Form>

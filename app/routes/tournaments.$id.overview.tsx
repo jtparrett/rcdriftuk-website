@@ -111,6 +111,11 @@ const TournamentsOverviewPage = () => {
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
     tournament.judges.length;
 
+  const qualifyingRun =
+    (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
+      (lap) => lap.id === tournament.nextQualifyingLapId
+    ) ?? 0) + 1;
+
   return (
     <Box
       p={1}
@@ -167,11 +172,16 @@ const TournamentsOverviewPage = () => {
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
                 <>
-                  <Box pt={4} px={4}>
+                  <Box p={4}>
                     <styled.p fontSize="lg" fontWeight="black">
                       {tournament.nextQualifyingLap.driver.user.firstName}{" "}
                       {tournament.nextQualifyingLap.driver.user.lastName}
                     </styled.p>
+                    {!qualiJudgingComplete && (
+                      <styled.p fontSize="sm" color="gray.400">
+                        Qualifying Run {qualifyingRun}
+                      </styled.p>
+                    )}
                   </Box>
 
                   {qualiJudgingComplete && (
