@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/remix";
-import { BattlesBracket, TournamentsState } from "@prisma/client";
+import { BattlesBracket, TicketStatus, TournamentsState } from "@prisma/client";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -55,7 +55,41 @@ export const loader = async (args: LoaderFunctionArgs) => {
     (judge) => judge.user.id === userId
   );
 
-  return { tournament, users, tournamentJudge };
+  const url = new URL(args.request.url);
+  const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
+  let eventDrivers: number[] = [];
+
+  if (eventId) {
+    const event = await prisma.events.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        EventTickets: {
+          where: {
+            status: TicketStatus.CONFIRMED,
+          },
+          include: {
+            user: {
+              select: {
+                driverId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    eventDrivers =
+      event?.EventTickets.map((ticket) => ticket.user?.driverId ?? 0) ?? [];
+  }
+
+  return {
+    tournament,
+    users,
+    tournamentJudge,
+    eventDrivers,
+  };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -161,7 +195,8 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 const TournamentPage = () => {
-  const { tournament, users, tournamentJudge } = useLoaderData<typeof loader>();
+  const { tournament, users, tournamentJudge, eventDrivers } =
+    useLoaderData<typeof loader>();
   const location = useLocation();
   const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
@@ -194,7 +229,11 @@ const TournamentPage = () => {
       </Box>
 
       {tournament.state === TournamentsState.START && (
-        <TournamentStartForm tournament={tournament} users={users} />
+        <TournamentStartForm
+          tournament={tournament}
+          users={users}
+          eventDrivers={eventDrivers}
+        />
       )}
 
       {tournament.state !== TournamentsState.START && (

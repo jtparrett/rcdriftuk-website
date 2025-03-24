@@ -14,6 +14,7 @@ import { RiDeleteBinFill } from "react-icons/ri";
 interface Props {
   tournament: GetTournament;
   users: GetUsers;
+  eventDrivers: number[];
 }
 
 const PeopleForm = ({
@@ -81,7 +82,11 @@ const PeopleForm = ({
   );
 };
 
-export const TournamentStartForm = ({ tournament, users }: Props) => {
+export const TournamentStartForm = ({
+  tournament,
+  users,
+  eventDrivers,
+}: Props) => {
   const [fullInclusion, setFullInclusion] = useState(false);
 
   return (
@@ -146,9 +151,13 @@ export const TournamentStartForm = ({ tournament, users }: Props) => {
 
             <PeopleForm
               users={users}
-              defaultValue={
-                tournament?.drivers.map((driver) => driver.driverId) ?? []
-              }
+              defaultValue={Array.from(
+                new Set([
+                  ...eventDrivers,
+                  ...(tournament?.drivers.map((driver) => driver.driverId) ??
+                    []),
+                ])
+              )}
               name="drivers"
             />
           </Box>
