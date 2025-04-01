@@ -1,0 +1,92 @@
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
+import invariant from "tiny-invariant";
+import { z } from "zod";
+import { Button, LinkButton } from "~/components/Button";
+import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { getAuth } from "~/utils/getAuth.server";
+import { prisma } from "~/utils/prisma.server";
+
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { params } = args;
+  const { id } = z.object({ id: z.string() }).parse(params);
+
+  const user = await getAuth(args);
+
+  const event = await prisma.events.findFirst({
+    where: {
+      id,
+      eventTrack: {
+        owners: {
+          some: {
+            id: user.userId,
+          },
+        },
+      },
+    },
+  });
+
+  if (!event) {
+    return new Response("Event not found", { status: 404 });
+  }
+
+  return event;
+};
+
+export const action = async (args: ActionFunctionArgs) => {
+  const { params } = args;
+  const { id } = z.object({ id: z.string() }).parse(params);
+  const user = await getAuth(args);
+
+  invariant(user.userId, "User not found");
+
+  await prisma.events.delete({
+    where: {
+      id,
+      eventTrack: {
+        owners: {
+          some: {
+            id: user.userId,
+          },
+        },
+      },
+    },
+  });
+
+  return redirect("/");
+};
+
+export const EventDeletePage = () => {
+  const event = useLoaderData<typeof loader>();
+
+  return (
+    <Container maxW={1100} px={2} py={10}>
+      <Box
+        bg="gray.900"
+        p={8}
+        borderRadius="md"
+        mx="auto"
+        maxW={500}
+        textAlign="center"
+      >
+        <styled.h1 fontWeight="black" fontSize="2xl">
+          Delete "{event.name}"
+        </styled.h1>
+        <Form method="delete">
+          <styled.p mb={4}>
+            Are you sure you want to delete this event?
+          </styled.p>
+          <Flex gap={2} justifyContent="center">
+            <LinkButton to={`/events/${event.id}`} variant="secondary">
+              Cancel
+            </LinkButton>
+            <Button type="submit">Yes, Delete this event</Button>
+          </Flex>
+        </Form>
+      </Box>
+    </Container>
+  );
+};
+
+export default EventDeletePage;

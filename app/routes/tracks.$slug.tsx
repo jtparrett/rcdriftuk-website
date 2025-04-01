@@ -1,23 +1,31 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
-import { RiFacebookFill, RiLink } from "react-icons/ri";
+import { RiAddCircleFill, RiFacebookFill, RiLink } from "react-icons/ri";
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
 import { ClientOnly } from "~/components/ClientOnly";
 import { EventCard } from "~/components/EventCard";
 import { MiniMap } from "~/components/MiniMap.client";
 import { styled, Box, Flex } from "~/styled-system/jsx";
+import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { params } = args;
   const slug = z.string().parse(params.slug);
+  const user = await getAuth(args);
 
   const track = await prisma.tracks.findFirst({
     where: {
       slug,
     },
     include: {
+      owners: {
+        where: {
+          id: user.userId ?? undefined,
+        },
+      },
       events: {
         where: {
           approved: true,
@@ -42,22 +50,25 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     });
   }
 
-  return track;
+  return {
+    track,
+    isOwner: track.owners.length > 0,
+  };
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    { title: `RC Drift UK | Tracks | ${data?.name}` },
-    { name: "description", content: data?.description },
+    { title: `RC Drift UK | Tracks | ${data?.track.name}` },
+    { name: "description", content: data?.track.description },
     {
       property: "og:image",
-      content: `https://rcdrift.uk/${data?.image}`,
+      content: `https://rcdrift.uk/${data?.track.image}`,
     },
   ];
 };
 
 const TrackPage = () => {
-  const track = useLoaderData<typeof loader>();
+  const { track, isOwner } = useLoaderData<typeof loader>();
 
   return (
     <Flex
@@ -66,61 +77,77 @@ const TrackPage = () => {
       alignItems={{ base: "stretch", md: "flex-start" }}
       mt={4}
     >
-      <Box
-        borderWidth={1}
-        borderColor="gray.800"
-        rounded="xl"
-        w={{ md: 400 }}
-        overflow="hidden"
-        pos={{ md: "sticky" }}
-        top={{ md: 100 }}
-        zIndex={1}
-      >
-        <Box h={200} mb={-100} pos="relative" zIndex={-1} pointerEvents="none">
-          <ClientOnly>
-            <MiniMap track={track} />
-          </ClientOnly>
-        </Box>
-
+      <Box w={{ md: 400 }} pos={{ md: "sticky" }} top={{ md: 100 }} zIndex={1}>
         <Box
-          w={40}
-          h={40}
-          rounded="full"
+          borderWidth={1}
+          borderColor="gray.800"
+          rounded="xl"
           overflow="hidden"
-          mx="auto"
-          borderWidth={2}
-          borderColor="gray.500"
-          mb={2}
         >
-          <styled.img src={track.image} w="full" h="full" objectFit="cover" />
-        </Box>
-
-        <Box textAlign="center" maxW={540} mx="auto" px={4} pb={8}>
-          <styled.h1 fontWeight="black" fontSize="2xl" textWrap="balance">
-            {track.name}
-          </styled.h1>
-          {track.description && (
-            <styled.p
-              color="gray.500"
-              fontSize="sm"
-              textWrap="balance"
-              whiteSpace="pre-line"
-            >
-              {track.description}
-            </styled.p>
-          )}
-
-          <LinkButton
-            mt={4}
-            to={track.url}
-            variant="secondary"
-            target="_blank"
-            size="sm"
-            fontSize="lg"
+          <Box
+            h={200}
+            mb={-100}
+            pos="relative"
+            zIndex={-1}
+            pointerEvents="none"
           >
-            {track.url.includes("facebook") ? <RiFacebookFill /> : <RiLink />}
-          </LinkButton>
+            <ClientOnly>
+              <MiniMap track={track} />
+            </ClientOnly>
+          </Box>
+
+          <Box
+            w={40}
+            h={40}
+            rounded="full"
+            overflow="hidden"
+            mx="auto"
+            borderWidth={2}
+            borderColor="gray.500"
+            mb={2}
+          >
+            <styled.img src={track.image} w="full" h="full" objectFit="cover" />
+          </Box>
+
+          <Box textAlign="center" maxW={540} mx="auto" px={4} pb={8}>
+            <styled.h1 fontWeight="black" fontSize="2xl" textWrap="balance">
+              {track.name}
+            </styled.h1>
+            {track.description && (
+              <styled.p
+                color="gray.500"
+                fontSize="sm"
+                textWrap="balance"
+                whiteSpace="pre-line"
+              >
+                {track.description}
+              </styled.p>
+            )}
+
+            <LinkButton
+              mt={4}
+              to={track.url}
+              variant="secondary"
+              target="_blank"
+              size="sm"
+              fontSize="lg"
+            >
+              {track.url.includes("facebook") ? <RiFacebookFill /> : <RiLink />}
+            </LinkButton>
+          </Box>
         </Box>
+
+        {isOwner && (
+          <LinkButton
+            variant="outline"
+            w="full"
+            mt={4}
+            size="sm"
+            to="/calendar/new"
+          >
+            Create Event <RiAddCircleFill />
+          </LinkButton>
+        )}
       </Box>
 
       <Box flex={1}>

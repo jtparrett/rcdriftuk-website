@@ -52,6 +52,11 @@ export const getEvent = async (id: string) => {
       },
       eventTrack: {
         include: {
+          owners: {
+            select: {
+              id: true,
+            },
+          },
           _count: {
             select: {
               events: {

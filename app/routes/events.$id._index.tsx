@@ -81,17 +81,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     ticket = await getUserEventTicket(id, userId);
 
     if (event.eventTrack) {
-      const trackOwner = await prisma.tracks.findFirst({
-        where: {
-          id: event.eventTrack.id,
-          owners: {
-            some: {
-              id: userId,
-            },
-          },
-        },
-      });
-      isTrackOwner = !!trackOwner;
+      isTrackOwner = event.eventTrack.owners.some(
+        (owner) => owner.id === userId
+      );
     }
   }
 
@@ -452,6 +444,17 @@ const Page = () => {
                       Create Tournament
                     </LinkButton>
                   </>
+                )}
+
+                {isTrackOwner && (
+                  <LinkButton
+                    w="full"
+                    variant="outline"
+                    to={`/events/${event.id}/delete`}
+                    color="brand.500"
+                  >
+                    Delete Event
+                  </LinkButton>
                 )}
               </Flex>
             </Flex>
