@@ -276,7 +276,7 @@ const Page = () => {
               </>
             )}
 
-            <Flex gap={2} pt={2}>
+            <Flex gap={2} pt={2} flexDir={{ base: "column", md: "row" }}>
               {!event.enableTicketing && (
                 <>
                   <SignedIn>
