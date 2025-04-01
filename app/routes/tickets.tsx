@@ -12,7 +12,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    throw new Response("Unauthorized", { status: 401 });
+    throw new Response(null, {
+      status: 401,
+      statusText: "Unauthorized",
+    });
   }
 
   const tickets = await prisma.eventTickets.findMany({

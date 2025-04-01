@@ -14,6 +14,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const user = await getAuth(args);
 
+  if (!user) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
+
   const event = await prisma.events.findFirst({
     where: {
       id,
@@ -28,7 +35,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
   });
 
   if (!event) {
-    return new Response("Event not found", { status: 404 });
+    throw new Response(null, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
 
   return event;
