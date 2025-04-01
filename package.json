@@ -23,6 +23,7 @@
     "@shopify/storefront-api-client": "^1.0.5",
     "@vercel/analytics": "^1.4.1",
     "ably": "^2.6.2",
+    "calendar-link": "^2.8.0",
     "change-case": "^5.4.4",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",

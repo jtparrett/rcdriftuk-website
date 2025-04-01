@@ -17,6 +17,7 @@ import {
   RiCloseCircleFill,
   RiExternalLinkLine,
   RiDownloadLine,
+  RiCalendarLine,
 } from "react-icons/ri";
 import { z } from "zod";
 import pluralize from "pluralize";
@@ -35,6 +36,7 @@ import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { Spinner } from "~/components/Spinner";
+import { google } from "calendar-link";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -137,6 +139,24 @@ const Page = () => {
   const clerk = useClerk();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  const CalendarLink = () => {
+    return (
+      <LinkButton
+        to={google({
+          title: event.name,
+          description: event.description ?? undefined,
+          start: startDate,
+          end: endDate,
+          location: event.eventTrack?.name,
+        })}
+        target="_blank"
+        variant="secondary"
+      >
+        Add to Calendar <RiCalendarLine />
+      </LinkButton>
+    );
+  };
 
   return (
     <Container maxW={1100} px={2} pb={6} mt={4}>
@@ -310,6 +330,8 @@ const Page = () => {
                   More Info <RiExternalLinkLine />
                 </LinkButton>
               )}
+
+              <CalendarLink />
             </Flex>
 
             {event.enableTicketing &&
