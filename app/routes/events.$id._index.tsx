@@ -151,7 +151,7 @@ const Page = () => {
           location: event.eventTrack?.name,
         })}
         target="_blank"
-        variant="secondary"
+        variant="outline"
       >
         Add to Calendar <RiCalendarLine />
       </LinkButton>
