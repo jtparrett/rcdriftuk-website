@@ -1,9 +1,9 @@
 import { useLoaderData } from "@remix-run/react";
-import { format } from "date-fns";
 import { Advert } from "~/components/Advert";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { getEventDate } from "~/utils/getEventDate";
 import { prisma } from "~/utils/prisma.server";
 
 export function headers() {
@@ -89,9 +89,7 @@ const Page = () => {
                       </styled.h1>
 
                       <styled.p color="gray.400" fontSize="sm" mb={2}>
-                        {format(startDate, "do MMMM")} from{" "}
-                        {format(startDate, "HH:mm")} -{" "}
-                        {format(new Date(event.endDate), "HH:mm")}
+                        {getEventDate(startDate, new Date(event.endDate))}
                       </styled.p>
 
                       <LinkButton

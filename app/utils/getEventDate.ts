@@ -14,11 +14,12 @@ export const getEventDay = (startDate: Date, showDayOfWeek = true) => {
 };
 
 export const getEventTime = (startDate: Date, endDate: Date) => {
-  // Ensure dates are in UTC
-  const utcStart = toZonedTime(startDate, "UTC");
-  const utcEnd = toZonedTime(endDate, "UTC");
+  const startHour = startDate.getHours().toString().padStart(2, "0");
+  const startMinute = startDate.getMinutes().toString().padStart(2, "0");
+  const endHour = endDate.getHours().toString().padStart(2, "0");
+  const endMinute = endDate.getMinutes().toString().padStart(2, "0");
 
-  return `from ${format(utcStart, "h:mmaaa")}-${format(utcEnd, "h:mmaaa")}`;
+  return `from ${startHour}:${startMinute}-${endHour}:${endMinute}`;
 };
 
 export const getEventDate = (startDate: Date, endDate: Date) => {
