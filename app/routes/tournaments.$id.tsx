@@ -213,23 +213,25 @@ const TournamentPage = () => {
   useAblyRealtimeReloader(tournament.id);
 
   return (
-    <Container pb={12} px={2} maxW={1100}>
+    <>
       {tournament.liveUrl && (
         <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
           <styled.iframe src={tournament.liveUrl} />
         </AspectRatio>
       )}
 
-      <Box mb={4}>
-        <styled.h1
-          fontSize="3xl"
-          fontWeight="extrabold"
-          overflow="hidden"
-          textOverflow="ellipsis"
-          whiteSpace="nowrap"
-        >
-          {tournament.name}
-        </styled.h1>
+      <Box py={2} borderBottomWidth={1} borderColor="gray.800">
+        <Container maxW={1100} px={2}>
+          <styled.h1
+            fontSize="xl"
+            fontWeight="bold"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+          >
+            {tournament.name}
+          </styled.h1>
+        </Container>
       </Box>
 
       {tournament.state === TournamentsState.START && (
@@ -242,90 +244,96 @@ const TournamentPage = () => {
 
       {tournament.state !== TournamentsState.START && (
         <>
-          <Flex mb={4} flexDir={{ base: "column", sm: "row" }} gap={2}>
-            <Flex bgColor="gray.900" rounded="xl" gap={1} p={1}>
-              <LinkButton
-                to={`/tournaments/${tournament.id}/overview`}
-                size="xs"
-                variant={isOverviewTab ? "secondary" : "ghost"}
-              >
-                Overview
-              </LinkButton>
-              <LinkButton
-                to={`/tournaments/${tournament.id}/qualifying`}
-                variant={isQualifyingTab ? "secondary" : "ghost"}
-                size="xs"
-              >
-                Qualifying
-              </LinkButton>
-              <LinkButton
-                to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-                variant={isBattlesTab ? "secondary" : "ghost"}
-                size="xs"
-              >
-                Battles
-              </LinkButton>
-            </Flex>
-
-            <Spacer />
-
-            {isOwner &&
-              tournament.state === TournamentsState.QUALIFYING &&
-              tournament.nextQualifyingLap &&
-              tournament.nextQualifyingLap.scores.length ===
-                tournament.judges.length &&
-              tournament.nextQualifyingLap && (
-                <Form method="post">
-                  <Button
-                    type="submit"
-                    w={{ base: "full", sm: "auto" }}
-                    disabled={isLoading}
+          <Box py={2} borderBottomWidth={1} borderColor="gray.800" mb={4}>
+            <Container maxW={1100} px={2}>
+              <Flex flexDir={{ base: "column", sm: "row" }} gap={1}>
+                <Flex bgColor="gray.900" rounded="xl" gap={1} p={1}>
+                  <LinkButton
+                    to={`/tournaments/${tournament.id}/overview`}
+                    size="xs"
+                    variant={isOverviewTab ? "secondary" : "ghost"}
                   >
-                    Start Next Run
-                  </Button>
-                </Form>
-              )}
-
-            {isOwner &&
-              tournament.state === TournamentsState.QUALIFYING &&
-              tournament.nextQualifyingLap === null && (
-                <Form method="post">
-                  <Button
-                    type="submit"
-                    w={{ base: "full", sm: "auto" }}
-                    disabled={isLoading}
+                    Overview
+                  </LinkButton>
+                  <LinkButton
+                    to={`/tournaments/${tournament.id}/qualifying`}
+                    variant={isQualifyingTab ? "secondary" : "ghost"}
+                    size="xs"
                   >
-                    End Qualifying
-                  </Button>
-                </Form>
-              )}
-
-            {isOwner &&
-              tournament.state === TournamentsState.BATTLES &&
-              (tournament.nextBattle?.BattleVotes.length ?? 0) >=
-                tournament.judges.length && (
-                <Form method="post">
-                  <Button
-                    type="submit"
-                    w={{ base: "full", sm: "auto" }}
-                    disabled={isLoading}
+                    Qualifying
+                  </LinkButton>
+                  <LinkButton
+                    to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+                    variant={isBattlesTab ? "secondary" : "ghost"}
+                    size="xs"
                   >
-                    Start Next Battle
-                  </Button>
-                </Form>
-              )}
+                    Battles
+                  </LinkButton>
+                </Flex>
 
-            {tournamentJudge && (
-              <LinkButton to={`/judge/${tournamentJudge.id}`}>
-                Open Judging
-              </LinkButton>
-            )}
-          </Flex>
+                <Spacer />
 
-          <Outlet />
+                {isOwner &&
+                  tournament.state === TournamentsState.QUALIFYING &&
+                  tournament.nextQualifyingLap &&
+                  tournament.nextQualifyingLap.scores.length ===
+                    tournament.judges.length &&
+                  tournament.nextQualifyingLap && (
+                    <Form method="post">
+                      <Button
+                        type="submit"
+                        w={{ base: "full", sm: "auto" }}
+                        disabled={isLoading}
+                      >
+                        Start Next Run
+                      </Button>
+                    </Form>
+                  )}
+
+                {isOwner &&
+                  tournament.state === TournamentsState.QUALIFYING &&
+                  tournament.nextQualifyingLap === null && (
+                    <Form method="post">
+                      <Button
+                        type="submit"
+                        w={{ base: "full", sm: "auto" }}
+                        disabled={isLoading}
+                      >
+                        End Qualifying
+                      </Button>
+                    </Form>
+                  )}
+
+                {isOwner &&
+                  tournament.state === TournamentsState.BATTLES &&
+                  (tournament.nextBattle?.BattleVotes.length ?? 0) >=
+                    tournament.judges.length && (
+                    <Form method="post">
+                      <Button
+                        type="submit"
+                        w={{ base: "full", sm: "auto" }}
+                        disabled={isLoading}
+                      >
+                        Start Next Battle
+                      </Button>
+                    </Form>
+                  )}
+
+                {tournamentJudge && (
+                  <LinkButton to={`/judge/${tournamentJudge.id}`}>
+                    Open Judging
+                  </LinkButton>
+                )}
+              </Flex>
+            </Container>
+          </Box>
+
+          <Container pb={12} px={2} maxW={1100}>
+            <Outlet />
+          </Container>
         </>
       )}
-    </Container>
+    </>
   );
 };
 
