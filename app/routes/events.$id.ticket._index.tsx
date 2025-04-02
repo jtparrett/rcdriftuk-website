@@ -3,6 +3,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { isBefore } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
@@ -50,7 +51,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   // This is because we set the time in UK TIME
   // even tho it's stored in UTC in the DB
-  const offset = new Date().getTimezoneOffset() * 60000;
+  const offset =
+    toZonedTime(new Date(), "Europe/London").getTimezoneOffset() * 60000;
   const isBeforeRelease = event?.ticketReleaseDate
     ? isBefore(new Date(), new Date(event.ticketReleaseDate.getTime() + offset))
     : false;
