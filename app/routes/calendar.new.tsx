@@ -16,7 +16,6 @@ import { TimePicker } from "~/components/TimePicker";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
-import { toZonedTime } from "date-fns-tz";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -103,9 +102,8 @@ export const action = async (args: ActionFunctionArgs) => {
       });
       const repeatEndDate = add(data.endDate, { weeks: i * data.repeatWeeks });
 
-      // Convert dates to UTC using toZonedTime
-      const utcStartDate = toZonedTime(repeatStartDate, "UTC");
-      const utcEndDate = toZonedTime(repeatEndDate, "UTC");
+      const utcStartDate = repeatStartDate;
+      const utcEndDate = repeatEndDate;
 
       return {
         name: data.name,
@@ -118,7 +116,7 @@ export const action = async (args: ActionFunctionArgs) => {
         enableTicketing: data.enableTicketing === "true",
         ticketCapacity: data.ticketCapacity,
         ticketReleaseDate: data.ticketReleaseDate
-          ? toZonedTime(data.ticketReleaseDate, "UTC")
+          ? data.ticketReleaseDate
           : null,
         earlyAccessCode: data.earlyAccessCode,
         ticketPrice: data.ticketPrice,

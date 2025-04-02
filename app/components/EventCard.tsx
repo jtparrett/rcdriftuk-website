@@ -5,7 +5,6 @@ import { Link } from "@remix-run/react";
 import { getEventDate } from "~/utils/getEventDate";
 import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
 import { isPast } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
 interface QueriedEvent
   extends Omit<
@@ -26,9 +25,9 @@ interface Props {
 }
 
 export const EventCard = ({ event, showAvatar = false }: Props) => {
-  const hasPast = isPast(toZonedTime(new Date(event.endDate), "UTC"));
-  const startDate = toZonedTime(new Date(event.startDate), "UTC");
-  const endDate = toZonedTime(new Date(event.endDate), "UTC");
+  const hasPast = isPast(new Date(event.endDate));
+  const startDate = new Date(event.startDate);
+  const endDate = new Date(event.endDate);
 
   return (
     <Flex
