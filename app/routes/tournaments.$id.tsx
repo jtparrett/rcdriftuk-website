@@ -235,11 +235,13 @@ const TournamentPage = () => {
       </Box>
 
       {tournament.state === TournamentsState.START && (
-        <TournamentStartForm
-          tournament={tournament}
-          users={users}
-          eventDrivers={eventDrivers}
-        />
+        <Container maxW={1100} px={2} py={4}>
+          <TournamentStartForm
+            tournament={tournament}
+            users={users}
+            eventDrivers={eventDrivers}
+          />
+        </Container>
       )}
 
       {tournament.state !== TournamentsState.START && (
