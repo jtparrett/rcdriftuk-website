@@ -51,10 +51,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   // This is because we set the time in UK TIME
   // even tho it's stored in UTC in the DB
-  const offset =
-    toZonedTime(new Date(), "Europe/London").getTimezoneOffset() * 60000;
+  const londonTimeNow = toZonedTime(new Date(), "Europe/London");
   const isBeforeRelease = event?.ticketReleaseDate
-    ? isBefore(new Date(), new Date(event.ticketReleaseDate.getTime() + offset))
+    ? isBefore(londonTimeNow, event.ticketReleaseDate)
     : false;
 
   if (
