@@ -2,6 +2,8 @@ import { TicketStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { isBefore } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
@@ -28,16 +30,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
       ticketPrice: {
         not: null,
       },
-      OR: [
-        {
-          ticketReleaseDate: {
-            lte: new Date(),
-          },
-        },
-        {
-          earlyAccessCode,
-        },
-      ],
+      ticketReleaseDate: {
+        not: null,
+      },
     },
     include: {
       _count: {
@@ -54,7 +49,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  if (!event) {
+  const isBeforeRelease = event?.ticketReleaseDate
+    ? isBefore(
+        new Date(),
+        toZonedTime(new Date(event.ticketReleaseDate), "UTC")
+      )
+    : false;
+
+  if (
+    !event ||
+    (isBeforeRelease && earlyAccessCode !== event.earlyAccessCode)
+  ) {
     throw new Response(null, {
       status: 404,
       statusText: "Not Found",

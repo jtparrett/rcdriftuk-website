@@ -89,7 +89,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
     : null;
 
   const isBeforeRelease = releaseDate
-    ? isBefore(toZonedTime(new Date(), "UTC"), releaseDate)
+    ? isBefore(new Date(), releaseDate)
     : false;
 
   if (!event || !event.enableTicketing) {
