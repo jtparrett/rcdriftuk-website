@@ -31,7 +31,7 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
     const updateCountdown = () => {
       const duration = intervalToDuration({
         start: toZonedTime(new Date(), "UTC"),
-        end: releaseDate,
+        end: toZonedTime(releaseDate, "UTC"),
       });
 
       // Convert months to days (approximate)

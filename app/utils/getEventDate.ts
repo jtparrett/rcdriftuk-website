@@ -13,13 +13,22 @@ export const getEventDay = (startDate: Date, showDayOfWeek = true) => {
   return format(startDate, showDayOfWeek ? "eeee do MMMM" : "do MMMM");
 };
 
-export const getEventTime = (startDate: Date, endDate: Date) => {
-  const startHour = startDate.getHours().toString().padStart(2, "0");
-  const startMinute = startDate.getMinutes().toString().padStart(2, "0");
-  const endHour = endDate.getHours().toString().padStart(2, "0");
-  const endMinute = endDate.getMinutes().toString().padStart(2, "0");
+export const getTime = (date: Date) => {
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // convert 0 to 12
+  const minutes = date.getMinutes().toString().padStart(2, "0");
 
-  return `from ${startHour}:${startMinute}-${endHour}:${endMinute}`;
+  if (minutes === "00") {
+    return `${hours}${ampm}`;
+  }
+
+  return `${hours}:${minutes}${ampm}`;
+};
+
+export const getEventTime = (startDate: Date, endDate: Date) => {
+  return `from ${getTime(startDate)}-${getTime(endDate)}`;
 };
 
 export const getEventDate = (startDate: Date, endDate: Date) => {
