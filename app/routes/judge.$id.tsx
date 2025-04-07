@@ -258,6 +258,12 @@ const BattleForm = () => {
   const nextBattle = tournament.nextBattle;
   const battleVote = nextBattle?.BattleVotes[0];
 
+  const leftDriverLead =
+    (nextBattle?.driverLeft?.qualifyingPosition ?? 0) >
+    (nextBattle?.driverRight?.qualifyingPosition ?? 0)
+      ? true
+      : false;
+
   return (
     <>
       {nextBattle?.winnerId !== null && (
@@ -294,7 +300,8 @@ const BattleForm = () => {
                 }
               >
                 {nextBattle.driverLeft?.user.firstName}{" "}
-                {nextBattle.driverLeft?.user.lastName}
+                {nextBattle.driverLeft?.user.lastName}{" "}
+                {leftDriverLead && "(Lead First)"}
               </Button>
             )}
 
@@ -311,7 +318,8 @@ const BattleForm = () => {
                 }
               >
                 {nextBattle.driverRight?.user.firstName}{" "}
-                {nextBattle.driverRight?.user.lastName}
+                {nextBattle.driverRight?.user.lastName}{" "}
+                {!leftDriverLead && "(Lead First)"}
               </Button>
             )}
 
