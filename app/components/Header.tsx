@@ -347,7 +347,7 @@ export const Header = ({ user }: Props) => {
             fontSize="lg"
             target="_blank"
             variant="ghost"
-            to="https://www.facebook.com/DriftRCUK/"
+            to="https://www.facebook.com/rcdriftinternational/"
           >
             <RiFacebookFill />
           </LinkButton>
