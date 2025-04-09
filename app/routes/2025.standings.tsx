@@ -97,8 +97,8 @@ const StandingsPage = () => {
             <tbody>
               {drivers.map((driver, i) => (
                 <tr key={driver.id}>
-                  <td>{i + 1}</td>
-                  <styled.td py={1}>
+                  <styled.td textAlign="right">{i + 1}</styled.td>
+                  <styled.td py={1} pl={1}>
                     <Flex pos="relative" alignItems="center" gap={2}>
                       <Box w={8} h={8} rounded="full" overflow="hidden">
                         <styled.img
