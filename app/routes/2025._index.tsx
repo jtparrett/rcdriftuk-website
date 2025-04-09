@@ -75,6 +75,13 @@ const UL = styled("ul", {
   },
 });
 
+const Strong = styled("span", {
+  base: {
+    color: "brand.500",
+    fontWeight: "bold",
+  },
+});
+
 const SummaryGrid = styled("div", {
   base: {
     display: "grid",
@@ -391,6 +398,7 @@ const Page = () => {
                 residential drivers completing two judged qualifying laps, with
                 a maximum of 100 points on offer for each run.
               </P>
+
               <P>
                 A qualifying standing will then be produced using the RCDrift.uk
                 driver ratings combined with the international qualifying
@@ -408,6 +416,27 @@ const Page = () => {
                 The competition winners will receive a large cash sum, prizes
                 from sponsors, and the title of the RCDrift.uk 2025 Champion.
               </P>
+
+              <P>
+                <Strong>
+                  UK Drivers must meet the following criteria to qualify for the
+                  main event:
+                </Strong>
+              </P>
+              <UL>
+                <styled.li>
+                  The driver must have competed in at least one feeder round
+                  prior to the event
+                </styled.li>
+                <styled.li>
+                  The driver must be ranked within the driver ratings
+                </styled.li>
+                <styled.li>
+                  The driver must be within the top 64 drivers within the driver
+                  ratings
+                </styled.li>
+              </UL>
+
               <Box mt={4}>
                 <LinkButton
                   to="https://www.google.com/maps/search/Hotels/@52.2999802,-1.9325026,7236m/data=!3m1!1e3!4m13!2m12!3m6!1sHotels!2sTudor+Grange+Academy,+Redditch,+Woodrow+Dr,+Redditch+B98+7UH!3s0x4870c10cb0889b39:0x6122ace3f5be76b0!4m2!1d-1.9094744!2d52.2822365!5m3!5m2!4m1!1i1!6e3?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoASAFQAw%3D%3D"
