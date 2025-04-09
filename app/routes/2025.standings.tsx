@@ -88,7 +88,7 @@ const StandingsPage = () => {
           <styled.table w="full">
             <thead>
               <tr>
-                <styled.th textAlign="left">#</styled.th>
+                <styled.th textAlign="right">#</styled.th>
                 <styled.th textAlign="left"></styled.th>
                 <styled.th textAlign="left"></styled.th>
                 <styled.th textAlign="left"></styled.th>
@@ -98,7 +98,7 @@ const StandingsPage = () => {
               {drivers.map((driver, i) => (
                 <tr key={driver.id}>
                   <styled.td textAlign="right">{i + 1}</styled.td>
-                  <styled.td py={1} pl={1}>
+                  <styled.td py={1} pl={2}>
                     <Flex pos="relative" alignItems="center" gap={2}>
                       <Box w={8} h={8} rounded="full" overflow="hidden">
                         <styled.img
