@@ -1,4 +1,5 @@
 import { TicketStatus } from "@prisma/client";
+import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay, startOfYear } from "date-fns";
 import { LinkOverlay } from "~/components/LinkOverlay";
@@ -6,6 +7,21 @@ import { Container, styled, Flex, Box } from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "RC Drift UK | 2025 Standings" },
+    {
+      name: "description",
+      content:
+        "Current list of drivers who've qualified for the 2025 Main Event",
+    },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/2025-cover.jpg",
+    },
+  ];
+};
 
 export const loader = async () => {
   const driverRatings = await getDriverRatings();
