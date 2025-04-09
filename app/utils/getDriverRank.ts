@@ -11,7 +11,7 @@ export const RANKS = {
 } as const;
 
 export const RANKS_RULES = {
-  [RANKS.UNRANKED]: "Unranked = < 5 battles",
+  [RANKS.UNRANKED]: "Unranked = < 3 battles",
   [RANKS.STEEL]: "Steel <= 1050 points",
   [RANKS.BRONZE]: "Bronze = 1050 - 1100 points",
   [RANKS.SILVER]: "Silver = 1100 - 1200 points",
@@ -42,7 +42,7 @@ export const getRankColor = (rank: Values<typeof RANKS>): [string, string] => {
 };
 
 export const getDriverRank = (currentElo: number, totalHistory: number) => {
-  if (totalHistory < 5) {
+  if (totalHistory < 3) {
     return RANKS.UNRANKED;
   }
 
