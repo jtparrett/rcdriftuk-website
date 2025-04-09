@@ -28,6 +28,9 @@ export const loader = async () => {
 
   const qualifiedDrivers = await prisma.users.findMany({
     where: {
+      driverId: {
+        in: driverRatings.map((driver) => driver.driverId),
+      },
       EventTickets: {
         some: {
           status: TicketStatus.CONFIRMED,
