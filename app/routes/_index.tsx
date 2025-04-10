@@ -203,29 +203,19 @@ const Page = () => {
               </styled.h1>
 
               <styled.table w="full">
-                <styled.thead>
-                  <styled.tr>
-                    <styled.th textAlign="left" w="full" p={1}>
-                      Name
-                    </styled.th>
-                    <styled.th textAlign="right" p={1}>
-                      Points
-                    </styled.th>
-                    <styled.th textAlign="right" p={1}>
-                      Rank
-                    </styled.th>
-                  </styled.tr>
-                </styled.thead>
                 <styled.tbody>
                   {drivers.map((driver, i) => (
                     <styled.tr key={driver.id}>
-                      <styled.td px={1}>
-                        #{i + 1} {driver.firstName} {driver.lastName}
+                      <styled.td textAlign="center" fontFamily="mono">
+                        {i + 1}
                       </styled.td>
-                      <styled.td textAlign="right" px={1}>
+                      <styled.td px={1}>
+                        {driver.firstName} {driver.lastName}
+                      </styled.td>
+                      <styled.td textAlign="right" fontFamily="mono">
                         {driver.currentElo.toFixed(3)}
                       </styled.td>
-                      <styled.td textAlign="center" px={1}>
+                      <styled.td textAlign="center">
                         <styled.img
                           w={8}
                           display="inline-block"
