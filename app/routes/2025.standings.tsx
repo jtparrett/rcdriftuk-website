@@ -89,18 +89,12 @@ const StandingsPage = () => {
           borderColor="gray.800"
         >
           <styled.table w="full">
-            <thead>
-              <tr>
-                <styled.th textAlign="right">#</styled.th>
-                <styled.th textAlign="left"></styled.th>
-                <styled.th textAlign="left"></styled.th>
-                <styled.th textAlign="left"></styled.th>
-              </tr>
-            </thead>
             <tbody>
               {drivers.map((driver, i) => (
                 <tr key={driver.id}>
-                  <styled.td textAlign="right">{i + 1}</styled.td>
+                  <styled.td textAlign="center" fontFamily="mono">
+                    {i + 1}
+                  </styled.td>
                   <styled.td py={1} pl={2}>
                     <Flex pos="relative" alignItems="center" gap={2}>
                       <Box w={8} h={8} rounded="full" overflow="hidden">
