@@ -116,7 +116,7 @@ const StandingsPage = () => {
                       {driver.firstName} {driver.lastName}
                     </Flex>
                   </styled.td>
-                  <styled.td textAlign="right">
+                  <styled.td textAlign="right" fontFamily="mono">
                     {driver.currentElo.toFixed(3)}
                   </styled.td>
                   <styled.td textAlign="right">
