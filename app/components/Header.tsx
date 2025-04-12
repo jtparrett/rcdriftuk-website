@@ -1,8 +1,16 @@
-import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
+import {
+  styled,
+  Flex,
+  Spacer,
+  Box,
+  Container,
+  Center,
+} from "~/styled-system/jsx";
 import { Link, useLocation } from "@remix-run/react";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
 import {
+  RiAddLine,
   RiCalendar2Line,
   RiFacebookFill,
   RiFlagLine,
@@ -24,7 +32,6 @@ import {
 import { GiCogLock } from "react-icons/gi";
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
-import { Popover } from "react-tiny-popover";
 import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/remix";
 import type { GetUser } from "~/utils/getUser.server";
 
@@ -85,42 +92,77 @@ const Menu = ({ user }: Props) => {
 
   return (
     <Box
-      bgColor="rgba(12, 12, 12, 0.8)"
-      backdropFilter="blur(10px)"
-      rounded="xl"
       borderWidth={1}
       borderColor="gray.800"
-      shadow="2xl"
-      mt={5}
-      overflow="hidden"
-      w={{ base: "100vw", sm: "auto" }}
+      bgColor="black"
+      w={{ base: "full", md: "480px" }}
+      maxW="full"
+      ml="auto"
+      rounded="xl"
+      pos="relative"
     >
+      <Box
+        pos="absolute"
+        top={0}
+        right="48px"
+        w={3}
+        h={3}
+        transform="translateY(-50%) rotate(45deg)"
+        bgColor="inherit"
+        borderTopWidth={1}
+        borderLeftWidth={1}
+        borderColor="gray.800"
+        borderTopLeftRadius="sm"
+      />
       {(user?.Tracks.length ?? 0) > 0 && (
-        <Flex
-          p={{ base: 2, md: 4 }}
-          borderBottomWidth={1}
-          borderColor="gray.800"
-          flexWrap="wrap"
-          gap={2}
-        >
-          {user?.Tracks.map(({ track }) => (
-            <Box key={track.id} w={10} h={10} overflow="hidden" rounded="full">
-              <Link to={`/tracks/${track.slug}`}>
-                <styled.img
-                  src={track.image}
+        <Box p={3} borderBottomWidth={1} borderColor="gray.800">
+          <styled.p fontSize="sm" fontWeight="semibold" mb={1}>
+            Your Tracks
+          </styled.p>
+          <Flex flexWrap="wrap" gap={2}>
+            {user?.Tracks.map(({ track }) => (
+              <Box key={track.id} w={10} overflow="hidden" textAlign="center">
+                <Box w="full" h={10} overflow="hidden" rounded="full">
+                  <Link to={`/tracks/${track.slug}`}>
+                    <styled.img
+                      src={track.image}
+                      w="full"
+                      h="full"
+                      alt={track.name}
+                    />
+                  </Link>
+                </Box>
+                <styled.span
+                  fontSize="xs"
+                  mt={1}
                   w="full"
-                  h="full"
-                  alt={track.name}
-                />
+                  display="block"
+                  overflow="hidden"
+                  whiteSpace="nowrap"
+                  textOverflow="ellipsis"
+                >
+                  {track.name}
+                </styled.span>
+              </Box>
+            ))}
+
+            <Box w={10} textAlign="center">
+              <Link to="/tracks/new">
+                <Center w="full" h={10} rounded="full" bgColor="gray.800">
+                  <RiAddLine />
+                </Center>
+                <styled.span fontSize="xs" mt={1}>
+                  New
+                </styled.span>
               </Link>
             </Box>
-          ))}
-        </Flex>
+          </Flex>
+        </Box>
       )}
 
-      <Box h={{ base: "calc(100vh - 200px)", md: "auto" }} overflowY="auto">
-        <Flex gap={2} p={{ base: 2, md: 4 }} minH="full">
-          <Flex gap={1} flexDir="column" flex={1}>
+      <Box h={{ base: "calc(100vh - 300px)", md: "auto" }} overflowY="auto">
+        <Flex minH="full">
+          <Flex gap="1px" flexDir="column" flex={1} p={3}>
             <MenuLink
               to="/"
               active={location.pathname === "/" ? "active" : "inactive"}
@@ -242,7 +284,7 @@ const Menu = ({ user }: Props) => {
 
           <SignedIn>
             <Box w="1px" bgColor="gray.800" />
-            <Flex gap={1} flexDir="column" flex={1}>
+            <Flex gap="1px" flexDir="column" flex={1} p={3}>
               {user && (
                 <MenuLink
                   to={`/tickets`}
@@ -304,20 +346,6 @@ const Menu = ({ user }: Props) => {
               </MenuLink>
 
               <MenuLink
-                to="/tracks/new"
-                active={
-                  location.pathname.startsWith("/tracks/new")
-                    ? "active"
-                    : "inactive"
-                }
-              >
-                <MenuIcon>
-                  <RiFlagLine />
-                </MenuIcon>
-                Create Track
-              </MenuLink>
-
-              <MenuLink
                 to="/"
                 onClick={(e) => {
                   e.preventDefault();
@@ -335,7 +363,12 @@ const Menu = ({ user }: Props) => {
       </Box>
 
       <SignedIn>
-        <Box bgColor="gray.900" p={1} textAlign="center">
+        <Box
+          bgColor="gray.900"
+          p={1}
+          textAlign="center"
+          borderBottomRadius="inherit"
+        >
           <styled.span
             fontWeight="semibold"
             fontSize="xs"
@@ -377,6 +410,8 @@ export const Header = ({ user }: Props) => {
       shadow="2xl"
       borderBottomWidth={1}
       borderColor="gray.900"
+      overflow="visible"
+      h="65px"
     >
       <Container maxW={1100} px={4}>
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"}>
@@ -409,28 +444,17 @@ export const Header = ({ user }: Props) => {
           </LinkButton>
 
           <Box>
-            <Popover
-              isOpen={menu.isOpen}
-              content={<Menu user={user} />}
-              positions={["bottom"]}
-              align="end"
-              containerStyle={{
-                zIndex: "20",
-              }}
-              onClickOutside={menu.onClose}
+            <Button
+              size="sm"
+              px={2}
+              fontSize="lg"
+              variant={menu.isOpen ? "primary" : "outline"}
+              onClick={() => menu.toggle()}
+              mx={2}
+              aria-label="Menu"
             >
-              <Button
-                size="sm"
-                px={2}
-                fontSize="lg"
-                variant={menu.isOpen ? "primary" : "outline"}
-                onClick={() => menu.toggle()}
-                mx={2}
-                aria-label="Menu"
-              >
-                <RiMenu2Line />
-              </Button>
-            </Popover>
+              <RiMenu2Line />
+            </Button>
           </Box>
 
           <SignedIn>
@@ -454,6 +478,8 @@ export const Header = ({ user }: Props) => {
             </LinkButton>
           </SignedOut>
         </Flex>
+
+        {menu.isOpen && <Menu user={user} />}
       </Container>
     </Box>
   );
