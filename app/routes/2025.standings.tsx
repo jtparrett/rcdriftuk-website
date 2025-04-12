@@ -69,13 +69,13 @@ const StandingsPage = () => {
   const drivers = useLoaderData<typeof loader>();
 
   return (
-    <Container maxW={1100} px={2} py={8}>
-      <styled.h1 fontWeight="extrabold" fontSize="3xl">
-        2025 Standings
-      </styled.h1>
+    <Container maxW={1100} px={4} py={8}>
+      <Box maxW={640} textAlign={{ md: "center" }} mx={{ md: "auto" }}>
+        <styled.h1 fontWeight="extrabold" fontSize="4xl">
+          2025 Standings
+        </styled.h1>
 
-      <Box maxW="640px">
-        <styled.p mb={4} textWrap="balance">
+        <styled.p mb={8} textWrap="balance" color="gray.500">
           See the current list of drivers who've qualified for the 2025 Main
           Event. Visit the season overview for details on the qualification
           criteria.

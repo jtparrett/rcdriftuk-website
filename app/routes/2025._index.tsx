@@ -280,8 +280,8 @@ const Page = () => {
                   width="100%"
                 />
               </ImageContainer>
-              <H1>RCDrift UK 2025</H1>
-              <P fontSize="lg" maxW={600} mx="auto" mt={4}>
+              <H1>RC Drift UK 2025</H1>
+              <P fontSize="lg" maxW={600} mx="auto" mt={2}>
                 We are thrilled to introduce "RCDrift.uk 2025," an innovative
                 platform that invites every driver and track to join the
                 excitement of a brand-new competitive format.

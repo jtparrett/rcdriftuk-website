@@ -57,18 +57,17 @@ export default function JudgingCriteriaPage() {
     <Container py={8} px={4} maxW={800}>
       <Stack gap={6}>
         <Box textAlign={{ md: "center" }}>
-          <styled.span fontSize="sm" color="gray.500">
-            Last updated: 14/03/2025
-          </styled.span>
-
           <styled.h1
             fontSize="4xl"
             fontWeight="extrabold"
             lineHeight={1.1}
-            mt={2}
+            mb={2}
           >
             Judging Criteria
           </styled.h1>
+          <styled.span fontSize="sm" color="gray.500">
+            Last updated: 14/03/2025
+          </styled.span>
         </Box>
 
         <Stack gap={4}>

@@ -95,9 +95,9 @@ const Page = () => {
   );
 
   return (
-    <Container px={2} maxW={1100}>
-      <styled.div pt={4} pb={12}>
-        <styled.h1 fontSize="3xl" mb={2} fontWeight="extrabold">
+    <Container px={4} maxW={1100}>
+      <styled.div pt={8} pb={12}>
+        <styled.h1 fontSize="4xl" mb={4} fontWeight="extrabold">
           2025 Schedule
         </styled.h1>
 
