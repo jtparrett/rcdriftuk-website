@@ -31,8 +31,10 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
 
   return (
     <Flex
-      rounded="md"
+      rounded="xl"
       bgColor="gray.900"
+      borderWidth={1}
+      borderColor="gray.800"
       p={4}
       alignItems="center"
       gap={4}

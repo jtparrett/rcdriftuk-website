@@ -5,7 +5,7 @@ export const Footer = () => {
   return (
     <Box
       borderTopWidth={1}
-      borderColor="gray.800"
+      borderColor="gray.900"
       py={8}
       textAlign="center"
       mt={4}

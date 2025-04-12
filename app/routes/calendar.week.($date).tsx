@@ -11,7 +11,7 @@ import {
   endOfDay,
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -114,13 +114,15 @@ const CalendarWeeksPage = () => {
           return (
             <Box
               key={i}
-              rounded="md"
+              rounded="2xl"
               overflow="hidden"
               borderWidth={1}
-              borderColor="gray.800"
+              borderColor="gray.900"
             >
-              <Box py={1} px={4} bgColor="gray.800">
-                <styled.h3>{format(day, "EEEE do")}</styled.h3>
+              <Box py={1} px={4} bgColor="gray.900">
+                <styled.h3 fontWeight="bold">
+                  {format(day, "EEEE do")}
+                </styled.h3>
               </Box>
 
               <Flex p={4} flexDir="column" gap={2}>
