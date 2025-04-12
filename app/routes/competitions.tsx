@@ -11,7 +11,7 @@ import {
 
 const Page = () => {
   return (
-    <Container maxW={1100} px={2} py={4} overflow="hidden">
+    <Container maxW={1100} px={4} py={8} overflow="hidden">
       <styled.h1 fontWeight="extrabold" fontSize="4xl" mb={4}>
         Competitions
       </styled.h1>

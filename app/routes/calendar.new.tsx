@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { add, differenceInWeeks, endOfYear, sub } from "date-fns";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -24,17 +24,24 @@ export const loader = async (args: LoaderFunctionArgs) => {
     throw redirect("/");
   }
 
-  const userData = await prisma.users.findFirst({
+  const user = await prisma.users.findFirst({
     where: {
       id: userId,
     },
+    include: {
+      Tracks: {
+        include: {
+          track: true,
+        },
+      },
+    },
   });
 
-  if (!userData?.trackId) {
+  if ((user?.Tracks.length ?? 0) <= 0) {
     throw redirect("/");
   }
 
-  return null;
+  return user;
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -44,14 +51,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   invariant(userId);
 
-  const userData = await prisma.users.findFirst({
-    where: {
-      id: userId,
-    },
-  });
-
-  invariant(userData?.trackId, "User does not own a track");
-
+  const trackId = body.get("trackId");
   const name = body.get("name");
   const startDate = body.get("startDate");
   const endDate = body.get("endDate");
@@ -66,6 +66,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   const data = z
     .object({
+      trackId: z.string(),
       name: z.string(),
       startDate: z.coerce.date(),
       endDate: z.coerce.date(),
@@ -79,6 +80,7 @@ export const action = async (args: ActionFunctionArgs) => {
       ticketPrice: z.coerce.number().nullable(),
     })
     .parse({
+      trackId,
       name,
       startDate,
       endDate,
@@ -91,6 +93,18 @@ export const action = async (args: ActionFunctionArgs) => {
       earlyAccessCode,
       ticketPrice,
     });
+
+  // Ensure the user owns the track
+  await prisma.users.findFirstOrThrow({
+    where: {
+      id: userId,
+      Tracks: {
+        some: {
+          trackId: data.trackId,
+        },
+      },
+    },
+  });
 
   const diff = differenceInWeeks(endOfYear(data.startDate), data.startDate);
   const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
@@ -107,7 +121,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
       return {
         name: data.name,
-        trackId: userData.trackId,
+        trackId: data.trackId,
         link: data.link,
         startDate: utcStartDate,
         endDate: utcEndDate,
@@ -132,6 +146,7 @@ const CalendarNewPage = () => {
   const [endDate, setEndDate] = useState(add(new Date(), { days: 1 }));
   const [enableTicketing, setEnableTicketing] = useState(false);
   const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
+  const user = useLoaderData<typeof loader>();
 
   return (
     <Box pb={12}>
@@ -140,6 +155,17 @@ const CalendarNewPage = () => {
       </styled.h1>
       <Form method="post">
         <Flex flexDir="column" maxW={500} gap={4}>
+          <Box>
+            <Label>Track</Label>
+            <Select name="trackId">
+              {user?.Tracks.map((track) => (
+                <option key={track.trackId} value={track.trackId}>
+                  {track.track.name}
+                </option>
+              ))}
+            </Select>
+          </Box>
+
           <Box>
             <Label>Date</Label>
             <DatePicker

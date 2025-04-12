@@ -56,9 +56,9 @@ const Page = () => {
   const { tournaments } = useLoaderData<typeof loader>();
 
   return (
-    <Container maxW={1100} px={2} py={4}>
+    <Container maxW={1100} px={4} py={8}>
       <Flex
-        alignItems={{ base: "stretch", md: "center" }}
+        alignItems={{ base: "stretch", md: "flex-end" }}
         pb={4}
         gap={2}
         flexDir={{ base: "column", md: "row" }}

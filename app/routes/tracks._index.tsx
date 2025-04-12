@@ -28,11 +28,11 @@ const TracksPage = () => {
   const tracks = useLoaderData<typeof loader>();
 
   return (
-    <styled.main py={6} overflow="hidden">
+    <styled.main py={8} overflow="hidden">
       <styled.h1 fontSize="4xl" fontWeight="extrabold" lineHeight={1.2}>
         Tracks
       </styled.h1>
-      <styled.p color="gray.400" mb={8}>
+      <styled.p color="gray.400" mb={4}>
         Here you can find a list of all the tracks, clubs and shops from across
         the UK.
       </styled.p>

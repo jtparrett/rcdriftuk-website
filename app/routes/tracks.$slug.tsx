@@ -14,17 +14,23 @@ import { prisma } from "~/utils/prisma.server";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const slug = z.string().parse(params.slug);
-  const user = await getAuth(args);
+  const { userId } = await getAuth(args);
 
   const track = await prisma.tracks.findFirst({
     where: {
       slug,
     },
     include: {
-      owners: {
-        where: {
-          id: user.userId ?? undefined,
-        },
+      Owners: {
+        ...(userId
+          ? {
+              where: {
+                userId,
+              },
+            }
+          : {
+              take: 0,
+            }),
       },
       events: {
         where: {
@@ -50,25 +56,23 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  return {
-    track,
-    isOwner: track.owners.length > 0,
-  };
+  return track;
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    { title: `RC Drift UK | Tracks | ${data?.track.name}` },
-    { name: "description", content: data?.track.description },
+    { title: `RC Drift UK | Tracks | ${data?.name}` },
+    { name: "description", content: data?.description },
     {
       property: "og:image",
-      content: `https://rcdrift.uk/${data?.track.image}`,
+      content: `https://rcdrift.uk/${data?.image}`,
     },
   ];
 };
 
 const TrackPage = () => {
-  const { track, isOwner } = useLoaderData<typeof loader>();
+  const track = useLoaderData<typeof loader>();
+  const isOwner = (track.Owners.length ?? 0) > 0;
 
   return (
     <Flex

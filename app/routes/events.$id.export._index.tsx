@@ -17,9 +17,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     include: {
       eventTrack: {
         include: {
-          owners: {
+          Owners: {
             where: {
-              id: userId,
+              userId,
             },
           },
         },
@@ -48,7 +48,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     throw new Response("Event not found", { status: 404 });
   }
 
-  if (event.eventTrack?.owners.length === 0) {
+  if ((event.eventTrack?.Owners.length ?? 0) <= 0) {
     throw new Response("Unauthorized", { status: 401 });
   }
 

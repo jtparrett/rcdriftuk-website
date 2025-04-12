@@ -55,7 +55,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  const event = await getEvent(id);
+  const event = await getEvent(id, userId ?? undefined);
 
   if (!event) {
     throw new Response(null, {
@@ -68,7 +68,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   let isAttending = false;
   let ticket: GetUserEventTicket = null;
-  let isTrackOwner = false;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -79,14 +78,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
 
     isAttending = !!userEventResponse;
-
     ticket = await getUserEventTicket(id, userId);
-
-    if (event.eventTrack) {
-      isTrackOwner = event.eventTrack.owners.some(
-        (owner) => owner.id === userId
-      );
-    }
   }
 
   const isSoldOut = isEventSoldOut(event);
@@ -96,7 +88,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isAttending,
     ticket,
     isSoldOut,
-    isTrackOwner,
   };
 };
 
@@ -132,13 +123,14 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending, ticket, isSoldOut, isTrackOwner } =
+  const { event, isAttending, ticket, isSoldOut } =
     useLoaderData<typeof loader>();
   const startDate = useMemo(() => new Date(event.startDate), [event]);
   const endDate = useMemo(() => new Date(event.endDate), [event]);
   const clerk = useClerk();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const isTrackOwner = (event.eventTrack?.Owners.length ?? 0) > 0;
 
   const CalendarLink = () => {
     return (

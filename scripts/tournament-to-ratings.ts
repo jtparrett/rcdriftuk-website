@@ -27,11 +27,11 @@ const run = async () => {
 
     return {
       winnerId: leftWinner
-        ? battle.driverLeft.user.driverId
-        : battle.driverRight.user.driverId,
+        ? battle.driverLeft?.user.driverId ?? 0
+        : battle.driverRight?.user.driverId ?? 0,
       loserId: leftWinner
-        ? battle.driverRight.user.driverId
-        : battle.driverLeft.user.driverId,
+        ? battle.driverRight?.user.driverId ?? 0
+        : battle.driverLeft?.user.driverId ?? 0,
       tournament: "2025-BBRC",
     };
   });

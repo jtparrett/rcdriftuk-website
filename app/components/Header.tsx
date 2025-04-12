@@ -95,199 +95,244 @@ const Menu = ({ user }: Props) => {
       overflow="hidden"
       w={{ base: "100vw", sm: "auto" }}
     >
-      <Flex gap={2} p={{ base: 2, md: 4 }}>
-        <Flex gap={1} flexDir="column" flex={1}>
-          <MenuLink
-            to="/"
-            active={location.pathname === "/" ? "active" : "inactive"}
-          >
-            <MenuIcon>
-              <RiHome2Line />
-            </MenuIcon>
-            Home
-          </MenuLink>
-
-          <MenuLink
-            to="/ratings"
-            active={
-              location.pathname.includes("/ratings") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiListOrdered2 />
-            </MenuIcon>
-            Driver Ratings
-          </MenuLink>
-          <MenuLink
-            to="/competitions"
-            active={
-              location.pathname.includes("/competitions")
-                ? "active"
-                : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiTrophyLine />
-            </MenuIcon>
-            Competitions
-          </MenuLink>
-          <MenuLink
-            to="/map/all"
-            active={location.pathname.includes("/map") ? "active" : "inactive"}
-          >
-            <MenuIcon>
-              <RiMapPin2Line />
-            </MenuIcon>
-            Drift Map
-          </MenuLink>
-          <MenuLink
-            to="/tracks"
-            active={
-              location.pathname.includes("/tracks") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiFlagLine />
-            </MenuIcon>
-            Tracks
-          </MenuLink>
-          <MenuLink
-            to={`/calendar/week/${today}`}
-            active={
-              location.pathname.includes("/calendar") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiCalendar2Line />
-            </MenuIcon>
-            Calendar
-          </MenuLink>
-
-          <MenuLink
-            to="/merch"
-            active={
-              location.pathname.includes("/merch") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiShoppingBagLine />
-            </MenuIcon>
-            Merch
-          </MenuLink>
-
-          <MenuLink
-            to="/catalogue"
-            active={
-              location.pathname.includes("/catalogue") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiSearch2Line />
-            </MenuIcon>
-            Catalogue
-          </MenuLink>
-
-          <MenuLink
-            to="/fdr"
-            active={location.pathname.includes("/fdr") ? "active" : "inactive"}
-          >
-            <MenuIcon>
-              <GiCogLock />
-            </MenuIcon>
-            FDR Calculator
-          </MenuLink>
-
-          <MenuLink
-            to="/getting-started"
-            active={
-              location.pathname.includes("/getting-started")
-                ? "active"
-                : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiRocketLine />
-            </MenuIcon>
-            Getting Started
-          </MenuLink>
+      {(user?.Tracks.length ?? 0) > 0 && (
+        <Flex
+          p={{ base: 2, md: 4 }}
+          borderBottomWidth={1}
+          borderColor="gray.800"
+          flexWrap="wrap"
+          gap={2}
+        >
+          {user?.Tracks.map(({ track }) => (
+            <Box key={track.id} w={10} h={10} overflow="hidden" rounded="full">
+              <Link to={`/tracks/${track.slug}`}>
+                <styled.img
+                  src={track.image}
+                  w="full"
+                  h="full"
+                  alt={track.name}
+                />
+              </Link>
+            </Box>
+          ))}
         </Flex>
+      )}
 
-        <SignedIn>
-          <Box w="1px" bgColor="gray.800" />
+      <Box h={{ base: "calc(100vh - 200px)", md: "auto" }} overflowY="auto">
+        <Flex gap={2} p={{ base: 2, md: 4 }} minH="full">
           <Flex gap={1} flexDir="column" flex={1}>
-            {user?.track && (
-              <MenuLink to={`/tracks/${user.track.slug}`} active="inactive">
-                <MenuIcon>
-                  <RiFlagLine />
-                </MenuIcon>
-                My Track
-              </MenuLink>
-            )}
+            <MenuLink
+              to="/"
+              active={location.pathname === "/" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiHome2Line />
+              </MenuIcon>
+              Home
+            </MenuLink>
 
-            {user && (
-              <MenuLink to={`/tickets`} active="inactive">
-                <MenuIcon>
-                  <RiTicketLine />
-                </MenuIcon>
-                My Tickets
-              </MenuLink>
-            )}
+            <MenuLink
+              to="/ratings"
+              active={location.pathname === "/ratings" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiListOrdered2 />
+              </MenuIcon>
+              Driver Ratings
+            </MenuLink>
+            <MenuLink
+              to="/competitions"
+              active={
+                location.pathname.startsWith("/competitions")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiTrophyLine />
+              </MenuIcon>
+              Competitions
+            </MenuLink>
+            <MenuLink
+              to="/map/all"
+              active={
+                location.pathname.startsWith("/map") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiMapPin2Line />
+              </MenuIcon>
+              Drift Map
+            </MenuLink>
+            <MenuLink
+              to="/tracks"
+              active={location.pathname === "/tracks" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiFlagLine />
+              </MenuIcon>
+              Tracks
+            </MenuLink>
+            <MenuLink
+              to={`/calendar/week/${today}`}
+              active={
+                location.pathname.startsWith("/calendar")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiCalendar2Line />
+              </MenuIcon>
+              Calendar
+            </MenuLink>
 
-            {user?.driverId && (
+            <MenuLink
+              to="/merch"
+              active={
+                location.pathname.startsWith("/merch") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiShoppingBagLine />
+              </MenuIcon>
+              Merch
+            </MenuLink>
+
+            <MenuLink
+              to="/catalogue"
+              active={
+                location.pathname.startsWith("/catalogue")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiSearch2Line />
+              </MenuIcon>
+              Catalogue
+            </MenuLink>
+
+            <MenuLink
+              to="/fdr"
+              active={
+                location.pathname.startsWith("/fdr") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <GiCogLock />
+              </MenuIcon>
+              FDR Calculator
+            </MenuLink>
+
+            <MenuLink
+              to="/getting-started"
+              active={
+                location.pathname.startsWith("/getting-started")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiRocketLine />
+              </MenuIcon>
+              Getting Started
+            </MenuLink>
+          </Flex>
+
+          <SignedIn>
+            <Box w="1px" bgColor="gray.800" />
+            <Flex gap={1} flexDir="column" flex={1}>
+              {user && (
+                <MenuLink
+                  to={`/tickets`}
+                  active={
+                    location.pathname.startsWith("/tickets")
+                      ? "active"
+                      : "inactive"
+                  }
+                >
+                  <MenuIcon>
+                    <RiTicketLine />
+                  </MenuIcon>
+                  My Tickets
+                </MenuLink>
+              )}
+
+              {user?.driverId && (
+                <MenuLink
+                  to={`/ratings/${user.driverId}`}
+                  active={
+                    location.pathname.startsWith(`/ratings/${user.driverId}`)
+                      ? "active"
+                      : "inactive"
+                  }
+                >
+                  <MenuIcon>
+                    <RiUserLine />
+                  </MenuIcon>
+                  My Driver Profile
+                </MenuLink>
+              )}
+
               <MenuLink
-                to={`/ratings/${user.driverId}`}
+                to="/tournaments"
                 active={
-                  location.pathname.includes(`/ratings/${user.driverId}`)
+                  location.pathname.startsWith("/tournaments")
                     ? "active"
                     : "inactive"
                 }
               >
                 <MenuIcon>
-                  <RiUserLine />
+                  <RiVipCrown2Line />
                 </MenuIcon>
-                My Driver Profile
+                My Tournaments
               </MenuLink>
-            )}
 
-            <MenuLink
-              to="/tournaments"
-              active={
-                location.pathname === "/tournaments" ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiVipCrown2Line />
-              </MenuIcon>
-              My Tournaments
-            </MenuLink>
+              <MenuLink
+                to="/user/profile"
+                active={
+                  location.pathname.startsWith("/user/profile")
+                    ? "active"
+                    : "inactive"
+                }
+              >
+                <MenuIcon>
+                  <RiSettings3Line />
+                </MenuIcon>
+                Account Settings
+              </MenuLink>
 
-            <MenuLink
-              to="/user/profile"
-              active={
-                location.pathname === "/user/profile" ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiSettings3Line />
-              </MenuIcon>
-              Account Settings
-            </MenuLink>
+              <MenuLink
+                to="/tracks/new"
+                active={
+                  location.pathname.startsWith("/tracks/new")
+                    ? "active"
+                    : "inactive"
+                }
+              >
+                <MenuIcon>
+                  <RiFlagLine />
+                </MenuIcon>
+                Create Track
+              </MenuLink>
 
-            <MenuLink
-              to="/"
-              onClick={(e) => {
-                e.preventDefault();
-                signOut();
-              }}
-            >
-              <MenuIcon>
-                <RiLogoutBoxRLine />
-              </MenuIcon>
-              Sign Out
-            </MenuLink>
-          </Flex>
-        </SignedIn>
-      </Flex>
+              <MenuLink
+                to="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  signOut();
+                }}
+              >
+                <MenuIcon>
+                  <RiLogoutBoxRLine />
+                </MenuIcon>
+                Sign Out
+              </MenuLink>
+            </Flex>
+          </SignedIn>
+        </Flex>
+      </Box>
 
       <SignedIn>
         <Box bgColor="gray.900" p={1} textAlign="center">
@@ -389,9 +434,13 @@ export const Header = ({ user }: Props) => {
           </Box>
 
           <SignedIn>
-            <styled.div w={8} h={8} rounded="full" overflow="hidden">
-              <styled.img src={clerkUser.user?.imageUrl} w="full" />
-            </styled.div>
+            {user && (
+              <styled.div w={8} h={8} rounded="full" overflow="hidden">
+                <Link to={`/ratings/${user.driverId}`}>
+                  <styled.img src={clerkUser.user?.imageUrl} w="full" />
+                </Link>
+              </styled.div>
+            )}
           </SignedIn>
 
           <SignedOut>

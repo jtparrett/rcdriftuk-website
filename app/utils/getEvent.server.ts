@@ -5,7 +5,7 @@ import { startOfDay } from "date-fns";
 
 export type GetEvent = Awaited<ReturnType<typeof getEvent>>;
 
-export const getEvent = async (id: string) => {
+export const getEvent = async (id: string, userId?: string) => {
   return prisma.events.findFirst({
     where: {
       id,
@@ -52,10 +52,16 @@ export const getEvent = async (id: string) => {
       },
       eventTrack: {
         include: {
-          owners: {
-            select: {
-              id: true,
-            },
+          Owners: {
+            ...(userId
+              ? {
+                  where: {
+                    userId,
+                  },
+                }
+              : {
+                  take: 0,
+                }),
           },
           _count: {
             select: {

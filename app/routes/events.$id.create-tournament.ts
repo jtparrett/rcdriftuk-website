@@ -6,13 +6,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { id } = args.params;
   const { userId } = await getAuth(args);
 
+  if (!userId) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+
   const event = await prisma.events.findUnique({
     where: {
       id,
       eventTrack: {
-        owners: {
+        Owners: {
           some: {
-            id: userId,
+            userId,
           },
         },
       },

@@ -52,6 +52,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
       where: {
         id: userId,
       },
+      include: {
+        Tracks: {
+          include: {
+            track: true,
+          },
+        },
+      },
     });
 
     return userData;
@@ -93,7 +100,7 @@ const CalendarPage = () => {
 
             <Spacer />
 
-            {userData && userData.trackId && (
+            {userData && userData.Tracks.length > 0 && (
               <LinkButton size="sm" to="/calendar/new">
                 Create Event <RiAddCircleFill />
               </LinkButton>
