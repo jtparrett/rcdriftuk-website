@@ -110,7 +110,7 @@ const TrackPage = () => {
           </Box>
 
           <Box textAlign="center" maxW={540} mx="auto" px={4} pb={8}>
-            <styled.h1 fontWeight="black" fontSize="2xl" textWrap="balance">
+            <styled.h1 fontWeight="extrabold" fontSize="2xl" textWrap="balance">
               {track.name}
             </styled.h1>
             {track.description && (

@@ -92,7 +92,7 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
 
         <styled.h3
           fontSize="lg"
-          fontWeight="black"
+          fontWeight="extrabold"
           textWrap="balance"
           lineHeight={1.1}
         >

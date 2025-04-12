@@ -91,7 +91,7 @@ export default function TicketsPage() {
 
   return (
     <Container maxW={1100} px={2} py={4}>
-      <styled.h1 fontSize="3xl" fontWeight="black" pb={4}>
+      <styled.h1 fontSize="3xl" fontWeight="extrabold" pb={4}>
         My Tickets
       </styled.h1>
 

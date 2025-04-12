@@ -93,7 +93,7 @@ const Page = () => {
             display="block"
           />
           <styled.h1
-            fontWeight="black"
+            fontWeight="extrabold"
             textTransform="uppercase"
             fontSize={{ base: "4xl", md: "6xl" }}
             lineHeight={1}
@@ -158,7 +158,7 @@ const Page = () => {
                   <styled.h2
                     lineHeight={1.2}
                     textTransform="uppercase"
-                    fontWeight="black"
+                    fontWeight="extrabold"
                     fontSize={{ base: "xl", md: "2xl" }}
                   >
                     RC Drift.uk 2025

@@ -189,7 +189,7 @@ const Page = () => {
             >
               <Box h={3} bgColor="brand.500" />
               <styled.span
-                fontWeight="black"
+                fontWeight="extrabold"
                 fontSize="3xl"
                 px={3}
                 py={1}
@@ -203,7 +203,7 @@ const Page = () => {
               {getEventDate(startDate, endDate)}
             </styled.p>
 
-            <styled.h1 fontSize="3xl" fontWeight="black">
+            <styled.h1 fontSize="3xl" fontWeight="extrabold">
               {event.name}
             </styled.h1>
 
@@ -414,7 +414,11 @@ const Page = () => {
                 />
               </Box>
 
-              <styled.h2 fontSize="xl" fontWeight="black" textWrap="balance">
+              <styled.h2
+                fontSize="xl"
+                fontWeight="extrabold"
+                textWrap="balance"
+              >
                 {event.eventTrack.name}
               </styled.h2>
 

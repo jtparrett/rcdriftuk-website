@@ -173,7 +173,7 @@ const QualifyingPage = () => {
                       {driver.user.firstName} {driver.user.lastName}
                     </styled.td>
 
-                    <styled.td fontWeight="black" textAlign="center">
+                    <styled.td fontWeight="extrabold" textAlign="center">
                       {driver.bestLapScore}
                     </styled.td>
 
@@ -261,7 +261,7 @@ const QualifyingPage = () => {
                       {driver.user.firstName} {driver.user.lastName}
                     </styled.td>
 
-                    <styled.td fontWeight="black" textAlign="center">
+                    <styled.td fontWeight="extrabold" textAlign="center">
                       {driver.bestLapScore}
                     </styled.td>
 

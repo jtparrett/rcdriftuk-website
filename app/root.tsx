@@ -129,7 +129,7 @@ export function ErrorBoundary() {
             shadow="lg"
             textAlign="center"
           >
-            <styled.h1 fontWeight="black" mb={4} fontSize="3xl">
+            <styled.h1 fontWeight="extrabold" mb={4} fontSize="3xl">
               {isRouteErrorResponse(error)
                 ? `${error.status} ${error.statusText}`
                 : error instanceof Error

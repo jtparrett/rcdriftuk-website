@@ -80,7 +80,7 @@ export const EventDeletePage = () => {
         maxW={500}
         textAlign="center"
       >
-        <styled.h1 fontWeight="black" fontSize="2xl">
+        <styled.h1 fontWeight="extrabold" fontSize="2xl">
           Delete "{event.name}"
         </styled.h1>
         <Form method="delete">

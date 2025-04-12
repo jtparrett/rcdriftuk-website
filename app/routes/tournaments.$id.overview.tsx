@@ -173,7 +173,7 @@ const TournamentsOverviewPage = () => {
               tournament.nextQualifyingLap && (
                 <>
                   <Box p={4}>
-                    <styled.p fontSize="lg" fontWeight="black">
+                    <styled.p fontSize="lg" fontWeight="extrabold">
                       {tournament.nextQualifyingLap.driver.user.firstName}{" "}
                       {tournament.nextQualifyingLap.driver.user.lastName}
                     </styled.p>
@@ -186,7 +186,7 @@ const TournamentsOverviewPage = () => {
 
                   {qualiJudgingComplete && (
                     <Box>
-                      <styled.p fontSize="6xl" fontWeight="black" pb={4}>
+                      <styled.p fontSize="6xl" fontWeight="extrabold" pb={4}>
                         {sumScores(
                           tournament.nextQualifyingLap.scores,
                           tournament.judges.length
@@ -227,7 +227,7 @@ const TournamentsOverviewPage = () => {
                       overflow="hidden"
                       whiteSpace="nowrap"
                       fontSize="lg"
-                      fontWeight="black"
+                      fontWeight="extrabold"
                       py={2}
                     >
                       {tournament.nextBattle.driverLeft?.user.firstName}{" "}
@@ -276,7 +276,7 @@ const TournamentsOverviewPage = () => {
                                 <styled.p
                                   lineHeight={1}
                                   fontSize={{ base: "sm", md: "lg" }}
-                                  fontWeight="black"
+                                  fontWeight="extrabold"
                                   textTransform="uppercase"
                                 >
                                   {vote.omt ? "OMT" : "Advance"}
@@ -296,7 +296,7 @@ const TournamentsOverviewPage = () => {
                       overflow="hidden"
                       whiteSpace="nowrap"
                       fontSize="lg"
-                      fontWeight="black"
+                      fontWeight="extrabold"
                       py={2}
                     >
                       {tournament.nextBattle.driverRight?.user.firstName}{" "}

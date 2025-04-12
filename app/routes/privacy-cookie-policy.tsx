@@ -3,7 +3,7 @@ import { Container, styled } from "~/styled-system/jsx";
 const Page = () => {
   return (
     <Container maxW={1100} px={2} py={12}>
-      <styled.h1 fontSize="4xl" fontWeight="black" mb={4}>
+      <styled.h1 fontSize="4xl" fontWeight="extrabold" mb={4}>
         Cookie Privacy Policy
       </styled.h1>
       <styled.p>RCDrift UK</styled.p>

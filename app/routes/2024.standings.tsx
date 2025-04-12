@@ -5,7 +5,7 @@ import { useDisclosure } from "~/utils/useDisclosure";
 const H2 = styled("h2", {
   base: {
     fontSize: "2xl",
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });

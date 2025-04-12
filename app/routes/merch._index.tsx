@@ -98,7 +98,7 @@ const MerchPage = () => {
 
   return (
     <Container maxW={1100} px={2} py={6}>
-      <styled.h1 fontWeight="black" fontSize="3xl" mb={4}>
+      <styled.h1 fontWeight="extrabold" fontSize="3xl" mb={4}>
         Merch Store
       </styled.h1>
       {products.length === 0 ? (

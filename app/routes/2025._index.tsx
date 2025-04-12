@@ -30,7 +30,7 @@ export const meta: MetaFunction = () => {
 const H1 = styled("h1", {
   base: {
     fontSize: "4xl",
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });
@@ -41,7 +41,7 @@ const H2 = styled("h2", {
       base: "xl",
       md: "2xl",
     },
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });
@@ -55,7 +55,7 @@ const H3 = styled("h3", {
       base: "lg",
       md: "xl",
     },
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });

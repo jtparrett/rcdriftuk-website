@@ -40,7 +40,7 @@ const H3 = styled("h3", {
       base: "lg",
       md: "xl",
     },
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });

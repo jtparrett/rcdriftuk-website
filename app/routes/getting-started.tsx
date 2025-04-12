@@ -23,15 +23,16 @@ export const meta: MetaFunction = () => {
 const H1 = styled("h1", {
   base: {
     fontSize: "4xl",
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
+    lineHeight: 1.1,
   },
 });
 
 const H2 = styled("h2", {
   base: {
     fontSize: "2xl",
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });
@@ -160,7 +161,7 @@ const GettingStartedPage = () => {
         <Container maxW={800} px={2} pt={8} pb={20}>
           <Box textAlign="center" mb={12}>
             <H1>Getting Started in RC Drifting: A Beginner's Guide</H1>
-            <P fontSize="lg" maxW={600} mx="auto" mt={4}>
+            <P maxW={600} mx="auto" mt={4} textWrap="balance">
               Welcome to the exciting world of RC drifting! At RCDrift.uk, we're
               here to help you start your drifting journey. Whether you're a
               complete novice or have some RC experience, this guide will

@@ -42,7 +42,7 @@ const H2 = styled("h2", {
       base: "xl",
       md: "2xl",
     },
-    fontWeight: "black",
+    fontWeight: "extrabold",
     textWrap: "balance",
   },
 });
@@ -75,4 +75,4 @@ export const CollapsibleCard = ({
       {disclosure.isOpen && <CardContent>{children}</CardContent>}
     </Card>
   );
-}; 
+};

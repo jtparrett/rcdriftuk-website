@@ -63,7 +63,7 @@ const Page = () => {
         gap={2}
         flexDir={{ base: "column", md: "row" }}
       >
-        <styled.h1 fontSize="3xl" fontWeight="black">
+        <styled.h1 fontSize="3xl" fontWeight="extrabold">
           My Tournaments
         </styled.h1>
         <Spacer />

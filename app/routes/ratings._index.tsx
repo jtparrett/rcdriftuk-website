@@ -284,7 +284,10 @@ const RatingsPage = () => {
     >
       <Container pb={12} px={2} pt={2} maxW={800}>
         <Box textAlign="center" py={8} w="full">
-          <styled.h1 fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black">
+          <styled.h1
+            fontSize={{ base: "4xl", md: "5xl" }}
+            fontWeight="extrabold"
+          >
             Driver Ratings
           </styled.h1>
 

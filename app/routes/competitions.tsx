@@ -12,10 +12,9 @@ import {
 const Page = () => {
   return (
     <Container maxW={1100} px={2} py={4} overflow="hidden">
-      <styled.h1 fontWeight="black" fontSize="4xl" mb={2}>
+      <styled.h1 fontWeight="extrabold" fontSize="4xl" mb={4}>
         Competitions
       </styled.h1>
-      <Box h={1} bgColor="brand.500" w={32} mb={6} />
       <Flex flexWrap="wrap" mr={-4}>
         {["2025", "2024"].map((year) => (
           <Box w={{ base: "full", md: "50%" }} pr={4} pb={4} key={year}>
