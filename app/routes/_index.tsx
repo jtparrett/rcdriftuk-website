@@ -68,7 +68,7 @@ const Page = () => {
       <Box
         bgImage="url(/grid-bg.svg)"
         bgRepeat="repeat"
-        bgSize="60px"
+        bgSize="30px"
         bgPosition="center"
         pos="relative"
         zIndex={1}
@@ -85,6 +85,13 @@ const Page = () => {
         }}
       >
         <Container maxW={650} textAlign="center" py={100}>
+          <styled.img
+            src="/flag.svg"
+            w="84px"
+            mx="auto"
+            mb={4}
+            display="block"
+          />
           <styled.h1
             fontWeight="black"
             textTransform="uppercase"
@@ -92,7 +99,7 @@ const Page = () => {
             lineHeight={1}
             textWrap="balance"
           >
-            The home of UK RC Drifting 🇬🇧
+            The home of UK RC Drifting
           </styled.h1>
           <styled.p
             textWrap="balance"
@@ -130,10 +137,6 @@ const Page = () => {
             <Glow />
             <Box
               bgColor="gray.950"
-              bgImage="url(/grid-bg.svg)"
-              bgRepeat="repeat"
-              bgSize="30px"
-              bgPosition="center"
               rounded="lg"
               borderWidth={1}
               borderColor="gray.700"

@@ -264,7 +264,7 @@ const RatingsPage = () => {
         right: 0,
         h: "100dvh",
         bgImage: "url(/grid-bg.svg)",
-        bgSize: "60px",
+        bgSize: "30px",
         bgPosition: "center",
         bgRepeat: "repeat",
         zIndex: -2,

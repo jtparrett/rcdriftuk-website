@@ -356,7 +356,7 @@ const MerchDetailPage = () => {
         <Box flex={1} bgColor="gray.900" rounded="lg" px={7} py={4}>
           <LinkButton to="/merch" variant="ghost" px={0}>
             <RiArrowLeftLine />
-            Back to Merch
+            Return to Merch
           </LinkButton>
 
           <styled.h1

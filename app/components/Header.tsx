@@ -331,7 +331,7 @@ export const Header = ({ user }: Props) => {
       backdropFilter="blur(10px)"
       shadow="2xl"
       borderBottomWidth={1}
-      borderColor="gray.800"
+      borderColor="gray.900"
     >
       <Container maxW={1100} px={4}>
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"}>

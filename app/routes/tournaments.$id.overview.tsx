@@ -129,7 +129,7 @@ const TournamentsOverviewPage = () => {
         bgColor="black"
         bgImage="url(/grid-bg.svg)"
         bgRepeat="repeat"
-        bgSize="60px"
+        bgSize="30px"
         bgPosition="center"
         borderWidth={1}
         rounded="2xl"

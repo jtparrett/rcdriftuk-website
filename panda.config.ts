@@ -1,7 +1,5 @@
 import { defineConfig } from "@pandacss/dev";
 
-const brandColor = "#ec1a55";
-
 export default defineConfig({
   // Whether to use css reset
   preflight: true,
@@ -39,37 +37,37 @@ export default defineConfig({
             value: "#0c0c0c",
           },
           "brand.50": {
-            value: "#fef5f8",
+            value: "#ffe5ec",
           },
           "brand.100": {
-            value: "#fcd7e1",
+            value: "#ffc1ce",
           },
           "brand.200": {
-            value: "#f9b2c6",
+            value: "#ff95aa",
           },
           "brand.300": {
-            value: "#f582a2",
+            value: "#ff6887",
           },
           "brand.400": {
-            value: "#f2638b",
+            value: "#f83b66",
           },
           "brand.500": {
-            value: brandColor,
+            value: "#F20C4E",
           },
           "brand.600": {
-            value: "#ce164a",
+            value: "#cb0a42",
           },
           "brand.700": {
-            value: "#a7123c",
+            value: "#a50937",
           },
           "brand.800": {
-            value: "#8e0f33",
+            value: "#7e072b",
           },
           "brand.900": {
-            value: "#680c26",
+            value: "#58051f",
           },
           "brand.950": {
-            value: "#7a0f2c",
+            value: "#370313",
           },
           "gray.50": {
             value: "#fafafa",
@@ -84,7 +82,7 @@ export default defineConfig({
             value: "#d4d4d8",
           },
           "gray.400": {
-            value: "#a1a1aa",
+            value: "#9f9fa8",
           },
           "gray.500": {
             value: "#71717a",

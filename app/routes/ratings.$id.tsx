@@ -96,7 +96,7 @@ const Page = () => {
         right: 0,
         h: "100dvh",
         bgImage: "url(/grid-bg.svg)",
-        bgSize: "60px",
+        bgSize: "30px",
         bgPosition: "center",
         bgRepeat: "repeat",
         zIndex: -2,
@@ -116,13 +116,8 @@ const Page = () => {
     >
       <Container maxW={800} px={4} py={6}>
         <Flex alignItems="center">
-          <LinkButton
-            to="/ratings"
-            variant="outline"
-            size="sm"
-            bgColor="gray.800"
-          >
-            <RiArrowLeftLine /> Back to Ratings
+          <LinkButton to="/ratings" variant="ghost" size="sm">
+            <RiArrowLeftLine /> Return to Ratings
           </LinkButton>
 
           <Spacer />

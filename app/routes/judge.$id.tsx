@@ -374,7 +374,7 @@ const JudgePage = () => {
             w="full"
             to={`/tournaments/${tournament.id}/overview`}
           >
-            <RiArrowLeftLine /> Back to Tournament
+            <RiArrowLeftLine /> Return to Tournament
           </LinkButton>
         </Container>
       </Box>
@@ -382,7 +382,7 @@ const JudgePage = () => {
         minH="60dvh"
         bgImage="url(/grid-bg.svg)"
         bgRepeat="repeat"
-        bgSize="60px"
+        bgSize="30px"
         bgPosition="center"
         pos="relative"
         zIndex={1}

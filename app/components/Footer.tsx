@@ -25,6 +25,9 @@ export const Footer = () => {
         <LinkButton variant="secondary" size="xs" to="/privacy-cookie-policy">
           Cookie Policy
         </LinkButton>
+        <LinkButton variant="secondary" to="mailto:info@rcdrift.uk" size="xs">
+          Contact
+        </LinkButton>
       </Flex>
     </Box>
   );
