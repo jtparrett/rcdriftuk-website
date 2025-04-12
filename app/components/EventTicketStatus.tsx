@@ -3,6 +3,7 @@ import type { GetEvent } from "~/utils/getEvent.server";
 import { styled } from "~/styled-system/jsx";
 import { format, isBefore } from "date-fns";
 import { getTime } from "~/utils/getEventDate";
+import { toZonedTime } from "date-fns-tz";
 interface Props {
   event: Pick<NonNullable<GetEvent>, "enableTicketing" | "ticketReleaseDate">;
   isSoldOut: boolean;
@@ -23,9 +24,15 @@ export const EventTicketStatus = ({ event, isSoldOut }: Props) => {
 
   if (event.ticketReleaseDate) {
     const ticketReleaseDate = new Date(event.ticketReleaseDate);
-    const today = new Date();
+    const releaseDate = event?.ticketReleaseDate
+      ? toZonedTime(new Date(event.ticketReleaseDate), "UTC")
+      : null;
 
-    if (isBefore(today, ticketReleaseDate)) {
+    const isBeforeRelease = releaseDate
+      ? isBefore(new Date(), releaseDate)
+      : false;
+
+    if (isBeforeRelease) {
       return (
         <styled.p color="brand.500" fontWeight="semibold" fontSize="sm">
           Tickets Release {format(ticketReleaseDate, "do MMM, yyyy")}{" "}

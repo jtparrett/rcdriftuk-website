@@ -104,29 +104,25 @@ const Page = () => {
         {Object.entries(eventsByMonth).map(([month, monthEvents]) => (
           <Box
             key={month}
-            mb={8}
-            p={6}
-            bgColor="gray.900"
+            mb={4}
             borderWidth={1}
-            borderColor="gray.800"
+            borderColor="gray.900"
             rounded="xl"
+            overflow="hidden"
           >
-            <styled.h2
-              fontSize="xl"
-              mb={4}
-              fontWeight="bold"
-              pb={2}
-              borderBottomWidth={1}
-              borderColor="gray.800"
-            >
-              {month}
-            </styled.h2>
-            <Box overflow="hidden">
+            <Box px={4} py={2} bgColor="gray.900">
+              <styled.h2 fontWeight="bold">{month}</styled.h2>
+            </Box>
+            <Box overflow="hidden" p={4}>
               <Flex flexWrap="wrap" ml={-4} mt={-4}>
                 {monthEvents.map((event) => {
                   const startDate = new Date(event.startDate);
                   const endDate = new Date(event.endDate);
                   const isSoldOut = isEventSoldOut(event);
+                  const isFinished = isAfter(
+                    new Date(),
+                    new Date(event.endDate)
+                  );
 
                   return (
                     <Flex
@@ -134,15 +130,16 @@ const Page = () => {
                       pt={4}
                       pl={4}
                       w={{ base: "100%", md: "50%", lg: "33.3333%" }}
+                      opacity={isFinished ? 0.5 : 1}
                     >
                       <styled.article
-                        bgColor="black"
                         overflow="hidden"
                         rounded="lg"
                         pos="relative"
                         w="full"
                         borderWidth={1}
                         borderColor={"gray.800"}
+                        bgColor="gray.900"
                       >
                         <AspectRatio ratio={16 / 7}>
                           <styled.img
@@ -178,7 +175,7 @@ const Page = () => {
                             </Box>
                           )}
 
-                          {isAfter(new Date(), new Date(event.endDate)) && (
+                          {isFinished && (
                             <Box mt={2}>
                               <styled.p color="gray.500" fontSize="sm">
                                 This event has ended.
