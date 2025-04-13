@@ -98,21 +98,7 @@ const Menu = ({ user }: Props) => {
       w={{ base: "calc(100% + 32px)", md: "480px" }}
       ml={{ base: -4, md: "auto" }}
       rounded="xl"
-      pos="relative"
     >
-      <Box
-        pos="absolute"
-        top={0}
-        right={{ base: "66px", md: "50px" }}
-        w={3}
-        h={3}
-        transform="translateY(-50%) rotate(45deg)"
-        bgColor="inherit"
-        borderTopWidth={1}
-        borderLeftWidth={1}
-        borderColor="gray.800"
-        borderTopLeftRadius="sm"
-      />
       {(user?.Tracks.length ?? 0) > 0 && (
         <Box p={3} borderBottomWidth={1} borderColor="gray.800">
           <styled.p fontSize="sm" fontWeight="semibold" mb={1}>
@@ -442,8 +428,26 @@ export const Header = ({ user }: Props) => {
               onClick={() => menu.toggle()}
               mx={2}
               aria-label="Menu"
+              pos="relative"
+              overflow="visible"
             >
               <RiMenu2Line />
+
+              {menu.isOpen && (
+                <styled.span
+                  pos="absolute"
+                  top="calc(100% + 9px)"
+                  left="50%"
+                  w={3}
+                  h={3}
+                  transform="translateX(-50%) rotate(45deg)"
+                  bgColor="gray.950"
+                  borderTopWidth={1}
+                  borderLeftWidth={1}
+                  borderColor="gray.800"
+                  borderTopLeftRadius="sm"
+                />
+              )}
             </Button>
           </Box>
 
