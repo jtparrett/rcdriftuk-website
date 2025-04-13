@@ -18,14 +18,13 @@ export const getUserOwnedTrackBySlug = async (slug: string, userId: string) => {
       id: true,
       name: true,
       address: true,
-      postcode: true,
-      city: true,
-      country: true,
       image: true,
       description: true,
       status: true,
       types: true,
       url: true,
+      lat: true,
+      lng: true,
     },
   });
 

@@ -168,9 +168,6 @@ model Tracks {
   Owners      TrackOwners[]
   status      TrackStatus   @default(PENDING)
   address     String?
-  postcode    String?
-  city        String?
-  country     String?
 }
 
 enum TrackStatus {
