@@ -166,6 +166,18 @@ model Tracks {
   events      Events[]
   Products    Products[]
   Owners      TrackOwners[]
+  status      TrackStatus   @default(PENDING)
+  address     String?
+  postcode    String?
+  city        String?
+  country     String?
+}
+
+enum TrackStatus {
+  ACTIVE
+  ARCHIVED
+  PENDING
+  CLOSED
 }
 
 model TrackOwners {

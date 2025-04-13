@@ -1,3 +1,4 @@
+import { SignedIn } from "@clerk/remix";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { RiAddCircleFill } from "react-icons/ri";
@@ -49,9 +50,11 @@ const TracksPage = () => {
             </Box>
 
             <Spacer />
-            {/* <LinkButton to="/tracks/new" variant="outline">
-              Create a Track <RiAddCircleFill />
-            </LinkButton> */}
+            <SignedIn>
+              <LinkButton to="/tracks/new" variant="outline">
+                Register a new Track <RiAddCircleFill />
+              </LinkButton>
+            </SignedIn>
           </Flex>
         </Container>
       </Box>

@@ -10,5 +10,6 @@ export const Textarea = styled("textarea", {
     w: "full",
     minH: "100px",
     resize: "vertical",
+    outline: "none",
   },
 });

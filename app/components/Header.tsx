@@ -136,16 +136,16 @@ const Menu = ({ user }: Props) => {
               </Box>
             ))}
 
-            {/* <Box w={10} textAlign="center">
+            <Box w={12} textAlign="center">
               <Link to="/tracks/new">
-                <Center w="full" h={10} rounded="full" bgColor="gray.800">
+                <Center w="full" h={12} rounded="full" bgColor="gray.800">
                   <RiAddLine />
                 </Center>
                 <styled.span fontSize="xs" mt={1}>
                   New
                 </styled.span>
               </Link>
-            </Box> */}
+            </Box>
           </Flex>
         </Box>
       )}

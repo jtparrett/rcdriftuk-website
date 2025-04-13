@@ -1,7 +1,13 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
-import { RiAddCircleFill, RiFacebookFill, RiLink } from "react-icons/ri";
+import {
+  RiAddCircleFill,
+  RiDeleteBinFill,
+  RiEditCircleFill,
+  RiFacebookFill,
+  RiLink,
+} from "react-icons/ri";
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
 import { ClientOnly } from "~/components/ClientOnly";
@@ -124,7 +130,7 @@ const TrackPage = () => {
               />
             </Box>
 
-            <Box textAlign="center" maxW={540} mx="auto" px={4} pb={8}>
+            <Box textAlign="center" maxW={540} mx="auto" px={4} pb={4}>
               <styled.h1
                 fontWeight="extrabold"
                 fontSize="2xl"
@@ -157,19 +163,39 @@ const TrackPage = () => {
                   <RiLink />
                 )}
               </LinkButton>
+            </Box>
 
-              {isOwner && (
+            {isOwner && (
+              <Box p={4}>
                 <LinkButton
                   variant="outline"
                   w="full"
-                  mt={4}
+                  mb={2}
                   size="sm"
+                  to="./edit"
+                >
+                  Edit Track <RiEditCircleFill />
+                </LinkButton>
+                <LinkButton
+                  variant="outline"
+                  w="full"
+                  size="sm"
+                  mb={2}
                   to="/calendar/new"
                 >
                   Create Event <RiAddCircleFill />
                 </LinkButton>
-              )}
-            </Box>
+                <LinkButton
+                  w="full"
+                  size="sm"
+                  bgColor="brand.950"
+                  borderColor="brand.900"
+                  to="./archive"
+                >
+                  Archive Track <RiDeleteBinFill />
+                </LinkButton>
+              </Box>
+            )}
           </Box>
         </Box>
 
