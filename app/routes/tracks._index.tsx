@@ -89,9 +89,8 @@ const TracksPage = () => {
                     pos="absolute"
                     inset={0}
                     bgGradient="to-b"
-                    gradientFrom="rgba(0, 0, 0, 0.9)"
+                    gradientFrom="rgba(24, 24, 27, 0.9)"
                     gradientTo="gray.900"
-                    backdropFilter="blur(4px)"
                   />
                 </Box>
                 <Box
