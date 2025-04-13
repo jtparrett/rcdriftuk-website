@@ -1,6 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
+import { styled, Container, Box, Flex } from "~/styled-system/jsx";
 import {
   getDriverRank,
   getRankColor,
@@ -52,9 +52,6 @@ const Row = ({
         "--row-bg": bg,
         "--row-hover": hover,
       }}
-      bg="var(--row-bg)"
-      p={1}
-      rounded="2xl"
       transition="all 0.2s"
       _hover={{
         md: {
@@ -77,8 +74,6 @@ const Row = ({
             },
           },
         }}
-        borderWidth="1px"
-        borderColor="rgba(0, 0, 0, 0.3)"
         _active={{
           md: {
             transform: "scale(0.99)",
@@ -282,7 +277,7 @@ const RatingsPage = () => {
         zIndex: -1,
       }}
     >
-      <Container pb={12} px={2} pt={2} maxW={800}>
+      <Container pb={12} px={4} pt={2} maxW={800}>
         <Box textAlign="center" py={8} w="full">
           <styled.h1
             fontSize={{ base: "4xl", md: "5xl" }}
@@ -327,19 +322,6 @@ const RatingsPage = () => {
               w="full"
               overflow="hidden"
             >
-              <Flex
-                gap={4}
-                color="gray.400"
-                fontWeight="bold"
-                px={{ base: 2, md: 4 }}
-                pb={2}
-              >
-                <styled.p>#</styled.p>
-                <Spacer />
-                <styled.p>Points</styled.p>
-                <styled.p>Rank</styled.p>
-              </Flex>
-
               <Flex flexDirection="column" gap={2}>
                 {drivers
                   .filter((driver) => driver.driverId !== 0)

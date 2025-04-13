@@ -121,8 +121,8 @@ const Menu = ({ user }: Props) => {
           </styled.p>
           <Flex flexWrap="wrap" gap={2}>
             {user?.Tracks.map(({ track }) => (
-              <Box key={track.id} w={10} overflow="hidden" textAlign="center">
-                <Box w="full" h={10} overflow="hidden" rounded="full">
+              <Box key={track.id} w={12} overflow="hidden" textAlign="center">
+                <Box w="full" h={12} overflow="hidden" rounded="full">
                   <Link to={`/tracks/${track.slug}`}>
                     <styled.img
                       src={track.image}
@@ -146,7 +146,7 @@ const Menu = ({ user }: Props) => {
               </Box>
             ))}
 
-            <Box w={10} textAlign="center">
+            {/* <Box w={10} textAlign="center">
               <Link to="/tracks/new">
                 <Center w="full" h={10} rounded="full" bgColor="gray.800">
                   <RiAddLine />
@@ -155,7 +155,7 @@ const Menu = ({ user }: Props) => {
                   New
                 </styled.span>
               </Link>
-            </Box>
+            </Box> */}
           </Flex>
         </Box>
       )}
