@@ -66,7 +66,8 @@ const TracksPage = () => {
                 pos="relative"
                 rounded="xl"
                 bgColor="gray.900"
-                p={8}
+                py={8}
+                px={2}
                 w={{
                   base: "calc(50% - var(--spacing-4))",
                   md: "calc(25% - var(--spacing-4))",
@@ -111,14 +112,19 @@ const TracksPage = () => {
                   />
                 </Box>
 
-                <LinkOverlay
-                  to={`/tracks/${track.slug}`}
-                  textWrap="balance"
-                  fontWeight="bold"
-                  textAlign="center"
-                  fontSize="lg"
-                >
-                  {track.name}
+                <LinkOverlay to={`/tracks/${track.slug}`}>
+                  <styled.span
+                    textWrap="balance"
+                    whiteSpace="pre-line"
+                    fontWeight="bold"
+                    textAlign="center"
+                    display="block"
+                    fontSize={{ base: "md", md: "lg" }}
+                    lineHeight={1.1}
+                    mb={1}
+                  >
+                    {track.name}
+                  </styled.span>
                 </LinkOverlay>
 
                 <styled.p

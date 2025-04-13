@@ -95,16 +95,15 @@ const Menu = ({ user }: Props) => {
       borderWidth={1}
       borderColor="gray.800"
       bgColor="black"
-      w={{ base: "full", md: "480px" }}
-      maxW="full"
-      ml="auto"
+      w={{ base: "calc(100% + 32px)", md: "480px" }}
+      ml={{ base: -4, md: "auto" }}
       rounded="xl"
       pos="relative"
     >
       <Box
         pos="absolute"
         top={0}
-        right="48px"
+        right={{ base: "66px", md: "50px" }}
         w={3}
         h={3}
         transform="translateY(-50%) rotate(45deg)"
@@ -160,19 +159,9 @@ const Menu = ({ user }: Props) => {
         </Box>
       )}
 
-      <Box h={{ base: "calc(100vh - 300px)", md: "auto" }} overflowY="auto">
+      <Box h={{ base: "calc(100vh - 246px)", md: "auto" }} overflowY="auto">
         <Flex minH="full">
-          <Flex gap="1px" flexDir="column" flex={1} p={3}>
-            <MenuLink
-              to="/"
-              active={location.pathname === "/" ? "active" : "inactive"}
-            >
-              <MenuIcon>
-                <RiHome2Line />
-              </MenuIcon>
-              Home
-            </MenuLink>
-
+          <Flex gap="1px" flexDir="column" flex={1} p={{ base: 2, md: 4 }}>
             <MenuLink
               to="/ratings"
               active={location.pathname === "/ratings" ? "active" : "inactive"}
@@ -195,6 +184,7 @@ const Menu = ({ user }: Props) => {
               </MenuIcon>
               Competitions
             </MenuLink>
+
             <MenuLink
               to="/map/all"
               active={
@@ -284,7 +274,7 @@ const Menu = ({ user }: Props) => {
 
           <SignedIn>
             <Box w="1px" bgColor="gray.800" />
-            <Flex gap="1px" flexDir="column" flex={1} p={3}>
+            <Flex gap="1px" flexDir="column" flex={1} p={{ base: 2, md: 4 }}>
               {user && (
                 <MenuLink
                   to={`/tickets`}
