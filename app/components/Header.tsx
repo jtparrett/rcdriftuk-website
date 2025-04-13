@@ -1,8 +1,16 @@
-import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
+import {
+  styled,
+  Flex,
+  Spacer,
+  Box,
+  Container,
+  Center,
+} from "~/styled-system/jsx";
 import { Link, useLocation } from "@remix-run/react";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
 import {
+  RiAddLine,
   RiCalendar2Line,
   RiFacebookFill,
   RiFlagLine,
@@ -24,7 +32,6 @@ import {
 import { GiCogLock } from "react-icons/gi";
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
-import { Popover } from "react-tiny-popover";
 import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/remix";
 import type { GetUser } from "~/utils/getUser.server";
 
@@ -85,212 +92,283 @@ const Menu = ({ user }: Props) => {
 
   return (
     <Box
-      bgColor="rgba(12, 12, 12, 0.8)"
-      backdropFilter="blur(10px)"
-      rounded="xl"
       borderWidth={1}
       borderColor="gray.800"
-      shadow="2xl"
-      mt={5}
-      overflow="hidden"
-      w={{ base: "100vw", sm: "auto" }}
+      bgColor="black"
+      w={{ base: "full", md: "480px" }}
+      maxW="full"
+      ml="auto"
+      rounded="xl"
+      pos="relative"
     >
-      <Flex gap={2} p={{ base: 2, md: 4 }}>
-        <Flex gap={1} flexDir="column" flex={1}>
-          <MenuLink
-            to="/"
-            active={location.pathname === "/" ? "active" : "inactive"}
-          >
-            <MenuIcon>
-              <RiHome2Line />
-            </MenuIcon>
-            Home
-          </MenuLink>
+      <Box
+        pos="absolute"
+        top={0}
+        right="48px"
+        w={3}
+        h={3}
+        transform="translateY(-50%) rotate(45deg)"
+        bgColor="inherit"
+        borderTopWidth={1}
+        borderLeftWidth={1}
+        borderColor="gray.800"
+        borderTopLeftRadius="sm"
+      />
+      {(user?.Tracks.length ?? 0) > 0 && (
+        <Box p={3} borderBottomWidth={1} borderColor="gray.800">
+          <styled.p fontSize="sm" fontWeight="semibold" mb={1}>
+            Your Tracks
+          </styled.p>
+          <Flex flexWrap="wrap" gap={2}>
+            {user?.Tracks.map(({ track }) => (
+              <Box key={track.id} w={12} overflow="hidden" textAlign="center">
+                <Box w="full" h={12} overflow="hidden" rounded="full">
+                  <Link to={`/tracks/${track.slug}`}>
+                    <styled.img
+                      src={track.image}
+                      w="full"
+                      h="full"
+                      alt={track.name}
+                    />
+                  </Link>
+                </Box>
+                <styled.span
+                  fontSize="xs"
+                  mt={1}
+                  w="full"
+                  display="block"
+                  overflow="hidden"
+                  whiteSpace="nowrap"
+                  textOverflow="ellipsis"
+                >
+                  {track.name}
+                </styled.span>
+              </Box>
+            ))}
 
-          <MenuLink
-            to="/ratings"
-            active={
-              location.pathname.includes("/ratings") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiListOrdered2 />
-            </MenuIcon>
-            Driver Ratings
-          </MenuLink>
-          <MenuLink
-            to="/competitions"
-            active={
-              location.pathname.includes("/competitions")
-                ? "active"
-                : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiTrophyLine />
-            </MenuIcon>
-            Competitions
-          </MenuLink>
-          <MenuLink
-            to="/map/all"
-            active={location.pathname.includes("/map") ? "active" : "inactive"}
-          >
-            <MenuIcon>
-              <RiMapPin2Line />
-            </MenuIcon>
-            Drift Map
-          </MenuLink>
-          <MenuLink
-            to="/tracks"
-            active={
-              location.pathname.includes("/tracks") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiFlagLine />
-            </MenuIcon>
-            Tracks
-          </MenuLink>
-          <MenuLink
-            to={`/calendar/week/${today}`}
-            active={
-              location.pathname.includes("/calendar") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiCalendar2Line />
-            </MenuIcon>
-            Calendar
-          </MenuLink>
+            {/* <Box w={10} textAlign="center">
+              <Link to="/tracks/new">
+                <Center w="full" h={10} rounded="full" bgColor="gray.800">
+                  <RiAddLine />
+                </Center>
+                <styled.span fontSize="xs" mt={1}>
+                  New
+                </styled.span>
+              </Link>
+            </Box> */}
+          </Flex>
+        </Box>
+      )}
 
-          <MenuLink
-            to="/merch"
-            active={
-              location.pathname.includes("/merch") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiShoppingBagLine />
-            </MenuIcon>
-            Merch
-          </MenuLink>
+      <Box h={{ base: "calc(100vh - 300px)", md: "auto" }} overflowY="auto">
+        <Flex minH="full">
+          <Flex gap="1px" flexDir="column" flex={1} p={3}>
+            <MenuLink
+              to="/"
+              active={location.pathname === "/" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiHome2Line />
+              </MenuIcon>
+              Home
+            </MenuLink>
 
-          <MenuLink
-            to="/catalogue"
-            active={
-              location.pathname.includes("/catalogue") ? "active" : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiSearch2Line />
-            </MenuIcon>
-            Catalogue
-          </MenuLink>
+            <MenuLink
+              to="/ratings"
+              active={location.pathname === "/ratings" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiListOrdered2 />
+              </MenuIcon>
+              Driver Ratings
+            </MenuLink>
+            <MenuLink
+              to="/competitions"
+              active={
+                location.pathname.startsWith("/competitions")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiTrophyLine />
+              </MenuIcon>
+              Competitions
+            </MenuLink>
+            <MenuLink
+              to="/map/all"
+              active={
+                location.pathname.startsWith("/map") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiMapPin2Line />
+              </MenuIcon>
+              Drift Map
+            </MenuLink>
+            <MenuLink
+              to="/tracks"
+              active={location.pathname === "/tracks" ? "active" : "inactive"}
+            >
+              <MenuIcon>
+                <RiFlagLine />
+              </MenuIcon>
+              Tracks
+            </MenuLink>
+            <MenuLink
+              to={`/calendar/week/${today}`}
+              active={
+                location.pathname.startsWith("/calendar")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiCalendar2Line />
+              </MenuIcon>
+              Calendar
+            </MenuLink>
 
-          <MenuLink
-            to="/fdr"
-            active={location.pathname.includes("/fdr") ? "active" : "inactive"}
-          >
-            <MenuIcon>
-              <GiCogLock />
-            </MenuIcon>
-            FDR Calculator
-          </MenuLink>
+            <MenuLink
+              to="/merch"
+              active={
+                location.pathname.startsWith("/merch") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiShoppingBagLine />
+              </MenuIcon>
+              Merch
+            </MenuLink>
 
-          <MenuLink
-            to="/getting-started"
-            active={
-              location.pathname.includes("/getting-started")
-                ? "active"
-                : "inactive"
-            }
-          >
-            <MenuIcon>
-              <RiRocketLine />
-            </MenuIcon>
-            Getting Started
-          </MenuLink>
-        </Flex>
+            <MenuLink
+              to="/catalogue"
+              active={
+                location.pathname.startsWith("/catalogue")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiSearch2Line />
+              </MenuIcon>
+              Catalogue
+            </MenuLink>
 
-        <SignedIn>
-          <Box w="1px" bgColor="gray.800" />
-          <Flex gap={1} flexDir="column" flex={1}>
-            {user?.track && (
-              <MenuLink to={`/tracks/${user.track.slug}`} active="inactive">
-                <MenuIcon>
-                  <RiFlagLine />
-                </MenuIcon>
-                My Track
-              </MenuLink>
-            )}
+            <MenuLink
+              to="/fdr"
+              active={
+                location.pathname.startsWith("/fdr") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <GiCogLock />
+              </MenuIcon>
+              FDR Calculator
+            </MenuLink>
 
-            {user && (
-              <MenuLink to={`/tickets`} active="inactive">
-                <MenuIcon>
-                  <RiTicketLine />
-                </MenuIcon>
-                My Tickets
-              </MenuLink>
-            )}
+            <MenuLink
+              to="/getting-started"
+              active={
+                location.pathname.startsWith("/getting-started")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiRocketLine />
+              </MenuIcon>
+              Getting Started
+            </MenuLink>
+          </Flex>
 
-            {user?.driverId && (
+          <SignedIn>
+            <Box w="1px" bgColor="gray.800" />
+            <Flex gap="1px" flexDir="column" flex={1} p={3}>
+              {user && (
+                <MenuLink
+                  to={`/tickets`}
+                  active={
+                    location.pathname.startsWith("/tickets")
+                      ? "active"
+                      : "inactive"
+                  }
+                >
+                  <MenuIcon>
+                    <RiTicketLine />
+                  </MenuIcon>
+                  My Tickets
+                </MenuLink>
+              )}
+
+              {user?.driverId && (
+                <MenuLink
+                  to={`/ratings/${user.driverId}`}
+                  active={
+                    location.pathname.startsWith(`/ratings/${user.driverId}`)
+                      ? "active"
+                      : "inactive"
+                  }
+                >
+                  <MenuIcon>
+                    <RiUserLine />
+                  </MenuIcon>
+                  My Driver Profile
+                </MenuLink>
+              )}
+
               <MenuLink
-                to={`/ratings/${user.driverId}`}
+                to="/tournaments"
                 active={
-                  location.pathname.includes(`/ratings/${user.driverId}`)
+                  location.pathname.startsWith("/tournaments")
                     ? "active"
                     : "inactive"
                 }
               >
                 <MenuIcon>
-                  <RiUserLine />
+                  <RiVipCrown2Line />
                 </MenuIcon>
-                My Driver Profile
+                My Tournaments
               </MenuLink>
-            )}
 
-            <MenuLink
-              to="/tournaments"
-              active={
-                location.pathname === "/tournaments" ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiVipCrown2Line />
-              </MenuIcon>
-              My Tournaments
-            </MenuLink>
+              <MenuLink
+                to="/user/profile"
+                active={
+                  location.pathname.startsWith("/user/profile")
+                    ? "active"
+                    : "inactive"
+                }
+              >
+                <MenuIcon>
+                  <RiSettings3Line />
+                </MenuIcon>
+                Account Settings
+              </MenuLink>
 
-            <MenuLink
-              to="/user/profile"
-              active={
-                location.pathname === "/user/profile" ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiSettings3Line />
-              </MenuIcon>
-              Account Settings
-            </MenuLink>
-
-            <MenuLink
-              to="/"
-              onClick={(e) => {
-                e.preventDefault();
-                signOut();
-              }}
-            >
-              <MenuIcon>
-                <RiLogoutBoxRLine />
-              </MenuIcon>
-              Sign Out
-            </MenuLink>
-          </Flex>
-        </SignedIn>
-      </Flex>
+              <MenuLink
+                to="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  signOut();
+                }}
+              >
+                <MenuIcon>
+                  <RiLogoutBoxRLine />
+                </MenuIcon>
+                Sign Out
+              </MenuLink>
+            </Flex>
+          </SignedIn>
+        </Flex>
+      </Box>
 
       <SignedIn>
-        <Box bgColor="gray.900" p={1} textAlign="center">
+        <Box
+          bgColor="gray.900"
+          p={1}
+          textAlign="center"
+          borderBottomRadius="inherit"
+        >
           <styled.span
             fontWeight="semibold"
             fontSize="xs"
@@ -332,6 +410,8 @@ export const Header = ({ user }: Props) => {
       shadow="2xl"
       borderBottomWidth={1}
       borderColor="gray.900"
+      overflow="visible"
+      h="65px"
     >
       <Container maxW={1100} px={4}>
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"}>
@@ -364,34 +444,27 @@ export const Header = ({ user }: Props) => {
           </LinkButton>
 
           <Box>
-            <Popover
-              isOpen={menu.isOpen}
-              content={<Menu user={user} />}
-              positions={["bottom"]}
-              align="end"
-              containerStyle={{
-                zIndex: "20",
-              }}
-              onClickOutside={menu.onClose}
+            <Button
+              size="sm"
+              px={2}
+              fontSize="lg"
+              variant={menu.isOpen ? "primary" : "outline"}
+              onClick={() => menu.toggle()}
+              mx={2}
+              aria-label="Menu"
             >
-              <Button
-                size="sm"
-                px={2}
-                fontSize="lg"
-                variant={menu.isOpen ? "primary" : "outline"}
-                onClick={() => menu.toggle()}
-                mx={2}
-                aria-label="Menu"
-              >
-                <RiMenu2Line />
-              </Button>
-            </Popover>
+              <RiMenu2Line />
+            </Button>
           </Box>
 
           <SignedIn>
-            <styled.div w={8} h={8} rounded="full" overflow="hidden">
-              <styled.img src={clerkUser.user?.imageUrl} w="full" />
-            </styled.div>
+            {user && (
+              <styled.div w={8} h={8} rounded="full" overflow="hidden">
+                <Link to={`/ratings/${user.driverId}`}>
+                  <styled.img src={clerkUser.user?.imageUrl} w="full" />
+                </Link>
+              </styled.div>
+            )}
           </SignedIn>
 
           <SignedOut>
@@ -405,6 +478,8 @@ export const Header = ({ user }: Props) => {
             </LinkButton>
           </SignedOut>
         </Flex>
+
+        {menu.isOpen && <Menu user={user} />}
       </Container>
     </Box>
   );

@@ -73,94 +73,91 @@ const getStatusText = (status: TicketStatus) => {
 export default function TicketsPage() {
   const tickets = useLoaderData<typeof loader>();
 
-  if (tickets.length === 0) {
-    return (
-      <Container py={12}>
-        <Box textAlign="center">
-          <styled.h1 fontSize="2xl" fontWeight="bold" mb={4}>
-            My Tickets
-          </styled.h1>
-          <styled.p color="gray.600" mb={6}>
-            You don't have any tickets yet.
-          </styled.p>
-          <LinkButton to="/2025/schedule">View Events</LinkButton>
-        </Box>
-      </Container>
-    );
-  }
-
   return (
-    <Container maxW={1100} px={2} py={4}>
-      <styled.h1 fontSize="3xl" fontWeight="extrabold" pb={4}>
+    <Container maxW={1100} px={4} py={8}>
+      <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
         My Tickets
       </styled.h1>
 
-      <styled.div display="grid" gap={4}>
-        {tickets.map((ticket) => {
-          const [bgColor, textColor] = getStatusColor(ticket.status);
+      {tickets.length <= 0 && (
+        <styled.p color="gray.500" mb={6}>
+          You don't have any tickets yet.
+        </styled.p>
+      )}
 
-          return (
-            <Box
-              key={ticket.id}
-              p={1}
-              rounded="xl"
-              borderWidth="1px"
-              borderColor="gray.700"
-              pos="relative"
-              overflow="hidden"
-            >
-              <Box p={4} rounded="lg" borderWidth="1px" borderColor="gray.800">
-                <Flex
-                  flexDir={{ base: "column", md: "row" }}
-                  gap={2}
-                  alignItems={{ md: "center" }}
+      {tickets.length > 0 && (
+        <styled.div display="grid" gap={4}>
+          {tickets.map((ticket) => {
+            const [bgColor, textColor] = getStatusColor(ticket.status);
+
+            return (
+              <Box
+                key={ticket.id}
+                p={1}
+                rounded="xl"
+                borderWidth="1px"
+                borderColor="gray.700"
+                pos="relative"
+                overflow="hidden"
+              >
+                <Box
+                  p={4}
+                  rounded="lg"
+                  borderWidth="1px"
+                  borderColor="gray.800"
                 >
-                  <Box>
-                    <styled.span
-                      fontSize="sm"
-                      fontWeight="medium"
-                      style={{
-                        backgroundColor: bgColor,
-                        color: textColor,
-                      }}
-                      px={2}
-                      py={1}
-                      rounded="full"
-                    >
-                      {getStatusText(ticket.status)}
-                    </styled.span>
-
-                    <styled.h2 fontSize="xl" fontWeight="semibold" mt={2}>
-                      {ticket.event.name}
-                    </styled.h2>
-
-                    <styled.p fontSize="sm" color="gray.500">
-                      {getEventDate(
-                        new Date(ticket.event.startDate),
-                        new Date(ticket.event.endDate)
-                      )}
-                    </styled.p>
-                    {ticket.event.eventTrack && (
-                      <styled.p fontSize="sm" color="gray.500">
-                        {ticket.event.eventTrack.name}
-                      </styled.p>
-                    )}
-                  </Box>
-
-                  <Spacer />
-
-                  <LinkButton
-                    to={`/events/${ticket.event.id}/ticket`}
-                    variant="secondary"
+                  <Flex
+                    flexDir={{ base: "column", md: "row" }}
+                    gap={2}
+                    alignItems={{ md: "center" }}
                   >
-                    View Ticket
-                  </LinkButton>
-                </Flex>
+                    <Box>
+                      <styled.span
+                        fontSize="sm"
+                        fontWeight="medium"
+                        style={{
+                          backgroundColor: bgColor,
+                          color: textColor,
+                        }}
+                        px={2}
+                        py={1}
+                        rounded="full"
+                      >
+                        {getStatusText(ticket.status)}
+                      </styled.span>
+
+                      <styled.h2 fontSize="xl" fontWeight="semibold" mt={2}>
+                        {ticket.event.name}
+                      </styled.h2>
+
+                      <styled.p fontSize="sm" color="gray.500">
+                        {getEventDate(
+                          new Date(ticket.event.startDate),
+                          new Date(ticket.event.endDate)
+                        )}
+                      </styled.p>
+                      {ticket.event.eventTrack && (
+                        <styled.p fontSize="sm" color="gray.500">
+                          {ticket.event.eventTrack.name}
+                        </styled.p>
+                      )}
+                    </Box>
+
+                    <Spacer />
+
+                    <LinkButton
+                      to={`/events/${ticket.event.id}/ticket`}
+                      variant="secondary"
+                    >
+                      View Ticket
+                    </LinkButton>
+                  </Flex>
+                </Box>
               </Box>
-            </Box>
-          );
-        })}
-      </styled.div>
+            );
+          })}
+        </styled.div>
+      )}
     </Container>
   );
 }

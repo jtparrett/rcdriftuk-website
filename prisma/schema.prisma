@@ -154,7 +154,7 @@ model TournamentBattleVotes {
 }
 
 model Tracks {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
   image       String
@@ -162,10 +162,19 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String       @default("")
+  slug        String        @default("")
   events      Events[]
   Products    Products[]
-  owners      Users[]
+  Owners      TrackOwners[]
+}
+
+model TrackOwners {
+  trackId String @db.Uuid
+  userId  String
+  track   Tracks @relation(fields: [trackId], references: [id])
+  user    Users  @relation(fields: [userId], references: [id])
+
+  @@unique([trackId, userId])
 }
 
 model DriverRatingBattles {
@@ -179,6 +188,8 @@ model DriverRatingBattles {
 }
 
 model Users {
+  deprecated_trackId String? @map("trackId") @db.Uuid
+
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @default(now()) @updatedAt
   driverId          Int                   @id @default(autoincrement())
@@ -186,16 +197,15 @@ model Users {
   firstName         String?
   image             String?
   lastName          String?
-  trackId           String?               @db.Uuid
   team              String?
   events            EventResponses[]
-  track             Tracks?               @relation(fields: [trackId], references: [id])
   Tournaments       Tournaments[]
   ratingsLosses     DriverRatingBattles[] @relation("driverRatingsLosses")
   ratingsWins       DriverRatingBattles[] @relation("driverRatingsWins")
   TournamentJudges  TournamentJudges[]
   TournamentDrivers TournamentDrivers[]
   EventTickets      EventTickets[]
+  Tracks            TrackOwners[]
 }
 
 model Products {

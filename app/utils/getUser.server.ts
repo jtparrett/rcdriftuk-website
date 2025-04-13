@@ -11,8 +11,19 @@ export const getUser = async (userId: string) => {
       id: true,
       firstName: true,
       lastName: true,
-      track: true,
       driverId: true,
+      Tracks: {
+        select: {
+          track: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
   });
 };

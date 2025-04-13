@@ -1,7 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
@@ -12,9 +11,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const { id } = z.object({ id: z.string() }).parse(params);
 
-  const user = await getAuth(args);
+  const { userId } = await getAuth(args);
 
-  if (!user) {
+  if (!userId) {
     throw new Response(null, {
       status: 404,
       statusText: "Not Found",
@@ -25,9 +24,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     where: {
       id,
       eventTrack: {
-        owners: {
+        Owners: {
           some: {
-            id: user.userId,
+            userId,
           },
         },
       },
@@ -47,17 +46,22 @@ export const loader = async (args: LoaderFunctionArgs) => {
 export const action = async (args: ActionFunctionArgs) => {
   const { params } = args;
   const { id } = z.object({ id: z.string() }).parse(params);
-  const user = await getAuth(args);
+  const { userId } = await getAuth(args);
 
-  invariant(user.userId, "User not found");
+  if (!userId) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
 
   await prisma.events.delete({
     where: {
       id,
       eventTrack: {
-        owners: {
+        Owners: {
           some: {
-            id: user.userId,
+            userId,
           },
         },
       },
