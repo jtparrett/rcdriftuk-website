@@ -10,7 +10,7 @@ export type AddressLookup = z.infer<typeof addressLookupSchema>;
 
 export const addressLookup = async (search: string) => {
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(search)}&format=json`
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(search)}&format=json&addressdetails=1`
   );
   const data = await response.json();
 
