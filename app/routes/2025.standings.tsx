@@ -1,7 +1,6 @@
-import { TicketStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { startOfDay, startOfYear } from "date-fns";
+import { startOfYear } from "date-fns";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Container, styled, Flex, Box } from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
@@ -25,25 +24,35 @@ export const meta: MetaFunction = () => {
 
 export const loader = async () => {
   const driverRatings = await getDriverRatings();
+  const startOfSeason = startOfYear(new Date());
 
   const qualifiedDrivers = await prisma.users.findMany({
     where: {
       driverId: {
-        in: driverRatings.map((driver) => driver.driverId),
+        in: driverRatings
+          .map((driver) => driver.driverId)
+          .filter((id) => id !== 0),
       },
-      EventTickets: {
-        some: {
-          status: TicketStatus.CONFIRMED,
-          event: {
-            startDate: {
-              gte: startOfYear(new Date()),
-            },
-            endDate: {
-              lte: startOfDay(new Date()),
+      OR: [
+        {
+          ratingsLosses: {
+            some: {
+              createdAt: {
+                gte: startOfSeason,
+              },
             },
           },
         },
-      },
+        {
+          ratingsWins: {
+            some: {
+              createdAt: {
+                gte: startOfSeason,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -62,6 +71,7 @@ export const loader = async () => {
       );
     });
 
+  // This is awkard, we should've sliced the ratings before the logic above
   return drivers.slice(0, 64);
 };
 
