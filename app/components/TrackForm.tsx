@@ -1,11 +1,11 @@
-import { Box, Divider, Flex, styled } from "~/styled-system/jsx";
+import { Box, Divider, Flex } from "~/styled-system/jsx";
 import { Input } from "./Input";
 import { Label } from "./Label";
-import { Select } from "./Select";
 import { Textarea } from "./Textarea";
 import type { GetUserOwnedTrackBySlug } from "~/utils/getUserOwnedTrackBySlug.server";
 import { Button } from "./Button";
 import { AddressInput } from "./AddressInput";
+import { ImageInput } from "./ImageInput";
 interface Props {
   track?: GetUserOwnedTrackBySlug;
 }
@@ -14,23 +14,27 @@ export const TrackForm = ({ track }: Props) => {
   return (
     <Flex flexDir="column" gap={4}>
       <Box>
+        <Label>Track Photo</Label>
+        <ImageInput name="image" />
+      </Box>
+
+      <Box>
         <Label>Name</Label>
-        <Input name="name" defaultValue={track?.name} />
+        <Input name="name" defaultValue={track?.name} required />
       </Box>
 
       <Box>
         <Label>Description</Label>
-        <Textarea name="description" defaultValue={track?.description ?? ""} />
-      </Box>
-
-      <Box>
-        <Label>Track Photo</Label>
-        <Input name="image" type="file" accept="image/*" />
+        <Textarea
+          name="description"
+          defaultValue={track?.description ?? ""}
+          required
+        />
       </Box>
 
       <Box>
         <Label>URL</Label>
-        <Input name="url" defaultValue={track?.url} />
+        <Input name="url" defaultValue={track?.url} required />
       </Box>
 
       <Divider borderColor="gray.800" />
@@ -42,12 +46,6 @@ export const TrackForm = ({ track }: Props) => {
           lat={track?.lat}
           lng={track?.lng}
         />
-      </Box>
-
-      <Divider borderColor="gray.800" />
-
-      <Box>
-        <Label>Categories</Label>
       </Box>
 
       <Divider borderColor="gray.800" />

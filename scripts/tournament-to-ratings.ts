@@ -3,7 +3,7 @@ import { prisma } from "~/utils/prisma.server";
 const run = async () => {
   const battles = await prisma.tournamentBattles.findMany({
     where: {
-      tournamentId: "4b47a904-bd88-4d37-b3f7-c6093e8cbb26",
+      tournamentId: "bcb1a684-e0d4-4b88-9c44-1172572c27ae",
     },
     orderBy: {
       id: "asc",
@@ -32,7 +32,7 @@ const run = async () => {
       loserId: leftWinner
         ? battle.driverRight?.user.driverId ?? 0
         : battle.driverLeft?.user.driverId ?? 0,
-      tournament: "2025-BBRC",
+      tournament: "2025-SLDN",
     };
   });
 

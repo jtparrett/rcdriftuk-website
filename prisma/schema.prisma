@@ -162,7 +162,7 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String        @default("")
+  slug        String        @unique
   events      Events[]
   Products    Products[]
   Owners      TrackOwners[]

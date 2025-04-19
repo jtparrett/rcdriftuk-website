@@ -3,7 +3,6 @@ import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
 import {
   RiAddCircleFill,
-  RiDeleteBinFill,
   RiEditCircleFill,
   RiFacebookFill,
   RiLink,
@@ -149,6 +148,12 @@ const TrackPage = () => {
                 </styled.p>
               )}
 
+              {track.address && (
+                <styled.p fontSize="sm" color="gray.500">
+                  {track.address}
+                </styled.p>
+              )}
+
               <LinkButton
                 mt={4}
                 to={track.url}
@@ -181,18 +186,9 @@ const TrackPage = () => {
                   w="full"
                   size="sm"
                   mb={2}
-                  to="/calendar/new"
+                  to="./events/new"
                 >
                   Create Event <RiAddCircleFill />
-                </LinkButton>
-                <LinkButton
-                  w="full"
-                  size="sm"
-                  bgColor="brand.950"
-                  borderColor="brand.900"
-                  to="./archive"
-                >
-                  Archive Track <RiDeleteBinFill />
                 </LinkButton>
               </Box>
             )}
