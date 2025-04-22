@@ -15,7 +15,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    return redirect("/login");
+    return redirect("/sign-in");
   }
 
   invariant(args.params.slug, "Slug is required");
@@ -29,7 +29,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    return redirect("/login");
+    return redirect("/sign-in");
   }
 
   invariant(args.params.slug, "Slug is required");

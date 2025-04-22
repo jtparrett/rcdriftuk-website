@@ -21,7 +21,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    return redirect("/login");
+    return redirect("/sign-in");
   }
 
   return null;
@@ -34,7 +34,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    throw redirect("/login");
+    throw redirect("/sign-in");
   }
 
   const data = z
