@@ -59,7 +59,7 @@ export const getDriverRatings = async () => {
       driver: Users;
       currentElo: number;
       history: {
-        battle: (typeof battles)[number];
+        battle: Omit<(typeof battles)[number], "createdAt">;
         elo: number; // Drivers boints after battle
         opponentElo: number; // Opponents points after battle
         startingElo: number;
