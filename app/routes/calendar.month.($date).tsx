@@ -1,3 +1,4 @@
+import { TrackStatus } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
@@ -35,6 +36,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const events = await prisma.events.findMany({
     where: {
+      eventTrack: {
+        status: TrackStatus.ACTIVE,
+      },
       approved: true,
       AND: [
         {

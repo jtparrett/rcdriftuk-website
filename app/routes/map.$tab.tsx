@@ -1,3 +1,4 @@
+import { TrackStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
@@ -14,7 +15,11 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const tracks = await prisma.tracks.findMany();
+  const tracks = await prisma.tracks.findMany({
+    where: {
+      status: TrackStatus.ACTIVE,
+    },
+  });
 
   return tracks;
 };

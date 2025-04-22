@@ -1,3 +1,4 @@
+import { TrackStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
@@ -31,6 +32,9 @@ export const loader = async () => {
       startDate: {
         gte: startOfDay(today),
         lte: endOfDay(today),
+      },
+      eventTrack: {
+        status: TrackStatus.ACTIVE,
       },
     },
     include: {

@@ -17,6 +17,7 @@ import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { TrackStatus } from "@prisma/client";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
@@ -29,6 +30,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const events = await prisma.events.findMany({
     where: {
       approved: true,
+      eventTrack: {
+        status: TrackStatus.ACTIVE,
+      },
       AND: [
         {
           startDate: {
