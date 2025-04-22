@@ -162,10 +162,19 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String        @default("")
+  slug        String        @unique
   events      Events[]
   Products    Products[]
   Owners      TrackOwners[]
+  status      TrackStatus   @default(PENDING)
+  address     String?
+}
+
+enum TrackStatus {
+  ACTIVE
+  ARCHIVED
+  PENDING
+  CLOSED
 }
 
 model TrackOwners {

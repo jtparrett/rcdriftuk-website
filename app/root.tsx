@@ -31,14 +31,6 @@ import { AnnouncementBanner } from "./components/AnnouncementBanner";
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   { rel: "stylesheet", href: styles },
-
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  { rel: "preconnect", href: "https://fonts.gstatic.com" },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap",
-  },
-
   {
     rel: "stylesheet",
     href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",

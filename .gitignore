@@ -9,3 +9,5 @@ node_modules
 /app/styled-system
 
 .DS_Store
+.vercel
+.env*.local

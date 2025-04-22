@@ -1,4 +1,6 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { TrackStatus } from "@prisma/client";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { endOfMonth, format, parse, startOfMonth } from "date-fns";
 import { EventCard } from "~/components/EventCard";
@@ -15,6 +17,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const events = await prisma.events.findMany({
     where: {
+      eventTrack: {
+        status: TrackStatus.ACTIVE,
+      },
       approved: true,
       startDate: {
         gte: startOfMonth(date),

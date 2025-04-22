@@ -1,3 +1,5 @@
+import { SignedIn } from "@clerk/remix";
+import { TrackStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { RiAddCircleFill } from "react-icons/ri";
@@ -20,6 +22,9 @@ export const loader = async () => {
   const tracks = await prisma.tracks.findMany({
     orderBy: {
       name: "asc",
+    },
+    where: {
+      status: TrackStatus.ACTIVE,
     },
   });
 
@@ -49,9 +54,11 @@ const TracksPage = () => {
             </Box>
 
             <Spacer />
-            {/* <LinkButton to="/tracks/new" variant="outline">
-              Create a Track <RiAddCircleFill />
-            </LinkButton> */}
+            <SignedIn>
+              <LinkButton to="/tracks/new" variant="outline">
+                Register a new Track <RiAddCircleFill />
+              </LinkButton>
+            </SignedIn>
           </Flex>
         </Container>
       </Box>

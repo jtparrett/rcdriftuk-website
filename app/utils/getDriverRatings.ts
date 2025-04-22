@@ -1,5 +1,9 @@
 import type { Users } from "@prisma/client";
 import { prisma } from "./prisma.server";
+import { isAfter, startOfYear } from "date-fns";
+
+// Activity bonus constant - 1 point per battle since start of year
+const ACTIVITY_BONUS_PER_BATTLE = 0;
 
 function calculateElos(
   ratingPlayer: number,
@@ -27,6 +31,7 @@ export const getDriverRatings = async () => {
       winnerId: true,
       loserId: true,
       tournament: true,
+      createdAt: true,
       winner: {
         select: {
           driverId: true,
@@ -54,19 +59,23 @@ export const getDriverRatings = async () => {
       driver: Users;
       currentElo: number;
       history: {
-        battle: (typeof battles)[number];
+        battle: Omit<(typeof battles)[number], "createdAt">;
         elo: number; // Drivers boints after battle
         opponentElo: number; // Opponents points after battle
         startingElo: number;
         startingOpponentElo: number;
         totalBattles: number;
         totalOpponentBattles: number;
+        activityBonus: number;
       }[];
     }
   > = {};
 
+  // Get the start of the current year
+  const yearStart = startOfYear(new Date());
+
   for (const battle of battles) {
-    const { winnerId, loserId, winner, loser } = battle;
+    const { winnerId, loserId, winner, loser, createdAt } = battle;
 
     driverElos[winnerId] = driverElos?.[winnerId] ?? {
       driver: winner,
@@ -94,19 +103,32 @@ export const getDriverRatings = async () => {
     const { newRatingPlayer: winnerElo, newRatingOpponent: loserElo } =
       calculateElos(winnerStartingElo, loserStartingElo, winnersK, losersK);
 
-    driverElos[winnerId].currentElo = winnerElo;
-    driverElos[loserId].currentElo = loserElo;
+    // Calculate activity bonus for this battle
+    const battleDate = new Date(createdAt);
+    const isThisYear = isAfter(battleDate, yearStart);
+
+    // Apply activity bonus if battle is from this year
+    const winnerActivityBonus = isThisYear ? ACTIVITY_BONUS_PER_BATTLE : 0;
+    const loserActivityBonus = isThisYear ? ACTIVITY_BONUS_PER_BATTLE : 0;
+
+    // Add activity bonus to the ELO ratings
+    const finalWinnerElo = winnerElo + winnerActivityBonus;
+    const finalLoserElo = loserElo + loserActivityBonus;
+
+    driverElos[winnerId].currentElo = finalWinnerElo;
+    driverElos[loserId].currentElo = finalLoserElo;
 
     driverElos[winnerId].history = [
       ...(driverElos[winnerId].history ?? []),
       {
         battle: battle,
-        elo: winnerElo,
-        opponentElo: loserElo,
+        elo: finalWinnerElo,
+        opponentElo: finalLoserElo,
         startingElo: winnerStartingElo,
         startingOpponentElo: loserStartingElo,
         totalBattles: winnerTotalBattles,
         totalOpponentBattles: loserTotalBattles,
+        activityBonus: winnerActivityBonus,
       },
     ];
 
@@ -114,12 +136,13 @@ export const getDriverRatings = async () => {
       ...(driverElos[loserId].history ?? []),
       {
         battle: battle,
-        elo: loserElo,
-        opponentElo: winnerElo,
+        elo: finalLoserElo,
+        opponentElo: finalWinnerElo,
         startingElo: loserStartingElo,
         startingOpponentElo: winnerStartingElo,
         totalBattles: loserTotalBattles,
         totalOpponentBattles: winnerTotalBattles,
+        activityBonus: loserActivityBonus,
       },
     ];
   }

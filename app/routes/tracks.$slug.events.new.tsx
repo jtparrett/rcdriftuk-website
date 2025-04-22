@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { add, differenceInWeeks, endOfYear, sub } from "date-fns";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -13,45 +13,45 @@ import { MoneyInput } from "~/components/MoneyInput";
 import { Select } from "~/components/Select";
 import { Textarea } from "~/components/Textarea";
 import { TimePicker } from "~/components/TimePicker";
-import { styled, Box, Flex } from "~/styled-system/jsx";
+import { styled, Box, Flex, Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
+  const { params } = args;
   const { userId } = await getAuth(args);
+  const slug = z.string().parse(params.slug);
 
   if (!userId) {
     throw redirect("/");
   }
 
-  const user = await prisma.users.findFirst({
+  const track = await prisma.tracks.findFirst({
     where: {
-      id: userId,
-    },
-    include: {
-      Tracks: {
-        include: {
-          track: true,
+      slug,
+      Owners: {
+        some: {
+          userId,
         },
       },
     },
   });
 
-  if ((user?.Tracks.length ?? 0) <= 0) {
+  if (!track) {
     throw redirect("/");
   }
 
-  return user;
+  return null;
 };
 
 export const action = async (args: ActionFunctionArgs) => {
-  const { request } = args;
+  const { request, params } = args;
   const { userId } = await getAuth(args);
   const body = await request.formData();
+  const slug = z.string().parse(params.slug);
 
   invariant(userId);
 
-  const trackId = body.get("trackId");
   const name = body.get("name");
   const startDate = body.get("startDate");
   const endDate = body.get("endDate");
@@ -66,7 +66,6 @@ export const action = async (args: ActionFunctionArgs) => {
 
   const data = z
     .object({
-      trackId: z.string(),
       name: z.string(),
       startDate: z.coerce.date(),
       endDate: z.coerce.date(),
@@ -80,7 +79,6 @@ export const action = async (args: ActionFunctionArgs) => {
       ticketPrice: z.coerce.number().nullable(),
     })
     .parse({
-      trackId,
       name,
       startDate,
       endDate,
@@ -94,13 +92,12 @@ export const action = async (args: ActionFunctionArgs) => {
       ticketPrice,
     });
 
-  // Ensure the user owns the track
-  await prisma.users.findFirstOrThrow({
+  const track = await prisma.tracks.findFirstOrThrow({
     where: {
-      id: userId,
-      Tracks: {
+      slug,
+      Owners: {
         some: {
-          trackId: data.trackId,
+          userId,
         },
       },
     },
@@ -121,7 +118,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
       return {
         name: data.name,
-        trackId: data.trackId,
+        trackId: track.id,
         link: data.link,
         startDate: utcStartDate,
         endDate: utcEndDate,
@@ -146,26 +143,14 @@ const CalendarNewPage = () => {
   const [endDate, setEndDate] = useState(add(new Date(), { days: 1 }));
   const [enableTicketing, setEnableTicketing] = useState(false);
   const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
-  const user = useLoaderData<typeof loader>();
 
   return (
-    <Box pb={12}>
+    <Container maxW={1100} px={4} py={8}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
         Create an event
       </styled.h1>
       <Form method="post">
         <Flex flexDir="column" maxW={500} gap={4}>
-          <Box>
-            <Label>Track</Label>
-            <Select name="trackId">
-              {user?.Tracks.map((track) => (
-                <option key={track.trackId} value={track.trackId}>
-                  {track.track.name}
-                </option>
-              ))}
-            </Select>
-          </Box>
-
           <Box>
             <Label>Date</Label>
             <DatePicker
@@ -305,7 +290,7 @@ const CalendarNewPage = () => {
           <Button type="submit">List Event</Button>
         </Flex>
       </Form>
-    </Box>
+    </Container>
   );
 };
 

@@ -42,3 +42,10 @@
   }
 }
 
+@font-face {
+  font-family: "RCDUK";
+  src: url("/RCDUK.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: normal;
+}

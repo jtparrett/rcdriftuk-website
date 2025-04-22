@@ -119,7 +119,7 @@ const MerchPage = () => {
                   h="auto"
                 />
                 <styled.h2 fontSize="sm">{product.title}</styled.h2>
-                <styled.p fontSize="xs" color="gray.600">
+                <styled.p fontSize="xs" color="gray.500">
                   &pound;
                   {parseFloat(
                     product.priceRange.minVariantPrice.amount

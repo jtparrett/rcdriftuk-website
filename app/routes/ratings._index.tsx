@@ -293,7 +293,7 @@ const RatingsPage = () => {
             maxW={300}
             mx="auto"
           >
-            Discover your ranking among the top drivers in the UK.
+            Discover the top rated drivers from across the UK.
           </styled.p>
         </Box>
 
