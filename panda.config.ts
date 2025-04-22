@@ -29,7 +29,7 @@ export default defineConfig({
         },
         fonts: {
           body: {
-            value: '"Inter", sans-serif',
+            value: '"RCDUK", sans-serif',
           },
         },
         colors: {

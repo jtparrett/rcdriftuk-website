@@ -84,10 +84,10 @@ const Page = () => {
           zIndex: -1,
         }}
       >
-        <Container maxW={650} textAlign="center" py={100}>
+        <Container maxW={680} textAlign="center" py={100} px={2}>
           <styled.img
             src="/flag.svg"
-            w="84px"
+            w={{ base: "84px", md: "120px" }}
             mx="auto"
             mb={4}
             display="block"
@@ -95,16 +95,16 @@ const Page = () => {
           <styled.h1
             fontWeight="extrabold"
             textTransform="uppercase"
-            fontSize={{ base: "4xl", md: "6xl" }}
+            fontSize={{ base: "5xl", md: "6xl" }}
             lineHeight={1}
             textWrap="balance"
           >
-            The home of UK RC Drifting
+            Connect with the UK’s RC Drift Scene
           </styled.h1>
           <styled.p
             textWrap="balance"
             color="gray.400"
-            pt={4}
+            pt={2}
             pb={8}
             fontSize="lg"
           >

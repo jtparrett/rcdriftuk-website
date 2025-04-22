@@ -28,8 +28,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 };
 
 export const action = async (args: ActionFunctionArgs) => {
-  const { request } = args;
-  const formData = await request.formData();
+  const clonedRequest = args.request.clone();
+  const formData = await clonedRequest.formData();
 
   const { userId } = await getAuth(args);
 
