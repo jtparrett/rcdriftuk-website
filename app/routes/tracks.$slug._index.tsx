@@ -1,7 +1,14 @@
+import { TrackTypes } from "@prisma/client";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
-import { RiAddCircleFill, RiEditCircleFill, RiLink } from "react-icons/ri";
+import {
+  RiAddCircleFill,
+  RiEditCircleFill,
+  RiFacebookCircleFill,
+  RiLink,
+  RiStoreFill,
+} from "react-icons/ri";
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -162,8 +169,16 @@ const TrackPage = () => {
               >
                 {track.url.includes("facebook")
                   ? "Visit Facebook"
-                  : "Visit Website"}
-                <RiLink />
+                  : track.types.includes(TrackTypes.SHOPS)
+                    ? "Shop Now"
+                    : "Visit Website"}
+                {track.url.includes("facebook") ? (
+                  <RiFacebookCircleFill />
+                ) : track.types.includes(TrackTypes.SHOPS) ? (
+                  <RiStoreFill />
+                ) : (
+                  <RiLink />
+                )}
               </LinkButton>
             </Box>
 
