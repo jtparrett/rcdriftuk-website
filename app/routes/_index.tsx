@@ -103,7 +103,7 @@ const Page = () => {
             lineHeight={1}
             textWrap="balance"
           >
-            Connect with the UK’s RC Drift Scene
+            Connect with the RC Drift Scene
           </styled.h1>
           <styled.p
             textWrap="balance"

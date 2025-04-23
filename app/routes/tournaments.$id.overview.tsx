@@ -166,7 +166,11 @@ const TournamentsOverviewPage = () => {
               boxShadow="inset 0 1px rgba(255, 255, 255, 0.3)"
             >
               <styled.p fontWeight="semibold">
-                {capitalCase(tournament.state)}
+                {capitalCase(
+                  tournament.state === TournamentsState.END
+                    ? "Tournament Finished"
+                    : tournament.state
+                )}
               </styled.p>
             </Box>
             {tournament?.state === TournamentsState.QUALIFYING &&
@@ -219,14 +223,19 @@ const TournamentsOverviewPage = () => {
             {tournament?.state === TournamentsState.BATTLES &&
               tournament.nextBattle && (
                 <Flex maxW={700}>
-                  <Box flex={1} borderRightWidth={1} borderColor="brand.500">
+                  <Box
+                    flex={1}
+                    borderRightWidth={1}
+                    borderColor="brand.500"
+                    overflow="hidden"
+                  >
                     <styled.img src="/blank-driver-left.jpg" w="full" />
                     <styled.p
                       w="full"
                       textOverflow="ellipsis"
                       overflow="hidden"
                       whiteSpace="nowrap"
-                      fontSize="lg"
+                      fontSize={{ base: "sm", md: "lg" }}
                       fontWeight="extrabold"
                       py={2}
                     >
@@ -288,14 +297,19 @@ const TournamentsOverviewPage = () => {
                       </>
                     )}
                   </Box>
-                  <Box flex={1} borderLeftWidth={1} borderColor="brand.500">
+                  <Box
+                    flex={1}
+                    borderLeftWidth={1}
+                    borderColor="brand.500"
+                    overflow="hidden"
+                  >
                     <styled.img src="/blank-driver-right.jpg" w="full" />
                     <styled.p
                       w="full"
                       textOverflow="ellipsis"
                       overflow="hidden"
                       whiteSpace="nowrap"
-                      fontSize="lg"
+                      fontSize={{ base: "sm", md: "lg" }}
                       fontWeight="extrabold"
                       py={2}
                     >

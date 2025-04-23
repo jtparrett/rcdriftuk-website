@@ -200,13 +200,13 @@ const TournamentBattlesPage = () => {
         rounded="3xl"
         bg="gray.900"
         borderWidth={1}
-        borderColor="gray.700"
+        borderColor="gray.800"
       >
         <Box
           overflow="auto"
           p={8}
           borderWidth={1}
-          borderColor="gray.700"
+          borderColor="gray.800"
           rounded="2xl"
           bg="black"
         >
@@ -249,14 +249,14 @@ const TournamentBattlesPage = () => {
                               top="50%"
                               w="full"
                               zIndex={1}
-                              borderBottomColor="gray.400"
+                              borderBottomColor="gray.700"
                             />
                             <Box
                               mx={4}
                               rounded="lg"
                               borderWidth={1}
                               borderColor={
-                                isNextBattle ? "brand.500" : "gray.400"
+                                isNextBattle ? "brand.500" : "gray.700"
                               }
                               position="relative"
                               overflow="hidden"
@@ -276,7 +276,7 @@ const TournamentBattlesPage = () => {
                           {i % 2 === 0 && battles.length > 1 ? (
                             <Box
                               borderRightWidth={1}
-                              borderRightColor="gray.400"
+                              borderRightColor="gray.700"
                               flex={1}
                               my={-6}
                             />
