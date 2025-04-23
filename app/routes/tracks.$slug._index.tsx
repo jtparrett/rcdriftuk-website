@@ -1,12 +1,7 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
-import {
-  RiAddCircleFill,
-  RiEditCircleFill,
-  RiFacebookFill,
-  RiLink,
-} from "react-icons/ri";
+import { RiAddCircleFill, RiEditCircleFill, RiLink } from "react-icons/ri";
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -88,7 +83,7 @@ const TrackPage = () => {
         <Box
           w={{ md: 400 }}
           pos={{ md: "sticky" }}
-          top={{ md: 100 }}
+          top={{ md: "80px" }}
           zIndex={1}
         >
           <Box
@@ -98,50 +93,54 @@ const TrackPage = () => {
             overflow="hidden"
           >
             {track.cover && (
+              <Box pos="relative" mb={-16} zIndex={-1}>
+                <styled.img src={track.cover} w="full" objectFit="cover" />
+                <Box
+                  pos="absolute"
+                  inset={0}
+                  bgGradient="to-b"
+                  gradientTo="black"
+                  gradientFrom="transparent"
+                  zIndex={1}
+                />
+              </Box>
+            )}
+            <Box textAlign="center" p={4} pt={track.cover ? 0 : 4}>
               <Box
-                h={200}
-                mb="-84px"
-                pos="relative"
-                zIndex={-1}
-                pointerEvents="none"
+                w={32}
+                h={32}
+                rounded="full"
+                overflow="hidden"
+                borderWidth={2}
+                borderColor="gray.500"
+                mx="auto"
+                mb={2}
               >
                 <styled.img
-                  src={track.cover}
+                  src={track.image}
                   w="full"
                   h="full"
                   objectFit="cover"
                 />
               </Box>
-            )}
 
-            <Box
-              w={40}
-              h={40}
-              rounded="full"
-              overflow="hidden"
-              mx="auto"
-              borderWidth={2}
-              borderColor="gray.500"
-              mb={2}
-              mt={track.cover ? 0 : 4}
-            >
-              <styled.img
-                src={track.image}
-                w="full"
-                h="full"
-                objectFit="cover"
-              />
-            </Box>
-
-            <Box textAlign="center" maxW={540} mx="auto" px={4} pb={4}>
               <styled.h1
                 fontWeight="extrabold"
                 fontSize="2xl"
                 textWrap="balance"
+                lineHeight="1.1"
               >
                 {track.name}
               </styled.h1>
-              {track.description && (
+              {track.address && (
+                <styled.p fontSize="sm" color="gray.500" mt={1}>
+                  {track.address}
+                </styled.p>
+              )}
+            </Box>
+
+            {track.description && (
+              <Box p={4} bgColor="gray.800" rounded="lg" mx={4}>
                 <styled.p
                   color="gray.500"
                   fontSize="sm"
@@ -150,32 +149,26 @@ const TrackPage = () => {
                 >
                   {track.description}
                 </styled.p>
-              )}
+              </Box>
+            )}
 
-              {track.address && (
-                <styled.p fontSize="sm" color="gray.500">
-                  {track.address}
-                </styled.p>
-              )}
-
+            <Box p={4}>
               <LinkButton
-                mt={4}
+                w="full"
                 to={track.url}
-                variant="secondary"
+                variant="outline"
                 target="_blank"
                 size="sm"
-                fontSize="lg"
               >
-                {track.url.includes("facebook") ? (
-                  <RiFacebookFill />
-                ) : (
-                  <RiLink />
-                )}
+                {track.url.includes("facebook")
+                  ? "Visit Facebook"
+                  : "Visit Website"}
+                <RiLink />
               </LinkButton>
             </Box>
 
             {isOwner && (
-              <Box p={4}>
+              <Box p={4} borderTopWidth={1} borderColor="gray.800">
                 <LinkButton
                   variant="outline"
                   w="full"
@@ -200,25 +193,8 @@ const TrackPage = () => {
         </Box>
 
         <Box flex={1}>
-          {track.events.length > 0 && (
-            <Box
-              rounded="lg"
-              overflow="hidden"
-              borderWidth={3}
-              borderColor="brand.500"
-              bgColor="brand.500"
-              mb={4}
-            >
-              <Box py={1} px={4} mt={-1}>
-                <styled.h3 fontWeight="bold">Up Next</styled.h3>
-              </Box>
-
-              <EventCard event={track.events[0]} />
-            </Box>
-          )}
-
           <Box
-            rounded="lg"
+            rounded="xl"
             overflow="hidden"
             borderWidth={1}
             borderColor="gray.800"
@@ -228,6 +204,33 @@ const TrackPage = () => {
             </Box>
 
             <Flex flexDir="column" gap={2} p={4}>
+              {track.events.length > 0 && (
+                <Box
+                  rounded="2xl"
+                  overflow="hidden"
+                  p={1}
+                  bgColor="brand.500"
+                  pos="relative"
+                >
+                  <Box
+                    py={1}
+                    px={4}
+                    pos="absolute"
+                    top={1}
+                    right={1}
+                    zIndex={1}
+                    bgColor="inherit"
+                    borderBottomLeftRadius="2xl"
+                  >
+                    <styled.h3 fontWeight="bold" fontSize="xs">
+                      NEXT
+                    </styled.h3>
+                  </Box>
+
+                  <EventCard event={track.events[0]} />
+                </Box>
+              )}
+
               {track.events.length <= 0 && (
                 <styled.p>No events here yet...</styled.p>
               )}
