@@ -83,6 +83,7 @@ const TracksEditPage = () => {
         borderColor="gray.800"
         borderRadius="xl"
         maxW={600}
+        overflow="hidden"
       >
         <Box px={6} py={2} bgColor="gray.800">
           <styled.h1 fontWeight="bold" lineHeight={1.2}>

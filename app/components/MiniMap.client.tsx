@@ -16,7 +16,7 @@ export const MiniMap = ({ track }: Props) => {
     if (!mapContainer.current) return;
 
     mapboxgl.accessToken =
-      "pk.eyJ1IjoicmNkcmlmdHVrIiwiYSI6ImNtOXRoemVnaDBjMTYyaXNhaTJmMGJzdDgifQ.sIkAsgKgczVp8rhphOGAcA";
+      "pk.eyJ1IjoicmNkcmlmdHVrIiwiYSI6ImNtOXRuenU3bjAxMDEyc3NldWxuMGp0YmEifQ.krploudyX3_F8kmpsaFePw";
 
     // Initialize map
     map.current = new mapboxgl.Map({
