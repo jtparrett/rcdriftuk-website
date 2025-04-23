@@ -27,13 +27,14 @@ import { RiHome2Line } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
 import { AnnouncementBanner } from "./components/AnnouncementBanner";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   { rel: "stylesheet", href: styles },
   {
     rel: "stylesheet",
-    href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+    href: "https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css",
   },
 ];
 

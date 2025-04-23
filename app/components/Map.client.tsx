@@ -1,13 +1,10 @@
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { styled, Box, Flex } from "~/styled-system/jsx";
-import { useParams } from "@remix-run/react";
+import { useEffect, useRef } from "react";
+import mapboxgl from "mapbox-gl";
+import { Box } from "~/styled-system/jsx";
+import { useNavigate, useParams } from "@remix-run/react";
 import { getTabParam } from "~/utils/getTabParam";
-import { LinkButton } from "./Button";
-import L from "leaflet";
 import type { Tracks } from "@prisma/client";
 import { TrackTypes } from "@prisma/client";
-import { RiFacebookFill, RiLink } from "react-icons/ri";
-import { singular } from "pluralize";
 
 export type Values<T> = T[keyof T];
 
@@ -16,108 +13,79 @@ interface Props {
 }
 
 export const Map = ({ tracks }: Props) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
   const params = useParams();
   const tab = getTabParam(params.tab);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!mapContainer.current) return;
+
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoicmNkcmlmdHVrIiwiYSI6ImNtOXRoemVnaDBjMTYyaXNhaTJmMGJzdDgifQ.sIkAsgKgczVp8rhphOGAcA";
+
+    // Initialize map
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/dark-v11",
+      center: [-1, 52.3555],
+      zoom: 6,
+    });
+
+    // Add navigation controls
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    // Cleanup
+    return () => {
+      map.current?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!map.current) return;
+
+    // Clear existing markers
+    markers.current.forEach((marker) => marker.remove());
+    markers.current = [];
+
+    // Filter tracks based on tab
+    const filteredTracks = tracks.filter((item) => {
+      if (tab === TrackTypes.ALL) {
+        return true;
+      }
+      return item.types.includes(tab);
+    });
+
+    // Add markers for each track
+    filteredTracks.forEach((track) => {
+      // Create marker element
+      const el = document.createElement("div");
+      el.className = "marker";
+
+      const img = document.createElement("img");
+      img.src = track.image;
+
+      el.appendChild(img);
+
+      // Create and add marker
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([track.lng, track.lat])
+        .addTo(map.current!);
+
+      // Add click handler
+      el.addEventListener("click", () => {
+        navigate(`/tracks/${track.slug}`);
+      });
+
+      markers.current.push(marker);
+    });
+  }, [tracks, tab, navigate]);
 
   return (
     <Box h="100%" position="relative" overflow="hidden" zIndex={1}>
-      <Box h="100%" overflow="hidden">
-        <MapContainer
-          center={[54.5, -2]}
-          style={{ height: "100%" }}
-          zoom={6}
-          zoomControl
-          doubleClickZoom
-        >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-          {tracks
-            .filter((item) => {
-              if (tab === TrackTypes.ALL) {
-                return true;
-              }
-
-              return item.types.includes(tab);
-            })
-            .map((item) => {
-              const icon = L.icon({
-                iconUrl: item.image,
-                iconSize: [50, 50],
-                className: "marker",
-              });
-
-              return (
-                <Marker
-                  key={item.name}
-                  position={[item.lat, item.lng]}
-                  icon={icon}
-                >
-                  <Popup closeButton>
-                    <Box minWidth={280} p={4}>
-                      {item.image && (
-                        <Box
-                          w="140px"
-                          h="140px"
-                          mb={2}
-                          rounded="full"
-                          overflow="hidden"
-                          borderWidth={2}
-                          borderColor="gray.500"
-                        >
-                          <styled.img
-                            src={item.image}
-                            w="full"
-                            h="full"
-                            objectFit="cover"
-                          />
-                        </Box>
-                      )}
-                      <styled.h1 fontSize="md" fontWeight="bold" mb={2}>
-                        {item.name}
-                      </styled.h1>
-                      {item.description && (
-                        <styled.p
-                          mt="0 !important"
-                          mb={2}
-                          whiteSpace="pre-line !important"
-                          lineClamp={4}
-                          truncate="ellipsis"
-                          w="full"
-                          overflow="hidden"
-                        >
-                          {item.description}
-                        </styled.p>
-                      )}
-
-                      <Flex gap={1}>
-                        <LinkButton
-                          to={`/tracks/${item.slug}`}
-                          flex={1}
-                          textTransform="capitalize"
-                        >
-                          {singular(item.types[0] ?? "").toLowerCase()} Info
-                        </LinkButton>
-
-                        <LinkButton
-                          to={item.url}
-                          variant="outline"
-                          target="_blank"
-                          size="sm"
-                        >
-                          {item.url.includes("facebook") ? (
-                            <RiFacebookFill />
-                          ) : (
-                            <RiLink />
-                          )}
-                        </LinkButton>
-                      </Flex>
-                    </Box>
-                  </Popup>
-                </Marker>
-              );
-            })}
-        </MapContainer>
-      </Box>
+      <Box ref={mapContainer} h="100%" overflow="hidden" />
     </Box>
   );
 };

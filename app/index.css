@@ -1,7 +1,11 @@
 @layer reset, base, tokens, recipes, utilities;
 
-.leaflet-popup-content {
-  margin: 0 !important;
+.mapboxgl-ctrl-bottom-left {
+  display: none !important;
+}
+
+.mapboxgl-ctrl-bottom-right {
+  display: none !important;
 }
 
 .marker {
@@ -10,15 +14,15 @@
   border: 2px solid black;
   box-shadow: 0px 5px 5px rgba(12, 12, 12, 0.4);
   background-color: black;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
 }
 
-.leaflet-popup-content-wrapper, .leaflet-popup-tip {
-  background: #0c0c0c !important;
-  color: white !important;
-}
-
-.leaflet-marker-icon {
-  object-fit: cover !important;
+.marker img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .month:hover .dot {

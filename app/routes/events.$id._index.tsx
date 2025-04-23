@@ -319,7 +319,10 @@ const Page = () => {
 
               {event.link && (
                 <LinkButton to={event.link} target="_blank" variant="outline">
-                  More Info <RiExternalLinkLine />
+                  {event.link.includes("/tournaments")
+                    ? "View Results"
+                    : "More Info"}
+                  <RiExternalLinkLine />
                 </LinkButton>
               )}
 
