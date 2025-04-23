@@ -102,9 +102,9 @@ export function ErrorBoundary() {
       <body>
         <Center
           h="100vh"
-          bgImage="url(/grid-bg.svg)"
+          bgImage="url(/dot-bg.svg)"
           bgRepeat="repeat"
-          bgSize="30px"
+          bgSize="16px"
           bgPosition="center"
           borderBottomWidth={1}
           borderColor="gray.800"

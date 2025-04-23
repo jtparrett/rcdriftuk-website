@@ -2,13 +2,16 @@ import { TrackStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
-import { RiArrowRightLine, RiMapPin2Fill, RiRocket2Line } from "react-icons/ri";
+import {
+  RiCalendarLine,
+  RiListOrdered2,
+  RiMapPin2Fill,
+  RiRocket2Line,
+} from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
-import { Glow } from "~/components/Glow";
 import { ImageContainer } from "~/components/ImageContainer";
-import { LinkOverlay } from "~/components/LinkOverlay";
-import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
@@ -70,9 +73,9 @@ const Page = () => {
   return (
     <>
       <Box
-        bgImage="url(/grid-bg.svg)"
+        bgImage="url(/dot-bg.svg)"
         bgRepeat="repeat"
-        bgSize="30px"
+        bgSize="16px"
         bgPosition="center"
         pos="relative"
         zIndex={1}
@@ -88,32 +91,32 @@ const Page = () => {
           zIndex: -1,
         }}
       >
-        <Container maxW={680} textAlign="center" py={100} px={2}>
-          <styled.img
-            src="/flag.svg"
-            w={{ base: "84px", md: "120px" }}
-            mx="auto"
-            mb={4}
-            display="block"
-          />
+        <Container textAlign="center" maxW={1100} py={100} px={6}>
           <styled.h1
-            fontWeight="extrabold"
-            textTransform="uppercase"
+            fontWeight="semibold"
             fontSize={{ base: "5xl", md: "6xl" }}
-            lineHeight={1}
+            lineHeight={1.1}
             textWrap="balance"
+            maxW={600}
+            mx="auto"
+            bgClip="text"
+            bgGradient="to-b"
+            gradientFrom="white"
+            gradientTo="gray.300"
+            color="transparent"
           >
-            Connect with the RC Drift Scene
+            The platform for RC Drifting.
           </styled.h1>
           <styled.p
-            textWrap="balance"
             color="gray.400"
             pt={2}
             pb={8}
             fontSize="lg"
+            maxW={400}
+            mx="auto"
           >
-            Everything RC Drift from across the UK. Tracks, Clubs, Shops, Driver
-            Ratings and more.
+            We provide the tools to help drivers, tracks and shops get the most
+            out of RC Drifting.
           </styled.p>
 
           <Flex
@@ -130,64 +133,15 @@ const Page = () => {
           </Flex>
         </Container>
 
-        <Container maxW={1100} px={2} mb={4}>
-          <Box
-            p={1}
-            bgColor="rgba(255, 255, 255, 0.1)"
-            rounded="xl"
-            pos="relative"
-            overflow="hidden"
-          >
-            <Glow />
-            <Box
-              bgColor="gray.950"
-              rounded="lg"
-              borderWidth={1}
-              borderColor="gray.700"
-              overflow="hidden"
-            >
-              <LinkOverlay to="/2025" />
-              <Flex
-                bgGradient="to-tr"
-                gradientFrom="brand.950"
-                gradientVia="transparent"
-                gradientTo="transparent"
-                px={5}
-                py={3}
-                alignItems="center"
-                gap={4}
-              >
-                <styled.img src="/2025/2025-logo.png" w="60px" />
-                <Box>
-                  <styled.h2
-                    lineHeight={1.2}
-                    textTransform="uppercase"
-                    fontWeight="extrabold"
-                    fontSize={{ base: "xl", md: "2xl" }}
-                  >
-                    RC Drift.uk 2025
-                  </styled.h2>
-                  <styled.p fontSize="sm">
-                    The UK's biggest RC Drift series, learn more.
-                  </styled.p>
-                </Box>
-
-                <Spacer />
-
-                <styled.span fontSize="2xl">
-                  <RiArrowRightLine />
-                </styled.span>
-              </Flex>
-            </Box>
-          </Box>
-        </Container>
-
         <Container maxW={1100} px={2}>
           <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
             <Card flex={1}>
-              <styled.h1 fontWeight="bold" fontSize="lg" mb={2}>
-                Today
-              </styled.h1>
+              <Flex align="center" gap={2} mb={2}>
+                <RiCalendarLine />
+                <styled.h1 fontWeight="bold" fontSize="lg">
+                  Today's Events
+                </styled.h1>
+              </Flex>
 
               <Flex gap={2} flexDir="column">
                 {events.length <= 0 && (
@@ -205,9 +159,12 @@ const Page = () => {
             </Card>
 
             <Card flex={1}>
-              <styled.h1 fontWeight="bold" fontSize="lg" mb={2}>
-                Top Driver Ratings
-              </styled.h1>
+              <Flex align="center" gap={2} mb={2}>
+                <RiListOrdered2 />
+                <styled.h1 fontWeight="bold" fontSize="lg">
+                  Top Driver Ratings
+                </styled.h1>
+              </Flex>
 
               <styled.table w="full">
                 <styled.tbody>

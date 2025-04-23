@@ -55,14 +55,8 @@ const MenuIcon = styled("span", {
 const MenuLink = styled(Link, {
   base: {
     rounded: "lg",
-    py: {
-      base: 1,
-      md: 2,
-    },
-    pl: {
-      base: 1,
-      md: 2,
-    },
+    py: 2,
+    pl: 2,
     display: "flex",
     gap: 3,
     alignItems: "center",

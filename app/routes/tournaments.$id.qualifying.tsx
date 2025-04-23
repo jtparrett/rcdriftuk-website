@@ -126,7 +126,9 @@ const Table = ({
         mb={{ base: startPosition <= 0 ? "-32px" : 0, md: 0 }}
       >
         <styled.thead
-          bgColor="brand.500"
+          bgGradient="to-b"
+          gradientFrom="brand.500"
+          gradientTo="brand.700"
           visibility={{
             base: startPosition <= 0 ? "visible" : "hidden",
             md: "visible",
@@ -151,7 +153,7 @@ const Table = ({
                   !tournament.fullInclusion && (
                     <styled.tr>
                       <styled.td colSpan={7}>
-                        <Box w="full" h="1px" bgColor="brand.500" />
+                        <Box w="full" h="1px" bgColor="brand.700" />
                       </styled.td>
                     </styled.tr>
                   )}

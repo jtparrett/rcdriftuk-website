@@ -380,9 +380,9 @@ const JudgePage = () => {
       </Box>
       <Center
         minH="60dvh"
-        bgImage="url(/grid-bg.svg)"
+        bgImage="url(/dot-bg.svg)"
         bgRepeat="repeat"
-        bgSize="30px"
+        bgSize="16px"
         bgPosition="center"
         pos="relative"
         zIndex={1}
