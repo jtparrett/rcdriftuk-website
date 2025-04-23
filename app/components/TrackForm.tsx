@@ -19,6 +19,11 @@ export const TrackForm = ({ track }: Props) => {
       </Box>
 
       <Box>
+        <Label>Track Cover</Label>
+        <ImageInput name="cover" />
+      </Box>
+
+      <Box>
         <Label>Name</Label>
         <Input name="name" defaultValue={track?.name} required />
       </Box>

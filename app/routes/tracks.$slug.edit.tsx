@@ -42,6 +42,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const data = z
     .object({
       image: z.instanceof(File).optional(),
+      cover: z.instanceof(File).optional(),
       name: z.string().optional(),
       description: z.string().optional(),
       url: z.string().optional(),
@@ -52,11 +53,16 @@ export const action = async (args: ActionFunctionArgs) => {
     })
     .parse(Object.fromEntries(formData.entries()));
 
-  const { image, ...update } = data;
+  const { image, cover, ...update } = data;
   let imageUrl = null;
+  let coverUrl = null;
 
   if (image && image.size > 0) {
     imageUrl = await uploadFile(image);
+  }
+
+  if (cover && cover.size > 0) {
+    coverUrl = await uploadFile(cover);
   }
 
   await prisma.tracks.update({
@@ -66,6 +72,7 @@ export const action = async (args: ActionFunctionArgs) => {
     data: {
       ...update,
       ...(imageUrl && { image: imageUrl }),
+      ...(coverUrl && { cover: coverUrl }),
     },
   });
 

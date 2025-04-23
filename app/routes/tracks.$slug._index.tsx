@@ -9,9 +9,7 @@ import {
 } from "react-icons/ri";
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
-import { ClientOnly } from "~/components/ClientOnly";
 import { EventCard } from "~/components/EventCard";
-import { MiniMap } from "~/components/MiniMap.client";
 import { styled, Box, Flex, Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
@@ -99,17 +97,22 @@ const TrackPage = () => {
             rounded="xl"
             overflow="hidden"
           >
-            <Box
-              h={200}
-              mb={-100}
-              pos="relative"
-              zIndex={-1}
-              pointerEvents="none"
-            >
-              <ClientOnly>
-                <MiniMap track={track} />
-              </ClientOnly>
-            </Box>
+            {track.cover && (
+              <Box
+                h={200}
+                mb="-84px"
+                pos="relative"
+                zIndex={-1}
+                pointerEvents="none"
+              >
+                <styled.img
+                  src={track.cover}
+                  w="full"
+                  h="full"
+                  objectFit="cover"
+                />
+              </Box>
+            )}
 
             <Box
               w={40}
@@ -120,6 +123,7 @@ const TrackPage = () => {
               borderWidth={2}
               borderColor="gray.500"
               mb={2}
+              mt={track.cover ? 0 : 4}
             >
               <styled.img
                 src={track.image}

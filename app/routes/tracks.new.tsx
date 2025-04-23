@@ -45,6 +45,7 @@ export const action = async (args: ActionFunctionArgs) => {
       image: z.instanceof(File).refine((file) => file.size > 0, {
         message: "Image is required",
       }),
+      cover: z.instanceof(File).optional(),
       lat: z.number(),
       lng: z.number(),
       address: z.string(),
@@ -60,6 +61,11 @@ export const action = async (args: ActionFunctionArgs) => {
     });
 
   const imageUrl = await uploadFile(data.image);
+  let coverUrl = null;
+
+  if (data.cover && data.cover.size > 0) {
+    coverUrl = await uploadFile(data.cover);
+  }
 
   const track = await prisma.tracks.create({
     data: {
@@ -69,6 +75,7 @@ export const action = async (args: ActionFunctionArgs) => {
         strict: true,
       }),
       image: imageUrl,
+      cover: coverUrl,
       Owners: {
         create: {
           userId,

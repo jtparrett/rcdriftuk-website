@@ -81,6 +81,34 @@ export const Map = ({ tracks }: Props) => {
 
       markers.current.push(marker);
     });
+
+    // Extra markers
+    [
+      {
+        lat: 35.107552,
+        lng: 144.032135,
+        image: "/zerofeel-source.png",
+        href: "https://zerofeel.co.uk",
+      },
+    ].forEach((data) => {
+      // Create marker element
+      const el = document.createElement("div");
+      el.className = "marker marker--large";
+
+      const img = document.createElement("img");
+      img.src = data.image;
+      el.appendChild(img);
+
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([data.lng, data.lat])
+        .addTo(map.current!);
+
+      el.addEventListener("click", () => {
+        window.open(data.href, "_blank");
+      });
+
+      markers.current.push(marker);
+    });
   }, [tracks, tab, navigate]);
 
   return (

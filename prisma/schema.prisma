@@ -158,6 +158,7 @@ model Tracks {
   name        String
   description String?
   image       String
+  cover       String?
   lat         Float
   lng         Float
   types       TrackTypes[]
