@@ -114,6 +114,7 @@ const Page = () => {
             fontSize="lg"
             maxW={400}
             mx="auto"
+            textWrap="balance"
           >
             We provide the tools to help drivers, tracks and shops get the most
             out of RC Drifting.

@@ -5,7 +5,7 @@ import { capitalCase } from "change-case";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
-import { Box, Center, Flex, styled } from "~/styled-system/jsx";
+import { AspectRatio, Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
@@ -27,6 +27,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 include: {
                   user: {
                     select: {
+                      image: true,
                       firstName: true,
                       lastName: true,
                     },
@@ -39,6 +40,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
             include: {
               user: {
                 select: {
+                  image: true,
                   firstName: true,
                   lastName: true,
                 },
@@ -49,6 +51,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
             include: {
               user: {
                 select: {
+                  image: true,
                   firstName: true,
                   lastName: true,
                 },
@@ -65,6 +68,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 include: {
                   user: {
                     select: {
+                      image: true,
                       firstName: true,
                       lastName: true,
                     },
@@ -77,6 +81,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
             include: {
               user: {
                 select: {
+                  image: true,
                   firstName: true,
                   lastName: true,
                 },
@@ -222,14 +227,21 @@ const TournamentsOverviewPage = () => {
 
             {tournament?.state === TournamentsState.BATTLES &&
               tournament.nextBattle && (
-                <Flex maxW={700}>
+                <Flex w={700} maxW="full">
                   <Box
                     flex={1}
                     borderRightWidth={1}
                     borderColor="brand.500"
                     overflow="hidden"
                   >
-                    <styled.img src="/blank-driver-left.jpg" w="full" />
+                    <AspectRatio ratio={0.75} w="full">
+                      <styled.img
+                        src={
+                          tournament.nextBattle.driverLeft?.user.image ??
+                          "/blank-driver-left.jpg"
+                        }
+                      />
+                    </AspectRatio>
                     <styled.p
                       w="full"
                       textOverflow="ellipsis"
@@ -243,7 +255,7 @@ const TournamentsOverviewPage = () => {
                       {tournament.nextBattle.driverLeft?.user.lastName}
                     </styled.p>
                   </Box>
-                  <Box flex={1.3} py={{ base: 8, md: 12 }}>
+                  <Box flex={1.2} py={{ base: 8, md: 12 }}>
                     {battleJudgingComplete && (
                       <>
                         {tournament.nextBattle.BattleVotes.map((vote, i) => {
@@ -303,7 +315,14 @@ const TournamentsOverviewPage = () => {
                     borderColor="brand.500"
                     overflow="hidden"
                   >
-                    <styled.img src="/blank-driver-right.jpg" w="full" />
+                    <AspectRatio ratio={0.75} w="full">
+                      <styled.img
+                        src={
+                          tournament.nextBattle.driverRight?.user.image ??
+                          "/blank-driver-right.jpg"
+                        }
+                      />
+                    </AspectRatio>
                     <styled.p
                       w="full"
                       textOverflow="ellipsis"
