@@ -99,19 +99,24 @@ const TrackPage = () => {
             rounded="xl"
             overflow="hidden"
           >
-            {track.cover && (
-              <Box pos="relative" mb={-16} zIndex={-1}>
-                <styled.img src={track.cover} w="full" objectFit="cover" />
-                <Box
-                  pos="absolute"
-                  inset={0}
-                  bgGradient="to-b"
-                  gradientTo="black"
-                  gradientFrom="transparent"
-                  zIndex={1}
-                />
-              </Box>
-            )}
+            <Box
+              pos="relative"
+              mb={-16}
+              zIndex={-1}
+              bgColor="gray.900"
+              minH="100px"
+            >
+              {track.cover && <styled.img src={track.cover} w="full" />}
+              <Box
+                pos="absolute"
+                inset={0}
+                bgGradient="to-b"
+                gradientTo="black"
+                gradientFrom="transparent"
+                zIndex={1}
+              />
+            </Box>
+
             <Box textAlign="center" p={4} pt={track.cover ? 0 : 4}>
               <Box
                 w={32}
@@ -147,7 +152,7 @@ const TrackPage = () => {
             </Box>
 
             {track.description && (
-              <Box p={4} bgColor="gray.800" rounded="lg" mx={4}>
+              <Box p={4} bgColor="gray.900" rounded="lg" mx={4}>
                 <styled.p
                   color="gray.500"
                   fontSize="sm"

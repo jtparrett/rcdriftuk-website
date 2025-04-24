@@ -159,7 +159,12 @@ const Page = () => {
               </Flex>
             </Card>
 
-            <Card flex={1}>
+            <Card
+              flex={1}
+              bgGradient="to-b"
+              gradientFrom="gray.900"
+              gradientTo="black"
+            >
               <Flex align="center" gap={2} mb={2}>
                 <RiListOrdered2 />
                 <styled.h1 fontWeight="bold" fontSize="lg">
