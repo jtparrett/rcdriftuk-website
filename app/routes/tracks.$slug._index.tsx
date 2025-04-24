@@ -2,6 +2,7 @@ import { TrackTypes } from "@prisma/client";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfDay } from "date-fns";
+import pluralize from "pluralize";
 import {
   RiAddCircleFill,
   RiEditCircleFill,
@@ -144,6 +145,11 @@ const TrackPage = () => {
               >
                 {track.name}
               </styled.h1>
+
+              <styled.span fontSize="sm" fontWeight="medium">
+                {track.types.map(pluralize.singular).join(" | ")}
+              </styled.span>
+
               {track.address && (
                 <styled.p fontSize="sm" color="gray.500" mt={1}>
                   {track.address}
