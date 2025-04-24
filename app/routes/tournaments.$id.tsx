@@ -36,6 +36,7 @@ import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
+import { RiFlagLine, RiRemoteControlLine } from "react-icons/ri";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -287,7 +288,7 @@ const TournamentPage = () => {
                         w={{ base: "full", sm: "auto" }}
                         disabled={isLoading}
                       >
-                        Start Next Run
+                        Start Next Run <RiFlagLine />
                       </Button>
                     </Form>
                   )}
@@ -316,14 +317,17 @@ const TournamentPage = () => {
                         w={{ base: "full", sm: "auto" }}
                         disabled={isLoading}
                       >
-                        Start Next Battle
+                        Start Next Battle <RiFlagLine />
                       </Button>
                     </Form>
                   )}
 
                 {tournamentJudge && (
-                  <LinkButton to={`/judge/${tournamentJudge.id}`}>
-                    Open Judging
+                  <LinkButton
+                    to={`/judge/${tournamentJudge.id}`}
+                    variant="outline"
+                  >
+                    Open Judges Remote <RiRemoteControlLine />
                   </LinkButton>
                 )}
               </Flex>

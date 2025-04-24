@@ -15,18 +15,18 @@ export const Footer = () => {
       </styled.p>
       <Flex gap={2} justifyContent="center">
         <LinkButton
-          variant="secondary"
+          variant="ghost"
           size="xs"
           target="_blank"
           to="https://rcdrift.uk/privacy-policy.html"
         >
           Privacy Policy
         </LinkButton>
-        <LinkButton variant="secondary" size="xs" to="/privacy-cookie-policy">
+        <LinkButton variant="ghost" size="xs" to="/privacy-cookie-policy">
           Cookie Policy
         </LinkButton>
-        <LinkButton variant="secondary" to="mailto:info@rcdrift.uk" size="xs">
-          Contact
+        <LinkButton variant="ghost" to="mailto:info@rcdrift.uk" size="xs">
+          Contact Us
         </LinkButton>
       </Flex>
     </Box>

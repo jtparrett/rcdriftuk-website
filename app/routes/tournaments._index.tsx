@@ -7,6 +7,7 @@ import { LinkButton } from "~/components/Button";
 import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { LinkOverlay } from "~/components/LinkOverlay";
+import { sentenceCase } from "change-case";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -83,27 +84,31 @@ const Page = () => {
         {tournaments.map((tournament) => (
           <Box
             key={tournament.id}
-            p={1}
+            p={4}
             rounded="xl"
             borderWidth="1px"
-            borderColor="gray.700"
+            borderColor="gray.800"
             pos="relative"
             overflow="hidden"
+            bgGradient="to-b"
+            gradientFrom="gray.900"
+            gradientTo="black"
           >
-            <LinkOverlay to={`/tournaments/${tournament.id}/overview`} />
-            <Flex p={4} rounded="lg" borderWidth="1px" borderColor="gray.800">
+            <Flex>
               <Box>
-                <styled.span fontWeight="bold" fontSize="lg">
-                  {tournament.name}
-                </styled.span>
+                <LinkOverlay to={`/tournaments/${tournament.id}/overview`}>
+                  <styled.span fontWeight="bold" fontSize="lg">
+                    {tournament.name}
+                  </styled.span>
+                </LinkOverlay>
 
                 <styled.p fontSize="sm" color="gray.500">
                   {format(new Date(tournament.createdAt), "MMM d, yyyy")}
                 </styled.p>
               </Box>
               <Spacer />
-              <styled.span fontSize="sm" color="gray.700">
-                {tournament.state}
+              <styled.span fontSize="sm" color="gray.500">
+                {sentenceCase(tournament.state.toLocaleLowerCase())}
               </styled.span>
             </Flex>
           </Box>
