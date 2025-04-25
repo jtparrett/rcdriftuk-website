@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Regions {
+  EU
+  NA
+  APAC
+  LATAM
+  MEA
+}
+
 model Events {
   cover             String?
   name              String
@@ -80,6 +88,7 @@ model Tournaments {
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?  @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
   fullInclusion       Boolean             @default(false)
+  region              Regions             @default(EU)
 }
 
 model TournamentDrivers {
@@ -126,19 +135,25 @@ model LapScores {
 }
 
 model TournamentBattles {
-  id            Int                     @id @default(autoincrement())
-  createdAt     DateTime                @default(now())
-  tournamentId  String                  @db.Uuid
-  tournament    Tournaments             @relation(fields: [tournamentId], references: [id])
+  id            Int      @id @default(autoincrement())
+  round         Int      @default(0)
+  createdAt     DateTime @default(now())
+  tournamentId  String   @db.Uuid
   driverLeftId  Int?
-  driverLeft    TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
   driverRightId Int?
-  driverRight   TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
   winnerId      Int?
-  isNextBattle  Tournaments?            @relation("tournamentNextBattle")
-  bracket       BattlesBracket          @default(UPPER)
-  round         Int                     @default(0)
-  BattleVotes   TournamentBattleVotes[]
+
+  winnerElo         Int?
+  loserElo          Int?
+  winnerRegionalElo Int?
+  loserRegionalElo  Int?
+
+  tournament   Tournaments             @relation(fields: [tournamentId], references: [id])
+  driverLeft   TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
+  driverRight  TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
+  isNextBattle Tournaments?            @relation("tournamentNextBattle")
+  bracket      BattlesBracket          @default(UPPER)
+  BattleVotes  TournamentBattleVotes[]
 }
 
 model TournamentBattleVotes {

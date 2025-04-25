@@ -10,7 +10,7 @@
     "start": "remix-serve ./build/index.js",
     "lint": "tsc",
     "prepare": "panda codegen",
-    "this-week": "tsx ./scripts/this-week-summary.ts"
+    "compute-ratings": "tsx ./scripts/compute-ratings.ts"
   },
   "dependencies": {
     "@clerk/remix": "^4.4.17",
@@ -27,6 +27,7 @@
     "ably": "^2.6.2",
     "calendar-link": "^2.8.0",
     "change-case": "^5.4.4",
+    "cli-color": "^2.0.4",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "formik": "^2.4.6",
@@ -53,6 +54,7 @@
     "@pandacss/dev": "^0.51.1",
     "@remix-run/dev": "^2.15.2",
     "@remix-run/eslint-config": "^2.15.2",
+    "@types/cli-color": "^2.0.6",
     "@types/number-to-words": "^1.2.3",
     "@types/pluralize": "^0.0.33",
     "@types/qrcode": "^1.5.5",
