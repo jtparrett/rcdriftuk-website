@@ -1,3 +1,4 @@
+import { Regions } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfYear } from "date-fns";
@@ -23,7 +24,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const driverRatings = await getDriverRatings();
+  const driverRatings = await getDriverRatings(Regions.ALL);
   const startOfSeason = startOfYear(new Date());
 
   const qualifiedDrivers = await prisma.users.findMany({
@@ -61,7 +62,7 @@ export const loader = async () => {
       return {
         ...driver,
         position: i + 1,
-        rank: getDriverRank(driver.currentElo, driver.history.length),
+        rank: getDriverRank(driver.elo, driver.totalBattles),
       };
     })
     .filter((a) => {
@@ -121,7 +122,7 @@ const StandingsPage = () => {
                     </Flex>
                   </styled.td>
                   <styled.td textAlign="right" fontFamily="mono">
-                    {driver.currentElo.toFixed(3)}
+                    {driver.elo.toFixed(3)}
                   </styled.td>
                   <styled.td textAlign="right">
                     <styled.img

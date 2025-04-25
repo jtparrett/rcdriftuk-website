@@ -11,6 +11,7 @@ import { getDriverRatings } from "~/utils/getDriverRatings";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
+import { Regions } from "@prisma/client";
 
 export const meta: MetaFunction = () => {
   return [
@@ -26,7 +27,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const drivers = await getDriverRatings();
+  const drivers = await getDriverRatings(Regions.ALL);
   return drivers;
 };
 
@@ -40,7 +41,7 @@ const Row = ({
   rank: number;
 }) => {
   const rankTitle = driver
-    ? getDriverRank(driver.currentElo, driver.history.length)
+    ? getDriverRank(driver.elo, driver.totalBattles)
     : RANKS.UNRANKED;
 
   const [bg, hover] = getRankColor(rankTitle);
@@ -147,7 +148,7 @@ const Row = ({
             fontFamily="mono"
             fontSize={{ base: "sm", md: "md" }}
           >
-            {driver.currentElo.toFixed(3)}
+            {driver.elo.toFixed(3)}
           </styled.span>
           <styled.span flex="none" textAlign="right">
             <styled.img

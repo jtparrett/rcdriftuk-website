@@ -8,6 +8,7 @@ datasource db {
 }
 
 enum Regions {
+  ALL
   EU
   NA
   APAC
@@ -89,6 +90,7 @@ model Tournaments {
   nextBattle          TournamentBattles?  @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
   fullInclusion       Boolean             @default(false)
   region              Regions             @default(EU)
+  rated               Boolean             @default(false)
 }
 
 model TournamentDrivers {
@@ -143,10 +145,10 @@ model TournamentBattles {
   driverRightId Int?
   winnerId      Int?
 
-  winnerElo         Int?
-  loserElo          Int?
-  winnerRegionalElo Int?
-  loserRegionalElo  Int?
+  winnerElo         Float?
+  loserElo          Float?
+  winnerRegionalElo Float?
+  loserRegionalElo  Float?
 
   tournament   Tournaments             @relation(fields: [tournamentId], references: [id])
   driverLeft   TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
@@ -231,6 +233,7 @@ model Users {
   TournamentDrivers TournamentDrivers[]
   EventTickets      EventTickets[]
   Tracks            TrackOwners[]
+  elo               Float                 @default(1000)
 }
 
 model Products {

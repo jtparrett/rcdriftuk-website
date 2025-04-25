@@ -28,8 +28,8 @@ import {
   RiArrowLeftLine,
 } from "react-icons/ri";
 import { Button, LinkButton } from "~/components/Button";
-import { getDriverAchievements } from "~/utils/getDriverAchievements";
 import type { Values } from "~/utils/values";
+import { Regions } from "@prisma/client";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);
@@ -40,7 +40,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  const ratings = await getDriverRatings();
+  const ratings = await getDriverRatings(Regions.ALL);
   const driverRatings = ratings.find((r) => r.driverId === driver.driverId);
 
   return {
@@ -68,13 +68,12 @@ const TABS = {
 const Page = () => {
   const { driver, driverRatings } = useLoaderData<typeof loader>();
   const rank = driverRatings
-    ? getDriverRank(driverRatings.currentElo, driverRatings.history.length)
+    ? getDriverRank(driverRatings.elo, driverRatings.totalBattles)
     : RANKS.UNRANKED;
 
   const [tab, setTab] = useState<Values<typeof TABS>>(TABS.battleHistory);
 
   const [expandedBattles, setExpandedBattles] = useState<string[]>([]);
-  const achievements = getDriverAchievements(driverRatings);
 
   const toggleBattle = (battleId: string) => {
     setExpandedBattles((prev) =>
@@ -133,7 +132,7 @@ const Page = () => {
                 />
               </Box>
               <styled.span fontSize="lg" fontWeight="bold">
-                {driverRatings.currentElo.toFixed(3)}
+                {driverRatings.elo.toFixed(3)}
               </styled.span>
             </Flex>
           )}
@@ -185,37 +184,7 @@ const Page = () => {
           >
             Rating History
           </Button>
-          <Button
-            flex={1}
-            onClick={() => setTab(TABS.achievements)}
-            variant={tab === TABS.achievements ? "secondary" : "ghost"}
-            px={0}
-          >
-            Achievements
-          </Button>
         </Flex>
-
-        {tab === TABS.achievements && (
-          <Box p={1} rounded="2xl" bg="gray.900" mb={8}>
-            <Box p={6} borderRadius="xl" borderWidth={1} borderColor="gray.800">
-              <styled.h2 fontSize="xl" fontWeight="bold" mb={2}>
-                Achievements
-              </styled.h2>
-
-              {achievements.length <= 0 && (
-                <styled.p color="gray.400">No achievements yet...</styled.p>
-              )}
-
-              {achievements.map((achievement) => (
-                <styled.img
-                  key={achievement}
-                  src={`/badges/${achievement}`}
-                  w={32}
-                />
-              ))}
-            </Box>
-          </Box>
-        )}
 
         {tab === TABS.ratingHistory &&
           driverRatings &&
