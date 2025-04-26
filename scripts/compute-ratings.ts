@@ -58,7 +58,6 @@ const run = async () => {
   console.log(clc.blue(`Found ${battles.length} battles to process`));
 
   const driverElos: Record<number, number> = {};
-  const driverTotalBattles: Record<number, number> = {};
 
   // Process each battle in chronological order
   for (const [index, battle] of battles.entries()) {
@@ -104,28 +103,12 @@ const run = async () => {
       loserId === 0 ? 1000 : driverElos?.[loserId] ?? 1000);
 
     // Count previous battles for K-factor calculation
-    const winnerTotalBattles = Math.max(
-      [...battles].slice(0, index).filter((b) => {
-        return (
-          b.driverLeft?.driverId === winnerId ||
-          b.driverRight?.driverId === winnerId
-        );
-      }).length,
-      0
-    );
-
-    const loserTotalBattles = Math.max(
-      [...battles].slice(0, index).filter((b) => {
-        return (
-          b.driverLeft?.driverId === loserId ||
-          b.driverRight?.driverId === loserId
-        );
-      }).length,
-      0
-    );
-
-    driverTotalBattles[winnerId] = winnerTotalBattles;
-    driverTotalBattles[loserId] = loserTotalBattles;
+    const winnerTotalBattles = [...battles].slice(0, index).filter((b) => {
+      return (
+        b.driverLeft?.driverId === winnerId ||
+        b.driverRight?.driverId === winnerId
+      );
+    }).length;
 
     // Calculate K-factor
     let winnersK = winnerTotalBattles >= 5 ? 32 : 64;
@@ -184,11 +167,18 @@ const run = async () => {
   console.log(clc.blue("\nUpdating user ELO scores..."));
 
   for (const [driverId, elo] of Object.entries(driverElos)) {
+    const totalBattles = [...battles].filter((b) => {
+      return (
+        b.driverLeft?.driverId === parseInt(driverId) ||
+        b.driverRight?.driverId === parseInt(driverId)
+      );
+    }).length;
+
     await prisma.users.update({
       where: { driverId: parseInt(driverId) },
       data: {
         elo,
-        totalBattles: driverTotalBattles[parseInt(driverId)],
+        totalBattles,
       },
     });
     console.log(
