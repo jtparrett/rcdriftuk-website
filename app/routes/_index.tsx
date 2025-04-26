@@ -180,7 +180,9 @@ const Page = () => {
                         {i + 1}
                       </styled.td>
                       <styled.td px={1}>
-                        {driver.firstName} {driver.lastName}
+                        <Link to={`/ratings/${driver.driverId}`}>
+                          {driver.firstName} {driver.lastName}
+                        </Link>
                       </styled.td>
                       <styled.td textAlign="right" fontFamily="mono">
                         {driver.elo.toFixed(3)}

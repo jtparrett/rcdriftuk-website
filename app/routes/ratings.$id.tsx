@@ -16,6 +16,7 @@ import {
   VStack,
   Flex,
   Spacer,
+  Grid,
 } from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { prisma } from "~/utils/prisma.server";
@@ -28,6 +29,7 @@ import {
 import { Button, LinkButton } from "~/components/Button";
 import type { Values } from "~/utils/values";
 import { format } from "date-fns";
+import { Regions } from "@prisma/client";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);
@@ -161,7 +163,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 const TABS = {
   battleHistory: "Battle History",
   ratingHistory: "Rating History",
-  achievements: "Achievements",
+  regionalRatings: "Regional Ratings",
 };
 
 const Page = () => {
@@ -246,7 +248,7 @@ const Page = () => {
         </Flex>
 
         <Flex textAlign="center" alignItems="center" flexDir="column" pb={12}>
-          <Box p={2} rounded="full" bg="rgba(255, 255, 255, 0.1)">
+          <Box p={2} rounded="full" bg="rgba(255, 255, 255, 0.1)" mb={4}>
             <Box
               rounded="full"
               overflow="hidden"
@@ -267,14 +269,25 @@ const Page = () => {
             </Box>
           </Box>
 
-          <styled.h1 fontSize="4xl" fontWeight="bold">
+          <styled.span
+            borderWidth={1}
+            borderColor="gray.800"
+            px={2}
+            py={1}
+            rounded="full"
+            fontSize="xs"
+            color="gray.400"
+          >
+            #{driver.driverId}
+          </styled.span>
+          <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1}>
             {driver.firstName} {driver.lastName}
           </styled.h1>
 
-          {driver.team && <styled.p color="gray.300">{driver.team}</styled.p>}
+          {driver.team && <styled.p color="gray.400">{driver.team}</styled.p>}
         </Flex>
 
-        <Flex gap={0.5} pb={2} alignItems="center" mx={1}>
+        <Flex gap={0.5} pb={4} alignItems="center" mx={1}>
           <Button
             flex={1}
             onClick={() => setTab(TABS.battleHistory)}
@@ -291,87 +304,94 @@ const Page = () => {
           >
             Rating History
           </Button>
+          <Button
+            flex={1}
+            onClick={() => setTab(TABS.regionalRatings)}
+            variant={tab === TABS.regionalRatings ? "secondary" : "ghost"}
+            px={0}
+          >
+            Regional Ratings
+          </Button>
         </Flex>
 
         {tab === TABS.ratingHistory &&
           driver &&
           driver.TournamentDrivers.length > 0 && (
-            <Box p={1} rounded="2xl" bg="gray.900" mb={8}>
-              <Box
-                p={6}
-                borderRadius="xl"
-                borderWidth={1}
-                borderColor="gray.800"
-              >
-                <styled.h2 fontSize="xl" fontWeight="bold" mb={4}>
-                  Rating History
-                </styled.h2>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart
-                    data={[
-                      { elo: 1000 },
-                      ...battles.map((battle) => {
-                        const isLeftDriver =
-                          battle.driverLeft?.driverId === driver.driverId;
-                        const isWinner = isLeftDriver
-                          ? battle.winnerId === battle.driverLeft?.id
-                          : battle.winnerId === battle.driverRight?.id;
+            <Box
+              px={6}
+              pt={10}
+              borderRadius="xl"
+              borderWidth={1}
+              borderColor="gray.800"
+              bgGradient="to-b"
+              gradientFrom="gray.900"
+              gradientTo="black"
+            >
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart
+                  data={[
+                    { elo: 1000 },
+                    ...battles.map((battle) => {
+                      const isLeftDriver =
+                        battle.driverLeft?.driverId === driver.driverId;
+                      const isWinner = isLeftDriver
+                        ? battle.winnerId === battle.driverLeft?.id
+                        : battle.winnerId === battle.driverRight?.id;
 
-                        return {
-                          date: format(battle.tournament.createdAt, "MMM, yy"),
-                          elo: isWinner ? battle.winnerElo : battle.loserElo,
-                          startingElo: isWinner
-                            ? battle.winnerStartingElo
-                            : battle.loserStartingElo,
-                        };
-                      }),
+                      return {
+                        date: format(battle.tournament.createdAt, "MMM, yy"),
+                        elo: isWinner ? battle.winnerElo : battle.loserElo,
+                        startingElo: isWinner
+                          ? battle.winnerStartingElo
+                          : battle.loserStartingElo,
+                      };
+                    }),
+                  ]}
+                  margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
+                >
+                  <defs>
+                    <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="5%"
+                        stopColor="rgba(236, 26, 85, 0.3)"
+                        stopOpacity={1}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="rgba(236, 26, 85, 0)"
+                        stopOpacity={1}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="date"
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    interval="preserveStartEnd"
+                    tick={{ fontSize: 10 }}
+                  />
+                  <YAxis
+                    domain={[
+                      (dataMin: number) =>
+                        Math.min(1000, Math.floor(dataMin * 0.9)),
+                      (dataMax: number) => Math.ceil(dataMax),
                     ]}
-                    margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
-                  >
-                    <defs>
-                      <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
-                        <stop
-                          offset="5%"
-                          stopColor="rgba(236, 26, 85, 0.3)"
-                          stopOpacity={1}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="rgba(236, 26, 85, 0)"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="date"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      interval="preserveStartEnd"
-                      tick={{ fontSize: 10 }}
-                    />
-                    <YAxis
-                      domain={[
-                        (dataMin: number) =>
-                          Math.min(1000, Math.floor(dataMin * 0.9)),
-                        (dataMax: number) => Math.ceil(dataMax),
-                      ]}
-                    />
-                    <Tooltip />
-                    <Area
-                      type="monotone"
-                      dataKey="elo"
-                      stroke="#ec1a55"
-                      fill="url(#colorElo)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Box>
+                  />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="elo"
+                    stroke="#ec1a55"
+                    fill="url(#colorElo)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </Box>
           )}
 
         {tab === TABS.battleHistory && battles.length > 0 && (
-          <VStack gap={4} mt={4}>
+          <VStack gap={4} mt={2}>
             {battles.map((battle, i) => {
               const isLeftDriver =
                 battle.driverLeft?.driverId === driver.driverId;
@@ -584,6 +604,36 @@ const Page = () => {
               );
             })}
           </VStack>
+        )}
+
+        {tab === TABS.regionalRatings && (
+          <Grid gridTemplateColumns="1fr 1fr" gap={4}>
+            {Object.values(Regions).map((region) => {
+              if (region === Regions.ALL) return null;
+
+              return (
+                <Flex
+                  key={region}
+                  bgGradient="to-b"
+                  gradientFrom="gray.900"
+                  gradientTo="black"
+                  rounded="xl"
+                  p={4}
+                  borderWidth={1}
+                  borderColor="gray.800"
+                  alignItems="center"
+                >
+                  <styled.span fontWeight="semibold">{region}</styled.span>
+                  <Spacer />
+                  <styled.span>-</styled.span>
+                  <styled.img
+                    src={`/badges/${getDriverRank(1000, 0)}.png`}
+                    w={10}
+                  />
+                </Flex>
+              );
+            })}
+          </Grid>
         )}
       </Container>
     </Box>
