@@ -140,6 +140,8 @@ const run = async () => {
       data: {
         winnerElo,
         loserElo,
+        winnerStartingElo,
+        loserStartingElo,
       },
     });
 

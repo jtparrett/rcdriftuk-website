@@ -145,10 +145,17 @@ model TournamentBattles {
   driverRightId Int?
   winnerId      Int?
 
+  winnerStartingElo Float?
   winnerElo         Float?
-  loserElo          Float?
-  winnerRegionalElo Float?
-  loserRegionalElo  Float?
+
+  loserStartingElo Float?
+  loserElo         Float?
+
+  winnerRegionalStartingElo Float?
+  winnerRegionalElo         Float?
+
+  loserRegionalStartingElo Float?
+  loserRegionalElo         Float?
 
   tournament   Tournaments             @relation(fields: [tournamentId], references: [id])
   driverLeft   TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
