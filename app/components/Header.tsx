@@ -72,7 +72,7 @@ const MenuLink = styled(Link, {
       inactive: {
         _hover: {
           md: {
-            bgColor: "gray.900",
+            bgColor: "gray.800",
           },
         },
       },
