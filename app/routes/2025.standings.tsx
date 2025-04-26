@@ -1,3 +1,4 @@
+import { Regions } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { startOfYear } from "date-fns";
@@ -23,7 +24,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const driverRatings = await getDriverRatings();
+  const driverRatings = await getDriverRatings(Regions.ALL);
   const startOfSeason = startOfYear(new Date());
 
   const qualifiedDrivers = await prisma.users.findMany({
@@ -33,26 +34,16 @@ export const loader = async () => {
           .map((driver) => driver.driverId)
           .filter((id) => id !== 0),
       },
-      OR: [
-        {
-          ratingsLosses: {
-            some: {
-              createdAt: {
-                gte: startOfSeason,
-              },
+      TournamentDrivers: {
+        some: {
+          tournament: {
+            rated: true,
+            createdAt: {
+              gte: startOfSeason,
             },
           },
         },
-        {
-          ratingsWins: {
-            some: {
-              createdAt: {
-                gte: startOfSeason,
-              },
-            },
-          },
-        },
-      ],
+      },
     },
   });
 
@@ -61,7 +52,7 @@ export const loader = async () => {
       return {
         ...driver,
         position: i + 1,
-        rank: getDriverRank(driver.currentElo, driver.history.length),
+        rank: getDriverRank(driver.elo, driver.totalBattles),
       };
     })
     .filter((a) => {
@@ -72,6 +63,7 @@ export const loader = async () => {
     });
 
   // This is awkard, we should've sliced the ratings before the logic above
+  // But we can't change it until after 2025 season is over
   return drivers.slice(0, 64);
 };
 
@@ -121,7 +113,7 @@ const StandingsPage = () => {
                     </Flex>
                   </styled.td>
                   <styled.td textAlign="right" fontFamily="mono">
-                    {driver.currentElo.toFixed(3)}
+                    {driver.elo.toFixed(3)}
                   </styled.td>
                   <styled.td textAlign="right">
                     <styled.img

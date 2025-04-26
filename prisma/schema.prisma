@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Regions {
+  ALL
+  EU
+  NA
+  APAC
+  LATAM
+  MEA
+}
+
 model Events {
   cover             String?
   name              String
@@ -80,6 +89,8 @@ model Tournaments {
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?  @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
   fullInclusion       Boolean             @default(false)
+  region              Regions             @default(EU)
+  rated               Boolean             @default(false)
 }
 
 model TournamentDrivers {
@@ -126,19 +137,32 @@ model LapScores {
 }
 
 model TournamentBattles {
-  id            Int                     @id @default(autoincrement())
-  createdAt     DateTime                @default(now())
-  tournamentId  String                  @db.Uuid
-  tournament    Tournaments             @relation(fields: [tournamentId], references: [id])
+  id            Int      @id @default(autoincrement())
+  round         Int      @default(0)
+  createdAt     DateTime @default(now())
+  tournamentId  String   @db.Uuid
   driverLeftId  Int?
-  driverLeft    TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
   driverRightId Int?
-  driverRight   TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
   winnerId      Int?
-  isNextBattle  Tournaments?            @relation("tournamentNextBattle")
-  bracket       BattlesBracket          @default(UPPER)
-  round         Int                     @default(0)
-  BattleVotes   TournamentBattleVotes[]
+
+  winnerStartingElo Float?
+  winnerElo         Float?
+
+  loserStartingElo Float?
+  loserElo         Float?
+
+  winnerRegionalStartingElo Float?
+  winnerRegionalElo         Float?
+
+  loserRegionalStartingElo Float?
+  loserRegionalElo         Float?
+
+  tournament   Tournaments             @relation(fields: [tournamentId], references: [id])
+  driverLeft   TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
+  driverRight  TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
+  isNextBattle Tournaments?            @relation("tournamentNextBattle")
+  bracket      BattlesBracket          @default(UPPER)
+  BattleVotes  TournamentBattleVotes[]
 }
 
 model TournamentBattleVotes {
@@ -193,29 +217,38 @@ model DriverRatingBattles {
   tournament String
   loserId    Int
   winnerId   Int
-  loser      Users    @relation("driverRatingsLosses", fields: [loserId], references: [driverId])
-  winner     Users    @relation("driverRatingsWins", fields: [winnerId], references: [driverId])
 }
 
 model Users {
   deprecated_trackId String? @map("trackId") @db.Uuid
 
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @default(now()) @updatedAt
-  driverId          Int                   @id @default(autoincrement())
-  id                String?               @unique
-  firstName         String?
-  image             String?
-  lastName          String?
-  team              String?
-  events            EventResponses[]
-  Tournaments       Tournaments[]
-  ratingsLosses     DriverRatingBattles[] @relation("driverRatingsLosses")
-  ratingsWins       DriverRatingBattles[] @relation("driverRatingsWins")
-  TournamentJudges  TournamentJudges[]
-  TournamentDrivers TournamentDrivers[]
-  EventTickets      EventTickets[]
-  Tracks            TrackOwners[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
+  driverId            Int                   @id @default(autoincrement())
+  id                  String?               @unique
+  firstName           String?
+  image               String?
+  lastName            String?
+  team                String?
+  elo                 Float                 @default(1000)
+  totalBattles        Int                   @default(0)
+  events              EventResponses[]
+  Tournaments         Tournaments[]
+  TournamentJudges    TournamentJudges[]
+  TournamentDrivers   TournamentDrivers[]
+  EventTickets        EventTickets[]
+  Tracks              TrackOwners[]
+  UserRegionalRatings UserRegionalRatings[]
+}
+
+model UserRegionalRatings {
+  driverId     Int
+  user         Users   @relation(fields: [driverId], references: [driverId])
+  region       Regions
+  elo          Float
+  totalBattles Int     @default(0)
+
+  @@unique([driverId, region])
 }
 
 model Products {

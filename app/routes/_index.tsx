@@ -1,4 +1,4 @@
-import { TrackStatus } from "@prisma/client";
+import { Regions, TrackStatus } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
@@ -50,7 +50,7 @@ export const loader = async () => {
     ],
   });
 
-  const drivers = (await getDriverRatings()).slice(0, 10);
+  const drivers = await getDriverRatings(Regions.ALL, 10);
 
   return { events, drivers };
 };
@@ -180,18 +180,20 @@ const Page = () => {
                         {i + 1}
                       </styled.td>
                       <styled.td px={1}>
-                        {driver.firstName} {driver.lastName}
+                        <Link to={`/ratings/${driver.driverId}`}>
+                          {driver.firstName} {driver.lastName}
+                        </Link>
                       </styled.td>
                       <styled.td textAlign="right" fontFamily="mono">
-                        {driver.currentElo.toFixed(3)}
+                        {driver.elo.toFixed(3)}
                       </styled.td>
                       <styled.td textAlign="center">
                         <styled.img
                           w={8}
                           display="inline-block"
                           src={`/badges/${getDriverRank(
-                            driver.currentElo,
-                            driver.history.length
+                            driver.elo,
+                            driver.totalBattles
                           )}.png`}
                           alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                         />
