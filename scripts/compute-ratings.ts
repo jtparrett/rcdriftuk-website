@@ -58,6 +58,7 @@ const run = async () => {
   console.log(clc.blue(`Found ${battles.length} battles to process`));
 
   const driverElos: Record<number, number> = {};
+  const driverTotalBattles: Record<number, number> = {};
 
   // Process each battle in chronological order
   for (const [index, battle] of battles.entries()) {
@@ -112,6 +113,19 @@ const run = async () => {
       }).length,
       0
     );
+
+    const loserTotalBattles = Math.max(
+      [...battles].slice(0, index).filter((b) => {
+        return (
+          b.driverLeft?.driverId === loserId ||
+          b.driverRight?.driverId === loserId
+        );
+      }).length,
+      0
+    );
+
+    driverTotalBattles[winnerId] = winnerTotalBattles;
+    driverTotalBattles[loserId] = loserTotalBattles;
 
     // Calculate K-factor
     let winnersK = winnerTotalBattles >= 5 ? 32 : 64;
@@ -172,7 +186,10 @@ const run = async () => {
   for (const [driverId, elo] of Object.entries(driverElos)) {
     await prisma.users.update({
       where: { driverId: parseInt(driverId) },
-      data: { elo },
+      data: {
+        elo,
+        totalBattles: driverTotalBattles[parseInt(driverId)],
+      },
     });
     console.log(
       clc.blue(`Updated driver ${driverId} with ELO: ${elo.toFixed(3)}`)

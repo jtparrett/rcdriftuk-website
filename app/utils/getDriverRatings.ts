@@ -25,33 +25,9 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
       elo: true,
       image: true,
       team: true,
-      TournamentDrivers: {
-        where: {
-          tournament: {
-            rated: true,
-          },
-        },
-        select: {
-          _count: {
-            select: {
-              leftBattles: true,
-              rightBattles: true,
-            },
-          },
-        },
-      },
+      totalBattles: true,
     },
   });
 
-  return users.map((user) => {
-    const totalBattles = user.TournamentDrivers.reduce(
-      (acc, curr) => acc + curr._count.leftBattles + curr._count.rightBattles,
-      0
-    );
-
-    return {
-      ...user,
-      totalBattles,
-    };
-  });
+  return users;
 };

@@ -43,6 +43,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       image: true,
       team: true,
       elo: true,
+      totalBattles: true,
       TournamentDrivers: {
         where: {
           tournament: {
@@ -57,12 +58,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           },
         ],
         select: {
-          _count: {
-            select: {
-              leftBattles: true,
-              rightBattles: true,
-            },
-          },
           leftBattles: {
             select: {
               id: true,
@@ -171,10 +166,6 @@ const TABS = {
 
 const Page = () => {
   const driver = useLoaderData<typeof loader>();
-  const totalBattles = driver.TournamentDrivers.reduce(
-    (acc, curr) => acc + curr._count.leftBattles + curr._count.rightBattles,
-    0
-  );
   const battles = driver.TournamentDrivers.flatMap((item) => {
     return [...item.leftBattles, ...item.rightBattles];
   }).sort(
@@ -184,7 +175,7 @@ const Page = () => {
   );
 
   const rank = driver
-    ? getDriverRank(driver.elo, totalBattles)
+    ? getDriverRank(driver.elo, driver.totalBattles)
     : RANKS.UNRANKED;
 
   const [tab, setTab] = useState<Values<typeof TABS>>(TABS.battleHistory);

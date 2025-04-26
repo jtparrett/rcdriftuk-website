@@ -232,6 +232,8 @@ model Users {
   image             String?
   lastName          String?
   team              String?
+  elo               Float                 @default(1000)
+  totalBattles      Int                   @default(0)
   events            EventResponses[]
   Tournaments       Tournaments[]
   ratingsLosses     DriverRatingBattles[] @relation("driverRatingsLosses")
@@ -240,7 +242,6 @@ model Users {
   TournamentDrivers TournamentDrivers[]
   EventTickets      EventTickets[]
   Tracks            TrackOwners[]
-  elo               Float                 @default(1000)
 }
 
 model Products {
