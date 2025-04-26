@@ -217,27 +217,23 @@ model DriverRatingBattles {
   tournament String
   loserId    Int
   winnerId   Int
-  loser      Users    @relation("driverRatingsLosses", fields: [loserId], references: [driverId])
-  winner     Users    @relation("driverRatingsWins", fields: [winnerId], references: [driverId])
 }
 
 model Users {
   deprecated_trackId String? @map("trackId") @db.Uuid
 
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @default(now()) @updatedAt
-  driverId          Int                   @id @default(autoincrement())
-  id                String?               @unique
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now()) @updatedAt
+  driverId          Int                 @id @default(autoincrement())
+  id                String?             @unique
   firstName         String?
   image             String?
   lastName          String?
   team              String?
-  elo               Float                 @default(1000)
-  totalBattles      Int                   @default(0)
+  elo               Float               @default(1000)
+  totalBattles      Int                 @default(0)
   events            EventResponses[]
   Tournaments       Tournaments[]
-  ratingsLosses     DriverRatingBattles[] @relation("driverRatingsLosses")
-  ratingsWins       DriverRatingBattles[] @relation("driverRatingsWins")
   TournamentJudges  TournamentJudges[]
   TournamentDrivers TournamentDrivers[]
   EventTickets      EventTickets[]
