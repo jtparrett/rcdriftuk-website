@@ -277,10 +277,12 @@ const Page = () => {
             rounded="full"
             fontSize="xs"
             color="gray.400"
+            bgColor="black"
+            mb={1}
           >
             #{driver.driverId}
           </styled.span>
-          <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1}>
+          <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1} mb={1}>
             {driver.firstName} {driver.lastName}
           </styled.h1>
 
