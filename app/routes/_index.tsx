@@ -50,7 +50,7 @@ export const loader = async () => {
     ],
   });
 
-  const drivers = (await getDriverRatings(Regions.ALL)).slice(0, 10);
+  const drivers = await getDriverRatings(Regions.ALL, 10);
 
   return { events, drivers };
 };

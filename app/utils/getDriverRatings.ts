@@ -1,7 +1,7 @@
 import { Regions } from "@prisma/client";
 import { prisma } from "./prisma.server";
 
-export const getDriverRatings = async (region: Regions) => {
+export const getDriverRatings = async (region: Regions, limit?: number) => {
   const users = await prisma.users.findMany({
     where: {
       TournamentDrivers: {
@@ -16,6 +16,7 @@ export const getDriverRatings = async (region: Regions) => {
     orderBy: {
       elo: "desc",
     },
+    take: limit,
     select: {
       id: true,
       driverId: true,
@@ -25,6 +26,11 @@ export const getDriverRatings = async (region: Regions) => {
       image: true,
       team: true,
       TournamentDrivers: {
+        where: {
+          tournament: {
+            rated: true,
+          },
+        },
         select: {
           _count: {
             select: {

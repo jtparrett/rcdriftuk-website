@@ -34,26 +34,16 @@ export const loader = async () => {
           .map((driver) => driver.driverId)
           .filter((id) => id !== 0),
       },
-      OR: [
-        {
-          ratingsLosses: {
-            some: {
-              createdAt: {
-                gte: startOfSeason,
-              },
+      TournamentDrivers: {
+        some: {
+          tournament: {
+            rated: true,
+            createdAt: {
+              gte: startOfSeason,
             },
           },
         },
-        {
-          ratingsWins: {
-            some: {
-              createdAt: {
-                gte: startOfSeason,
-              },
-            },
-          },
-        },
-      ],
+      },
     },
   });
 
@@ -73,6 +63,7 @@ export const loader = async () => {
     });
 
   // This is awkard, we should've sliced the ratings before the logic above
+  // But we can't change it until after 2025 season is over
   return drivers.slice(0, 64);
 };
 
