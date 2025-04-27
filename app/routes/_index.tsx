@@ -31,7 +31,6 @@ export const loader = async () => {
   const today = new Date();
   const events = await prisma.events.findMany({
     where: {
-      approved: true,
       startDate: {
         gte: startOfDay(today),
         lte: endOfDay(today),
@@ -93,7 +92,7 @@ const Page = () => {
       >
         <Container textAlign="center" maxW={1100} py={100} px={6}>
           <styled.h1
-            fontWeight="semibold"
+            fontWeight="bold"
             fontSize={{ base: "5xl", md: "6xl" }}
             lineHeight={1.1}
             textWrap="balance"

@@ -280,20 +280,7 @@ const Page = () => {
                         disabled={isSubmitting}
                         color={isSubmitting ? "transparent" : undefined}
                       >
-                        {isSubmitting && (
-                          <styled.span
-                            position="absolute"
-                            top={0}
-                            left={0}
-                            w="full"
-                            h="full"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            <Spinner />
-                          </styled.span>
-                        )}
+                        {isSubmitting && <Spinner />}
                         {isAttending && "Not "}Interested{" "}
                         {isAttending ? (
                           <RiCloseCircleFill />
@@ -421,7 +408,7 @@ const Page = () => {
                 {event.eventTrack._count.events} past events
               </styled.span>
 
-              {event.eventTrack.description && (
+              {event.eventTrack.address && (
                 <styled.p
                   color="gray.500"
                   fontSize="sm"
@@ -429,7 +416,7 @@ const Page = () => {
                   mt={2}
                   whiteSpace="pre-line"
                 >
-                  {event.eventTrack.description}
+                  {event.eventTrack.address}
                 </styled.p>
               )}
 
@@ -439,7 +426,7 @@ const Page = () => {
                   to={`/tracks/${event.eventTrack.slug}`}
                   variant="secondary"
                 >
-                  See All Events
+                  More Info
                 </LinkButton>
 
                 {isTrackOwner && event.enableTicketing && (

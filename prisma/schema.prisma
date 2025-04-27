@@ -24,7 +24,6 @@ model Events {
   endDate           DateTime
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @default(now()) @updatedAt
-  approved          Boolean          @default(false)
   id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   link              String?          @default("")
   trackId           String?          @db.Uuid

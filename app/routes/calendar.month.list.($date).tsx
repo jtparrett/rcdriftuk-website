@@ -20,7 +20,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       eventTrack: {
         status: TrackStatus.ACTIVE,
       },
-      approved: true,
       startDate: {
         gte: startOfMonth(date),
         lte: endOfMonth(date),

@@ -123,7 +123,6 @@ export const action = async (args: ActionFunctionArgs) => {
         startDate: utcStartDate,
         endDate: utcEndDate,
         description: data.description,
-        approved: true,
         enableTicketing: data.enableTicketing === "true",
         ticketCapacity: data.ticketCapacity,
         ticketReleaseDate: data.ticketReleaseDate

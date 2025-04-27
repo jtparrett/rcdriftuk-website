@@ -1,10 +1,11 @@
-import type { Events, Tracks } from "@prisma/client";
+import type { Events } from "@prisma/client";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
 import { Link } from "@remix-run/react";
 import { getEventDate } from "~/utils/getEventDate";
 import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
 import { isPast } from "date-fns";
+import { LinkOverlay } from "./LinkOverlay";
 
 interface QueriedEvent
   extends Omit<
@@ -16,7 +17,11 @@ interface QueriedEvent
   createdAt: string;
   updatedAt: string;
   ticketReleaseDate: string | null;
-  eventTrack: Tracks | null;
+  eventTrack: {
+    slug: string;
+    name: string;
+    image: string;
+  } | null;
 }
 
 interface Props {
@@ -40,6 +45,7 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
       gap={4}
       pos="relative"
       opacity={hasPast ? 0.65 : 1}
+      overflow="hidden"
     >
       {hasPast && (
         <styled.span
@@ -92,20 +98,28 @@ export const EventCard = ({ event, showAvatar = false }: Props) => {
           {event.eventTrack?.name ?? event.track}
         </styled.span>
 
-        <styled.h3
-          fontSize="lg"
-          fontWeight="extrabold"
-          textWrap="balance"
-          lineHeight={1.1}
-        >
-          {event.name}
-        </styled.h3>
+        <LinkOverlay to={`/events/${event.id}`}>
+          <styled.h3
+            fontSize="lg"
+            fontWeight="extrabold"
+            textWrap="balance"
+            lineHeight={1.1}
+          >
+            {event.name}
+          </styled.h3>
+        </LinkOverlay>
 
         <styled.p fontSize="sm" color="gray.300" fontWeight="semibold" mb={2}>
           {getEventDate(startDate, endDate)}
         </styled.p>
 
-        <LinkButton to={`/events/${event.id}`} variant="secondary" size="xs">
+        <LinkButton
+          to={`/events/${event.id}`}
+          variant="secondary"
+          size="xs"
+          pos="relative"
+          zIndex={4}
+        >
           Event Info <RiArrowRightSLine />
         </LinkButton>
       </Box>
