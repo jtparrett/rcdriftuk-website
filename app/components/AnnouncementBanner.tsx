@@ -9,7 +9,7 @@ export const AnnouncementBanner = () => {
         <Link to="/2025">
           <Flex justifyContent="center" gap={2} alignItems="center" py={1}>
             <styled.p fontWeight="semibold" fontSize="sm">
-              Learn more about RC Drift.uk 2025
+              Learn more about RC Drift UK 2025
             </styled.p>
             <RiArrowRightLine size={16} />
           </Flex>

@@ -6,7 +6,7 @@ import {
   RiCalendarLine,
   RiListOrdered2,
   RiMapPin2Fill,
-  RiRocket2Line,
+  RiRocketLine,
 } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -96,7 +96,7 @@ const Page = () => {
             fontSize={{ base: "5xl", md: "6xl" }}
             lineHeight={1.1}
             textWrap="balance"
-            maxW={600}
+            maxW={800}
             mx="auto"
             bgClip="text"
             bgGradient="to-b"
@@ -104,19 +104,19 @@ const Page = () => {
             gradientTo="gray.300"
             color="transparent"
           >
-            The platform for RC Drifting.
+            The complete platform for RC Drifting.
           </styled.h1>
           <styled.p
             color="gray.400"
             pt={2}
             pb={8}
             fontSize="lg"
-            maxW={400}
+            maxW={600}
             mx="auto"
             textWrap="balance"
           >
-            We provide the tools to help drivers, tracks and shops get the most
-            out of RC Drifting.
+            We're empowering the RC drift community with powerful tools, major
+            events, beginner guides, and our innovative driver ratings.
           </styled.p>
 
           <Flex
@@ -125,7 +125,7 @@ const Page = () => {
             flexDir={{ base: "column", sm: "row" }}
           >
             <LinkButton to="/getting-started">
-              <RiRocket2Line /> Getting Started
+              <RiRocketLine /> Getting Started
             </LinkButton>
             <LinkButton to="/map/all" variant="secondary">
               <RiMapPin2Fill /> Find Your Local Track
