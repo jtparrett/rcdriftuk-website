@@ -102,6 +102,15 @@ export default defineConfig({
           "gray.950": {
             value: "#09090b",
           },
+          "bronze.500": {
+            value: "#cd7f32",
+          },
+          "bronze.800": {
+            value: "#8b4513",
+          },
+          "bronze.900": {
+            value: "#63310d",
+          },
         },
       },
       keyframes: {

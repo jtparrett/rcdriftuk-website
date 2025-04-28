@@ -2,13 +2,13 @@ import { TournamentsState } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { capitalCase } from "change-case";
-import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
 import { AspectRatio, Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
+import { RiTrophyFill } from "react-icons/ri";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -19,6 +19,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
     include: {
       judges: true,
+      battles: {
+        take: 2,
+        orderBy: [
+          {
+            id: "desc",
+          },
+        ],
+        include: {
+          driverLeft: {
+            include: {
+              user: true,
+            },
+          },
+          driverRight: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
       nextBattle: {
         include: {
           BattleVotes: {
@@ -100,13 +120,92 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
+  if (!tournament) {
+    throw new Response("Not Found", { status: 404 });
+  }
+
   return tournament;
 };
 
+const FinalResults = () => {
+  const tournament = useLoaderData<typeof loader>();
+  const [finalBattle, playoffBattle] = tournament.battles;
+  const first =
+    finalBattle.driverLeftId === finalBattle?.winnerId
+      ? finalBattle?.driverLeft
+      : finalBattle?.driverRight;
+
+  const second =
+    finalBattle.driverLeftId === finalBattle?.winnerId
+      ? finalBattle?.driverRight
+      : finalBattle?.driverLeft;
+
+  const third =
+    playoffBattle.driverLeftId === playoffBattle?.winnerId
+      ? playoffBattle?.driverLeft
+      : playoffBattle?.driverRight;
+
+  const results = [first, second, third];
+
+  return (
+    <Flex w={700} maxW="full" alignItems="flex-end" p={4} gap={1}>
+      {results.map((driver) => {
+        const i = results.indexOf(driver);
+
+        return (
+          <Box
+            style={{
+              order: i === 0 ? 2 : i === 1 ? 1 : 3,
+              zIndex: 3 - i,
+              flex: 1 - i * 0.1,
+            }}
+            pos="relative"
+            key={i}
+            p={1}
+            bgColor="brand.500"
+            rounded="2xl"
+            overflow="hidden"
+          >
+            <styled.span
+              pos="absolute"
+              display="flex"
+              alignItems="center"
+              gap={2}
+              top={1}
+              left={1}
+              bgColor="inherit"
+              pl={2}
+              pr={3}
+              py={1}
+              borderBottomRightRadius="xl"
+              fontWeight="bold"
+              fontSize="sm"
+              zIndex={1}
+            >
+              <RiTrophyFill />
+              {i === 0 ? "First" : i === 1 ? "Second" : "Third"}
+            </styled.span>
+            <AspectRatio ratio={0.75} w="full" overflow="hidden" rounded="xl">
+              <styled.img
+                src={driver?.user.image ?? "/blank-driver-right.jpg"}
+                alt={driver?.user.firstName ?? ""}
+              />
+            </AspectRatio>
+            <styled.p
+              fontWeight="bold"
+              py={1}
+              fontSize={{ base: "xs", md: "md" }}
+            >
+              {driver?.user.firstName} {driver?.user.lastName}
+            </styled.p>
+          </Box>
+        );
+      })}
+    </Flex>
+  );
+};
 const TournamentsOverviewPage = () => {
   const tournament = useLoaderData<typeof loader>();
-
-  invariant(tournament);
 
   const qualiJudgingComplete =
     (tournament.nextQualifyingLap?.scores.length ?? 0) ===
@@ -173,11 +272,14 @@ const TournamentsOverviewPage = () => {
               <styled.p fontWeight="semibold">
                 {capitalCase(
                   tournament.state === TournamentsState.END
-                    ? "Tournament Finished"
+                    ? "Final Results"
                     : tournament.state
                 )}
               </styled.p>
             </Box>
+
+            {tournament.state === TournamentsState.END && <FinalResults />}
+
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
                 <>
