@@ -7,9 +7,11 @@ import {
   RiListOrdered2,
   RiMapPin2Fill,
   RiRocketLine,
+  RiTrophyLine,
 } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
+import { Glow } from "~/components/Glow";
 import { ImageContainer } from "~/components/ImageContainer";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
@@ -80,36 +82,59 @@ const Page = () => {
         zIndex={1}
         _after={{
           content: '""',
-          display: "block",
           pos: "absolute",
           inset: 0,
           bgGradient: "to-b",
           gradientFrom: "transparent",
-          gradientVia: "transparent",
           gradientTo: "black",
           zIndex: -1,
         }}
       >
         <Container textAlign="center" maxW={1100} py={100} px={6}>
+          <Box pos="relative" mx="auto" w="fit-content" rounded="full" p={1}>
+            <Link to="/2025">
+              <styled.span
+                borderWidth={1}
+                borderColor="brand.700"
+                rounded="full"
+                px={4}
+                py={1}
+                bgGradient="to-b"
+                gradientTo="transparent"
+                gradientFrom="brand.900"
+                fontWeight="medium"
+                fontSize="sm"
+                display="inline-flex"
+                alignItems="center"
+                gap={2}
+              >
+                <RiTrophyLine />
+                RC Drift UK 2025
+              </styled.span>
+            </Link>
+            <Glow />
+          </Box>
+
           <styled.h1
-            fontWeight="bold"
+            mt={8}
+            fontWeight="semibold"
             fontSize={{ base: "5xl", md: "6xl" }}
             lineHeight={1.1}
             textWrap="balance"
             maxW={800}
             mx="auto"
             bgClip="text"
-            bgGradient="to-b"
+            bgGradient="to-br"
             gradientFrom="white"
-            gradientTo="gray.300"
+            gradientTo="gray.400"
             color="transparent"
           >
             The complete platform for RC Drifting.
           </styled.h1>
           <styled.p
             color="gray.400"
-            pt={2}
-            pb={8}
+            pt={3}
+            pb={12}
             fontSize="lg"
             maxW={600}
             mx="auto"
