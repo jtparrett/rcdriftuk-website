@@ -11,7 +11,12 @@ export const Footer = () => {
           flexDirection={{ base: "column", md: "row" }}
         >
           <Box>
-            <styled.img src="/rcdriftuk-light.svg" w={130} mb={2} />
+            <styled.img
+              src="/rcdriftuk-light.svg"
+              w={100}
+              mb={2}
+              alt="RC Drift UK"
+            />
           </Box>
 
           <Spacer />
