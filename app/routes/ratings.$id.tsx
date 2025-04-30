@@ -488,7 +488,7 @@ const Page = () => {
                             color={isWinner ? "green.400" : "red.400"}
                           >
                             {isWinner ? "Won vs" : "Lost to"}{" "}
-                            {isWinner
+                            {isLeftDriver
                               ? battle.driverRight?.user.firstName +
                                 " " +
                                 battle.driverRight?.user.lastName
