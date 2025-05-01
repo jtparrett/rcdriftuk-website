@@ -29,7 +29,7 @@ export default defineConfig({
         },
         fonts: {
           body: {
-            value: '"RCDUK", sans-serif',
+            value: '"SF Pro Display", sans-serif',
           },
         },
         colors: {

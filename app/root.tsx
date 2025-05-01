@@ -31,6 +31,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: "https://fonts.cdnfonts.com/css/sf-pro-display" },
   { rel: "stylesheet", href: styles },
 ];
 

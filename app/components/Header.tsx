@@ -471,12 +471,7 @@ export const Header = ({ user }: Props) => {
           </SignedIn>
 
           <SignedOut>
-            <LinkButton
-              variant="outline"
-              size="md"
-              to="/sign-in"
-              rounded="full"
-            >
+            <LinkButton variant="outline" size="md" to="/sign-in">
               Sign In
             </LinkButton>
           </SignedOut>

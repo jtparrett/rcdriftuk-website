@@ -3,6 +3,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { endOfDay, format, startOfDay } from "date-fns";
 import {
+  RiArrowRightLine,
   RiCalendarLine,
   RiListOrdered2,
   RiMapPin2Fill,
@@ -96,11 +97,11 @@ const Page = () => {
           py={{ base: 12, md: 100 }}
           px={6}
         >
-          <Box pos="relative" mx="auto" w="fit-content" rounded="full" p={1}>
+          <Box pos="relative" mx="auto" w="fit-content" rounded="full">
             <Link to="/2025">
               <styled.span
                 borderWidth={1}
-                borderColor="brand.700"
+                borderColor="brand.800"
                 rounded="full"
                 px={4}
                 py={1}
@@ -112,21 +113,23 @@ const Page = () => {
                 display="inline-flex"
                 alignItems="center"
                 gap={2}
+                shadow="0 6px 24px rgba(242, 12, 78, 0.4)"
               >
                 <RiTrophyLine />
                 RC Drift UK 2025
+                <RiArrowRightLine />
               </styled.span>
             </Link>
-            <Glow />
+            <Glow size="sm" />
           </Box>
 
           <styled.h1
             mt={4}
-            fontWeight="semibold"
+            fontWeight="medium"
             fontSize={{ base: "5xl", md: "6xl" }}
             lineHeight={1.1}
             textWrap="balance"
-            maxW={800}
+            maxW={700}
             mx="auto"
             bgClip="text"
             bgGradient="to-br"
@@ -134,7 +137,11 @@ const Page = () => {
             gradientTo="gray.400"
             color="transparent"
           >
-            The complete platform for RC Drifting.
+            The{" "}
+            <styled.span display={{ base: "none", sm: "inline" }}>
+              complete{" "}
+            </styled.span>
+            platform for RC Drifting.
           </styled.h1>
           <styled.p
             color="gray.400"
