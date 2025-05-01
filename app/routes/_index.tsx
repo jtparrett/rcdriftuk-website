@@ -90,7 +90,12 @@ const Page = () => {
           zIndex: -1,
         }}
       >
-        <Container textAlign="center" maxW={1100} py={100} px={6}>
+        <Container
+          textAlign="center"
+          maxW={1100}
+          py={{ base: 12, md: 100 }}
+          px={6}
+        >
           <Box pos="relative" mx="auto" w="fit-content" rounded="full" p={1}>
             <Link to="/2025">
               <styled.span
@@ -116,7 +121,7 @@ const Page = () => {
           </Box>
 
           <styled.h1
-            mt={8}
+            mt={4}
             fontWeight="semibold"
             fontSize={{ base: "5xl", md: "6xl" }}
             lineHeight={1.1}
