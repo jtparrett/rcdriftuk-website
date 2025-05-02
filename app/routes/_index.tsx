@@ -74,23 +74,26 @@ const Page = () => {
 
   return (
     <>
-      <Box
-        bgImage="url(/bg.png)"
-        bgSize="100% auto"
-        bgPosition="top"
-        bgRepeat="no-repeat"
-        pos="relative"
-        zIndex={1}
-        _after={{
-          content: '""',
-          pos: "absolute",
-          inset: 0,
-          bgGradient: "to-b",
-          gradientFrom: "transparent",
-          gradientTo: "black",
-          zIndex: -1,
-        }}
-      >
+      <Box pos="relative" zIndex={1} w="full" overflow="hidden">
+        <Box
+          pos="absolute"
+          top={0}
+          left="50%"
+          transform="translateX(-50%)"
+          w={{ base: "150%", md: "full" }}
+          zIndex={-1}
+          _after={{
+            content: '""',
+            pos: "absolute",
+            inset: 0,
+            bgGradient: "to-b",
+            gradientFrom: "transparent",
+            gradientTo: "black",
+            zIndex: 1,
+          }}
+        >
+          <styled.img src="/bg.png" w="full" alt="background" />
+        </Box>
         <Container
           textAlign="center"
           maxW={1100}
