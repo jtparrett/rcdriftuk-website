@@ -75,10 +75,10 @@ const Page = () => {
   return (
     <>
       <Box
-        bgImage="url(/dot-bg.svg)"
-        bgRepeat="repeat"
-        bgSize="16px"
-        bgPosition="center"
+        bgImage="url(/bg.png)"
+        bgSize="100% auto"
+        bgPosition="top"
+        bgRepeat="no-repeat"
         pos="relative"
         zIndex={1}
         _after={{
