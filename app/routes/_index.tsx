@@ -76,12 +76,13 @@ const Page = () => {
     <>
       <Box pos="relative" zIndex={1} w="full" overflow="hidden">
         <Box
-          pos="absolute"
-          top={0}
-          left="50%"
-          transform="translateX(-50%)"
-          w={{ base: "150%", md: "full" }}
-          zIndex={-1}
+          w="full"
+          bgImage="url(/bg.png)"
+          bgSize={{ base: "200%", md: "130%" }}
+          bgPosition="center"
+          bgRepeat="no-repeat"
+          pos="relative"
+          zIndex={0}
           _after={{
             content: '""',
             pos: "absolute",
@@ -89,89 +90,88 @@ const Page = () => {
             bgGradient: "to-b",
             gradientFrom: "transparent",
             gradientTo: "black",
-            zIndex: 1,
+            zIndex: -1,
           }}
         >
-          <styled.img src="/bg.png" w="full" alt="background" />
-        </Box>
-        <Container
-          textAlign="center"
-          maxW={1100}
-          py={{ base: 12, md: 100 }}
-          px={6}
-        >
-          <Box pos="relative" mx="auto" w="fit-content" rounded="full">
-            <Link to="/2025">
-              <styled.span
-                borderWidth={1}
-                borderColor="brand.800"
-                rounded="full"
-                px={4}
-                py={1}
-                bgGradient="to-b"
-                gradientTo="transparent"
-                gradientFrom="brand.900"
-                fontWeight="medium"
-                fontSize="sm"
-                display="inline-flex"
-                alignItems="center"
-                gap={2}
-                shadow="0 6px 24px rgba(242, 12, 78, 0.4)"
-              >
-                <RiTrophyLine />
-                RC Drift UK 2025
-                <RiArrowRightLine />
+          <Container
+            textAlign="center"
+            maxW={1100}
+            py={{ base: 12, md: 100 }}
+            px={6}
+          >
+            <Box pos="relative" mx="auto" w="fit-content" rounded="full">
+              <Link to="/2025">
+                <styled.span
+                  borderWidth={1}
+                  borderColor="brand.800"
+                  rounded="full"
+                  px={4}
+                  py={1}
+                  bgGradient="to-b"
+                  gradientTo="transparent"
+                  gradientFrom="brand.900"
+                  fontWeight="medium"
+                  fontSize="sm"
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={2}
+                  shadow="0 6px 24px rgba(242, 12, 78, 0.4)"
+                >
+                  <RiTrophyLine />
+                  RC Drift UK 2025
+                  <RiArrowRightLine />
+                </styled.span>
+              </Link>
+              <Glow size="sm" />
+            </Box>
+
+            <styled.h1
+              mt={4}
+              fontWeight="medium"
+              fontSize={{ base: "5xl", md: "6xl" }}
+              lineHeight={1.1}
+              textWrap="balance"
+              maxW={700}
+              mx="auto"
+              bgClip="text"
+              bgGradient="to-br"
+              gradientFrom="white"
+              gradientTo="gray.400"
+              color="transparent"
+            >
+              The{" "}
+              <styled.span display={{ base: "none", sm: "inline" }}>
+                complete{" "}
               </styled.span>
-            </Link>
-            <Glow size="sm" />
-          </Box>
+              platform for RC Drifting.
+            </styled.h1>
+            <styled.p
+              color="gray.400"
+              pt={3}
+              pb={12}
+              fontSize="lg"
+              maxW={600}
+              mx="auto"
+              textWrap="balance"
+            >
+              We're empowering the RC drift community with powerful tools, major
+              events, beginner guides, and our innovative driver ratings.
+            </styled.p>
 
-          <styled.h1
-            mt={4}
-            fontWeight="medium"
-            fontSize={{ base: "5xl", md: "6xl" }}
-            lineHeight={1.1}
-            textWrap="balance"
-            maxW={700}
-            mx="auto"
-            bgClip="text"
-            bgGradient="to-br"
-            gradientFrom="white"
-            gradientTo="gray.400"
-            color="transparent"
-          >
-            The{" "}
-            <styled.span display={{ base: "none", sm: "inline" }}>
-              complete{" "}
-            </styled.span>
-            platform for RC Drifting.
-          </styled.h1>
-          <styled.p
-            color="gray.400"
-            pt={3}
-            pb={12}
-            fontSize="lg"
-            maxW={600}
-            mx="auto"
-            textWrap="balance"
-          >
-            We're empowering the RC drift community with powerful tools, major
-            events, beginner guides, and our innovative driver ratings.
-          </styled.p>
-
-          <Flex
-            gap={4}
-            justify="center"
-            flexDir={{ base: "column", sm: "row" }}
-          >
-            <LinkButton to="/getting-started">
-              <RiRocketLine /> Getting Started
-            </LinkButton>
-            <LinkButton to="/map/all" variant="secondary">
-              <RiMapPin2Fill /> Find Your Local Track
-            </LinkButton>
-          </Flex>
-        </Container>
+            <Flex
+              gap={4}
+              justify="center"
+              flexDir={{ base: "column", sm: "row" }}
+            >
+              <LinkButton to="/getting-started">
+                <RiRocketLine /> Getting Started
+              </LinkButton>
+              <LinkButton to="/map/all" variant="secondary">
+                <RiMapPin2Fill /> Find Your Local Track
+              </LinkButton>
+            </Flex>
+          </Container>
+        </Box>
 
         <Container maxW={1100} px={2}>
           <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
