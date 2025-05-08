@@ -6,7 +6,7 @@ const ButtonStyles = cva({
   base: {
     py: 2,
     px: 4,
-    rounded: "lg",
+    rounded: "full",
     display: "inline-flex",
     gap: 2,
     alignItems: "center",
