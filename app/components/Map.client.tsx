@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { Box } from "~/styled-system/jsx";
-import { useNavigate, useParams } from "@remix-run/react";
+import { useNavigate, useParams } from "react-router";
 import { getTabParam } from "~/utils/getTabParam";
 import type { Tracks } from "@prisma/client";
 import { TrackTypes } from "@prisma/client";

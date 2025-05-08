@@ -1,6 +1,6 @@
 import { TournamentsState } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import { capitalCase } from "change-case";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";

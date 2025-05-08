@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { RiArrowRightLine } from "react-icons/ri";
 import { styled, Box, Container, Flex } from "~/styled-system/jsx";
 

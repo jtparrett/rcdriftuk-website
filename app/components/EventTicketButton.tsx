@@ -2,13 +2,13 @@ import { RiTicketFill } from "react-icons/ri";
 import { Button, LinkButton } from "./Button";
 import { TicketStatus } from "@prisma/client";
 import type { GetEvent } from "~/utils/getEvent.server";
-import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
+import { SignedIn, SignedOut, useClerk } from "@clerk/react-router";
 import { isBefore, intervalToDuration } from "date-fns";
 import { styled } from "~/styled-system/jsx";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { useState, useEffect } from "react";
 import { ClientOnly } from "./ClientOnly";
-import { useRevalidator } from "@remix-run/react";
+import { useRevalidator } from "react-router";
 import { toZonedTime } from "date-fns-tz";
 
 interface Props {

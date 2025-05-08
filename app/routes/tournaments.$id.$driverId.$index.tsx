@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useParams } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, useLoaderData, useParams } from "react-router";
 import { styled, Box, VStack } from "~/styled-system/jsx";
 import invariant from "tiny-invariant";
 import { prisma } from "~/utils/prisma.server";

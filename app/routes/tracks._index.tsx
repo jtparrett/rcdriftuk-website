@@ -1,14 +1,14 @@
-import { SignedIn } from "@clerk/remix";
+import { SignedIn } from "@clerk/react-router";
 import { TrackStatus } from "@prisma/client";
-import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 import { RiAddCircleFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import type { Route } from "./+types/tracks._index";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: `RC Drift UK | Tracks` },
     {

@@ -8,12 +8,12 @@ import {
   RiTicketFill,
 } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
-import type { MetaFunction } from "@remix-run/node";
+import type { Route } from "./+types/2025";
 import { ImageContainer } from "~/components/ImageContainer";
 import { Glow } from "~/components/Glow";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | 2025" },
     {

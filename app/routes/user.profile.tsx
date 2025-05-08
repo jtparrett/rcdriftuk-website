@@ -1,4 +1,4 @@
-import { UserProfile } from "@clerk/remix";
+import { UserProfile } from "@clerk/react-router";
 import { Box } from "~/styled-system/jsx";
 
 const UserProfilePage = () => {

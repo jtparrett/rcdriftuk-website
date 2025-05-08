@@ -1,6 +1,6 @@
 import { TicketStatus } from "@prisma/client";
-import type { MetaFunction } from "@remix-run/react";
-import { useLoaderData } from "@remix-run/react";
+import type { Route } from "./+types/2025";
+import { useLoaderData } from "react-router";
 import { EventTicketStatus } from "~/components/EventTicketStatus";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { AspectRatio, Box, Container, Flex, styled } from "~/styled-system/jsx";
@@ -15,7 +15,7 @@ export function headers() {
   };
 }
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | 2025 Schedule" },
     {
@@ -91,7 +91,7 @@ const Page = () => {
       acc[monthKey].push(event);
       return acc;
     },
-    {} as Record<string, typeof events>
+    {} as Record<string, typeof events>,
   );
 
   return (
@@ -121,7 +121,7 @@ const Page = () => {
                   const isSoldOut = isEventSoldOut(event);
                   const isFinished = isAfter(
                     new Date(),
-                    new Date(event.endDate)
+                    new Date(event.endDate),
                   );
 
                   return (

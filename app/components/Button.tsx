@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { cva } from "~/styled-system/css/cva";
 import { styled } from "~/styled-system/jsx";
 

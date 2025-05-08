@@ -1,4 +1,4 @@
-import { SignIn } from "@clerk/remix";
+import { SignIn } from "@clerk/react-router";
 import { Container } from "~/styled-system/jsx";
 
 export default function SignInPage() {

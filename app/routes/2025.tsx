@@ -1,12 +1,12 @@
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
-import { Outlet, useLocation } from "@remix-run/react";
+import { Outlet, useLocation } from "react-router";
 import { Tab } from "~/components/Tab";
 
 const Page = () => {
   const location = useLocation();
 
   return (
-    <styled.main>
+    (<styled.main>
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} maxW={1100}>
           <Box overflowX="auto" w="full">
@@ -47,9 +47,8 @@ const Page = () => {
           </Box>
         </Container>
       </Box>
-
       <Outlet />
-    </styled.main>
+    </styled.main>)
   );
 };
 

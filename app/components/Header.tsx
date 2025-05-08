@@ -6,7 +6,7 @@ import {
   Container,
   Center,
 } from "~/styled-system/jsx";
-import { Link, useLocation } from "@remix-run/react";
+import { Link, useLocation } from "react-router";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
 import {
@@ -32,7 +32,7 @@ import {
 import { GiCogLock } from "react-icons/gi";
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
-import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/remix";
+import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/react-router";
 import type { GetUser } from "~/utils/getUser.server";
 
 const today = format(new Date(), "dd-MM-yy");

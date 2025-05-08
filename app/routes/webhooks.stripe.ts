@@ -1,5 +1,5 @@
 import { TicketStatus } from "@prisma/client";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { getEventDate } from "~/utils/getEventDate";
 import { prisma } from "~/utils/prisma.server";

@@ -1,6 +1,6 @@
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
-import { Form } from "@remix-run/react";
+import { Form } from "react-router";
 
 export const CookieBanner = () => {
   return (

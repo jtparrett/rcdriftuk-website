@@ -1,5 +1,5 @@
 import { TrackTypes } from "@prisma/client";
-import { Outlet, useParams } from "@remix-run/react";
+import { Outlet, useParams } from "react-router";
 import { Tab } from "~/components/Tab";
 import { Box, Container, Flex } from "~/styled-system/jsx";
 import { getTabParam } from "~/utils/getTabParam";

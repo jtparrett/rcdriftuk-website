@@ -1,10 +1,6 @@
-import { useUser } from "@clerk/remix";
+import { useUser } from "@clerk/react-router";
 import { BattlesBracket, TicketStatus, TournamentsState } from "@prisma/client";
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
   Outlet,
@@ -12,7 +8,7 @@ import {
   useLoaderData,
   useLocation,
   useNavigation,
-} from "@remix-run/react";
+} from "react-router";
 import { AblyProvider, ChannelProvider } from "ably/react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
@@ -38,6 +34,7 @@ import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import { RiFlagLine, RiRemoteControlLine } from "react-icons/ri";
 import { Spinner } from "~/components/Spinner";
+import type { Route } from "./+types/tournaments.$id";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -55,7 +52,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const users = await getUsers();
 
   const tournamentJudge = tournament.judges.find(
-    (judge) => judge.user.id === userId
+    (judge) => judge.user.id === userId,
   );
 
   const url = new URL(args.request.url);
@@ -135,7 +132,7 @@ export const action = async (args: ActionFunctionArgs) => {
     invariant(
       tournament?.judges.length ===
         tournament?.nextQualifyingLap?.scores.length,
-      "Judging not complete for current lap"
+      "Judging not complete for current lap",
     );
 
     const nextQualifyingLap = await prisma.laps.findFirst({
@@ -186,14 +183,14 @@ export const action = async (args: ActionFunctionArgs) => {
     });
 
     return redirect(
-      `/tournaments/${id}/battles/${nextBattle?.nextBattle?.bracket ?? BattlesBracket.UPPER}`
+      `/tournaments/${id}/battles/${nextBattle?.nextBattle?.bracket ?? BattlesBracket.UPPER}`,
     );
   }
 
   return redirect(`/tournaments/${id}/qualifying`);
 };
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   return [{ title: `RC Drift UK | ${data?.tournament.name}` }];
 };
 
@@ -252,7 +249,7 @@ const TournamentPage = () => {
           <Box py={2} borderBottomWidth={1} borderColor="gray.800" mb={4}>
             <Container maxW={1100} px={2}>
               <Flex flexDir={{ base: "column", sm: "row" }} gap={1}>
-                <Flex bgColor="gray.900" rounded="xl" gap={1} p={1}>
+                <Flex bgColor="gray.900" rounded="full" gap={1} p={1}>
                   <LinkButton
                     to={`/tournaments/${tournament.id}/overview`}
                     size="xs"

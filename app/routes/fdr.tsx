@@ -1,8 +1,7 @@
-import type { MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 import { Select } from "~/components/Select";
 import { Box, Container, styled } from "~/styled-system/jsx";
-
+import type { Route } from "./+types/fdr";
 const CHASSIS_RATIOS = {
   "Yokomo YD-2": 2.6,
   "Yokomo MD1.0": 2.6,
@@ -23,7 +22,7 @@ function calculateFDR(pinion: number, spur: number, internalRatio: number) {
   return ((spur / pinion) * internalRatio).toFixed(2);
 }
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: `RC Drift UK | FDR Calculator` },
     { name: "description", content: "Calculate your FDR" },

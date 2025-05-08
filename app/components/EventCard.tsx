@@ -1,7 +1,7 @@
 import type { Events } from "@prisma/client";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { getEventDate } from "~/utils/getEventDate";
 import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
 import { isPast } from "date-fns";

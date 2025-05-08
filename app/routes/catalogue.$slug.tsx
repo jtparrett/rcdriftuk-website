@@ -1,13 +1,13 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "react-router";
 import { styled, Flex, Box, Spacer } from "~/styled-system/jsx";
 import { LinkButton } from "~/components/Button";
 import { ProductStatus as Status } from "@prisma/client";
 import { prisma } from "~/utils/prisma.server";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { RiLink } from "react-icons/ri";
 import { ProductStatus } from "~/components/ProductStatus";
+import type { Route } from "./+types/catalogue.$slug";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   return [
     {
       title: `RC Drift UK | ${data?.title}`,
@@ -19,7 +19,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params }: Route.LoaderArgs) => {
   const product = await prisma.products.findFirst({
     where: {
       slug: params.slug,

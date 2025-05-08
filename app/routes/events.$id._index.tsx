@@ -1,9 +1,5 @@
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
-import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, redirect, useLoaderData, useNavigation } from "react-router";
 import {
   format,
   formatDuration,
@@ -25,7 +21,7 @@ import { Button, LinkButton } from "~/components/Button";
 import { styled, Box, Container, Flex, Divider } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import invariant from "tiny-invariant";
-import { SignedIn, SignedOut, useClerk } from "@clerk/remix";
+import { SignedIn, SignedOut, useClerk } from "@clerk/react-router";
 import { getEventDate } from "~/utils/getEventDate";
 import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
@@ -37,8 +33,9 @@ import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { Spinner } from "~/components/Spinner";
 import { google } from "calendar-link";
+import type { Route } from "./+types/events.$id._index";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   return [
     { title: `RC Drift UK | Events | ${data?.event.name}` },
     { name: "description", content: data?.event.description },
@@ -213,7 +210,7 @@ const Page = () => {
                     intervalToDuration({
                       start: startDate,
                       end: endDate,
-                    })
+                    }),
                   )}
                 </styled.p>
                 <styled.p fontSize="sm" color="gray.500">
@@ -437,7 +434,7 @@ const Page = () => {
                       variant="outline"
                       download={`${event.name} Tickets ${format(
                         new Date(),
-                        "dd-MM-yyyy"
+                        "dd-MM-yyyy",
                       )}.csv`}
                       target="_blank"
                     >

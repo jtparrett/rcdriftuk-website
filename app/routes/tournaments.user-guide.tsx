@@ -1,10 +1,10 @@
 import { styled, Container, Box, Flex } from "~/styled-system/jsx";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
-import type { MetaFunction } from "@remix-run/node";
 import { ImageContainer } from "~/components/ImageContainer";
+import type { Route } from "./+types/tournaments.user-guide";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | Tournament User Guide" },
     {

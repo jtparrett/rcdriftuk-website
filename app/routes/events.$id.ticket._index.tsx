@@ -1,7 +1,7 @@
 import { TicketStatus } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { useLoaderData } from "react-router";
 import { isBefore } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { LinkButton } from "~/components/Button";

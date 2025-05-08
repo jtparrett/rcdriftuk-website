@@ -1,5 +1,5 @@
-import { redirect } from "@remix-run/node";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
 export const loader = async (args: LoaderFunctionArgs) => {
   if (!args.params.tab) {
     throw redirect(`/tracks/${args.params.slug}/events`);

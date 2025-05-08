@@ -1,13 +1,12 @@
-node_modules
-
-/.cache
-/build
-/public/build
 .env
 
-
-/app/styled-system
-
 .DS_Store
-.vercel
-.env*.local
+/node_modules/
+
+# React Router
+/.react-router/
+/build/
+
+## Panda
+styled-system
+styled-system-studio

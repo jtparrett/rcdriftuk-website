@@ -1,6 +1,6 @@
 import { TrackTypes } from "@prisma/client";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import { startOfDay } from "date-fns";
 import pluralize from "pluralize";
 import {
@@ -18,6 +18,7 @@ import { Tab } from "~/components/Tab";
 import { styled, Box, Flex, Container, Grid } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
+import type { Route } from "./+types/tracks.$slug.$tab";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -143,7 +144,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   });
 };
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   return [
     { title: `RC Drift UK | Tracks | ${data?.track?.name}` },
     { name: "description", content: data?.track?.description },

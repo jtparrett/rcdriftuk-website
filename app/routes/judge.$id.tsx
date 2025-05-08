@@ -1,6 +1,6 @@
 import { TournamentsState } from "@prisma/client";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, redirect, useLoaderData, useNavigation } from "react-router";
 import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
 import { RiArrowLeftLine } from "react-icons/ri";

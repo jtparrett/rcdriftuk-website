@@ -1,5 +1,5 @@
-import { redirect } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { redirect } from "react-router";
+import { useLoaderData, useParams } from "react-router";
 import {
   add,
   endOfWeek,
@@ -11,7 +11,7 @@ import {
   endOfDay,
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";

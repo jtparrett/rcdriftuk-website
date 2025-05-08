@@ -1,6 +1,6 @@
 import { Regions, TrackStatus } from "@prisma/client";
-import type { MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import type { Route } from "./+types/_index";
+import { Link, useLoaderData } from "react-router";
 import { endOfDay, format, startOfDay } from "date-fns";
 import {
   RiArrowRightLine,
@@ -57,7 +57,7 @@ export const loader = async () => {
   return { events, drivers };
 };
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | Home" },
     { name: "description", content: "Welcome to RCDrift.uk" },
@@ -231,7 +231,7 @@ const Page = () => {
                           display="inline-block"
                           src={`/badges/${getDriverRank(
                             driver.elo,
-                            driver.totalBattles
+                            driver.totalBattles,
                           )}.png`}
                           alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                         />

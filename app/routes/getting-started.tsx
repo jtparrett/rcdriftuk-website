@@ -1,10 +1,10 @@
-import type { MetaFunction } from "@remix-run/node";
 import { RiMapPin2Fill, RiSearch2Line, RiArrowDownSLine } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Flex, Box } from "~/styled-system/jsx";
 import { useDisclosure } from "~/utils/useDisclosure";
+import type { Route } from "./+types/getting-started";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     {
       title: "RC Drift UK | Getting Started | A Beginner's Guide",

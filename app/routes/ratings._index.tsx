@@ -1,5 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 import { styled, Container, Box, Flex } from "~/styled-system/jsx";
 import {
   getDriverRank,
@@ -12,8 +11,9 @@ import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Regions } from "@prisma/client";
+import type { Route } from "./+types/ratings._index";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     {
       title: `RC Drift UK | Driver Ratings`,
@@ -210,12 +210,12 @@ const RankSection = () => {
         {keyDisclosure.isOpen && (
           <Box borderTopWidth={1} borderColor="gray.800" p={4}>
             <Flex gap={4} flexWrap="wrap" justifyContent="space-between">
-              {Object.values(RANKS).map((rank) => {
+              {Object.values(RANKS).map((rank, i) => {
                 const [bg] = getRankColor(rank);
 
                 return (
                   <Flex
-                    key={rank}
+                    key={i}
                     gap={3}
                     alignItems="center"
                     minW="150px"
@@ -327,7 +327,7 @@ const RatingsPage = () => {
                 {drivers
                   .filter((driver) => driver.driverId !== 0)
                   .map((driver, i) => {
-                    return <Row key={driver.id} driver={driver} rank={i + 1} />;
+                    return <Row key={i} driver={driver} rank={i + 1} />;
                   })}
               </Flex>
             </Box>

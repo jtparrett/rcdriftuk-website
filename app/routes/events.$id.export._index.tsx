@@ -1,6 +1,6 @@
 import { prisma } from "~/utils/prisma.server";
 import { getAuth } from "~/utils/getAuth.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import { TicketStatus } from "@prisma/client";
 import { format } from "date-fns";
 

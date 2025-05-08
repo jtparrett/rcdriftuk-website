@@ -1,6 +1,6 @@
 import { TicketStatus } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { token } from "~/styled-system/tokens";
