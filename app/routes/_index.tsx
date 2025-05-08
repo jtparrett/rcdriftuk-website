@@ -78,7 +78,7 @@ const Page = () => {
         <Box
           w="full"
           bgImage="url(/bg.png)"
-          bgSize={{ base: "200%", md: "130%" }}
+          bgSize={{ base: "240%", md: "130%" }}
           bgPosition="center"
           bgRepeat="no-repeat"
           pos="relative"
@@ -107,9 +107,7 @@ const Page = () => {
                   rounded="full"
                   px={4}
                   py={1}
-                  bgGradient="to-b"
-                  gradientTo="transparent"
-                  gradientFrom="brand.900"
+                  bgColor="brand.900"
                   fontWeight="medium"
                   fontSize="sm"
                   display="inline-flex"
@@ -138,6 +136,7 @@ const Page = () => {
               gradientFrom="white"
               gradientTo="gray.400"
               color="transparent"
+              letterSpacing="tight"
             >
               The{" "}
               <styled.span display={{ base: "none", sm: "inline" }}>
