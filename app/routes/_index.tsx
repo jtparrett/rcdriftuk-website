@@ -213,7 +213,7 @@ const Page = () => {
               <styled.table w="full">
                 <styled.tbody>
                   {drivers.map((driver, i) => (
-                    <styled.tr key={driver.id}>
+                    <styled.tr key={i}>
                       <styled.td textAlign="center" fontFamily="mono">
                         {i + 1}
                       </styled.td>

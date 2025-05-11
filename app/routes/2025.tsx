@@ -6,7 +6,7 @@ const Page = () => {
   const location = useLocation();
 
   return (
-    (<styled.main>
+    <styled.main>
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} maxW={1100}>
           <Box overflowX="auto" w="full">
@@ -38,7 +38,7 @@ const Page = () => {
               <Tab
                 to="/2025/judging-criteria"
                 isActive={location.pathname.startsWith(
-                  "/2025/judging-criteria"
+                  "/2025/judging-criteria",
                 )}
               >
                 Judging Criteria
@@ -48,7 +48,7 @@ const Page = () => {
         </Container>
       </Box>
       <Outlet />
-    </styled.main>)
+    </styled.main>
   );
 };
 

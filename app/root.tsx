@@ -7,7 +7,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
   useLocation,
   useRouteError,
 } from "react-router";
@@ -56,45 +55,47 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { hideBanner, user } = useLoaderData<typeof loader>();
+  const { hideBanner, user } = loaderData;
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
 
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-        <script src="https://cdn.splitbee.io/sb.js"></script>
-        <script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
-          crossOrigin="anonymous"
-        ></script>
-      </head>
-      <body>
-        <ClerkProvider
-          loaderData={loaderData}
-          appearance={{
-            baseTheme: dark,
-            layout: {
-              logoPlacement: "none",
-            },
-            variables: {
-              colorPrimary: "#ec1a55",
-            },
-            elements: {
-              rootBox: {
-                margin: "0 auto",
-                overflow: "hidden",
-              },
-              card: {
-                margin: 0,
-              },
-            },
-          }}
-        >
+    <ClerkProvider
+      loaderData={loaderData}
+      appearance={{
+        baseTheme: dark,
+        layout: {
+          logoPlacement: "none",
+        },
+        variables: {
+          colorPrimary: "#ec1a55",
+        },
+        elements: {
+          rootBox: {
+            margin: "0 auto",
+            overflow: "hidden",
+          },
+          card: {
+            margin: 0,
+          },
+        },
+      }}
+    >
+      <html lang="en">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <Meta />
+          <Links />
+          <script src="https://cdn.splitbee.io/sb.js"></script>
+          {process.env.NODE_ENV === "production" && (
+            <script
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
+              crossOrigin="anonymous"
+            ></script>
+          )}
+        </head>
+        <body>
           {!hideBanner && <CookieBanner />}
           <AnnouncementBanner />
           <Header user={user} />
@@ -102,9 +103,9 @@ function App({
           {!isMap && <Footer />}
           <ScrollRestoration />
           <Scripts />
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
 
