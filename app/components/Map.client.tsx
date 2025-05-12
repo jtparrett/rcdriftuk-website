@@ -3,8 +3,7 @@ import mapboxgl from "mapbox-gl";
 import { Box } from "~/styled-system/jsx";
 import { useNavigate, useParams } from "react-router";
 import { getTabParam } from "~/utils/getTabParam";
-import type { Tracks } from "@prisma/client";
-import { TrackTypes } from "@prisma/client";
+import { TrackTypes, type Tracks } from "~/utils/prismaTypes";
 
 export type Values<T> = T[keyof T];
 
