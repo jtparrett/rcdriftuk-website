@@ -220,7 +220,7 @@ const TournamentPage = () => {
         </AspectRatio>
       )}
 
-      <Box py={2} borderBottomWidth={1} borderColor="gray.800">
+      <Box py={2} borderBottomWidth={1} borderColor="gray.900">
         <Container maxW={1100} px={2}>
           <styled.h1
             fontSize="xl"
@@ -246,7 +246,7 @@ const TournamentPage = () => {
 
       {tournament.state !== TournamentsState.START && (
         <>
-          <Box py={2} borderBottomWidth={1} borderColor="gray.800" mb={4}>
+          <Box py={2} borderBottomWidth={1} borderColor="gray.900" mb={4}>
             <Container maxW={1100} px={2}>
               <Flex flexDir={{ base: "column", sm: "row" }} gap={1}>
                 <Flex bgColor="gray.900" rounded="full" gap={1} p={1}>
