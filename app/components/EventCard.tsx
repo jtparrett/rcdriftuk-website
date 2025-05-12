@@ -12,11 +12,11 @@ interface QueriedEvent
     Events,
     "startDate" | "endDate" | "createdAt" | "updatedAt" | "ticketReleaseDate"
   > {
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  updatedAt: string;
-  ticketReleaseDate: string | null;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  ticketReleaseDate: Date | null;
   eventTrack: {
     slug: string;
     name: string;
