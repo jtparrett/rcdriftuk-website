@@ -1,4 +1,4 @@
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 import type { Route } from "./+types/2025";
 import { useLoaderData } from "react-router";
 import { EventTicketStatus } from "~/components/EventTicketStatus";

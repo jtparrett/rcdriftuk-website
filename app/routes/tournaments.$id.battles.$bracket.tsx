@@ -1,4 +1,4 @@
-import { BattlesBracket, TournamentsFormat } from "@prisma/client";
+import { BattlesBracket, TournamentsFormat } from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
@@ -145,7 +145,7 @@ const TournamentBattlesPage = () => {
         [battle.round]: [...(agg[battle.round?.toString()] ?? []), battle],
       };
     },
-    {}
+    {},
   );
 
   const battlesInRound = Object.values(battlesByRound).reduce<Battle[][]>(
@@ -163,10 +163,10 @@ const TournamentBattlesPage = () => {
         : [];
 
       return [...agg, firstChunk, secondChunk].filter(
-        (item) => item.length > 0
+        (item) => item.length > 0,
       );
     },
-    []
+    [],
   );
 
   return (
@@ -227,7 +227,7 @@ const TournamentBattlesPage = () => {
                     {getBracketName(
                       battles[0].round,
                       battles[0].bracket,
-                      tournament.format
+                      tournament.format,
                     )}
                   </styled.p>
                   <Flex

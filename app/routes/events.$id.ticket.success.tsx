@@ -1,4 +1,4 @@
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 import { useLoaderData } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";

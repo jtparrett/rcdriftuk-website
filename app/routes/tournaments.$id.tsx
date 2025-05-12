@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/react-router";
-import { BattlesBracket, TicketStatus, TournamentsState } from "@prisma/client";
+import { BattlesBracket, TicketStatus, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,

@@ -8,7 +8,7 @@ import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import { TrackStatus } from "@prisma/client";
+import { TrackStatus } from "~/utils/enums";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {

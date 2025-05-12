@@ -3,7 +3,7 @@ import {
   BattlesBracket,
   TournamentsFormat,
   TournamentsState,
-} from "@prisma/client";
+} from "~/utils/enums";
 import invariant from "tiny-invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
@@ -74,7 +74,7 @@ export const tournamentEndQualifying = async (id: string) => {
     ? totalDrivers * 2 - tournament.drivers.length
     : 0;
   const totalDriversWithBuys = pow2Floor(
-    tournament.drivers.length + totalBuysToCreate
+    tournament.drivers.length + totalBuysToCreate,
   );
 
   const sortedDrivers = [
@@ -86,7 +86,7 @@ export const tournamentEndQualifying = async (id: string) => {
   ]
     .map((driver) => {
       const lapScores = driver.laps.map((lap) =>
-        sumScores(lap.scores, tournament._count.judges)
+        sumScores(lap.scores, tournament._count.judges),
       );
 
       return {
@@ -96,10 +96,10 @@ export const tournamentEndQualifying = async (id: string) => {
     })
     .sort((a, b) => {
       const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
-        (lapA, lapB) => lapB - lapA
+        (lapA, lapB) => lapB - lapA,
       );
       const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
-        (lapA, lapB) => lapB - lapA
+        (lapA, lapB) => lapB - lapA,
       );
 
       return bestB - bestA || secondB - secondA || thirdB - thirdA;
@@ -116,7 +116,7 @@ export const tournamentEndQualifying = async (id: string) => {
           qualifyingPosition: i + 1,
         },
       });
-    })
+    }),
   );
 
   // Pairs top and bottom qualifiers into battles
@@ -150,14 +150,14 @@ export const tournamentEndQualifying = async (id: string) => {
         driverLeftId: leftDriver.id,
         driverRightId: rightDriver.id,
       };
-    })
+    }),
   );
 
   const upperBracket = Array.from(new Array(totalDriversWithBuys - 1)).map(
     (_, i) => {
       let round = Math.ceil(
         Math.log2(totalDriversWithBuys) -
-          Math.log2(totalDriversWithBuys - (i + 1))
+          Math.log2(totalDriversWithBuys - (i + 1)),
       );
 
       return {
@@ -165,7 +165,7 @@ export const tournamentEndQualifying = async (id: string) => {
         round: round === Infinity ? totalDriversWithBuys : round,
         bracket: BattlesBracket.UPPER,
       };
-    }
+    },
   );
 
   const rounds = [...new Set(upperBracket.map(({ round }) => round))];
@@ -180,7 +180,7 @@ export const tournamentEndQualifying = async (id: string) => {
             const multiplier = round <= 1 ? 0.5 : 1.5;
             const totalBattlesForRound = Math.ceil(
               upperBracket.filter((battle) => battle.round === round).length *
-                multiplier
+                multiplier,
             );
 
             return Array.from(new Array(totalBattlesForRound)).map(() => {
@@ -229,7 +229,7 @@ export const tournamentEndQualifying = async (id: string) => {
           driverRightId: drivers.driverRightId,
         },
       });
-    })
+    }),
   );
 
   // Get next battle

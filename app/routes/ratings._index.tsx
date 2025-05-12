@@ -10,7 +10,7 @@ import { getDriverRatings } from "~/utils/getDriverRatings";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
-import { Regions } from "@prisma/client";
+import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/ratings._index";
 
 export const meta: Route.MetaFunction = () => {

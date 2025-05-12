@@ -1,4 +1,4 @@
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { LinkButton } from "~/components/Button";
@@ -133,7 +133,7 @@ export default function TicketsPage() {
                       <styled.p fontSize="sm" color="gray.500">
                         {getEventDate(
                           new Date(ticket.event.startDate),
-                          new Date(ticket.event.endDate)
+                          new Date(ticket.event.endDate),
                         )}
                       </styled.p>
                       {ticket.event.eventTrack && (

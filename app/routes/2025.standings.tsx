@@ -1,4 +1,4 @@
-import { Regions } from "@prisma/client";
+import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/2025";
 import { useLoaderData } from "react-router";
 import { startOfYear } from "date-fns";

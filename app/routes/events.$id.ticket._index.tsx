@@ -1,4 +1,4 @@
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { useLoaderData } from "react-router";
@@ -240,7 +240,7 @@ const Page = () => {
           <styled.p fontSize="sm" color="gray.600">
             {getEventDate(
               new Date(ticket.event.startDate),
-              new Date(ticket.event.endDate)
+              new Date(ticket.event.endDate),
             )}
           </styled.p>
           <styled.p fontSize="sm" color="gray.500" mb={4}>

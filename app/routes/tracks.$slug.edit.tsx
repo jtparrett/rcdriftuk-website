@@ -1,4 +1,4 @@
-import { TrackTypes } from "@prisma/client";
+import { TrackTypes } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { Form, useLoaderData } from "react-router";

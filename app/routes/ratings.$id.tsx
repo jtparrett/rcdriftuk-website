@@ -29,7 +29,7 @@ import {
 import { Button, LinkButton } from "~/components/Button";
 import type { Values } from "~/utils/values";
 import { format } from "date-fns";
-import { Regions } from "@prisma/client";
+import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/ratings.$id";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {

@@ -1,4 +1,4 @@
-import { BattlesBracket } from "@prisma/client";
+import { BattlesBracket } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 
 export const pow2Ceil = (value: number) => {
@@ -72,7 +72,7 @@ export const advanceSingleEliminationBattleWinner = async ({
           data: {
             driverLeftId: thisLoserId,
           },
-        })
+        }),
       );
 
       queries.push(
@@ -83,7 +83,7 @@ export const advanceSingleEliminationBattleWinner = async ({
           data: {
             driverLeftId: winnerId,
           },
-        })
+        }),
       );
 
       await prisma.$transaction(queries);
@@ -101,7 +101,7 @@ export const advanceSingleEliminationBattleWinner = async ({
           data: {
             driverRightId: thisLoserId,
           },
-        })
+        }),
       );
 
       queries.push(
@@ -112,7 +112,7 @@ export const advanceSingleEliminationBattleWinner = async ({
           data: {
             driverRightId: winnerId,
           },
-        })
+        }),
       );
     }
 
@@ -137,7 +137,7 @@ export const advanceSingleEliminationBattleWinner = async ({
         data: {
           [emptySide]: winnerId,
         },
-      })
+      }),
     );
 
     await prisma.$transaction(queries);

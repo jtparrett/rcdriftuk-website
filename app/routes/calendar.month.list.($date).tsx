@@ -1,4 +1,4 @@
-import { TrackStatus } from "@prisma/client";
+import { TrackStatus } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { useLoaderData } from "react-router";

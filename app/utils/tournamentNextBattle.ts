@@ -1,4 +1,4 @@
-import { TournamentsFormat, TournamentsState } from "@prisma/client";
+import { TournamentsFormat, TournamentsState } from "~/utils/enums";
 import invariant from "tiny-invariant";
 import {
   advanceDoubleEliminationBattleWinner,

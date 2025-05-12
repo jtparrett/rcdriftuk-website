@@ -1,5 +1,5 @@
 import { SignedIn } from "@clerk/react-router";
-import { TrackStatus } from "@prisma/client";
+import { TrackStatus } from "~/utils/enums";
 import { useLoaderData } from "react-router";
 import { RiAddCircleFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";

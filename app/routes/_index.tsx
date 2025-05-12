@@ -1,4 +1,4 @@
-import { Regions, TrackStatus } from "@prisma/client";
+import { Regions, TrackStatus } from "~/utils/enums";
 import type { Route } from "./+types/_index";
 import { Link, useLoaderData } from "react-router";
 import { endOfDay, format, startOfDay } from "date-fns";

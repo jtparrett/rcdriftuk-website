@@ -1,4 +1,4 @@
-import { TrackStatus } from "~/utils/prismaTypes";
+import { TrackStatus } from "~/utils/enums";
 import { useLoaderData } from "react-router";
 import { ClientOnly } from "~/components/ClientOnly";
 import { Map } from "~/components/Map.client";

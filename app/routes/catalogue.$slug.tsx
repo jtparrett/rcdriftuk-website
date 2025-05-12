@@ -1,7 +1,7 @@
 import { Link, useLoaderData } from "react-router";
 import { styled, Flex, Box, Spacer } from "~/styled-system/jsx";
 import { LinkButton } from "~/components/Button";
-import { ProductStatus as Status } from "@prisma/client";
+import { ProductStatus as Status } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 import { RiLink } from "react-icons/ri";
 import { ProductStatus } from "~/components/ProductStatus";

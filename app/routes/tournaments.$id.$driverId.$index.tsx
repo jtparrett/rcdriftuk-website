@@ -4,7 +4,7 @@ import { styled, Box, VStack } from "~/styled-system/jsx";
 import invariant from "tiny-invariant";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
-import { TournamentsState } from "@prisma/client";
+import { TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -54,7 +54,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   invariant(tournament, "Tournament not found");
   invariant(
     tournament.state === TournamentsState.QUALIFYING,
-    "Tournament is not in qualifying"
+    "Tournament is not in qualifying",
   );
   invariant(tournament.drivers.length > 0, "Driver not found");
 

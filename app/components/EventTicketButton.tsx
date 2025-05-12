@@ -1,6 +1,6 @@
 import { RiTicketFill } from "react-icons/ri";
 import { Button, LinkButton } from "./Button";
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 import type { GetEvent } from "~/utils/getEvent.server";
 import { SignedIn, SignedOut, useClerk } from "@clerk/react-router";
 import { isBefore, intervalToDuration } from "date-fns";

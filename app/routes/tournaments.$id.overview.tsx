@@ -1,4 +1,4 @@
-import { TournamentsState } from "@prisma/client";
+import { TournamentsState } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { capitalCase } from "change-case";

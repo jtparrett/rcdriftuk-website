@@ -1,5 +1,5 @@
 import { prisma } from "./prisma.server";
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 
 export const clearPendingTickets = async (eventId: string) => {
   const fifteenMinutesAgo = new Date(Date.now() - 1000 * 60 * 15);

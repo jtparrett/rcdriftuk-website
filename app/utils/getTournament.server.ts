@@ -1,4 +1,4 @@
-import { TournamentsState } from "@prisma/client";
+import { TournamentsState } from "~/utils/enums";
 import { prisma } from "./prisma.server";
 
 export const getTournament = (id: string, userId: string | null) => {

@@ -1,4 +1,4 @@
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { getEventDate } from "~/utils/getEventDate";
@@ -15,13 +15,13 @@ export async function action(args: ActionFunctionArgs) {
     invariant(sig, "Missing stripe-signature header");
     invariant(
       process.env.STRIPE_WEBHOOK_SECRET,
-      "Missing STRIPE_WEBHOOK_SECRET"
+      "Missing STRIPE_WEBHOOK_SECRET",
     );
 
     const event = stripe.webhooks.constructEvent(
       payload,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.STRIPE_WEBHOOK_SECRET,
     );
 
     if (event.type === "checkout.session.completed") {
@@ -120,7 +120,7 @@ export async function action(args: ActionFunctionArgs) {
             This is an automated message from RC Drift UK. Please do not reply to this email.
           </p>
         </div>
-        `
+        `,
         );
       }
     }

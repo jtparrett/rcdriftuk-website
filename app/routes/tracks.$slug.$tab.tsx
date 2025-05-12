@@ -1,4 +1,4 @@
-import { TrackTypes } from "@prisma/client";
+import { TrackTypes } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { startOfDay } from "date-fns";
