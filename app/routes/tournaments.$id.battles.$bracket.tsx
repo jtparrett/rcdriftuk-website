@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
-import { Box, Divider, Flex, styled } from "~/styled-system/jsx";
+import { Box, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
 import { prisma } from "~/utils/prisma.server";
 import { Glow } from "~/components/Glow";
@@ -89,11 +89,11 @@ const Driver = ({
 }) => {
   if (driver?.isBye) {
     return (
-      <Flex h={6} alignItems="center" pl={6} bgColor="gray.800">
+      <Flex h={6} alignItems="center" pl={6}>
         <styled.span
           fontSize="xs"
           display="block"
-          color="gray.500"
+          color="gray.800"
           fontWeight="semibold"
         >
           Bye Run
@@ -125,7 +125,7 @@ const Driver = ({
             ? undefined
             : winnerId === driver?.id
               ? "green.500"
-              : "gray.600"
+              : "gray.500"
         }
         pr={2}
       >
@@ -243,16 +243,19 @@ const TournamentBattlesPage = () => {
                       return (
                         <Fragment key={battle.id}>
                           <Box position="relative" flex="none" zIndex={1}>
-                            <Divider
-                              position="absolute"
-                              borderBottomWidth={1}
-                              top="50%"
-                              w="full"
-                              zIndex={1}
-                              borderBottomColor="gray.700"
-                            />
+                            {battles.length <= 1 && (
+                              <Box
+                                pos="absolute"
+                                top="50%"
+                                borderBottomWidth={1}
+                                borderColor="gray.700"
+                                w="full"
+                                borderStyle="dashed"
+                              />
+                            )}
                             <Box
                               mx={4}
+                              h={12}
                               rounded="lg"
                               borderWidth={1}
                               borderColor={
@@ -276,9 +279,13 @@ const TournamentBattlesPage = () => {
                           {i % 2 === 0 && battles.length > 1 ? (
                             <Box
                               borderRightWidth={1}
-                              borderRightColor="gray.700"
+                              borderTopWidth={1}
+                              borderBottomWidth={1}
+                              borderStyle="dashed"
+                              borderColor="gray.700"
                               flex={1}
                               my={-6}
+                              borderRightRadius="lg"
                             />
                           ) : (
                             <Spacer />

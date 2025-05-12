@@ -252,7 +252,7 @@ const TournamentPage = () => {
           <Box py={2} borderBottomWidth={1} borderColor="gray.800" mb={4}>
             <Container maxW={1100} px={2}>
               <Flex flexDir={{ base: "column", sm: "row" }} gap={1}>
-                <Flex bgColor="gray.900" rounded="xl" gap={1} p={1}>
+                <Flex bgColor="gray.900" rounded="full" gap={1} p={1}>
                   <LinkButton
                     to={`/tournaments/${tournament.id}/overview`}
                     size="xs"
