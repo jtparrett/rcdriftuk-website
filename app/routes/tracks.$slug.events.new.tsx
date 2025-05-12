@@ -217,7 +217,7 @@ const CalendarNewPage = () => {
               name="enableTicketing"
               value={enableTicketing ? "true" : "false"}
             />
-            <Flex overflow="hidden" rounded="md">
+            <Flex overflow="hidden" rounded="full">
               <Button
                 rounded="none"
                 variant={enableTicketing ? "secondary" : "primary"}
