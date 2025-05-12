@@ -90,15 +90,15 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         return {
           ...driver,
           lapScores,
-          bestLapScore: Math.max(...lapScores),
+          bestLapScore: lapScores.length > 0 ? Math.max(...lapScores) : null,
         };
       })
       .sort((a, b) => {
         const [bestA, secondA, thirdA] = [...a.lapScores].sort(
-          (lapA, lapB) => lapB - lapA
+          (lapA, lapB) => lapB - lapA,
         );
         const [bestB, secondB, thirdB] = [...b.lapScores].sort(
-          (lapA, lapB) => lapB - lapA
+          (lapA, lapB) => lapB - lapA,
         );
 
         return bestB - bestA || secondB - secondA || thirdB - thirdA;
@@ -204,7 +204,7 @@ const QualifyingPage = () => {
   const tournament = useLoaderData<typeof loader>();
 
   const driversWithoutBuys = tournament.drivers.filter(
-    (driver) => !driver.isBye
+    (driver) => !driver.isBye,
   );
   const qualifyingCutOff = pow2Floor(driversWithoutBuys.length);
   const half = Math.ceil(driversWithoutBuys.length / 2);

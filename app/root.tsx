@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
   useLocation,
   useRouteError,
 } from "react-router";
@@ -50,11 +51,8 @@ export const loader = (args: LoaderFunctionArgs) =>
     };
   });
 
-function App({
-  loaderData,
-}: {
-  loaderData: Awaited<ReturnType<typeof loader>>;
-}) {
+export function Layout({ children }: { children: React.ReactNode }) {
+  const loaderData = useLoaderData<typeof loader>();
   const { hideBanner, user } = loaderData;
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
@@ -99,7 +97,7 @@ function App({
           {!hideBanner && <CookieBanner />}
           <AnnouncementBanner />
           <Header user={user} />
-          <Outlet />
+          {children}
           {!isMap && <Footer />}
           <ScrollRestoration />
           <Scripts />
@@ -112,49 +110,41 @@ function App({
 export function ErrorBoundary() {
   const error = useRouteError();
   return (
-    <html lang="en">
-      <head>
-        <title>Oops!</title>
-        <Meta />
-        <Links />
-        <script async src="https://cdn.splitbee.io/sb.js"></script>
-      </head>
-      <body>
-        <Center
-          h="100vh"
-          bgImage="url(/dot-bg.svg)"
-          bgRepeat="repeat"
-          bgSize="16px"
-          bgPosition="center"
-          borderBottomWidth={1}
-          borderColor="gray.800"
-        >
-          <Box
-            p={8}
-            bg="gray.900"
-            borderRadius="lg"
-            borderWidth={1}
-            borderColor="gray.800"
-            shadow="lg"
-            textAlign="center"
-          >
-            <styled.h1 fontWeight="extrabold" mb={4} fontSize="3xl">
-              {isRouteErrorResponse(error)
-                ? `${error.status} ${error.statusText}`
-                : error instanceof Error
-                  ? error.message
-                  : "Unknown Error"}
-            </styled.h1>
-            <LinkButton to="/">
-              Go Home <RiHome2Line />
-            </LinkButton>
-          </Box>
-        </Center>
-
-        <Scripts />
-      </body>
-    </html>
+    <Center
+      h="100vh"
+      bgImage="url(/dot-bg.svg)"
+      bgRepeat="repeat"
+      bgSize="16px"
+      bgPosition="center"
+      borderBottomWidth={1}
+      borderColor="gray.800"
+    >
+      <Box
+        p={8}
+        bg="gray.900"
+        borderRadius="lg"
+        borderWidth={1}
+        borderColor="gray.800"
+        shadow="lg"
+        textAlign="center"
+      >
+        <styled.h1 fontWeight="extrabold" mb={4} fontSize="3xl">
+          {isRouteErrorResponse(error)
+            ? `${error.status} ${error.statusText}`
+            : error instanceof Error
+              ? error.message
+              : "Unknown Error"}
+        </styled.h1>
+        <LinkButton to="/">
+          Go Home <RiHome2Line />
+        </LinkButton>
+      </Box>
+    </Center>
   );
+}
+
+function App() {
+  return <Outlet />;
 }
 
 export default App;

@@ -217,7 +217,7 @@ const TournamentsOverviewPage = () => {
 
   const qualifyingRun =
     (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
-      (lap) => lap.id === tournament.nextQualifyingLapId
+      (lap) => lap.id === tournament.nextQualifyingLapId,
     ) ?? 0) + 1;
 
   return (
@@ -273,7 +273,7 @@ const TournamentsOverviewPage = () => {
                 {capitalCase(
                   tournament.state === TournamentsState.END
                     ? "Final Results"
-                    : tournament.state
+                    : tournament.state,
                 )}
               </styled.p>
             </Box>
@@ -300,7 +300,7 @@ const TournamentsOverviewPage = () => {
                       <styled.p fontSize="6xl" fontWeight="extrabold" pb={4}>
                         {sumScores(
                           tournament.nextQualifyingLap.scores,
-                          tournament.judges.length
+                          tournament.judges.length,
                         )}
                       </styled.p>
                       <Flex textAlign="center" gap="1px">
@@ -373,6 +373,10 @@ const TournamentsOverviewPage = () => {
                             <motion.div
                               key={i}
                               animate={{ x: winnerDirection }}
+                              transition={{
+                                duration: 1,
+                                ease: "anticipate",
+                              }}
                             >
                               <Box
                                 rounded="xl"
