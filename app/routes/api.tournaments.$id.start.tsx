@@ -1,6 +1,6 @@
-import { TournamentsFormat, TournamentsState } from "@prisma/client";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import { TournamentsFormat, TournamentsState } from "~/utils/enums";
+import type { ActionFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
@@ -25,7 +25,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
   const qualifyingLaps = Math.max(
     z.coerce.number().parse(formData.get("qualifyingLaps")),
-    1
+    1,
   );
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
   const fullInclusion =
@@ -59,7 +59,7 @@ export const action = async (args: ActionFunctionArgs) => {
     data: tournamentDrivers.flatMap((driver) =>
       Array.from({ length: qualifyingLaps }, () => ({
         tournamentDriverId: driver.id,
-      }))
+      })),
     ),
   });
 

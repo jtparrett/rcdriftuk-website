@@ -1,7 +1,7 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import { prisma } from "~/utils/prisma.server";
 import z from "zod";
-import { TrackStatus } from "@prisma/client";
+import { TrackStatus } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const url = new URL(args.request.url);

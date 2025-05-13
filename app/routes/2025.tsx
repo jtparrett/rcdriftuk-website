@@ -1,5 +1,5 @@
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
-import { Outlet, useLocation } from "@remix-run/react";
+import { Outlet, useLocation } from "react-router";
 import { Tab } from "~/components/Tab";
 
 const Page = () => {
@@ -38,7 +38,7 @@ const Page = () => {
               <Tab
                 to="/2025/judging-criteria"
                 isActive={location.pathname.startsWith(
-                  "/2025/judging-criteria"
+                  "/2025/judging-criteria",
                 )}
               >
                 Judging Criteria
@@ -47,7 +47,6 @@ const Page = () => {
           </Box>
         </Container>
       </Box>
-
       <Outlet />
     </styled.main>
   );

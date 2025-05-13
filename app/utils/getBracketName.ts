@@ -1,9 +1,9 @@
-import { BattlesBracket, TournamentsFormat } from "@prisma/client";
+import { BattlesBracket, TournamentsFormat } from "~/utils/enums";
 
 export const getBracketName = (
   round: number,
   bracket: BattlesBracket,
-  format: TournamentsFormat
+  format: TournamentsFormat,
 ) => {
   if (round === 1000) {
     return "🏆 Final 🏆";

@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Form } from "react-router";
 import { add, differenceInWeeks, endOfYear, sub } from "date-fns";
 import { useState } from "react";
 import invariant from "tiny-invariant";
@@ -217,7 +217,7 @@ const CalendarNewPage = () => {
               name="enableTicketing"
               value={enableTicketing ? "true" : "false"}
             />
-            <Flex overflow="hidden" rounded="md">
+            <Flex overflow="hidden" rounded="full">
               <Button
                 rounded="none"
                 variant={enableTicketing ? "secondary" : "primary"}

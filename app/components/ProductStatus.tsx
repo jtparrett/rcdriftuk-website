@@ -1,4 +1,4 @@
-import { ProductStatus as Status } from "@prisma/client";
+import { ProductStatus as Status } from "~/utils/enums";
 import { Box } from "~/styled-system/jsx";
 import { getProductStatus } from "~/utils/getProductStatus";
 

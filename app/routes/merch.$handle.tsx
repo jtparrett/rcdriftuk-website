@@ -1,9 +1,5 @@
-import { Form, redirect, useLoaderData } from "@remix-run/react";
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
+import { Form, redirect, useLoaderData } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { styled, Box, Flex, Container } from "~/styled-system/jsx";
 import { Button, LinkButton } from "~/components/Button";
 import { useState } from "react";
@@ -11,6 +7,7 @@ import { z } from "zod";
 import { shopify } from "~/utils/shopify.server";
 import { Select } from "~/components/Select";
 import { RiArrowLeftLine } from "react-icons/ri";
+import type { Route } from "./+types/merch.$handle";
 
 const CartCreateResponseSchema = z.object({
   data: z.object({
@@ -24,7 +21,7 @@ const CartCreateResponseSchema = z.object({
               node: z.object({
                 id: z.string(),
               }),
-            })
+            }),
           ),
         }),
       }),
@@ -32,7 +29,7 @@ const CartCreateResponseSchema = z.object({
         z.object({
           field: z.string(),
           message: z.string(),
-        })
+        }),
       ),
     }),
   }),
@@ -50,7 +47,7 @@ const CartLinesAddResponseSchema = z.object({
               node: z.object({
                 id: z.string(),
               }),
-            })
+            }),
           ),
         }),
       }),
@@ -58,7 +55,7 @@ const CartLinesAddResponseSchema = z.object({
         z.object({
           field: z.string(),
           message: z.string(),
-        })
+        }),
       ),
     }),
   }),
@@ -75,7 +72,7 @@ const CartQueryResponseSchema = z.object({
             node: z.object({
               id: z.string(),
             }),
-          })
+          }),
         ),
       }),
     }),
@@ -94,7 +91,7 @@ const ProductResponseSchema = z.object({
             node: z.object({
               url: z.string(),
             }),
-          })
+          }),
         ),
       }),
       variants: z.object({
@@ -107,7 +104,7 @@ const ProductResponseSchema = z.object({
                 amount: z.string(),
               }),
             }),
-          })
+          }),
         ),
       }),
     }),
@@ -156,7 +153,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         variables: {
           handle,
         },
-      }
+      },
     );
 
     const validatedData = ProductResponseSchema.parse(data);
@@ -244,7 +241,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           cartId,
           variantId,
         },
-      }
+      },
     );
 
     const validatedAddToCartData =
@@ -252,7 +249,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     if (validatedAddToCartData.data.cartLinesAdd.userErrors.length > 0) {
       throw new Error(
-        validatedAddToCartData.data.cartLinesAdd.userErrors[0].message
+        validatedAddToCartData.data.cartLinesAdd.userErrors[0].message,
       );
     }
 
@@ -277,7 +274,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         variables: {
           cartId,
         },
-      }
+      },
     );
 
     const validatedCheckoutData = CartQueryResponseSchema.parse(checkoutData);
@@ -289,12 +286,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       JSON.stringify({ error: "Failed to create checkout" }),
       {
         status: 500,
-      }
+      },
     );
   }
 };
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   const { product } = data ?? {};
   return [
     { title: `RC Drift UK | Merch | ${product?.title}` },
@@ -305,12 +302,12 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 const MerchDetailPage = () => {
   const { product } = useLoaderData<typeof loader>();
   const [selectedVariantId, setSelectedVariantId] = useState(
-    product.variants.edges[0].node.id
+    product.variants.edges[0].node.id,
   );
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const selectedVariant = product.variants.edges.find(
-    (variant) => variant.node.id === selectedVariantId
+    (variant) => variant.node.id === selectedVariantId,
   );
 
   const selectedImage = product.images.edges[selectedImageIndex];

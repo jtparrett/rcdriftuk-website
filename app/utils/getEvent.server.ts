@@ -1,4 +1,4 @@
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus } from "~/utils/enums";
 
 import { prisma } from "./prisma.server";
 import { startOfDay } from "date-fns";

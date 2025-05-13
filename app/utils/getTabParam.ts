@@ -1,4 +1,4 @@
-import { TrackTypes } from "@prisma/client";
+import { TrackTypes } from "~/utils/enums";
 import { z } from "zod";
 
 export const getTabParam = (param?: string) => {

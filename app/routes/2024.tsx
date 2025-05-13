@@ -1,10 +1,11 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Outlet, useLocation } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import type { Route } from "./+types/2024";
+import { redirect } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { Tab } from "~/components/Tab";
 import { Box, Flex, Container } from "~/styled-system/jsx";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | 2024 | Championship" },
     {

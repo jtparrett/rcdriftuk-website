@@ -1,7 +1,7 @@
 import type { Events } from "@prisma/client";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { getEventDate } from "~/utils/getEventDate";
 import { RiArrowRightSLine, RiCheckLine } from "react-icons/ri";
 import { isPast } from "date-fns";
@@ -12,11 +12,11 @@ interface QueriedEvent
     Events,
     "startDate" | "endDate" | "createdAt" | "updatedAt" | "ticketReleaseDate"
   > {
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  updatedAt: string;
-  ticketReleaseDate: string | null;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  ticketReleaseDate: Date | null;
   eventTrack: {
     slug: string;
     name: string;

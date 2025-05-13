@@ -1,7 +1,7 @@
 import { prisma } from "~/utils/prisma.server";
 import { getAuth } from "~/utils/getAuth.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { TicketStatus } from "@prisma/client";
+import type { LoaderFunctionArgs } from "react-router";
+import { TicketStatus } from "~/utils/enums";
 import { format } from "date-fns";
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -67,7 +67,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         ticket.user?.lastName ?? "",
         ticket.status,
         new Date(ticket.createdAt).toLocaleDateString(),
-      ].join(",")
+      ].join(","),
     ),
   ];
 
@@ -78,7 +78,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       "Content-Type": "text/csv",
       "Content-Disposition": `attachment; filename="${event.name}-tickets-${format(
         new Date(),
-        "dd-MM-yyyy"
+        "dd-MM-yyyy",
       )}.csv"`,
     },
   });

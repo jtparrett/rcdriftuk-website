@@ -1,7 +1,15 @@
 import { styled, Container } from "~/styled-system/jsx";
-import { Link, MetaFunction, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "react-router";
 import { z } from "zod";
 import { shopify } from "~/utils/shopify.server";
+import type { Route } from "./+types/merch._index";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: "RC Drift UK | Merch" },
+    { description: "RC Drift UK Merch Store" },
+  ];
+};
 
 const ProductResponseSchema = z.object({
   data: z.object({
@@ -18,7 +26,7 @@ const ProductResponseSchema = z.object({
                   node: z.object({
                     url: z.string(),
                   }),
-                })
+                }),
               ),
             }),
             priceRange: z.object({
@@ -27,7 +35,7 @@ const ProductResponseSchema = z.object({
               }),
             }),
           }),
-        })
+        }),
       ),
     }),
   }),
@@ -86,13 +94,6 @@ export const loader = async () => {
   }
 };
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "RC Drift UK | Merch" },
-    { description: "RC Drift UK Merch Store" },
-  ];
-};
-
 const MerchPage = () => {
   const { products } = useLoaderData<typeof loader>();
 
@@ -122,7 +123,7 @@ const MerchPage = () => {
                 <styled.p fontSize="xs" color="gray.500">
                   &pound;
                   {parseFloat(
-                    product.priceRange.minVariantPrice.amount
+                    product.priceRange.minVariantPrice.amount,
                   ).toFixed(2)}
                 </styled.p>
               </styled.div>

@@ -1,10 +1,10 @@
-import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { type ActionFunctionArgs } from "react-router";
 import { prisma } from "~/utils/prisma.server";
 import { z } from "zod";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
-    return json({ message: "Method not allowed" }, 405);
+    return new Response("Method not allowed", { status: 405 });
   }
 
   const { type, data } = await request.json();
@@ -51,5 +51,5 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       throw new Error("Unsupported clerk event");
   }
 
-  return json({ success: true }, 200);
+  return new Response("Success", { status: 200 });
 };

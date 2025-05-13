@@ -1,6 +1,6 @@
-import { Regions } from "@prisma/client";
-import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Regions } from "~/utils/enums";
+import type { Route } from "./+types/2025";
+import { useLoaderData } from "react-router";
 import { startOfYear } from "date-fns";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Container, styled, Flex, Box } from "~/styled-system/jsx";
@@ -8,7 +8,7 @@ import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | 2025 Standings" },
     {

@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import {
   Area,
   AreaChart,
@@ -29,7 +29,8 @@ import {
 import { Button, LinkButton } from "~/components/Button";
 import type { Values } from "~/utils/values";
 import { format } from "date-fns";
-import { Regions } from "@prisma/client";
+import { Regions } from "~/utils/enums";
+import type { Route } from "./+types/ratings.$id";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);
@@ -150,7 +151,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return driver;
 };
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   if (!data) return [];
 
   return [
@@ -173,7 +174,7 @@ const Page = () => {
   }).sort(
     (a, b) =>
       new Date(a.tournament.createdAt).getTime() -
-        new Date(b.tournament.createdAt).getTime() || a.id - b.id
+        new Date(b.tournament.createdAt).getTime() || a.id - b.id,
   );
 
   const rank = driver
@@ -188,7 +189,7 @@ const Page = () => {
     setExpandedBattles((prev) =>
       prev.includes(battleId)
         ? prev.filter((id) => id !== battleId)
-        : [...prev, battleId]
+        : [...prev, battleId],
     );
   };
 

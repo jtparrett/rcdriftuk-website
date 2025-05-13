@@ -1,7 +1,7 @@
-import { TrackStatus } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { TrackStatus } from "~/utils/enums";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Link, useLoaderData, useParams } from "react-router";
 import {
   add,
   differenceInDays,
@@ -77,9 +77,9 @@ const Page = () => {
             monthStartDate,
             startOfWeek(monthStartDate, {
               weekStartsOn: 1,
-            })
-          )
-        )
+            }),
+          ),
+        ),
       ).map((_, i) => (
         <Box key={i} w={`${100 / 7}%`}></Box>
       ))}
@@ -92,7 +92,7 @@ const Page = () => {
         const dayEvents = events.filter(
           (event) =>
             startOfDay(new Date(event.endDate)) >= startOfDay(day) &&
-            startOfDay(new Date(event.startDate)) <= endOfDay(day)
+            startOfDay(new Date(event.startDate)) <= endOfDay(day),
         );
 
         return (

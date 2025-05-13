@@ -1,8 +1,8 @@
 import { Box, Container, Stack, styled } from "~/styled-system/jsx";
-import type { MetaFunction } from "@remix-run/node";
+import type { Route } from "./+types/2025";
 import { CollapsibleCard } from "~/components/CollapsibleCard";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | 2025 Judging Criteria" },
     {

@@ -1,11 +1,12 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Outlet, useLocation, useParams } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Outlet, useLocation, useParams } from "react-router";
 import { format, isThisWeek, parse } from "date-fns";
 import { Tab } from "~/components/Tab";
 import { Flex, Container, Box } from "~/styled-system/jsx";
+import type { Route } from "./+types/calendar";
 
-export const meta: MetaFunction = ({ params }) => {
+export const meta: Route.MetaFunction = ({ params }) => {
   const today = format(new Date(), "dd-MM-yy");
   const dateParam = params.date ?? today;
   const date = parse(dateParam, "dd-MM-yy", new Date());

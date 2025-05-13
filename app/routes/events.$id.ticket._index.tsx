@@ -1,7 +1,7 @@
-import { TicketStatus } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { TicketStatus } from "~/utils/enums";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { useLoaderData } from "react-router";
 import { isBefore } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { LinkButton } from "~/components/Button";
@@ -240,7 +240,7 @@ const Page = () => {
           <styled.p fontSize="sm" color="gray.600">
             {getEventDate(
               new Date(ticket.event.startDate),
-              new Date(ticket.event.endDate)
+              new Date(ticket.event.endDate),
             )}
           </styled.p>
           <styled.p fontSize="sm" color="gray.500" mb={4}>

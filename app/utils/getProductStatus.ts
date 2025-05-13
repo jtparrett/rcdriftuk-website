@@ -1,4 +1,4 @@
-import { ProductStatus } from "@prisma/client";
+import { ProductStatus } from "~/utils/enums";
 
 export const getProductStatus = (status: ProductStatus) => {
   switch (status) {

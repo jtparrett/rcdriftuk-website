@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { Form, useLoaderData, useSearchParams } from "react-router";
 import {
   RiArrowLeftSLine,
   RiArrowRightSLine,
@@ -10,8 +10,9 @@ import { Button, LinkButton } from "~/components/Button";
 import { ProductCard } from "~/components/ProductCard";
 import { styled, Box, Flex, Spacer, Center, Grid } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import type { Route } from "./+types/catalogue";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     {
       title: `RC Drift UK | Catalogue`,
@@ -30,7 +31,7 @@ export const loader = async (params: LoaderFunctionArgs) => {
     z.string().nullable().parse(url.searchParams.get("query")) ?? "";
   const page = Math.max(
     z.coerce.number().nullable().parse(url.searchParams.get("page")) ?? 1,
-    1
+    1,
   );
 
   const search =
@@ -80,7 +81,7 @@ const Page = () => {
   const query = searchParams.get("query") ?? "";
   const page = Math.max(
     z.coerce.number().nullable().parse(searchParams.get("page")) ?? 1,
-    1
+    1,
   );
 
   return (

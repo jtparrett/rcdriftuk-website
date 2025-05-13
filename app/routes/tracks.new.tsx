@@ -1,10 +1,6 @@
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Form } from "react-router";
 import { z } from "zod";
 import { TrackForm } from "~/components/TrackForm";
 import { styled, Container, Box } from "~/styled-system/jsx";
@@ -12,8 +8,9 @@ import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { uploadFile } from "~/utils/uploadFile.server";
 import slugify from "slugify";
+import type { Route } from "./+types/tracks.new";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: "RC Drift UK | Create a Track" }];
 };
 

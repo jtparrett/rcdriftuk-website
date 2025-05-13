@@ -1,13 +1,13 @@
-import { TrackStatus } from "@prisma/client";
-import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { TrackStatus } from "~/utils/enums";
+import { useLoaderData } from "react-router";
 import { ClientOnly } from "~/components/ClientOnly";
 import { Map } from "~/components/Map.client";
 
 import { Box } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import type { Route } from "./+types/map.$tab";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | Map" },
     { name: "description", content: "Welcome to RCDrift.uk" },

@@ -1,6 +1,6 @@
-import { TicketStatus } from "@prisma/client";
-import { useLoaderData } from "@remix-run/react";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import { TicketStatus } from "~/utils/enums";
+import { useLoaderData } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";

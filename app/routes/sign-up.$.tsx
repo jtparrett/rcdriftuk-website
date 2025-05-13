@@ -1,4 +1,4 @@
-import { SignUp } from "@clerk/remix";
+import { SignUp } from "@clerk/react-router";
 import { Container } from "~/styled-system/jsx";
 
 export default function SignUpPage() {

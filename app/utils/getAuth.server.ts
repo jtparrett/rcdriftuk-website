@@ -1,5 +1,5 @@
-import { getAuth as getAuthClerk } from "@clerk/remix/ssr.server";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { getAuth as getAuthClerk } from "@clerk/react-router/ssr.server";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 
 const generateNewRequestForClerk = (request: Request) => {
   const originalRequest = request.clone();

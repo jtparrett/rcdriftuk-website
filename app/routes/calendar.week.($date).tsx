@@ -1,5 +1,5 @@
-import { redirect } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { redirect } from "react-router";
+import { useLoaderData, useParams } from "react-router";
 import {
   add,
   endOfWeek,
@@ -11,13 +11,13 @@ import {
   endOfDay,
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import { TrackStatus } from "@prisma/client";
+import { TrackStatus } from "~/utils/enums";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
@@ -111,7 +111,7 @@ const CalendarWeeksPage = () => {
           const dayEvents = events.filter(
             (event) =>
               startOfDay(new Date(event.endDate)) >= startOfDay(day) &&
-              startOfDay(new Date(event.startDate)) <= endOfDay(day)
+              startOfDay(new Date(event.startDate)) <= endOfDay(day),
           );
 
           return (

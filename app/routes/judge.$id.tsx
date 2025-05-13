@@ -1,6 +1,6 @@
-import { TournamentsState } from "@prisma/client";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, redirect, useLoaderData, useNavigation } from "@remix-run/react";
+import { TournamentsState } from "~/utils/enums";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, redirect, useLoaderData, useNavigation } from "react-router";
 import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
 import { RiArrowLeftLine } from "react-icons/ri";
@@ -194,7 +194,7 @@ const QualiForm = () => {
   const scoreValue = tournament.nextQualifyingLap?.scores[0]?.score;
   const qualifyingRun =
     (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
-      (lap) => lap.id === tournament.nextQualifyingLapId
+      (lap) => lap.id === tournament.nextQualifyingLapId,
     ) ?? 0) + 1;
 
   if (tournament.nextQualifyingLap === null) {

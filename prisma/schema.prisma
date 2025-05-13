@@ -7,15 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Regions {
-  ALL
-  EU
-  NA
-  APAC
-  LATAM
-  MEA
-}
-
 model Events {
   cover             String?
   name              String
@@ -50,13 +41,6 @@ model EventTickets {
   sessionId String?
 
   @@unique([eventId, userId])
-}
-
-enum TicketStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  REFUNDED
 }
 
 model EventResponses {
@@ -194,13 +178,6 @@ model Tracks {
   address     String?
 }
 
-enum TrackStatus {
-  ACTIVE
-  ARCHIVED
-  PENDING
-  CLOSED
-}
-
 model TrackOwners {
   trackId String @db.Uuid
   userId  String
@@ -302,4 +279,27 @@ enum TournamentsFormat {
 enum BattlesBracket {
   UPPER
   LOWER
+}
+
+enum TrackStatus {
+  ACTIVE
+  ARCHIVED
+  PENDING
+  CLOSED
+}
+
+enum TicketStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+}
+
+enum Regions {
+  ALL
+  EU
+  NA
+  APAC
+  LATAM
+  MEA
 }

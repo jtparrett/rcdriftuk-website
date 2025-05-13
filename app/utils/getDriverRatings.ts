@@ -1,4 +1,4 @@
-import { Regions } from "@prisma/client";
+import { Regions } from "~/utils/enums";
 import { prisma } from "./prisma.server";
 
 export const getDriverRatings = async (region: Regions, limit?: number) => {
