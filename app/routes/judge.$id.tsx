@@ -259,7 +259,7 @@ const BattleForm = () => {
   const battleVote = nextBattle?.BattleVotes[0];
 
   const leftDriverLead =
-    (nextBattle?.driverLeft?.qualifyingPosition ?? 0) >
+    (nextBattle?.driverLeft?.qualifyingPosition ?? 0) <
     (nextBattle?.driverRight?.qualifyingPosition ?? 0)
       ? true
       : false;
