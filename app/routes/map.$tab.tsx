@@ -1,9 +1,9 @@
 import { TrackStatus } from "~/utils/enums";
-import { useLoaderData } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 import { ClientOnly } from "~/components/ClientOnly";
 import { Map } from "~/components/Map.client";
 
-import { Box } from "~/styled-system/jsx";
+import { Box, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/map.$tab";
 
@@ -28,11 +28,15 @@ const Page = () => {
   const tracks = useLoaderData<typeof loader>();
 
   return (
-    <Box position="absolute" inset={0} zIndex={1}>
-      <ClientOnly>
-        <Map tracks={tracks} />
-      </ClientOnly>
-    </Box>
+    <>
+      <Box position="absolute" inset={0} zIndex={1}>
+        <ClientOnly>
+          <Map tracks={tracks} />
+        </ClientOnly>
+      </Box>
+
+      <Outlet />
+    </>
   );
 };
 

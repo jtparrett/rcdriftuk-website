@@ -19,6 +19,8 @@ import { styled, Box, Flex, Container, Grid } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/tracks.$slug.$tab";
+import { TrackSnippet } from "~/components/TrackSnippet";
+import notFoundInvariant from "~/utils/notFoundInvariant";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -59,12 +61,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    if (!track) {
-      throw new Response(null, {
-        status: 404,
-        statusText: "Not Found",
-      });
-    }
+    notFoundInvariant(track);
 
     return { track, tab };
   }
@@ -89,12 +86,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    if (!track) {
-      throw new Response(null, {
-        status: 404,
-        statusText: "Not Found",
-      });
-    }
+    notFoundInvariant(track);
 
     return { track, tab };
   }
@@ -128,12 +120,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    if (!track) {
-      throw new Response(null, {
-        status: 404,
-        statusText: "Not Found",
-      });
-    }
+    notFoundInvariant(track);
 
     return { track, tab };
   }
@@ -180,83 +167,7 @@ const TrackPage = () => {
             rounded="xl"
             overflow="hidden"
           >
-            <Box
-              pos="relative"
-              mb={-16}
-              zIndex={-1}
-              bgColor="gray.900"
-              minH="100px"
-            >
-              {data?.track?.cover && (
-                <styled.img src={data?.track?.cover} w="full" />
-              )}
-              <Box
-                pos="absolute"
-                inset={0}
-                bgGradient="to-b"
-                gradientTo="black"
-                gradientFrom="transparent"
-                zIndex={1}
-              />
-            </Box>
-
-            <Box textAlign="center" p={4} pt={data?.track?.cover ? 0 : 4}>
-              <Box
-                w={32}
-                h={32}
-                rounded="full"
-                overflow="hidden"
-                borderWidth={2}
-                borderColor="gray.500"
-                mx="auto"
-                mb={2}
-              >
-                <styled.img
-                  src={data?.track?.image}
-                  w="full"
-                  h="full"
-                  objectFit="cover"
-                />
-              </Box>
-
-              <styled.h1
-                fontWeight="extrabold"
-                fontSize="2xl"
-                textWrap="balance"
-                lineHeight="1.1"
-              >
-                {data?.track?.name}
-              </styled.h1>
-
-              <styled.span fontSize="sm" fontWeight="medium">
-                {data?.track?.types.map(pluralize.singular).join(" | ")}
-              </styled.span>
-
-              {data?.track?.address && (
-                <styled.p
-                  fontSize="sm"
-                  color="gray.500"
-                  mt={1}
-                  maxW={200}
-                  mx="auto"
-                >
-                  {data?.track?.address}
-                </styled.p>
-              )}
-            </Box>
-
-            {data?.track?.description && (
-              <Box p={4} bgColor="gray.900" rounded="lg" mx={4}>
-                <styled.p
-                  color="gray.500"
-                  fontSize="sm"
-                  textWrap="balance"
-                  whiteSpace="pre-line"
-                >
-                  {data?.track?.description}
-                </styled.p>
-              </Box>
-            )}
+            <TrackSnippet track={data.track} />
 
             <Box p={4}>
               <LinkButton

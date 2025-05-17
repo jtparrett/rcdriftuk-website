@@ -76,7 +76,7 @@ export const Map = ({ tracks }: Props) => {
 
       // Add click handler
       el.addEventListener("click", () => {
-        navigate(`/tracks/${track.slug}`);
+        navigate(`./${track.slug}`);
       });
 
       markers.current.push(marker);
