@@ -45,31 +45,43 @@ const MapTrackDrawer = () => {
           borderTopRadius: "2xl",
           borderColor: "gray.800",
           borderWidth: 1,
-          rounded: "2xl",
-          overflow: "hidden",
+          rounded: "4xl",
+          overflow: "auto",
         })}
         initial={{ x: "-110%" }}
         animate={{ x: 0 }}
         exit={{ x: "-110%" }}
         transition={{ duration: 0.5, ease: "anticipate" }}
       >
-        <LinkButton
-          to="../"
-          variant="ghost"
-          p={1}
-          fontSize="2xl"
-          pos="absolute"
-          top={2}
-          right={2}
-        >
-          <RiCloseCircleFill />
-        </LinkButton>
+        <Box overflow="visible" h="0px" pos="sticky" top={0} left={0}>
+          <LinkButton
+            to="../"
+            variant="ghost"
+            p={1}
+            fontSize="2xl"
+            m={4}
+            ml="auto"
+            display="block"
+            w="fit-content"
+          >
+            <RiCloseCircleFill />
+          </LinkButton>
+        </Box>
 
-        <Box flex={1} overflow="auto">
+        <Box flex={1}>
           <TrackSnippet track={track} />
         </Box>
 
-        <Box p={4}>
+        <Box
+          px={6}
+          pb={6}
+          pos="sticky"
+          bottom={0}
+          mt={4}
+          bgGradient="to-t"
+          gradientFrom="gray.950"
+          gradientTo="transparent"
+        >
           <LinkButton to={`/tracks/${track.slug}`} w="full">
             View {track.types.includes(TrackTypes.SHOPS) ? "Shop" : "Track"}{" "}
             Profile
