@@ -205,6 +205,7 @@ const TournamentPage = () => {
   const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
+  const isStandingsTab = location.pathname.includes("standings");
   const { user } = useUser();
 
   const isOwner = user?.id === tournament.userId;
@@ -214,12 +215,6 @@ const TournamentPage = () => {
 
   return (
     <>
-      {tournament.liveUrl && (
-        <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
-          <styled.iframe src={tournament.liveUrl} />
-        </AspectRatio>
-      )}
-
       <Box py={2} borderBottomWidth={1} borderColor="gray.900">
         <Container maxW={1100} px={2}>
           <styled.h1
@@ -233,6 +228,16 @@ const TournamentPage = () => {
           </styled.h1>
         </Container>
       </Box>
+
+      {tournament.liveUrl && (
+        <Box borderBottomWidth={1} borderColor="gray.900">
+          <Container maxW={1100} px={2} mt={4}>
+            <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
+              <styled.iframe src={tournament.liveUrl} />
+            </AspectRatio>
+          </Container>
+        </Box>
+      )}
 
       {tournament.state === TournamentsState.START && (
         <Container maxW={1100} px={2} py={4}>
@@ -248,8 +253,18 @@ const TournamentPage = () => {
         <>
           <Box py={2} borderBottomWidth={1} borderColor="gray.900" mb={4}>
             <Container maxW={1100} px={2}>
-              <Flex flexDir={{ base: "column", sm: "row" }} gap={1}>
-                <Flex bgColor="gray.900" rounded="full" gap={1} p={1}>
+              <Flex
+                flexDir={{ base: "column", sm: "row" }}
+                gap={1}
+                overflow="auto"
+              >
+                <Flex
+                  bgColor="gray.900"
+                  rounded="full"
+                  gap={1}
+                  p={1}
+                  w="fit-content"
+                >
                   <LinkButton
                     to={`/tournaments/${tournament.id}/overview`}
                     size="xs"
@@ -271,6 +286,15 @@ const TournamentPage = () => {
                   >
                     Battles
                   </LinkButton>
+                  {tournament.state === TournamentsState.END && (
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/standings`}
+                      variant={isStandingsTab ? "secondary" : "ghost"}
+                      size="xs"
+                    >
+                      Standings
+                    </LinkButton>
+                  )}
                 </Flex>
 
                 <Spacer />
