@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import {
   Area,
   AreaChart,
@@ -31,6 +31,7 @@ import type { Values } from "~/utils/values";
 import { format } from "date-fns";
 import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/ratings.$id";
+import { css } from "~/styled-system/css";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);
@@ -73,6 +74,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                     select: {
                       firstName: true,
                       lastName: true,
+                      image: true,
+                      driverId: true,
                     },
                   },
                 },
@@ -85,6 +88,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                     select: {
                       firstName: true,
                       lastName: true,
+                      image: true,
+                      driverId: true,
                     },
                   },
                 },
@@ -98,6 +103,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   name: true,
                   createdAt: true,
+                  id: true,
                 },
               },
             },
@@ -114,6 +120,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                     select: {
                       firstName: true,
                       lastName: true,
+                      image: true,
+                      driverId: true,
                     },
                   },
                 },
@@ -126,6 +134,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                     select: {
                       firstName: true,
                       lastName: true,
+                      image: true,
+                      driverId: true,
                     },
                   },
                 },
@@ -139,6 +149,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   name: true,
                   createdAt: true,
+                  id: true,
                 },
               },
             },
@@ -444,7 +455,6 @@ const Page = () => {
                   rounded="2xl"
                   width="full"
                   cursor="pointer"
-                  onClick={() => toggleBattle(battle.id.toString())}
                 >
                   <Box
                     borderRadius="xl"
@@ -453,6 +463,13 @@ const Page = () => {
                     borderWidth={1}
                     borderColor={color}
                   >
+                    <Box
+                      onClick={() => toggleBattle(battle.id.toString())}
+                      pos="absolute"
+                      inset={0}
+                      zIndex={1}
+                    />
+
                     <styled.span
                       fontSize="xs"
                       color={color}
@@ -474,43 +491,101 @@ const Page = () => {
                     </styled.span>
 
                     <Flex p={4} alignItems="center">
-                      <Box flex={1}>
-                        <styled.h3
-                          fontSize="lg"
-                          fontWeight="bold"
-                          color="gray.200"
-                        >
-                          {battle.tournament.name}
-                        </styled.h3>
-
+                      <Box flex={1} overflow="hidden">
                         {!isByeRun && (
-                          <styled.span
-                            fontSize="md"
-                            color={isWinner ? "green.400" : "red.400"}
+                          <Flex
+                            alignItems="center"
+                            gap={1}
+                            fontSize={{ base: "sm", md: "lg" }}
+                            fontWeight="medium"
                           >
-                            {isWinner ? "Won vs" : "Lost to"}{" "}
-                            {isLeftDriver
-                              ? battle.driverRight?.user.firstName +
-                                " " +
-                                battle.driverRight?.user.lastName
-                              : battle.driverLeft?.user.firstName +
-                                " " +
-                                battle.driverLeft?.user.lastName}
-                          </styled.span>
+                            <styled.span
+                              color={isWinner ? "green.400" : "red.400"}
+                            >
+                              {isWinner ? "Won vs" : "Lost vs"}
+                            </styled.span>
+
+                            <Link
+                              to={`/ratings/${
+                                isLeftDriver
+                                  ? battle.driverRight?.user.driverId
+                                  : battle.driverLeft?.user.driverId
+                              }`}
+                              className={css({
+                                pos: "relative",
+                                zIndex: 2,
+                                _hover: {
+                                  textDecoration: "underline",
+                                },
+                              })}
+                            >
+                              <Flex
+                                alignItems="center"
+                                gap={2}
+                                rounded="full"
+                                bgColor="rgba(255, 255, 255, 0.1)"
+                                p={1}
+                              >
+                                <styled.span ml={2} lineHeight={1}>
+                                  {isLeftDriver
+                                    ? battle.driverRight?.user.firstName +
+                                      " " +
+                                      battle.driverRight?.user.lastName
+                                    : battle.driverLeft?.user.firstName +
+                                      " " +
+                                      battle.driverLeft?.user.lastName}
+                                </styled.span>
+
+                                <Box
+                                  w={7}
+                                  h={7}
+                                  rounded="full"
+                                  overflow="hidden"
+                                >
+                                  <styled.img
+                                    src={
+                                      (isLeftDriver
+                                        ? battle.driverRight?.user.image
+                                        : battle.driverLeft?.user.image) ??
+                                      "/blank-driver-right.jpg"
+                                    }
+                                  />
+                                </Box>
+                              </Flex>
+                            </Link>
+                          </Flex>
                         )}
 
                         {isByeRun && (
-                          <styled.span fontSize="md" color="yellow.400">
+                          <styled.p fontSize="md" color="yellow.400">
                             BYE RUN
-                          </styled.span>
+                          </styled.p>
                         )}
+
+                        <Link
+                          to={`/tournaments/${battle.tournament.id}/overview`}
+                          className={css({
+                            fontSize: "sm",
+                            color: "gray.200",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            pos: "relative",
+                            zIndex: 2,
+                            _hover: {
+                              textDecoration: "underline",
+                            },
+                          })}
+                        >
+                          {battle.tournament.name}
+                        </Link>
                       </Box>
 
                       <Flex
                         justifyContent="flex-end"
                         alignItems="center"
                         gap={2}
-                        fontSize="lg"
+                        fontSize={{ base: "sm", md: "lg" }}
                         fontWeight="semibold"
                       >
                         <styled.span>{startingElo.toFixed(3)}</styled.span>
