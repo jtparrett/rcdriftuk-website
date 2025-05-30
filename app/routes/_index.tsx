@@ -18,6 +18,8 @@ import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
+import { motion } from "motion/react";
+import { css } from "~/styled-system/css";
 
 const Card = styled("article", {
   base: {
@@ -123,39 +125,49 @@ const Page = () => {
               <Glow size="sm" />
             </Box>
 
-            <styled.h1
-              mt={4}
-              fontWeight="medium"
-              fontSize={{ base: "5xl", md: "6xl" }}
-              lineHeight={1.1}
-              textWrap="balance"
-              maxW={700}
-              mx="auto"
-              bgClip="text"
-              bgGradient="to-br"
-              gradientFrom="white"
-              gradientTo="gray.400"
-              color="transparent"
-              letterSpacing="tight"
+            <motion.h1
+              className={css({
+                mt: 4,
+                fontWeight: "medium",
+                fontSize: { base: "5xl", md: "7xl" },
+                lineHeight: 1.1,
+                textWrap: "balance",
+                maxW: 700,
+                mx: "auto",
+                bgClip: "text",
+                bgGradient: "to-br",
+                gradientFrom: "white",
+                gradientTo: "gray.400",
+                color: "transparent",
+                letterSpacing: "tight",
+              })}
+              initial={{ opacity: 0, y: 24, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.5 }}
             >
               The{" "}
               <styled.span display={{ base: "none", sm: "inline" }}>
                 complete{" "}
               </styled.span>
               platform for RC Drifting.
-            </styled.h1>
-            <styled.p
-              color="gray.400"
-              pt={3}
-              pb={12}
-              fontSize="lg"
-              maxW={600}
-              mx="auto"
-              textWrap="balance"
+            </motion.h1>
+            <motion.p
+              className={css({
+                color: "gray.400",
+                pt: 3,
+                pb: 12,
+                fontSize: "lg",
+                maxW: 600,
+                mx: "auto",
+                textWrap: "balance",
+              })}
+              initial={{ opacity: 0, y: 24, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               We're empowering the RC drift community with powerful tools, major
               events, beginner guides, and our innovative driver ratings.
-            </styled.p>
+            </motion.p>
 
             <Flex
               gap={4}
