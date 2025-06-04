@@ -491,7 +491,15 @@ const Page = () => {
                     </styled.span>
 
                     <Flex p={4} alignItems="center" gap={3}>
-                      <Box w={8} h={8} overflow="hidden" rounded="md" mb={1}>
+                      <Box
+                        w={8}
+                        h={8}
+                        overflow="hidden"
+                        rounded="md"
+                        mb={1}
+                        borderWidth={1}
+                        borderColor={color}
+                      >
                         <styled.img
                           src={driver.image ?? "/blank-driver-right.jpg"}
                           w="full"
@@ -508,6 +516,8 @@ const Page = () => {
                           rounded="md"
                           ml={-9}
                           mt={1}
+                          borderWidth={1}
+                          borderColor={color}
                         >
                           <styled.img
                             src={
@@ -527,7 +537,6 @@ const Page = () => {
                       <Box flex={1} overflow="hidden">
                         {!isByeRun && (
                           <styled.p
-                            fontSize={{ base: "sm", md: "lg" }}
                             fontWeight="medium"
                             letterSpacing="tight"
                             lineHeight={1.1}
@@ -564,7 +573,6 @@ const Page = () => {
 
                         {isByeRun && (
                           <styled.p
-                            fontSize={{ base: "sm", md: "lg" }}
                             lineHeight={1.1}
                             color="yellow.400"
                             fontWeight="medium"
@@ -594,27 +602,20 @@ const Page = () => {
                         </Link>
                       </Box>
 
-                      <Flex
-                        justifyContent="flex-end"
-                        alignItems="center"
-                        gap={2}
+                      <styled.span
                         fontSize={{ base: "sm", md: "lg" }}
                         fontWeight="semibold"
+                        color={pointsChange >= 0 ? "green.400" : "red.400"}
                       >
-                        <styled.span>{startingElo.toFixed(3)}</styled.span>
-                        <Box h={4} w="1px" bgColor={color} />
-                        <styled.span
-                          color={pointsChange >= 0 ? "green.400" : "red.400"}
-                        >
-                          {pointsChange > 0 ? "+" : ""}
-                          {pointsChange.toFixed(3)}
-                        </styled.span>
-                        {isExpanded ? (
-                          <RiArrowUpSLine size={20} />
-                        ) : (
-                          <RiArrowDownSLine size={20} />
-                        )}
-                      </Flex>
+                        {pointsChange > 0 ? "+" : ""}
+                        {pointsChange.toFixed(3)}
+                      </styled.span>
+
+                      {isExpanded ? (
+                        <RiArrowUpSLine size={20} />
+                      ) : (
+                        <RiArrowDownSLine size={20} />
+                      )}
                     </Flex>
 
                     {isExpanded && (

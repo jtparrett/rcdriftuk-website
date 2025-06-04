@@ -12,6 +12,7 @@ import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/ratings._index";
+import { Tab } from "~/components/Tab";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -294,7 +295,7 @@ const RatingsPage = () => {
             maxW={300}
             mx="auto"
           >
-            Discover the top rated drivers from across the UK.
+            Discover the top rated drivers from across the world.
           </styled.p>
         </Box>
 
@@ -323,6 +324,20 @@ const RatingsPage = () => {
               w="full"
               overflow="hidden"
             >
+              {/* <Flex gap={2} alignItems="center" mb={4}>
+                {Object.values(Regions).map((region) => {
+                  return (
+                    <Tab
+                      key={region}
+                      to={`/ratings/${region}`}
+                      isActive={region === "ALL"}
+                    >
+                      {region}
+                    </Tab>
+                  );
+                })}
+              </Flex> */}
+
               <Flex flexDirection="column" gap={2}>
                 {drivers
                   .filter((driver) => driver.driverId !== 0)
