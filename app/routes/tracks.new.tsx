@@ -93,9 +93,8 @@ const TracksNewPage = () => {
         borderColor="gray.800"
         borderRadius="xl"
         maxW={600}
-        overflow="hidden"
       >
-        <Box px={6} py={2} bgColor="gray.800">
+        <Box px={6} py={2} bgColor="gray.800" borderTopRadius="xl">
           <styled.h1 fontWeight="bold">Register a new Track</styled.h1>
         </Box>
         <Box p={6}>
