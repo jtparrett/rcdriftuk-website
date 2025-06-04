@@ -188,7 +188,7 @@ const GettingStartedPage = () => {
 
               <Box mt={4}>
                 <LinkButton to="/map/all" target="_blank">
-                  <RiMapPin2Fill /> Find your local track
+                  <RiMapPin2Fill /> Find my local track
                 </LinkButton>
               </Box>
 

@@ -297,6 +297,7 @@ enum TicketStatus {
 
 enum Regions {
   ALL
+  UK
   EU
   NA
   APAC

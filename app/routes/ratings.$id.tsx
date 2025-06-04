@@ -490,21 +490,53 @@ const Page = () => {
                       Battle #{i + 1}
                     </styled.span>
 
-                    <Flex p={4} alignItems="center">
+                    <Flex p={4} alignItems="center" gap={3}>
+                      <Box w={8} h={8} overflow="hidden" rounded="md" mb={1}>
+                        <styled.img
+                          src={driver.image ?? "/blank-driver-right.jpg"}
+                          w="full"
+                          h="full"
+                          objectFit="cover"
+                        />
+                      </Box>
+
+                      {!isByeRun && (
+                        <Box
+                          w={8}
+                          h={8}
+                          overflow="hidden"
+                          rounded="md"
+                          ml={-9}
+                          mt={1}
+                        >
+                          <styled.img
+                            src={
+                              isLeftDriver
+                                ? battle.driverRight?.user.image ??
+                                  "/blank-driver-right.jpg"
+                                : battle.driverLeft?.user.image ??
+                                  "/blank-driver-right.jpg"
+                            }
+                            w="full"
+                            h="full"
+                            objectFit="cover"
+                          />
+                        </Box>
+                      )}
+
                       <Box flex={1} overflow="hidden">
                         {!isByeRun && (
-                          <Flex
-                            alignItems="center"
-                            gap={1}
+                          <styled.p
                             fontSize={{ base: "sm", md: "lg" }}
                             fontWeight="medium"
+                            letterSpacing="tight"
+                            lineHeight={1.1}
                           >
                             <styled.span
                               color={isWinner ? "green.400" : "red.400"}
                             >
                               {isWinner ? "Won vs" : "Lost vs"}
-                            </styled.span>
-
+                            </styled.span>{" "}
                             <Link
                               to={`/ratings/${
                                 isLeftDriver
@@ -519,45 +551,25 @@ const Page = () => {
                                 },
                               })}
                             >
-                              <Flex
-                                alignItems="center"
-                                gap={2}
-                                rounded="full"
-                                bgColor="rgba(255, 255, 255, 0.1)"
-                                p={1}
-                              >
-                                <styled.span ml={2} lineHeight={1}>
-                                  {isLeftDriver
-                                    ? battle.driverRight?.user.firstName +
-                                      " " +
-                                      battle.driverRight?.user.lastName
-                                    : battle.driverLeft?.user.firstName +
-                                      " " +
-                                      battle.driverLeft?.user.lastName}
-                                </styled.span>
-
-                                <Box
-                                  w={7}
-                                  h={7}
-                                  rounded="full"
-                                  overflow="hidden"
-                                >
-                                  <styled.img
-                                    src={
-                                      (isLeftDriver
-                                        ? battle.driverRight?.user.image
-                                        : battle.driverLeft?.user.image) ??
-                                      "/blank-driver-right.jpg"
-                                    }
-                                  />
-                                </Box>
-                              </Flex>
+                              {isLeftDriver
+                                ? battle.driverRight?.user.firstName +
+                                  " " +
+                                  battle.driverRight?.user.lastName
+                                : battle.driverLeft?.user.firstName +
+                                  " " +
+                                  battle.driverLeft?.user.lastName}
                             </Link>
-                          </Flex>
+                          </styled.p>
                         )}
 
                         {isByeRun && (
-                          <styled.p fontSize="md" color="yellow.400">
+                          <styled.p
+                            fontSize={{ base: "sm", md: "lg" }}
+                            lineHeight={1.1}
+                            color="yellow.400"
+                            fontWeight="medium"
+                            letterSpacing="tight"
+                          >
                             BYE RUN
                           </styled.p>
                         )}
@@ -571,6 +583,7 @@ const Page = () => {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             pos: "relative",
+                            letterSpacing: "tight",
                             zIndex: 2,
                             _hover: {
                               textDecoration: "underline",

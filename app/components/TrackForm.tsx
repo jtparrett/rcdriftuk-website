@@ -24,7 +24,7 @@ export const TrackForm = ({ track }: Props) => {
       </Box>
 
       <Box>
-        <Label>Name</Label>
+        <Label>Track Name</Label>
         <Input name="name" defaultValue={track?.name} required />
       </Box>
 
@@ -38,7 +38,7 @@ export const TrackForm = ({ track }: Props) => {
       </Box>
 
       <Box>
-        <Label>URL</Label>
+        <Label>Website/Primary Social URL</Label>
         <Input name="url" defaultValue={track?.url} required />
       </Box>
 

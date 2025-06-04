@@ -9,6 +9,7 @@ import {
   RiMapPin2Fill,
   RiRocketLine,
   RiTrophyLine,
+  RiUserLine,
 } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
@@ -20,6 +21,7 @@ import { getDriverRatings } from "~/utils/getDriverRatings";
 import { prisma } from "~/utils/prisma.server";
 import { motion } from "motion/react";
 import { css } from "~/styled-system/css";
+import { SignedIn, SignedOut } from "@clerk/react-router";
 
 const Card = styled("article", {
   base: {
@@ -175,11 +177,19 @@ const Page = () => {
                 justify="center"
                 flexDir={{ base: "column", sm: "row" }}
               >
-                <LinkButton to="/getting-started">
-                  <RiRocketLine /> Getting Started
-                </LinkButton>
+                <SignedOut>
+                  <LinkButton to="/getting-started">
+                    <RiRocketLine /> Getting Started Guide
+                  </LinkButton>
+                </SignedOut>
+                <SignedIn>
+                  <LinkButton to="/ratings/me">
+                    <RiUserLine />
+                    View My Driver Profile
+                  </LinkButton>
+                </SignedIn>
                 <LinkButton to="/map/all" variant="secondary">
-                  <RiMapPin2Fill /> Find Your Local Track
+                  <RiMapPin2Fill /> Find My Local Track
                 </LinkButton>
               </Flex>
             </Box>

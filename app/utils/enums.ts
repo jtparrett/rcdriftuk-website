@@ -61,6 +61,7 @@ export type TicketStatus = Values<typeof TicketStatus>;
 
 export const Regions = {
   ALL: "ALL",
+  UK: "UK",
   EU: "EU",
   NA: "NA",
   APAC: "APAC",

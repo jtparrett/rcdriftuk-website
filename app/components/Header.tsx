@@ -293,7 +293,7 @@ const Menu = ({ user }: Props) => {
 
               {user?.driverId && (
                 <MenuLink
-                  to={`/ratings/${user.driverId}`}
+                  to="/ratings/me"
                   active={
                     location.pathname.startsWith(`/ratings/${user.driverId}`)
                       ? "active"
