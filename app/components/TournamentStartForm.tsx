@@ -191,7 +191,7 @@ export const TournamentStartForm = ({
               p={1}
               display="inline-flex"
               bgColor="gray.800"
-              rounded="xl"
+              rounded="full"
             >
               <Button
                 type="button"

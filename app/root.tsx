@@ -53,7 +53,7 @@ export const loader = (args: LoaderFunctionArgs) =>
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const loaderData = useLoaderData<typeof loader>();
-  const { hideBanner, user } = loaderData;
+  const { hideBanner, user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
 
