@@ -383,7 +383,7 @@ export const Header = ({ user }: Props) => {
   useEffect(() => {
     menu.onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
+  }, [location.pathname]);
 
   return (
     <Box

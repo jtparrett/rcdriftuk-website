@@ -7,7 +7,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
   useLocation,
   useRouteError,
 } from "react-router";
@@ -52,63 +51,35 @@ export const loader = (args: LoaderFunctionArgs) =>
   });
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const loaderData = useLoaderData<typeof loader>();
-  const { hideBanner, user } = loaderData || {};
-  const location = useLocation();
-  const isMap = location.pathname.includes("/map");
-
   return (
-    <ClerkProvider
-      loaderData={loaderData}
-      appearance={{
-        baseTheme: dark,
-        layout: {
-          logoPlacement: "none",
-        },
-        variables: {
-          colorPrimary: "#ec1a55",
-        },
-        elements: {
-          rootBox: {
-            margin: "0 auto",
-            overflow: "hidden",
-          },
-          card: {
-            margin: 0,
-          },
-        },
-      }}
-    >
-      <html lang="en">
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <Meta />
-          <Links />
-          <script src="https://cdn.splitbee.io/sb.js"></script>
-          {process.env.NODE_ENV === "production" && (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <script src="https://cdn.splitbee.io/sb.js"></script>
             <script
               src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
               crossOrigin="anonymous"
             ></script>
-          )}
-        </head>
-        <body>
-          {!hideBanner && <CookieBanner />}
-          <AnnouncementBanner />
-          <Header user={user} />
-          {children}
-          {!isMap && <Footer />}
-          <ScrollRestoration />
-          <Scripts />
-        </body>
-      </html>
-    </ClerkProvider>
+          </>
+        )}
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
   );
 }
 
 export function ErrorBoundary() {
   const error = useRouteError();
+
   return (
     <Center
       h="100vh"
@@ -143,8 +114,45 @@ export function ErrorBoundary() {
   );
 }
 
-function App() {
-  return <Outlet />;
+function App({
+  loaderData,
+}: {
+  loaderData: Awaited<ReturnType<typeof loader>>;
+}) {
+  const { hideBanner } = loaderData || {};
+  const { user } = loaderData || {};
+  const location = useLocation();
+  const isMap = location.pathname.includes("/map");
+
+  return (
+    <ClerkProvider
+      loaderData={loaderData}
+      appearance={{
+        baseTheme: dark,
+        layout: {
+          logoPlacement: "none",
+        },
+        variables: {
+          colorPrimary: "#ec1a55",
+        },
+        elements: {
+          rootBox: {
+            margin: "0 auto",
+            overflow: "hidden",
+          },
+          card: {
+            margin: 0,
+          },
+        },
+      }}
+    >
+      <AnnouncementBanner />
+      {!hideBanner && <CookieBanner />}
+      <Header user={user} />
+      <Outlet />
+      {!isMap && <Footer />}
+    </ClerkProvider>
+  );
 }
 
 export default App;
