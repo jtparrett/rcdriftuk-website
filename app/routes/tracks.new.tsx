@@ -38,7 +38,7 @@ export const action = async (args: ActionFunctionArgs) => {
     .object({
       name: z.string(),
       description: z.string(),
-      url: z.string().url(),
+      url: z.string(),
       image: z.instanceof(File).refine((file) => file.size > 0, {
         message: "Image is required",
       }),
