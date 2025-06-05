@@ -40,6 +40,7 @@ import { useReloader } from "~/utils/useReloader";
 import { RiFlagLine, RiRemoteControlLine } from "react-icons/ri";
 import { Spinner } from "~/components/Spinner";
 import type { Route } from "./+types/tournaments.$id";
+import { sentenceCase } from "change-case";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -226,15 +227,29 @@ const TournamentPage = () => {
     <>
       <Box py={2} borderBottomWidth={1} borderColor="gray.900">
         <Container maxW={1100} px={2}>
-          <styled.h1
-            fontSize="xl"
-            fontWeight="bold"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-          >
-            {tournament.name}
-          </styled.h1>
+          <Flex alignItems="center" gap={2}>
+            <styled.h1
+              fontSize="xl"
+              fontWeight="bold"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
+              {tournament.name}
+            </styled.h1>
+            <styled.span
+              fontSize="sm"
+              fontWeight="medium"
+              borderWidth={1}
+              rounded="full"
+              borderColor="gray.700"
+              px={2}
+              color="gray.600"
+              display="block"
+            >
+              {sentenceCase(tournament.format)}
+            </styled.span>
+          </Flex>
         </Container>
       </Box>
 
