@@ -21,18 +21,31 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(tournament);
 
   const formData = await args.request.formData();
+
   const judges = z.array(z.string()).parse(formData.getAll("judges"));
   const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
+
   const qualifyingLaps = Math.max(
-    z.coerce.number().parse(formData.get("qualifyingLaps")),
+    z.coerce.number().parse(formData.get("qualifyingLaps") || 1),
     1,
   );
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
   const fullInclusion =
-    z.string().parse(formData.get("fullInclusion")) === "true";
+    z.string().parse(formData.get("fullInclusion") || "false") === "true";
 
-  invariant(judges.length > 0, "Please add at least one judge");
-  invariant(drivers.length > 1, "Please add at least 2 drivers");
+  if (judges.length <= 0) {
+    throw new Error("Please add at least one judge to the tournament");
+  }
+
+  if (
+    fullInclusion || format === TournamentsFormat.DRIFT_WARS
+      ? drivers.length < 2
+      : drivers.length < 4
+  ) {
+    throw new Error(
+      `Please add at least ${fullInclusion ? 2 : 4} drivers to the tournament`,
+    );
+  }
 
   // Create judges
   await prisma.tournamentJudges.createMany({
@@ -53,6 +66,33 @@ export const action = async (args: ActionFunctionArgs) => {
       };
     }),
   });
+
+  const isDriftWars = format === TournamentsFormat.DRIFT_WARS;
+
+  if (isDriftWars) {
+    const nextBattle = await prisma.tournamentBattles.create({
+      data: {
+        tournamentId: id,
+        round: 1,
+        driverLeftId: tournamentDrivers[0].id,
+        driverRightId: tournamentDrivers[1].id,
+      },
+    });
+
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        state: TournamentsState.BATTLES,
+        qualifyingLaps: 0,
+        format,
+        nextBattleId: nextBattle.id,
+      },
+    });
+
+    return redirect(`/tournaments/${id}/overview`);
+  }
 
   // Create laps
   await prisma.laps.createMany({

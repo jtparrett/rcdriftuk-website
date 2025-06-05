@@ -140,6 +140,8 @@ export const tournamentNextBattle = async (id: string) => {
     });
 
     await advanceToNextBattle(id);
+
+    return null;
   }
 
   if (winnerId && tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
@@ -150,5 +152,22 @@ export const tournamentNextBattle = async (id: string) => {
     });
 
     await advanceToNextBattle(id);
+
+    return null;
+  }
+
+  if (winnerId && tournament.format === TournamentsFormat.DRIFT_WARS) {
+    await prisma.tournamentBattles.update({
+      where: {
+        id: tournament.nextBattleId,
+      },
+      data: {
+        winnerId,
+      },
+    });
+
+    await advanceToNextBattle(id);
+
+    return null;
   }
 };

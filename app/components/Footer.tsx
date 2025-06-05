@@ -13,7 +13,7 @@ export const Footer = () => {
           <Box>
             <styled.img
               src="/rcdriftuk-26-light.svg"
-              w={140}
+              w={120}
               mb={2}
               alt="RC Drift UK"
             />
@@ -33,14 +33,11 @@ export const Footer = () => {
             <LinkButton variant="ghost" size="xs" to="/privacy-cookie-policy">
               Cookie Policy
             </LinkButton>
-            <LinkButton variant="ghost" to="mailto:info@rcdrift.uk" size="xs">
-              Contact Us
-            </LinkButton>
           </Flex>
         </Flex>
 
         <styled.p
-          fontSize="xs"
+          fontSize="sm"
           color="gray.600"
           textAlign={{ base: "center", md: "left" }}
         >

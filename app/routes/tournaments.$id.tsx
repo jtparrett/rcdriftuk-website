@@ -1,5 +1,10 @@
 import { useUser } from "@clerk/react-router";
-import { BattlesBracket, TicketStatus, TournamentsState } from "~/utils/enums";
+import {
+  BattlesBracket,
+  TicketStatus,
+  TournamentsFormat,
+  TournamentsState,
+} from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
@@ -35,6 +40,7 @@ import { useReloader } from "~/utils/useReloader";
 import { RiFlagLine, RiRemoteControlLine } from "react-icons/ri";
 import { Spinner } from "~/components/Spinner";
 import type { Route } from "./+types/tournaments.$id";
+import { sentenceCase } from "change-case";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -96,7 +102,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  invariant(userId);
+  invariant(userId, "User not found");
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
     where: {
@@ -210,6 +216,10 @@ const TournamentPage = () => {
 
   const isOwner = user?.id === tournament.userId;
 
+  const judgingCompleteForNextBattle =
+    (tournament.nextBattle?.BattleVotes.length ?? 0) >=
+    tournament.judges.length;
+
   useReloader();
   useAblyRealtimeReloader(tournament.id);
 
@@ -217,15 +227,29 @@ const TournamentPage = () => {
     <>
       <Box py={2} borderBottomWidth={1} borderColor="gray.900">
         <Container maxW={1100} px={2}>
-          <styled.h1
-            fontSize="xl"
-            fontWeight="bold"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-          >
-            {tournament.name}
-          </styled.h1>
+          <Flex alignItems="center" gap={2}>
+            <styled.h1
+              fontSize="xl"
+              fontWeight="bold"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
+              {tournament.name}
+            </styled.h1>
+            <styled.span
+              fontSize="sm"
+              fontWeight="medium"
+              borderWidth={1}
+              rounded="full"
+              borderColor="gray.700"
+              px={2}
+              color="gray.600"
+              display="block"
+            >
+              {sentenceCase(tournament.format)}
+            </styled.span>
+          </Flex>
         </Container>
       </Box>
 
@@ -240,7 +264,7 @@ const TournamentPage = () => {
       )}
 
       {tournament.state === TournamentsState.START && (
-        <Container maxW={1100} px={2} py={4}>
+        <Container maxW={1100} px={4}>
           <TournamentStartForm
             tournament={tournament}
             users={users}
@@ -272,13 +296,15 @@ const TournamentPage = () => {
                   >
                     Overview
                   </LinkButton>
-                  <LinkButton
-                    to={`/tournaments/${tournament.id}/qualifying`}
-                    variant={isQualifyingTab ? "secondary" : "ghost"}
-                    size="xs"
-                  >
-                    Qualifying
-                  </LinkButton>
+                  {tournament.qualifyingLaps > 0 && (
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/qualifying`}
+                      variant={isQualifyingTab ? "secondary" : "ghost"}
+                      size="xs"
+                    >
+                      Qualifying
+                    </LinkButton>
+                  )}
                   <LinkButton
                     to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
                     variant={isBattlesTab ? "secondary" : "ghost"}
@@ -286,7 +312,8 @@ const TournamentPage = () => {
                   >
                     Battles
                   </LinkButton>
-                  {tournament.state === TournamentsState.END && (
+                  {(tournament.state === TournamentsState.END ||
+                    tournament.format === TournamentsFormat.DRIFT_WARS) && (
                     <LinkButton
                       to={`/tournaments/${tournament.id}/standings`}
                       variant={isStandingsTab ? "secondary" : "ghost"}
@@ -298,6 +325,17 @@ const TournamentPage = () => {
                 </Flex>
 
                 <Spacer />
+
+                {isOwner &&
+                  tournament.state === TournamentsState.BATTLES &&
+                  tournament.format === TournamentsFormat.DRIFT_WARS &&
+                  judgingCompleteForNextBattle && (
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/battles/create`}
+                    >
+                      Next Battle <RiFlagLine />
+                    </LinkButton>
+                  )}
 
                 {isOwner &&
                   tournament.state === TournamentsState.QUALIFYING &&
@@ -336,8 +374,8 @@ const TournamentPage = () => {
 
                 {isOwner &&
                   tournament.state === TournamentsState.BATTLES &&
-                  (tournament.nextBattle?.BattleVotes.length ?? 0) >=
-                    tournament.judges.length && (
+                  judgingCompleteForNextBattle &&
+                  tournament.format !== TournamentsFormat.DRIFT_WARS && (
                     <Form method="post">
                       <Button
                         type="submit"

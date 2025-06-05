@@ -1,6 +1,5 @@
 import { Form } from "react-router";
 import { styled, Box, Flex } from "~/styled-system/jsx";
-import { StepNumber } from "./StepNumber";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { Input } from "./Input";
 import { Button } from "./Button";
@@ -8,15 +7,17 @@ import { Select } from "./Select";
 import { TournamentsFormat } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { RiDeleteBinFill } from "react-icons/ri";
+import { isOneOf } from "~/utils/oneOf";
+import { StepDot } from "./StepDot";
+import { Dropdown, Option } from "./Dropdown";
 
 interface Props {
   tournament: GetTournament;
   users: GetUsers;
   eventDrivers: number[];
 }
-
 const PeopleForm = ({
   users,
   defaultValue,
@@ -27,11 +28,24 @@ const PeopleForm = ({
   name: string;
 }) => {
   const [value, onChange] = useState(defaultValue);
+  const [focused, setFocused] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(
+      (user) =>
+        !value.includes(user.driverId) &&
+        `${user.firstName} ${user.lastName}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+    );
+  }, [users, value, search]);
 
   return (
-    <Box bgColor="gray.900" rounded="lg" overflow="hidden">
+    <Box bgColor="gray.900" rounded="lg">
       {value.map((userId) => {
         const user = users.find((user) => user.driverId === userId);
+
         return (
           <Flex
             key={userId}
@@ -61,23 +75,44 @@ const PeopleForm = ({
         );
       })}
 
-      <Select
-        rounded="none"
-        borderTopWidth={1}
-        borderTopColor="gray.900"
-        onChange={(e) => onChange([...value, Number(e.target.value)])}
-      >
-        <option>Select a person...</option>
-        {users
-          .filter((user) => !value.includes(user.driverId))
-          .map((user) => {
-            return (
-              <option key={user.driverId} value={user.driverId}>
-                {user.firstName} {user.lastName}
-              </option>
-            );
-          })}
-      </Select>
+      <Box pos="relative">
+        <Input
+          placeholder="Type to search..."
+          onBlur={(e) => {
+            // Only blur if we're not clicking inside the dropdown
+            if (!e.relatedTarget?.closest('[role="listbox"]')) {
+              setFocused(false);
+            }
+          }}
+          onFocus={() => setFocused(true)}
+          onChange={(e) => setSearch(e.target.value)}
+          value={search}
+        />
+        {focused && search.length > 0 && (
+          <Dropdown role="listbox">
+            {filteredUsers.length === 0 && (
+              <styled.p px={2} py={1} fontWeight="semibold">
+                No results found
+              </styled.p>
+            )}
+
+            {filteredUsers.map((user) => {
+              return (
+                <Option
+                  key={user.driverId}
+                  type="button"
+                  onClick={() => {
+                    onChange([...value, user.driverId]);
+                    setSearch("");
+                  }}
+                >
+                  {user.firstName} {user.lastName}
+                </Option>
+              );
+            })}
+          </Dropdown>
+        )}
+      </Box>
     </Box>
   );
 };
@@ -88,17 +123,28 @@ export const TournamentStartForm = ({
   eventDrivers,
 }: Props) => {
   const [fullInclusion, setFullInclusion] = useState(false);
+  const [format, setFormat] = useState(
+    tournament?.format ?? TournamentsFormat.STANDARD,
+  );
 
   return (
     <Form method="post" action={`/api/tournaments/${tournament?.id}/start`}>
       <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
-        <Flex gap={4}>
-          <StepNumber value={1} />
+        <Flex gap={4} pt={8}>
+          <StepDot />
           <Box flex={1}>
             <styled.label mb={2} display="block">
               What format is this tournament?
             </styled.label>
-            <Select name="format" defaultValue={tournament?.format}>
+            <Select
+              name="format"
+              value={format}
+              onChange={(e) => {
+                if (isOneOf(e.target.value, Object.values(TournamentsFormat))) {
+                  setFormat(e.target.value);
+                }
+              }}
+            >
               {Object.values(TournamentsFormat).map((format) => {
                 return (
                   <styled.option key={format} value={format}>
@@ -110,23 +156,26 @@ export const TournamentStartForm = ({
           </Box>
         </Flex>
 
-        <Flex gap={4}>
-          <StepNumber value={2} />
-          <Box flex={1}>
-            <styled.label mb={2} display="block">
-              How many qualifying laps?
-            </styled.label>
-            <Input
-              maxW={100}
-              type="number"
-              name="qualifyingLaps"
-              defaultValue={tournament?.qualifyingLaps}
-            />
-          </Box>
-        </Flex>
+        {(format === TournamentsFormat.STANDARD ||
+          format === TournamentsFormat.DOUBLE_ELIMINATION) && (
+          <Flex gap={4}>
+            <StepDot />
+            <Box flex={1}>
+              <styled.label mb={2} display="block">
+                How many qualifying laps?
+              </styled.label>
+              <Input
+                maxW={100}
+                type="number"
+                name="qualifyingLaps"
+                defaultValue={tournament?.qualifyingLaps}
+              />
+            </Box>
+          </Flex>
+        )}
 
         <Flex gap={4}>
-          <StepNumber value={3} />
+          <StepDot />
           <Box flex={1}>
             <styled.label mb={2} display="block">
               Who are the tournament judges?
@@ -143,7 +192,7 @@ export const TournamentStartForm = ({
         </Flex>
 
         <Flex gap={4}>
-          <StepNumber value={4} />
+          <StepDot />
           <Box flex={1}>
             <styled.label mb={2} display="block">
               Who are the tournament drivers?
@@ -163,56 +212,58 @@ export const TournamentStartForm = ({
           </Box>
         </Flex>
 
-        <Flex gap={4}>
-          <StepNumber value={5} />
-          <Box flex={1}>
-            <styled.label display="block" mb={1}>
-              Should all drivers participate in battles?
-            </styled.label>
-            <styled.span
-              mb={2}
-              color="gray.500"
-              display="block"
-              textWrap="pretty"
-            >
-              Enabling this option will ensure the bracket is fully populated,
-              granting Bye-runs to the highest-qualified drivers where
-              necessary.
-            </styled.span>
-
-            <input
-              type="hidden"
-              name="fullInclusion"
-              value={fullInclusion ? "true" : "false"}
-            />
-
-            <Flex
-              gap={2}
-              p={1}
-              display="inline-flex"
-              bgColor="gray.800"
-              rounded="full"
-            >
-              <Button
-                type="button"
-                variant={!fullInclusion ? "primary" : "ghost"}
-                onClick={() => setFullInclusion(false)}
+        {(format === TournamentsFormat.STANDARD ||
+          format === TournamentsFormat.DOUBLE_ELIMINATION) && (
+          <Flex gap={4}>
+            <StepDot />
+            <Box flex={1}>
+              <styled.label display="block" mb={1}>
+                Should all drivers participate in battles?
+              </styled.label>
+              <styled.span
+                mb={2}
+                color="gray.500"
+                display="block"
+                textWrap="pretty"
               >
-                No
-              </Button>
-              <Button
-                type="button"
-                variant={fullInclusion ? "primary" : "ghost"}
-                onClick={() => setFullInclusion(true)}
+                Enabling this option will ensure the bracket is fully populated,
+                granting Bye-runs to the highest-qualified drivers where
+                necessary.
+              </styled.span>
+
+              <input
+                type="hidden"
+                name="fullInclusion"
+                value={fullInclusion ? "true" : "false"}
+              />
+
+              <Flex
+                p={1}
+                display="inline-flex"
+                bgColor="gray.800"
+                rounded="full"
               >
-                Yes
-              </Button>
-            </Flex>
-          </Box>
-        </Flex>
+                <Button
+                  type="button"
+                  variant={!fullInclusion ? "primary" : "ghost"}
+                  onClick={() => setFullInclusion(false)}
+                >
+                  No
+                </Button>
+                <Button
+                  type="button"
+                  variant={fullInclusion ? "primary" : "ghost"}
+                  onClick={() => setFullInclusion(true)}
+                >
+                  Yes
+                </Button>
+              </Flex>
+            </Box>
+          </Flex>
+        )}
 
         <Flex gap={4}>
-          <StepNumber value={6} />
+          <StepDot />
           <Box flex={1}>
             <styled.label display="block" mb={2}>
               Are you ready to start this tournament?

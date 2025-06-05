@@ -103,18 +103,18 @@ const Page = () => {
   const lapIndex = Number(params.index);
 
   return (
-    <Box p={4}>
+    <Box maxW="500px">
       <VStack gap={4} alignItems="stretch">
         <Box>
           <styled.h1 fontSize="2xl" fontWeight="bold">
-            Edit Lap Score
+            Edit Qualifying Score
           </styled.h1>
           <styled.p color="gray.400">
-            {driver.user.firstName} {driver.user.lastName} - Lap {lapIndex + 1}
+            {driver.user.firstName} {driver.user.lastName}: Lap {lapIndex + 1}
           </styled.p>
         </Box>
 
-        <Box p={4} rounded="xl" bgColor="gray.900">
+        <Box p={6} rounded="xl" bgColor="gray.900">
           <VStack gap={4} alignItems="stretch">
             {tournament.judges.map((judge) => {
               const score = lap.scores.find((s) => s.judgeId === judge.id);
