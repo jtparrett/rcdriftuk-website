@@ -63,6 +63,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
+  if (battles.length === 0) {
+    return [];
+  }
+
+  const tournament = battles[0].tournament;
+
   // Create a map to track unique drivers and their battle counts
   const driverMap = new Map();
 
@@ -118,7 +124,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   // Convert map to array and sort by battle count, win count, and qualifying position
   const sortedDrivers = Array.from(driverMap.values()).sort((a, b) => {
-    if (a.tournament.format === TournamentsFormat.DRIFT_WARS) {
+    if (tournament.format === TournamentsFormat.DRIFT_WARS) {
       if (b.winCount !== a.winCount) {
         return b.winCount - a.winCount;
       }
