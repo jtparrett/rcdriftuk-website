@@ -140,6 +140,8 @@ export const tournamentNextBattle = async (id: string) => {
     });
 
     await advanceToNextBattle(id);
+
+    return null;
   }
 
   if (winnerId && tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
@@ -150,5 +152,9 @@ export const tournamentNextBattle = async (id: string) => {
     });
 
     await advanceToNextBattle(id);
+
+    return null;
   }
+
+  await advanceToNextBattle(id);
 };

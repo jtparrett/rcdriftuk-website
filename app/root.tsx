@@ -82,7 +82,7 @@ export function ErrorBoundary() {
 
   return (
     <Center
-      h="100vh"
+      h="100dvh"
       bgImage="url(/dot-bg.svg)"
       bgRepeat="repeat"
       bgSize="16px"

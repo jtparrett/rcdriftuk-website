@@ -21,15 +21,19 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(tournament);
 
   const formData = await args.request.formData();
+
+  console.log(formData);
+
   const judges = z.array(z.string()).parse(formData.getAll("judges"));
   const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
+
   const qualifyingLaps = Math.max(
-    z.coerce.number().parse(formData.get("qualifyingLaps")),
+    z.coerce.number().parse(formData.get("qualifyingLaps") || 1),
     1,
   );
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
   const fullInclusion =
-    z.string().parse(formData.get("fullInclusion")) === "true";
+    z.string().parse(formData.get("fullInclusion") || "false") === "true";
 
   invariant(judges.length > 0, "Please add at least one judge");
   invariant(drivers.length > 1, "Please add at least 2 drivers");
@@ -53,6 +57,23 @@ export const action = async (args: ActionFunctionArgs) => {
       };
     }),
   });
+
+  const isDriftWars = format === TournamentsFormat.DRIFT_WARS;
+
+  if (isDriftWars) {
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        state: TournamentsState.BATTLES,
+        qualifyingLaps: 0,
+        format,
+      },
+    });
+
+    return redirect(`/tournaments/${id}/overview`);
+  }
 
   // Create laps
   await prisma.laps.createMany({

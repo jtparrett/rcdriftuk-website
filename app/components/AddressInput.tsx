@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Box, styled } from "~/styled-system/jsx";
-import { Button } from "./Button";
+import { Dropdown, Option } from "./Dropdown";
 
 interface Props {
   address?: string;
@@ -21,21 +21,9 @@ const formSchema = z.object({
 
 const validationSchema = toFormikValidationSchema(formSchema);
 
-const Option = styled(Button, {
-  base: {
-    px: 2,
-    py: 1,
-    bgColor: "transparent",
-    borderWidth: 0,
-    w: "full",
-    justifyContent: "flex-start",
-    rounded: "none",
-    textAlign: "left",
-  },
-});
-
 export const AddressInput = ({ address, lat, lng }: Props) => {
   const [options, setOptions] = useState<AddressLookup[]>([]);
+  const [focused, setFocused] = useState(false);
 
   const formik = useFormik({
     validationSchema,
@@ -72,28 +60,20 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
       <Input
         name="address"
         value={formik.values.address}
-        onFocus={() => {
-          formik.setFieldTouched("address", true);
+        placeholder="Type an address to search..."
+        onFocus={() => setFocused(true)}
+        onBlur={(e) => {
+          if (!e.relatedTarget?.closest('[role="listbox"]')) {
+            setFocused(false);
+          }
         }}
         onChange={(e) => {
           formik.setFieldValue("address", e.target.value);
         }}
       />
 
-      {formik.touched.address && formik.values.address.length > 0 && (
-        <Box
-          pos="absolute"
-          top="full"
-          left={0}
-          w="full"
-          zIndex={1000}
-          bgColor="gray.800"
-          borderRadius="lg"
-          borderWidth={1}
-          borderColor="gray.700"
-          mt={1}
-          overflow="hidden"
-        >
+      {formik.values.address.length > 0 && focused && (
+        <Dropdown role="listbox">
           {options.length > 0 && (
             <Box>
               {options.map((option) => (
@@ -104,6 +84,7 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
                     formik.setFieldValue("lat", parseFloat(option.lat));
                     formik.setFieldValue("lng", parseFloat(option.lon));
                     formik.setFieldTouched("address", false);
+                    setFocused(false);
                   }}
                   type="button"
                 >
@@ -114,15 +95,9 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
           )}
 
           {options.length <= 0 && !formik.isValid && (
-            <styled.span
-              color="red.500"
-              px={2}
-              py={1}
-              fontSize="sm"
-              display="block"
-            >
-              No results found, try a different address
-            </styled.span>
+            <styled.p px={2} py={1} fontSize="sm">
+              No results found, try a different search
+            </styled.p>
           )}
 
           {formik.isValid && (
@@ -130,12 +105,13 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
               type="button"
               onClick={() => {
                 formik.setFieldTouched("address", false);
+                setFocused(false);
               }}
             >
               Use "{formik.values.address}"
             </Option>
           )}
-        </Box>
+        </Dropdown>
       )}
     </Box>
   );

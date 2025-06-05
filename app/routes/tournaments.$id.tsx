@@ -96,7 +96,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  invariant(userId);
+  invariant(userId, "User not found");
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
     where: {
@@ -240,7 +240,7 @@ const TournamentPage = () => {
       )}
 
       {tournament.state === TournamentsState.START && (
-        <Container maxW={1100} px={2} py={4}>
+        <Container maxW={1100} px={4}>
           <TournamentStartForm
             tournament={tournament}
             users={users}
@@ -272,13 +272,15 @@ const TournamentPage = () => {
                   >
                     Overview
                   </LinkButton>
-                  <LinkButton
-                    to={`/tournaments/${tournament.id}/qualifying`}
-                    variant={isQualifyingTab ? "secondary" : "ghost"}
-                    size="xs"
-                  >
-                    Qualifying
-                  </LinkButton>
+                  {tournament.qualifyingLaps > 0 && (
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/qualifying`}
+                      variant={isQualifyingTab ? "secondary" : "ghost"}
+                      size="xs"
+                    >
+                      Qualifying
+                    </LinkButton>
+                  )}
                   <LinkButton
                     to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
                     variant={isBattlesTab ? "secondary" : "ghost"}

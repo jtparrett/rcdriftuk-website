@@ -209,9 +209,13 @@ const TournamentBattlesPage = () => {
           borderColor="gray.800"
           rounded="2xl"
           bg="black"
+          bgImage="url(/dot-bg.svg)"
+          bgRepeat="repeat"
+          bgSize="16px"
+          bgPosition="center"
         >
           {tournament.battles.length <= 0 && (
-            <styled.p>No battles here.</styled.p>
+            <styled.p>No battles constructed yet.</styled.p>
           )}
 
           <Flex>
@@ -233,7 +237,8 @@ const TournamentBattlesPage = () => {
                   <Flex
                     flexDir="column"
                     style={{
-                      height: Math.ceil(battlesByRound[1].length) * 54 + "px",
+                      height:
+                        Math.ceil(battlesByRound[1]?.length ?? 0) * 54 + "px",
                     }}
                   >
                     <Spacer />
@@ -251,6 +256,7 @@ const TournamentBattlesPage = () => {
                                 borderColor="gray.700"
                                 w="full"
                                 borderStyle="dashed"
+                                zIndex={1}
                               />
                             )}
                             <Box
@@ -263,6 +269,9 @@ const TournamentBattlesPage = () => {
                               }
                               position="relative"
                               overflow="hidden"
+                              bgColor="gray.950"
+                              shadow="0 4px 12px black"
+                              zIndex={0}
                             >
                               {isNextBattle && <Glow size="sm" />}
                               <Driver
@@ -282,10 +291,12 @@ const TournamentBattlesPage = () => {
                               borderTopWidth={1}
                               borderBottomWidth={1}
                               borderStyle="dashed"
-                              borderColor="gray.700"
+                              borderColor="gray.600"
                               flex={1}
                               my={-6}
                               borderRightRadius="lg"
+                              position="relative"
+                              zIndex={4}
                             />
                           ) : (
                             <Spacer />

@@ -274,6 +274,7 @@ enum TournamentsState {
 enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
+  DRIFT_WARS
 }
 
 enum BattlesBracket {

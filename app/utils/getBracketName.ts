@@ -6,7 +6,7 @@ export const getBracketName = (
   format: TournamentsFormat,
 ) => {
   if (round === 1000) {
-    return "🏆 Final 🏆";
+    return "Final";
   }
 
   if (format === TournamentsFormat.STANDARD) {
