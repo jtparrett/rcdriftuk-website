@@ -63,13 +63,13 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
         placeholder="Type an address to search..."
         onFocus={() => setFocused(true)}
         onBlur={(e) => {
-          const next = e.relatedTarget;
-          if (
-            !next ||
-            !document.querySelector('[role="listbox"]')?.contains(next)
-          ) {
-            setFocused(false);
-          }
+          setTimeout(() => {
+            const active = document.activeElement;
+            const listbox = document.querySelector('[role="listbox"]');
+            if (!listbox?.contains(active)) {
+              setFocused(false);
+            }
+          }, 0);
         }}
         onChange={(e) => {
           formik.setFieldValue("address", e.target.value);

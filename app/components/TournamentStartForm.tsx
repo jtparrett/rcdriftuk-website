@@ -79,13 +79,13 @@ const PeopleForm = ({
         <Input
           placeholder="Type to search..."
           onBlur={(e) => {
-            const next = e.relatedTarget;
-            if (
-              !next ||
-              !document.querySelector('[role="listbox"]')?.contains(next)
-            ) {
-              setFocused(false);
-            }
+            setTimeout(() => {
+              const active = document.activeElement;
+              const listbox = document.querySelector('[role="listbox"]');
+              if (!listbox?.contains(active)) {
+                setFocused(false);
+              }
+            }, 0);
           }}
           onFocus={() => setFocused(true)}
           onChange={(e) => setSearch(e.target.value)}
