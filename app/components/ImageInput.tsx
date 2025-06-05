@@ -1,22 +1,23 @@
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { Input } from "./Input";
-import { useState } from "react";
 import { RiCameraFill } from "react-icons/ri";
 
 interface Props {
   name: string;
+  onChange: (file: File) => void;
+  value: File | string | null;
 }
 
-export const ImageInput = ({ name }: Props) => {
-  const [image, setImage] = useState<File | null>(null);
-
+export const ImageInput = ({ name, onChange, value }: Props) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
     if (file) {
-      setImage(file);
+      onChange?.(file);
     }
   };
+
+  const imageUrl = value instanceof File ? URL.createObjectURL(value) : value;
 
   return (
     <Box
@@ -38,16 +39,16 @@ export const ImageInput = ({ name }: Props) => {
         zIndex={1}
         cursor="pointer"
       />
-      {image && (
+      {imageUrl && (
         <styled.img
-          src={URL.createObjectURL(image)}
+          src={imageUrl}
           alt="Uploaded"
           w="full"
           h="full"
           objectFit="cover"
         />
       )}
-      {!image && (
+      {!imageUrl && (
         <Center h="full" w="full">
           <Box>
             <Flex justifyContent="center" fontSize="xl">

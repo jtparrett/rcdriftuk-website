@@ -3,7 +3,7 @@ import { Outlet, useLoaderData } from "react-router";
 import { ClientOnly } from "~/components/ClientOnly";
 import { Map } from "~/components/Map.client";
 
-import { Box, styled } from "~/styled-system/jsx";
+import { Box } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/map.$tab";
 

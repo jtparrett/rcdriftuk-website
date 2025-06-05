@@ -12,6 +12,7 @@ export const getUser = async (userId: string) => {
       firstName: true,
       lastName: true,
       driverId: true,
+      image: true,
       Tracks: {
         select: {
           track: {

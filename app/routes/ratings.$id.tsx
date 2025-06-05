@@ -294,11 +294,28 @@ const Page = () => {
           >
             #{driver.driverId}
           </styled.span>
-          <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1} mb={1}>
+
+          <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1} mb={3}>
             {driver.firstName} {driver.lastName}
           </styled.h1>
 
-          {driver.team && <styled.p color="gray.400">{driver.team}</styled.p>}
+          {driver.team && (
+            <Flex gap={1} flexWrap="wrap" justifyContent="center" px={4}>
+              {driver.team.split(",").map((team) => (
+                <styled.p
+                  color="gray.400"
+                  fontSize="sm"
+                  fontWeight="medium"
+                  px={2}
+                  rounded="full"
+                  borderWidth={1}
+                  borderColor="gray.800"
+                >
+                  {team}
+                </styled.p>
+              ))}
+            </Flex>
+          )}
         </Flex>
 
         <Flex gap={0.5} pb={4} alignItems="center" mx={1}>

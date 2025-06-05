@@ -38,7 +38,6 @@ import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import { RiFlagLine, RiRemoteControlLine } from "react-icons/ri";
-import { Spinner } from "~/components/Spinner";
 import type { Route } from "./+types/tournaments.$id";
 import { sentenceCase } from "change-case";
 
@@ -347,10 +346,9 @@ const TournamentPage = () => {
                       <Button
                         type="submit"
                         w={{ base: "full", sm: "auto" }}
-                        disabled={isLoading}
-                        color={isSubmitting ? "transparent" : undefined}
+                        disabled={isLoading || isSubmitting}
+                        isLoading={isSubmitting}
                       >
-                        {isSubmitting && <Spinner />}
                         Start Next Run <RiFlagLine />
                       </Button>
                     </Form>
@@ -363,10 +361,9 @@ const TournamentPage = () => {
                       <Button
                         type="submit"
                         w={{ base: "full", sm: "auto" }}
-                        disabled={isLoading}
-                        color={isSubmitting ? "transparent" : undefined}
+                        disabled={isLoading || isSubmitting}
+                        isLoading={isSubmitting}
                       >
-                        {isSubmitting && <Spinner />}
                         End Qualifying
                       </Button>
                     </Form>
@@ -380,10 +377,9 @@ const TournamentPage = () => {
                       <Button
                         type="submit"
                         w={{ base: "full", sm: "auto" }}
-                        disabled={isLoading}
-                        color={isSubmitting ? "transparent" : undefined}
+                        disabled={isLoading || isSubmitting}
+                        isLoading={isSubmitting}
                       >
-                        {isSubmitting && <Spinner />}
                         Start Next Battle <RiFlagLine />
                       </Button>
                     </Form>

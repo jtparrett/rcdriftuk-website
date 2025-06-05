@@ -196,8 +196,7 @@ model DriverRatingBattles {
 }
 
 model Users {
-  deprecated_trackId String? @map("trackId") @db.Uuid
-
+  deprecated_trackId  String?               @map("trackId") @db.Uuid
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @default(now()) @updatedAt
   driverId            Int                   @id @default(autoincrement())

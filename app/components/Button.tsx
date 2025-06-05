@@ -35,6 +35,22 @@ const ButtonStyles = cva({
         px: 3,
       },
     },
+    isLoading: {
+      true: {
+        color: "transparent",
+        _after: {
+          content: '""',
+          position: "absolute",
+          w: 6,
+          h: 6,
+          rounded: "full",
+          animation: "spin .8s linear infinite",
+          borderWidth: 2,
+          borderColor: "transparent",
+          borderTopColor: "white",
+        },
+      },
+    },
     variant: {
       primary: {
         bg: "brand.500",

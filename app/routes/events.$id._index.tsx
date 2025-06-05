@@ -31,7 +31,6 @@ import { EventTicketButton } from "~/components/EventTicketButton";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
-import { Spinner } from "~/components/Spinner";
 import { google } from "calendar-link";
 import type { Route } from "./+types/events.$id._index";
 
@@ -275,9 +274,8 @@ const Page = () => {
                         value="submit"
                         variant="secondary"
                         disabled={isSubmitting}
-                        color={isSubmitting ? "transparent" : undefined}
+                        isLoading={isSubmitting}
                       >
-                        {isSubmitting && <Spinner />}
                         {isAttending && "Not "}Interested{" "}
                         {isAttending ? (
                           <RiCloseCircleFill />

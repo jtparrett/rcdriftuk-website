@@ -464,7 +464,10 @@ export const Header = ({ user }: Props) => {
             {user && (
               <styled.div w={8} h={8} rounded="full" overflow="hidden">
                 <Link to={`/ratings/${user.driverId}`}>
-                  <styled.img src={clerkUser.user?.imageUrl} w="full" />
+                  <styled.img
+                    src={user.image ?? "/blank-driver-right.jpg"}
+                    w="full"
+                  />
                 </Link>
               </styled.div>
             )}

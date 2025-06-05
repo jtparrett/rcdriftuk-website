@@ -132,16 +132,18 @@ const Row = ({
             >
               {driver.firstName} {driver.lastName}
             </styled.p>
-            <styled.p
-              fontSize="xs"
-              color="rgba(255, 255, 255, 0.5)"
-              whiteSpace="nowrap"
-              textOverflow="ellipsis"
-              overflow="hidden"
-              w="full"
-            >
-              {driver.team}
-            </styled.p>
+            {driver.team && (
+              <styled.p
+                fontSize="xs"
+                color="rgba(255, 255, 255, 0.5)"
+                whiteSpace="nowrap"
+                textOverflow="ellipsis"
+                overflow="hidden"
+                w="full"
+              >
+                {driver.team}
+              </styled.p>
+            )}
           </Box>
           <styled.span
             flex="none"
