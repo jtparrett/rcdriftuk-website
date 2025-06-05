@@ -63,7 +63,11 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
         placeholder="Type an address to search..."
         onFocus={() => setFocused(true)}
         onBlur={(e) => {
-          if (!e.relatedTarget?.closest('[role="listbox"]')) {
+          const next = e.relatedTarget;
+          if (
+            !next ||
+            !document.querySelector('[role="listbox"]')?.contains(next)
+          ) {
             setFocused(false);
           }
         }}

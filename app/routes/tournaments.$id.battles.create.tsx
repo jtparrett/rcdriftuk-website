@@ -119,8 +119,11 @@ const DriverSelect = ({ name }: { name: string }) => {
       <Input
         placeholder="Type to search..."
         onBlur={(e) => {
-          // Only blur if we're not clicking inside the dropdown
-          if (!e.relatedTarget?.closest('[role="listbox"]')) {
+          const next = e.relatedTarget;
+          if (
+            !next ||
+            !document.querySelector('[role="listbox"]')?.contains(next)
+          ) {
             setFocused(false);
           }
         }}
