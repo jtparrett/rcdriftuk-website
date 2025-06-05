@@ -2,7 +2,7 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Flex, styled } from "~/styled-system/jsx";
-import { TournamentsState } from "~/utils/enums";
+import { TournamentsFormat, TournamentsState } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -12,7 +12,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     where: {
       tournamentId: id,
       tournament: {
-        state: TournamentsState.END,
+        OR: [
+          {
+            state: TournamentsState.END,
+          },
+          {
+            format: TournamentsFormat.DRIFT_WARS,
+          },
+        ],
       },
     },
     select: {

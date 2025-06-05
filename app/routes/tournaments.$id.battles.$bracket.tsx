@@ -150,6 +150,10 @@ const TournamentBattlesPage = () => {
 
   const battlesInRound = Object.values(battlesByRound).reduce<Battle[][]>(
     (agg, round) => {
+      if (tournament.format === TournamentsFormat.DRIFT_WARS) {
+        return [round];
+      }
+
       const n = Math.log2(round.length);
       const isOddRound = n - Math.floor(n) !== 0;
 
@@ -218,22 +222,31 @@ const TournamentBattlesPage = () => {
             <styled.p>No battles constructed yet.</styled.p>
           )}
 
-          <Flex>
+          <Flex
+            justifyContent={
+              tournament.format === TournamentsFormat.DRIFT_WARS
+                ? "center"
+                : undefined
+            }
+          >
             {battlesInRound.map((battles, i) => {
               return (
                 <Box key={i} w={240} flex="none">
-                  <styled.p
-                    fontSize="sm"
-                    textAlign="center"
-                    textTransform="uppercase"
-                    fontWeight="bold"
-                  >
-                    {getBracketName(
-                      battles[0].round,
-                      battles[0].bracket,
-                      tournament.format,
-                    )}
-                  </styled.p>
+                  {tournament.format !== TournamentsFormat.DRIFT_WARS && (
+                    <styled.p
+                      fontSize="sm"
+                      textAlign="center"
+                      textTransform="uppercase"
+                      fontWeight="bold"
+                    >
+                      {getBracketName(
+                        battles[0].round,
+                        battles[0].bracket,
+                        tournament.format,
+                      )}
+                    </styled.p>
+                  )}
+
                   <Flex
                     flexDir="column"
                     style={{
@@ -248,7 +261,9 @@ const TournamentBattlesPage = () => {
                       return (
                         <Fragment key={battle.id}>
                           <Box position="relative" flex="none" zIndex={1}>
-                            {battles.length <= 1 && (
+                            {(battles.length <= 1 ||
+                              tournament.format ===
+                                TournamentsFormat.DRIFT_WARS) && (
                               <Box
                                 pos="absolute"
                                 top="50%"
@@ -285,7 +300,9 @@ const TournamentBattlesPage = () => {
                             </Box>
                           </Box>
 
-                          {i % 2 === 0 && battles.length > 1 ? (
+                          {i % 2 === 0 &&
+                          battles.length > 1 &&
+                          tournament.format !== TournamentsFormat.DRIFT_WARS ? (
                             <Box
                               borderRightWidth={1}
                               borderTopWidth={1}
