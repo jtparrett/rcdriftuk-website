@@ -37,7 +37,11 @@ export const action = async (args: ActionFunctionArgs) => {
     throw new Error("Please add at least one judge to the tournament");
   }
 
-  if (fullInclusion ? drivers.length < 2 : drivers.length < 4) {
+  if (
+    fullInclusion || format === TournamentsFormat.DRIFT_WARS
+      ? drivers.length < 2
+      : drivers.length < 4
+  ) {
     throw new Error(
       `Please add at least ${fullInclusion ? 2 : 4} drivers to the tournament`,
     );
