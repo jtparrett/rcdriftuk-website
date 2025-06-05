@@ -9,11 +9,11 @@ export const getBracketName = (
     return "Final";
   }
 
-  if (format === TournamentsFormat.STANDARD) {
-    return `Round ${round}`;
+  if (format === TournamentsFormat.DOUBLE_ELIMINATION) {
+    return `Round ${round} : ${
+      bracket === BattlesBracket.UPPER ? "Upper" : "Lower"
+    }`;
   }
 
-  return `Round ${round} - ${
-    bracket === BattlesBracket.UPPER ? "Upper" : "Lower"
-  }`;
+  return `Round ${round}`;
 };

@@ -1,5 +1,10 @@
 import { useUser } from "@clerk/react-router";
-import { BattlesBracket, TicketStatus, TournamentsState } from "~/utils/enums";
+import {
+  BattlesBracket,
+  TicketStatus,
+  TournamentsFormat,
+  TournamentsState,
+} from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
@@ -210,6 +215,10 @@ const TournamentPage = () => {
 
   const isOwner = user?.id === tournament.userId;
 
+  const judgingCompleteForNextBattle =
+    (tournament.nextBattle?.BattleVotes.length ?? 0) >=
+    tournament.judges.length;
+
   useReloader();
   useAblyRealtimeReloader(tournament.id);
 
@@ -288,7 +297,8 @@ const TournamentPage = () => {
                   >
                     Battles
                   </LinkButton>
-                  {tournament.state === TournamentsState.END && (
+                  {(tournament.state === TournamentsState.END ||
+                    tournament.format === TournamentsFormat.DRIFT_WARS) && (
                     <LinkButton
                       to={`/tournaments/${tournament.id}/standings`}
                       variant={isStandingsTab ? "secondary" : "ghost"}
@@ -300,6 +310,17 @@ const TournamentPage = () => {
                 </Flex>
 
                 <Spacer />
+
+                {isOwner &&
+                  tournament.state === TournamentsState.BATTLES &&
+                  tournament.format === TournamentsFormat.DRIFT_WARS &&
+                  judgingCompleteForNextBattle && (
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/battles/create`}
+                    >
+                      Next Battle <RiFlagLine />
+                    </LinkButton>
+                  )}
 
                 {isOwner &&
                   tournament.state === TournamentsState.QUALIFYING &&
@@ -338,8 +359,8 @@ const TournamentPage = () => {
 
                 {isOwner &&
                   tournament.state === TournamentsState.BATTLES &&
-                  (tournament.nextBattle?.BattleVotes.length ?? 0) >=
-                    tournament.judges.length && (
+                  judgingCompleteForNextBattle &&
+                  tournament.format !== TournamentsFormat.DRIFT_WARS && (
                     <Form method="post">
                       <Button
                         type="submit"

@@ -13,7 +13,7 @@ export const Footer = () => {
           <Box>
             <styled.img
               src="/rcdriftuk-26-light.svg"
-              w={140}
+              w={120}
               mb={2}
               alt="RC Drift UK"
             />
