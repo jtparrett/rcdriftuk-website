@@ -124,16 +124,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   // Convert map to array and sort by battle count, win count, and qualifying position
   const sortedDrivers = Array.from(driverMap.values()).sort((a, b) => {
-    if (tournament.format === TournamentsFormat.DRIFT_WARS) {
-      if (b.winCount !== a.winCount) {
-        return b.winCount - a.winCount;
-      }
-
-      return a.qualifyingPosition - b.qualifyingPosition;
-    }
-
     // First sort by battle count (descending)
-    if (b.battleCount !== a.battleCount) {
+    if (
+      b.battleCount !== a.battleCount &&
+      tournament.format !== TournamentsFormat.DRIFT_WARS
+    ) {
       return b.battleCount - a.battleCount;
     }
     // Then sort by win count (descending)
