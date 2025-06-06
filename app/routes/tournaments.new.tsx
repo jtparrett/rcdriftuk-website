@@ -1,6 +1,6 @@
 import { getAuth } from "~/utils/getAuth.server";
 import type { ActionFunctionArgs } from "react-router";
-import { Form, redirect } from "react-router";
+import { Form, redirect, useFetcher } from "react-router";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
@@ -9,6 +9,9 @@ import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { styled, Box, Flex, Center } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { FormControl } from "~/components/FormControl";
 
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -28,7 +31,30 @@ export const action = async (args: ActionFunctionArgs) => {
   return redirect(`/tournaments/${tournament.id}`);
 };
 
+const formSchema = z.object({
+  name: z.string().min(1),
+});
+
+const validationSchema = toFormikValidationSchema(formSchema);
+
 const Page = () => {
+  const fetcher = useFetcher();
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+    },
+    validationSchema,
+    async onSubmit(values) {
+      const formData = new FormData();
+      formData.append("name", values.name);
+
+      await fetcher.submit(formData, {
+        method: "POST",
+      });
+    },
+  });
+
   return (
     <Center minH="70dvh">
       <Box
@@ -47,15 +73,26 @@ const Page = () => {
             New Tournament
           </styled.h1>
 
-          <Form method="post">
+          <form onSubmit={formik.handleSubmit}>
             <Flex gap={2} flexDir="column">
-              <Box>
+              <FormControl error={formik.errors.name}>
                 <Label>Tournament Name</Label>
-                <Input name="name" placeholder="Type here..." required />
-              </Box>
-              <Button type="submit">Create Tournament</Button>
+                <Input
+                  name="name"
+                  placeholder="Type here..."
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+              <Button
+                type="submit"
+                isLoading={formik.isSubmitting}
+                disabled={formik.isSubmitting}
+              >
+                Create Tournament
+              </Button>
             </Flex>
-          </Form>
+          </form>
         </Box>
       </Box>
     </Center>

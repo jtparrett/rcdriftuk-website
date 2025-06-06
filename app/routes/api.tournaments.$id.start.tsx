@@ -58,8 +58,31 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   // Create drivers
+  const newDrivers = drivers.filter((driverId) => !/^\d+$/.test(driverId));
+  let allDrivers = drivers.filter((driverId) => !newDrivers.includes(driverId));
+
+  if (newDrivers.length > 0) {
+    const newUsers = await prisma.users.createManyAndReturn({
+      data: newDrivers.map((driverId) => {
+        const [firstName, lastName] = driverId.split(" ");
+
+        return {
+          firstName,
+          lastName,
+        };
+      }),
+      select: {
+        driverId: true,
+      },
+    });
+
+    allDrivers = allDrivers.concat(
+      newUsers.map((user) => user.driverId.toString()),
+    );
+  }
+
   const tournamentDrivers = await prisma.tournamentDrivers.createManyAndReturn({
-    data: drivers.map((driverId) => {
+    data: allDrivers.map((driverId) => {
       return {
         driverId: Number(driverId),
         tournamentId: id,

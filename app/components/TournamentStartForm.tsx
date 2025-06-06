@@ -18,16 +18,19 @@ interface Props {
   users: GetUsers;
   eventDrivers: number[];
 }
+
 const PeopleForm = ({
   users,
   defaultValue,
   name,
+  allowNewDrivers = false,
 }: {
   users: GetUsers;
   defaultValue: number[];
   name: string;
+  allowNewDrivers?: boolean;
 }) => {
-  const [value, onChange] = useState(defaultValue);
+  const [value, onChange] = useState<(number | string)[]>(defaultValue);
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -42,38 +45,53 @@ const PeopleForm = ({
   }, [users, value, search]);
 
   return (
-    <Box bgColor="gray.900" rounded="lg">
-      {value.map((userId) => {
-        const user = users.find((user) => user.driverId === userId);
+    <Box>
+      {value.length > 0 && (
+        <Box
+          bgColor="gray.900"
+          rounded="lg"
+          mb={2}
+          overflow="hidden"
+          borderWidth={1}
+          borderColor="gray.800"
+        >
+          <Box mb="-1px">
+            {value.map((userId, i) => {
+              const user = users.find((user) =>
+                typeof userId === "string" ? false : user.driverId === userId,
+              );
 
-        return (
-          <Flex
-            key={userId}
-            gap={1}
-            borderBottomWidth={1}
-            borderBottomColor="gray.700"
-          >
-            <input type="hidden" name={name} value={userId} />
-            <styled.p py={1} px={4} flex={1}>
-              {user?.firstName} {user?.lastName}
-            </styled.p>
+              return (
+                <Flex
+                  key={userId}
+                  gap={1}
+                  borderBottomWidth={1}
+                  borderBottomColor="gray.800"
+                >
+                  <input type="hidden" name={name} value={userId} />
+                  <styled.p py={1} px={4} flex={1}>
+                    {user ? `${user.firstName} ${user.lastName}` : userId}
+                  </styled.p>
 
-            <Box p={1}>
-              <Button
-                px={1}
-                size="xs"
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  onChange(value.filter((id) => id !== userId));
-                }}
-              >
-                <RiDeleteBinFill />
-              </Button>
-            </Box>
-          </Flex>
-        );
-      })}
+                  <Box p={1}>
+                    <Button
+                      px={1}
+                      size="xs"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        onChange(value.filter((_id, index) => index !== i));
+                      }}
+                    >
+                      <RiDeleteBinFill />
+                    </Button>
+                  </Box>
+                </Flex>
+              );
+            })}
+          </Box>
+        </Box>
+      )}
 
       <Box pos="relative">
         <Input
@@ -113,6 +131,18 @@ const PeopleForm = ({
                 </Option>
               );
             })}
+
+            {allowNewDrivers && (
+              <Option
+                type="button"
+                onClick={() => {
+                  onChange([...value, search]);
+                  setSearch("");
+                }}
+              >
+                Create "{search}" as a new driver
+              </Option>
+            )}
           </Dropdown>
         )}
       </Box>
@@ -202,6 +232,7 @@ export const TournamentStartForm = ({
             </styled.label>
 
             <PeopleForm
+              allowNewDrivers
               users={users}
               defaultValue={Array.from(
                 new Set([

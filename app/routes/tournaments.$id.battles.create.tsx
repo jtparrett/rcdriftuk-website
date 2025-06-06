@@ -6,6 +6,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router";
+import invariant from "tiny-invariant";
 import z from "zod";
 import { Button } from "~/components/Button";
 import { Dropdown, Option } from "~/components/Dropdown";
@@ -54,8 +55,39 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   const formData = await request.formData();
-  const driverLeftId = formData.get("driverLeftId");
-  const driverRightId = formData.get("driverRightId");
+  let { driverLeftId, driverRightId } = z
+    .object({
+      driverLeftId: z.string(),
+      driverRightId: z.string(),
+    })
+    .parse({
+      driverLeftId: formData.get("driverLeftId"),
+      driverRightId: formData.get("driverRightId"),
+    });
+
+  if (!/^\d+$/.test(driverLeftId)) {
+    const [firstName, lastName] = driverLeftId.split(" ");
+    const user = await prisma.users.create({
+      data: {
+        firstName,
+        lastName,
+      },
+    });
+
+    driverLeftId = user.driverId.toString();
+  }
+
+  if (!/^\d+$/.test(driverRightId)) {
+    const [firstName, lastName] = driverRightId.split(" ");
+    const user = await prisma.users.create({
+      data: {
+        firstName,
+        lastName,
+      },
+    });
+
+    driverRightId = user.driverId.toString();
+  }
 
   let driverLeft = tournament.drivers.find(
     (driver) => driver.driverId === Number(driverLeftId),
@@ -101,7 +133,7 @@ const DriverSelect = ({ name }: { name: string }) => {
   const { users } = useLoaderData<typeof loader>();
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
-  const [value, onChange] = useState<number>();
+  const [value, onChange] = useState<number | string>();
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -154,6 +186,16 @@ const DriverSelect = ({ name }: { name: string }) => {
               </Option>
             );
           })}
+
+          <Option
+            type="button"
+            onClick={() => {
+              onChange(search);
+              setFocused(false);
+            }}
+          >
+            Create "{search}" as a new driver
+          </Option>
         </Dropdown>
       )}
     </Box>
