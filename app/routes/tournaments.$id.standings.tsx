@@ -4,6 +4,7 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { TournamentsFormat, TournamentsState } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
+import { getTournamentStandings } from "~/utils/getTournamentStandings";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -63,83 +64,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  if (battles.length === 0) {
-    return [];
-  }
-
-  const tournament = battles[0].tournament;
-
-  // Create a map to track unique drivers and their battle counts
-  const driverMap = new Map();
-
-  // Loop through battles to count appearances and store qualifying positions
-  battles.forEach((battle) => {
-    const leftDriver = battle.driverLeft;
-    const rightDriver = battle.driverRight;
-
-    if (leftDriver && !leftDriver.isBye) {
-      // Process left driver
-      if (!driverMap.has(leftDriver.id)) {
-        driverMap.set(leftDriver.id, {
-          id: leftDriver.id,
-          driverId: leftDriver.user.driverId,
-          firstName: leftDriver.user.firstName,
-          lastName: leftDriver.user.lastName,
-          battleCount: 1,
-          winCount: battle.winnerId === leftDriver.id ? 1 : 0,
-          qualifyingPosition: leftDriver.qualifyingPosition,
-          image: leftDriver.user.image,
-        });
-      } else {
-        const driver = driverMap.get(leftDriver.id);
-        driver.battleCount++;
-        if (battle.winnerId === leftDriver.id) {
-          driver.winCount++;
-        }
-      }
-    }
-
-    if (rightDriver && !rightDriver.isBye) {
-      // Process right driver
-      if (!driverMap.has(rightDriver.id)) {
-        driverMap.set(rightDriver.id, {
-          id: rightDriver.id,
-          driverId: rightDriver.user.driverId,
-          firstName: rightDriver.user.firstName,
-          lastName: rightDriver.user.lastName,
-          battleCount: 1,
-          winCount: battle.winnerId === rightDriver.id ? 1 : 0,
-          qualifyingPosition: rightDriver.qualifyingPosition,
-          image: rightDriver.user.image,
-        });
-      } else {
-        const driver = driverMap.get(rightDriver.id);
-        driver.battleCount++;
-        if (battle.winnerId === rightDriver.id) {
-          driver.winCount++;
-        }
-      }
-    }
-  });
-
-  // Convert map to array and sort by battle count, win count, and qualifying position
-  const sortedDrivers = Array.from(driverMap.values()).sort((a, b) => {
-    // First sort by battle count (descending)
-    if (
-      b.battleCount !== a.battleCount &&
-      tournament.format !== TournamentsFormat.DRIFT_WARS
-    ) {
-      return b.battleCount - a.battleCount;
-    }
-    // Then sort by win count (descending)
-    if (b.winCount !== a.winCount) {
-      return b.winCount - a.winCount;
-    }
-    // Finally sort by qualifying position (ascending)
-    return a.qualifyingPosition - b.qualifyingPosition;
-  });
-
-  return sortedDrivers;
+  return getTournamentStandings(battles);
 };
 
 const TournamentStandingsPage = () => {

@@ -79,7 +79,7 @@ export const EventDeletePage = () => {
       <Box
         bg="gray.900"
         p={8}
-        borderRadius="md"
+        borderRadius="2xl"
         mx="auto"
         maxW={500}
         textAlign="center"

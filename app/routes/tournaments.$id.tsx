@@ -329,11 +329,19 @@ const TournamentPage = () => {
                   tournament.state === TournamentsState.BATTLES &&
                   tournament.format === TournamentsFormat.DRIFT_WARS &&
                   judgingCompleteForNextBattle && (
-                    <LinkButton
-                      to={`/tournaments/${tournament.id}/battles/create`}
-                    >
-                      Next Battle <RiFlagLine />
-                    </LinkButton>
+                    <>
+                      <LinkButton
+                        to={`/tournaments/${tournament.id}/battles/create`}
+                      >
+                        Next Battle <RiFlagLine />
+                      </LinkButton>
+                      <LinkButton
+                        to={`/tournaments/${tournament.id}/end`}
+                        variant="outline"
+                      >
+                        End Tournament
+                      </LinkButton>
+                    </>
                   )}
 
                 {isOwner &&

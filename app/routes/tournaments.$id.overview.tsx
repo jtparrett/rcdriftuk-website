@@ -9,6 +9,7 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
 import { RiTrophyFill } from "react-icons/ri";
+import { getTournamentStandings } from "~/utils/getTournamentStandings";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -20,13 +21,17 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     include: {
       judges: true,
       battles: {
-        take: 2,
         orderBy: [
           {
             id: "desc",
           },
         ],
         include: {
+          tournament: {
+            select: {
+              format: true,
+            },
+          },
           driverLeft: {
             include: {
               user: true,
@@ -129,23 +134,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 const FinalResults = () => {
   const tournament = useLoaderData<typeof loader>();
-  const [finalBattle, playoffBattle] = tournament.battles;
-  const first =
-    finalBattle.driverLeftId === finalBattle?.winnerId
-      ? finalBattle?.driverLeft
-      : finalBattle?.driverRight;
-
-  const second =
-    finalBattle.driverLeftId === finalBattle?.winnerId
-      ? finalBattle?.driverRight
-      : finalBattle?.driverLeft;
-
-  const third =
-    playoffBattle.driverLeftId === playoffBattle?.winnerId
-      ? playoffBattle?.driverLeft
-      : playoffBattle?.driverRight;
-
-  const results = [first, second, third];
+  const results = getTournamentStandings(tournament.battles).slice(0, 3);
 
   return (
     <Flex w={700} maxW="full" alignItems="flex-end" p={4} gap={1}>
@@ -187,8 +176,8 @@ const FinalResults = () => {
             </styled.span>
             <AspectRatio ratio={0.75} w="full" overflow="hidden" rounded="xl">
               <styled.img
-                src={driver?.user.image ?? "/blank-driver-right.jpg"}
-                alt={driver?.user.firstName ?? ""}
+                src={driver?.image ?? "/blank-driver-right.jpg"}
+                alt={driver?.firstName ?? ""}
               />
             </AspectRatio>
             <styled.p
@@ -196,7 +185,7 @@ const FinalResults = () => {
               py={1}
               fontSize={{ base: "xs", md: "md" }}
             >
-              {driver?.user.firstName} {driver?.user.lastName}
+              {driver?.firstName} {driver?.lastName}
             </styled.p>
           </Box>
         );
@@ -357,7 +346,12 @@ const TournamentsOverviewPage = () => {
                       {tournament.nextBattle.driverLeft?.user.lastName}
                     </styled.p>
                   </Box>
-                  <Box flex={1.2} py={{ base: 8, md: 12 }}>
+                  <Box
+                    flex={1.2}
+                    py={{ base: 8, md: 12 }}
+                    pos="relative"
+                    zIndex={1}
+                  >
                     {battleJudgingComplete && (
                       <>
                         {tournament.nextBattle.BattleVotes.map((vote, i) => {

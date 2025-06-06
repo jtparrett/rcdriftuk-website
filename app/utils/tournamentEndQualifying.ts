@@ -8,7 +8,7 @@ import invariant from "tiny-invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
-import { pow2Floor } from "~/utils/tournament";
+import { pow2Floor } from "~/utils/tournament.server";
 
 const addByeDriverToTournament = async (tournament: Tournaments) => {
   const byeDriver = await prisma.users.findFirstOrThrow({

@@ -3,7 +3,7 @@ import invariant from "tiny-invariant";
 import {
   advanceDoubleEliminationBattleWinner,
   advanceSingleEliminationBattleWinner,
-} from "~/utils/tournament";
+} from "~/utils/tournament.server";
 import { prisma } from "~/utils/prisma.server";
 
 const advanceToNextBattle = async (tournamentId: string) => {
