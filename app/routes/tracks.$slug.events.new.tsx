@@ -143,6 +143,8 @@ const CalendarNewPage = () => {
   const [enableTicketing, setEnableTicketing] = useState(false);
   const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
 
+  // console.log(startDate, endDate);
+
   return (
     <Container maxW={1100} px={4} py={8}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>

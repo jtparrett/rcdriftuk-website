@@ -14,6 +14,8 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { useFormik } from "formik";
 import { FormControl } from "./FormControl";
 import { useFetcher } from "react-router";
+import { resizeImage } from "~/utils/resizeImage";
+
 interface Props {
   track?: GetUserOwnedTrackBySlug;
 }
@@ -36,7 +38,7 @@ export const TrackForm = ({ track }: Props) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const fetcher = useFetcher();
 
-  const formik = useFormik({
+  const formik = useFormik<z.infer<typeof formSchema>>({
     validationSchema,
     initialValues: {
       name: track?.name ?? "",
@@ -50,14 +52,27 @@ export const TrackForm = ({ track }: Props) => {
     },
     onSubmit: async (values) => {
       const formData = new FormData();
+
+      if (values.image instanceof File) {
+        const result = await resizeImage(values.image);
+        formData.append("image", result);
+      } else {
+        formData.append("image", values.image);
+      }
+
+      if (values.cover instanceof File) {
+        const result = await resizeImage(values.cover);
+        formData.append("cover", result);
+      } else if (values.cover) {
+        formData.append("cover", values.cover);
+      }
+
       formData.append("name", values.name);
       formData.append("description", values.description);
       formData.append("url", values.url);
       formData.append("address", values.address);
       formData.append("lat", values.lat.toString());
       formData.append("lng", values.lng.toString());
-      formData.append("image", values.image);
-      formData.append("cover", values.cover);
 
       await fetcher.submit(formData, {
         method: "POST",
@@ -120,7 +135,7 @@ export const TrackForm = ({ track }: Props) => {
           <Label>Track Cover Photo</Label>
           <ImageInput
             name="cover"
-            value={formik.values.cover}
+            value={formik.values.cover ?? null}
             onChange={(file) => formik.setFieldValue("cover", file)}
           />
         </FormControl>

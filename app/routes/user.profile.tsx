@@ -19,6 +19,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import { ImageInput } from "~/components/ImageInput";
 import { uploadFile } from "~/utils/uploadFile.server";
+import { resizeImage } from "~/utils/resizeImage";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "RC Drift UK | Edit Profile" }];
@@ -97,7 +98,7 @@ const UserProfilePage = () => {
   const data = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
 
-  const formik = useFormik({
+  const formik = useFormik<z.infer<typeof formSchema>>({
     validationSchema,
     initialValues: {
       firstName: data.firstName ?? "",
@@ -107,10 +108,20 @@ const UserProfilePage = () => {
     },
     onSubmit: async (values) => {
       const formData = new FormData();
+
+      if (values.avatar instanceof File) {
+        const result = await resizeImage(values.avatar);
+        formData.append("avatar", result);
+      } else if (values.avatar) {
+        formData.append("avatar", values.avatar);
+      }
+
       formData.append("firstName", values.firstName);
       formData.append("lastName", values.lastName);
-      formData.append("team", values.team);
-      formData.append("avatar", values.avatar);
+
+      if (values.team) {
+        formData.append("team", values.team);
+      }
 
       await fetcher.submit(formData, {
         method: "POST",
@@ -128,7 +139,7 @@ const UserProfilePage = () => {
               <Label>Avatar</Label>
               <ImageInput
                 name="avatar"
-                value={formik.values.avatar}
+                value={formik.values.avatar ?? null}
                 onChange={(file) => {
                   formik.setFieldValue("avatar", file);
                 }}
