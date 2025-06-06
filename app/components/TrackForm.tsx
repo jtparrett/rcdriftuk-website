@@ -21,7 +21,7 @@ interface Props {
 const formSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
-  url: z.string().url().min(1),
+  url: z.string().min(1),
   address: z.string().min(1),
   lat: z.number(),
   lng: z.number(),
