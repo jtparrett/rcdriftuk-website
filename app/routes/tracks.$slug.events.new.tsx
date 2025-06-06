@@ -1,7 +1,16 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { Form } from "react-router";
-import { add, differenceInWeeks, endOfYear, sub } from "date-fns";
+import {
+  add,
+  differenceInWeeks,
+  endOfYear,
+  format,
+  parse,
+  parseISO,
+  startOfHour,
+  sub,
+} from "date-fns";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
@@ -67,8 +76,8 @@ export const action = async (args: ActionFunctionArgs) => {
   const data = z
     .object({
       name: z.string(),
-      startDate: z.coerce.date(),
-      endDate: z.coerce.date(),
+      startDate: z.string(),
+      endDate: z.string(),
       link: z.string().optional(),
       repeatWeeks: z.coerce.number(),
       description: z.string().optional(),
@@ -92,6 +101,9 @@ export const action = async (args: ActionFunctionArgs) => {
       ticketPrice,
     });
 
+  const startDateNoZone = parseISO(data.startDate);
+  const endDateNoZone = parseISO(data.endDate);
+
   const track = await prisma.tracks.findFirstOrThrow({
     where: {
       slug,
@@ -103,25 +115,22 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  const diff = differenceInWeeks(endOfYear(data.startDate), data.startDate);
+  const diff = differenceInWeeks(endOfYear(startDateNoZone), startDateNoZone);
   const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
 
   await prisma.events.createMany({
     data: Array.from({ length: arrayLength }).map((_, i) => {
-      const repeatStartDate = add(data.startDate, {
+      const repeatStartDate = add(startDateNoZone, {
         weeks: i * data.repeatWeeks,
       });
-      const repeatEndDate = add(data.endDate, { weeks: i * data.repeatWeeks });
-
-      const utcStartDate = repeatStartDate;
-      const utcEndDate = repeatEndDate;
+      const repeatEndDate = add(endDateNoZone, { weeks: i * data.repeatWeeks });
 
       return {
         name: data.name,
         trackId: track.id,
         link: data.link,
-        startDate: utcStartDate,
-        endDate: utcEndDate,
+        startDate: repeatStartDate,
+        endDate: repeatEndDate,
         description: data.description,
         enableTicketing: data.enableTicketing === "true",
         ticketCapacity: data.ticketCapacity,
@@ -138,12 +147,14 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const CalendarNewPage = () => {
-  const [startDate, setStartDate] = useState(add(new Date(), { days: 1 }));
-  const [endDate, setEndDate] = useState(add(new Date(), { days: 1 }));
+  const [startDate, setStartDate] = useState(
+    startOfHour(add(new Date(), { days: 1 })),
+  );
+  const [endDate, setEndDate] = useState(
+    startOfHour(add(new Date(), { days: 1 })),
+  );
   const [enableTicketing, setEnableTicketing] = useState(false);
   const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
-
-  // console.log(startDate, endDate);
 
   return (
     <Container maxW={1100} px={4} py={8}>
@@ -169,11 +180,13 @@ const CalendarNewPage = () => {
               type="hidden"
               name="startDate"
               required
-              value={startDate.toISOString()}
+              value={format(startDate, "yyyy-MM-dd'T'HH:mm:ss'Z'")}
             />
             <TimePicker
               value={startDate}
-              onChange={(date) => setStartDate(date)}
+              onChange={(date) => {
+                setStartDate(date);
+              }}
             />
           </Box>
 
@@ -183,7 +196,7 @@ const CalendarNewPage = () => {
               type="hidden"
               name="endDate"
               required
-              value={endDate.toISOString()}
+              value={format(endDate, "yyyy-MM-dd'T'HH:mm:ss'Z'")}
             />
             <TimePicker value={endDate} onChange={(date) => setEndDate(date)} />
           </Box>
