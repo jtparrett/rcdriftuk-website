@@ -38,7 +38,7 @@ const MapTrackDrawer = () => {
           bottom: 4,
           top: 4,
           left: 4,
-          zIndex: 1,
+          zIndex: 500,
           w: "500px",
           maxW: "calc(100% - 32px)",
           bgColor: "gray.950",

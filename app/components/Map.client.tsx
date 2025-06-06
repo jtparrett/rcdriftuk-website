@@ -1,16 +1,57 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import { Box } from "~/styled-system/jsx";
-import { useNavigate, useParams } from "react-router";
+import { Box, Container, Flex } from "~/styled-system/jsx";
+import { Outlet, useNavigate, useParams } from "react-router";
 import { getTabParam } from "~/utils/getTabParam";
 import type { Tracks } from "@prisma/client";
-import { TrackTypes } from "~/utils/enums";
+import { Regions, TrackTypes } from "~/utils/enums";
+import { Tab } from "./Tab";
+import { sentenceCase } from "change-case";
+import { Button } from "./Button";
 
 export type Values<T> = T[keyof T];
 
 interface Props {
   tracks: Tracks[];
 }
+
+const REGION_LOCATIONS = {
+  [Regions.ALL]: {
+    lat: 20,
+    lng: 0,
+    zoom: 2,
+  },
+  [Regions.UK]: {
+    lat: 52.3555,
+    lng: -1,
+    zoom: 6,
+  },
+  [Regions.EU]: {
+    lat: 54,
+    lng: 15,
+    zoom: 4,
+  },
+  [Regions.NA]: {
+    lat: 39.8,
+    lng: -98.6,
+    zoom: 3,
+  },
+  [Regions.APAC]: {
+    lat: 13.5,
+    lng: 121.0,
+    zoom: 3,
+  },
+  [Regions.LATAM]: {
+    lat: -14,
+    lng: -60,
+    zoom: 3,
+  },
+  [Regions.MEA]: {
+    lat: 25,
+    lng: 45,
+    zoom: 3,
+  },
+};
 
 export const Map = ({ tracks }: Props) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -19,6 +60,7 @@ export const Map = ({ tracks }: Props) => {
   const params = useParams();
   const tab = getTabParam(params.tab);
   const navigate = useNavigate();
+  const [region, setRegion] = useState<Regions>(Regions.ALL);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -26,12 +68,14 @@ export const Map = ({ tracks }: Props) => {
     mapboxgl.accessToken =
       "pk.eyJ1IjoicmNkcmlmdHVrIiwiYSI6ImNtOXRuenU3bjAxMDEyc3NldWxuMGp0YmEifQ.krploudyX3_F8kmpsaFePw";
 
+    const location = REGION_LOCATIONS[region];
+
     // Initialize map
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/dark-v11",
-      center: [-1, 52.3555],
-      zoom: 6,
+      center: [location.lng, location.lat],
+      zoom: location.zoom,
     });
 
     // Add navigation controls
@@ -111,9 +155,41 @@ export const Map = ({ tracks }: Props) => {
     });
   }, [tracks, tab, navigate]);
 
+  useEffect(() => {
+    if (!map.current) return;
+
+    const location = REGION_LOCATIONS[region];
+
+    map.current.flyTo({
+      center: [location.lng, location.lat],
+      zoom: location.zoom,
+    });
+  }, [region]);
+
   return (
-    <Box h="100%" position="relative" overflow="hidden" zIndex={1}>
-      <Box ref={mapContainer} h="100%" overflow="hidden" />
-    </Box>
+    <>
+      <Box borderBottomWidth={1} borderColor="gray.900">
+        <Container px={2} w="full" maxW={1100} overflowX="auto">
+          <Flex gap={0.5} py={2}>
+            {Object.values(Regions).map((item) => (
+              <Button
+                key={item}
+                px={3}
+                rounded="lg"
+                variant={item === region ? "secondary" : "ghost"}
+                onClick={() => setRegion(item)}
+              >
+                {item}
+              </Button>
+            ))}
+          </Flex>
+        </Container>
+      </Box>
+
+      <Box h="100%" position="relative" overflow="hidden" zIndex={1} flex={1}>
+        <Box ref={mapContainer} h="100%" overflow="hidden" />
+        <Outlet />
+      </Box>
+    </>
   );
 };
