@@ -19,6 +19,7 @@ export const getUserOwnedTrackBySlug = async (slug: string, userId: string) => {
       name: true,
       address: true,
       image: true,
+      cover: true,
       description: true,
       status: true,
       types: true,

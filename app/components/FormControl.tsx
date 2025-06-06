@@ -19,8 +19,8 @@ export const FormControl = ({ error, children, ...props }: Props) => {
           : token("colors.gray.800"),
       }}
       className={css({
-        "& input": {
-          borderColor: "var(--border-color)",
+        "& > *": {
+          borderColor: "var(--border-color) !important",
         },
       })}
     >

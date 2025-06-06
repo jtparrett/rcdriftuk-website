@@ -1,68 +1,42 @@
 import { addressLookup, type AddressLookup } from "~/utils/addressLookup";
 import { Input } from "./Input";
 import { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import { z } from "zod";
-import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Box, styled } from "~/styled-system/jsx";
 import { Dropdown, Option } from "./Dropdown";
 
 interface Props {
-  address?: string;
-  lat?: number;
-  lng?: number;
+  address: string;
+  lat: number;
+  lng: number;
+  onChange?: (address: string, lat: number, lng: number) => void;
 }
 
-const formSchema = z.object({
-  address: z.string(),
-  lat: z.number(),
-  lng: z.number(),
-});
-
-const validationSchema = toFormikValidationSchema(formSchema);
-
-export const AddressInput = ({ address, lat, lng }: Props) => {
+export const AddressInput = ({ address, lat, lng, onChange }: Props) => {
   const [options, setOptions] = useState<AddressLookup[]>([]);
   const [focused, setFocused] = useState(false);
 
-  const formik = useFormik({
-    validationSchema,
-    initialValues: {
-      address: address ?? "",
-      lat: lat ?? 0,
-      lng: lng ?? 0,
-    },
-    onSubmit() {},
-  });
-
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
-      if (formik.values.address && formik.dirty) {
-        const lookup = await addressLookup(formik.values.address);
+      if (address && focused) {
+        const lookup = await addressLookup(address);
         setOptions(lookup);
       }
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [formik.values.address, formik.dirty]);
+  }, [address, focused]);
 
   return (
     <Box pos="relative">
-      <input type="hidden" name="lat" value={formik.values.lat} />
-      <input type="hidden" name="lng" value={formik.values.lng} />
-
-      {!formik.isValid && (
-        <styled.p color="red.500" fontSize="sm">
-          Please select an address
-        </styled.p>
-      )}
+      <input type="hidden" name="lat" value={lat} />
+      <input type="hidden" name="lng" value={lng} />
 
       <Input
         name="address"
-        value={formik.values.address}
+        value={address}
         placeholder="Type an address to search..."
         onFocus={() => setFocused(true)}
-        onBlur={(e) => {
+        onBlur={() => {
           setTimeout(() => {
             const active = document.activeElement;
             const listbox = document.querySelector('[role="listbox"]');
@@ -72,11 +46,11 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
           }, 0);
         }}
         onChange={(e) => {
-          formik.setFieldValue("address", e.target.value);
+          onChange?.(e.target.value, lat, lng);
         }}
       />
 
-      {formik.values.address.length > 0 && focused && (
+      {address.length > 0 && focused && (
         <Dropdown role="listbox">
           {options.length > 0 && (
             <Box>
@@ -84,10 +58,11 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
                 <Option
                   key={option.display_name}
                   onClick={() => {
-                    formik.setFieldValue("address", option.display_name);
-                    formik.setFieldValue("lat", parseFloat(option.lat));
-                    formik.setFieldValue("lng", parseFloat(option.lon));
-                    formik.setFieldTouched("address", false);
+                    onChange?.(
+                      option.display_name,
+                      parseFloat(option.lat),
+                      parseFloat(option.lon),
+                    );
                     setFocused(false);
                   }}
                   type="button"
@@ -98,23 +73,20 @@ export const AddressInput = ({ address, lat, lng }: Props) => {
             </Box>
           )}
 
-          {options.length <= 0 && !formik.isValid && (
+          {options.length <= 0 && (
             <styled.p px={2} py={1} fontSize="sm">
               No results found, try a different search
             </styled.p>
           )}
 
-          {formik.isValid && (
-            <Option
-              type="button"
-              onClick={() => {
-                formik.setFieldTouched("address", false);
-                setFocused(false);
-              }}
-            >
-              Use "{formik.values.address}"
-            </Option>
-          )}
+          <Option
+            type="button"
+            onClick={() => {
+              setFocused(false);
+            }}
+          >
+            Use "{address}"
+          </Option>
         </Dropdown>
       )}
     </Box>

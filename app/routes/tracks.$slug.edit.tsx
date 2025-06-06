@@ -1,7 +1,7 @@
 import { TrackTypes } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { Form, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { TrackForm } from "~/components/TrackForm";
@@ -41,28 +41,35 @@ export const action = async (args: ActionFunctionArgs) => {
 
   const data = z
     .object({
-      image: z.instanceof(File).optional(),
-      cover: z.instanceof(File).optional(),
-      name: z.string().optional(),
-      description: z.string().optional(),
-      url: z.string().optional(),
-      address: z.string().optional(),
-      lat: z.coerce.number().optional(),
-      lng: z.coerce.number().optional(),
-      types: z.array(z.nativeEnum(TrackTypes)).optional(),
+      image: z.union([z.instanceof(File), z.string()]),
+      cover: z.union([z.instanceof(File), z.string()]).optional(),
+      name: z.string(),
+      description: z.string(),
+      url: z.string(),
+      address: z.string(),
+      lat: z.coerce.number(),
+      lng: z.coerce.number(),
     })
     .parse(Object.fromEntries(formData.entries()));
 
   const { image, cover, ...update } = data;
-  let imageUrl = null;
-  let coverUrl = null;
+  let imageUrl = "";
+  let coverUrl: string | null = null;
 
-  if (image && image.size > 0) {
+  if (image instanceof File && image.size > 0) {
     imageUrl = await uploadFile(image);
   }
 
-  if (cover && cover.size > 0) {
+  if (typeof image === "string") {
+    imageUrl = image;
+  }
+
+  if (cover instanceof File && cover.size > 0) {
     coverUrl = await uploadFile(cover);
+  }
+
+  if (typeof cover === "string") {
+    coverUrl = cover;
   }
 
   await prisma.tracks.update({
@@ -71,8 +78,8 @@ export const action = async (args: ActionFunctionArgs) => {
     },
     data: {
       ...update,
-      ...(imageUrl && { image: imageUrl }),
-      ...(coverUrl && { cover: coverUrl }),
+      image: imageUrl,
+      cover: coverUrl,
     },
   });
 
@@ -98,9 +105,7 @@ const TracksEditPage = () => {
           </styled.h1>
         </Box>
         <Box p={6}>
-          <Form method="post" encType="multipart/form-data">
-            <TrackForm track={track} />
-          </Form>
+          <TrackForm track={track} />
         </Box>
       </Box>
     </Container>

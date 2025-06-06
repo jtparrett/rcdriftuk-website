@@ -5,7 +5,6 @@ import {
   useLoaderData,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-  type MetaFunction,
 } from "react-router";
 import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
@@ -42,7 +41,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 };
 
 const formSchema = z.object({
-  avatar: z.instanceof(File).nullable().optional(),
+  avatar: z.union([z.instanceof(File), z.string()]).optional(),
   firstName: z.string(),
   lastName: z.string(),
   team: z.string().optional(),
@@ -69,10 +68,14 @@ export const action = async (args: ActionFunctionArgs) => {
     team,
   });
 
-  let avatarUrl = null;
+  let avatarUrl: string | null = null;
 
-  if (data.avatar && data.avatar.size > 0) {
+  if (data.avatar instanceof File && data.avatar.size > 0) {
     avatarUrl = await uploadFile(data.avatar);
+  }
+
+  if (typeof data.avatar === "string") {
+    avatarUrl = data.avatar;
   }
 
   await prisma.users.update({
@@ -83,9 +86,7 @@ export const action = async (args: ActionFunctionArgs) => {
       firstName: data.firstName,
       lastName: data.lastName,
       team: data.team ?? null,
-      ...(avatarUrl && {
-        image: avatarUrl,
-      }),
+      image: avatarUrl,
     },
   });
 
@@ -102,17 +103,14 @@ const UserProfilePage = () => {
       firstName: data.firstName ?? "",
       lastName: data.lastName ?? "",
       team: data.team ?? "",
-      avatar: null,
+      avatar: data.image ?? "",
     },
     onSubmit: async (values) => {
       const formData = new FormData();
       formData.append("firstName", values.firstName);
       formData.append("lastName", values.lastName);
       formData.append("team", values.team);
-
-      if (values.avatar) {
-        formData.append("avatar", values.avatar);
-      }
+      formData.append("avatar", values.avatar);
 
       await fetcher.submit(formData, {
         method: "POST",

@@ -5,7 +5,7 @@ export const Select = styled("select", {
     py: 2,
     px: 4,
     bgColor: "gray.800",
-    rounded: "md",
+    rounded: "lg",
     color: "white",
     w: "full",
     minH: "40px",

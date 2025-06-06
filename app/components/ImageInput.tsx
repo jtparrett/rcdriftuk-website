@@ -1,6 +1,6 @@
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { Input } from "./Input";
-import { RiCameraFill } from "react-icons/ri";
+import { RiUpload2Line } from "react-icons/ri";
 
 interface Props {
   name: string;
@@ -21,12 +21,14 @@ export const ImageInput = ({ name, onChange, value }: Props) => {
 
   return (
     <Box
-      w="86px"
-      h="86px"
+      w={16}
+      h={16}
       overflow="hidden"
-      rounded="full"
+      rounded="2xl"
       pos="relative"
-      bgColor="black"
+      bgColor="gray.800"
+      borderWidth={1}
+      borderColor="gray.800"
     >
       <Input
         pos="absolute"
@@ -36,7 +38,7 @@ export const ImageInput = ({ name, onChange, value }: Props) => {
         type="file"
         accept="image/*"
         onChange={handleImageChange}
-        zIndex={1}
+        zIndex={2}
         cursor="pointer"
       />
       {imageUrl && (
@@ -46,20 +48,12 @@ export const ImageInput = ({ name, onChange, value }: Props) => {
           w="full"
           h="full"
           objectFit="cover"
+          opacity={0.7}
         />
       )}
-      {!imageUrl && (
-        <Center h="full" w="full">
-          <Box>
-            <Flex justifyContent="center" fontSize="xl">
-              <RiCameraFill />
-            </Flex>
-            <styled.span fontSize="sm" fontWeight="medium">
-              Upload
-            </styled.span>
-          </Box>
-        </Center>
-      )}
+      <Center pos="absolute" inset={0} pointerEvents="none" zIndex={2}>
+        <RiUpload2Line size={24} />
+      </Center>
     </Box>
   );
 };

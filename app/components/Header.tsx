@@ -12,10 +12,8 @@ import { format } from "date-fns";
 import {
   RiAddLine,
   RiCalendar2Line,
-  RiFacebookFill,
   RiFlagLine,
   RiHome2Line,
-  RiInstagramFill,
   RiListOrdered2,
   RiLogoutBoxRLine,
   RiMapPin2Line,
@@ -399,49 +397,24 @@ export const Header = ({ user }: Props) => {
       h="65px"
     >
       <Container maxW={1100} px={4}>
-        <Flex alignItems="center" h={HEADER_HEIGHT + "px"}>
+        <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={2}>
           <Link to="/">
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
           </Link>
 
           <Spacer />
 
-          <LinkButton
-            size="sm"
-            px={2}
-            fontSize="lg"
-            target="_blank"
-            variant="ghost"
-            to="https://www.facebook.com/rcdriftinternational/"
-          >
-            <RiFacebookFill />
-          </LinkButton>
-
-          <LinkButton
-            size="sm"
-            px={2}
-            fontSize="lg"
-            target="_blank"
-            variant="ghost"
-            to="https://www.instagram.com/rcdriftuk"
-          >
-            <RiInstagramFill />
-          </LinkButton>
-
           <Box>
             <Button
               size="sm"
-              px={2}
-              fontSize="lg"
               variant={menu.isOpen ? "primary" : "outline"}
               onClick={() => menu.toggle()}
-              mx={2}
               aria-label="Menu"
               pos="relative"
               overflow="visible"
             >
               <RiMenu2Line />
-
+              Menu
               {menu.isOpen && (
                 <styled.span
                   pos="absolute"

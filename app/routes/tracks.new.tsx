@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { Form } from "react-router";
 import { z } from "zod";
 import { TrackForm } from "~/components/TrackForm";
 import { styled, Container, Box } from "~/styled-system/jsx";
@@ -39,9 +38,7 @@ export const action = async (args: ActionFunctionArgs) => {
       name: z.string(),
       description: z.string(),
       url: z.string(),
-      image: z.instanceof(File).refine((file) => file.size > 0, {
-        message: "Image is required",
-      }),
+      image: z.instanceof(File),
       cover: z.instanceof(File).optional(),
       lat: z.number(),
       lng: z.number(),
@@ -98,9 +95,7 @@ const TracksNewPage = () => {
           <styled.h1 fontWeight="bold">Register a new Track</styled.h1>
         </Box>
         <Box p={6}>
-          <Form method="post" encType="multipart/form-data">
-            <TrackForm />
-          </Form>
+          <TrackForm />
         </Box>
       </Box>
     </Container>
