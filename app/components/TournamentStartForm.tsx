@@ -298,7 +298,7 @@ export const TournamentStartForm = ({
 
         <Flex gap={4}>
           <StepDot />
-          <Box flex={1}>
+          <Box flex={1} pb={24}>
             <styled.label display="block" mb={2}>
               Are you ready to start this tournament?
             </styled.label>

@@ -14,7 +14,7 @@ export const Dropdown = styled("div", {
     borderColor: "gray.700",
     mt: 1,
     overflow: "auto",
-    maxH: "200px",
+    maxH: "180px",
   },
 });
 
