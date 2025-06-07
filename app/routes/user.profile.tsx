@@ -45,7 +45,7 @@ const formSchema = z.object({
   avatar: z.union([z.instanceof(File), z.string()]).optional(),
   firstName: z.string(),
   lastName: z.string(),
-  team: z.string().optional(),
+  team: z.string().optional().nullable(),
 });
 
 const validationSchema = toFormikValidationSchema(formSchema);
@@ -169,7 +169,7 @@ const UserProfilePage = () => {
               <Label>Team(s)</Label>
               <Input
                 name="team"
-                value={formik.values.team}
+                value={formik.values.team ?? ""}
                 onChange={formik.handleChange}
               />
             </FormControl>

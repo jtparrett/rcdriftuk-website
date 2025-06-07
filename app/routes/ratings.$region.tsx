@@ -1,4 +1,4 @@
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { styled, Container, Box, Flex } from "~/styled-system/jsx";
 import {
   getDriverRank,
@@ -29,10 +29,15 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const region = z.nativeEnum(Regions).parse(params.region?.toUpperCase());
-  const drivers = await getDriverRatings(region);
+  const region = z.nativeEnum(Regions).safeParse(params.region?.toUpperCase());
 
-  return { drivers, region };
+  if (!region.success) {
+    throw redirect("/ratings/all");
+  }
+
+  const drivers = await getDriverRatings(region.data);
+
+  return { drivers, region: region.data };
 };
 
 type LoaderData = typeof loader;
