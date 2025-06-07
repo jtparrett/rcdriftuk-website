@@ -19,5 +19,5 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   notFoundInvariant(user);
 
-  throw redirect(`/ratings/${user.driverId}`);
+  throw redirect(`/drivers/${user.driverId}`);
 };

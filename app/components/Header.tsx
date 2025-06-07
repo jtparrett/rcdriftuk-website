@@ -161,7 +161,7 @@ const Menu = ({ user }: Props) => {
               Home
             </MenuLink>
             <MenuLink
-              to="/ratings"
+              to="/ratings/all"
               active={location.pathname === "/ratings" ? "active" : "inactive"}
             >
               <MenuIcon>
@@ -291,9 +291,9 @@ const Menu = ({ user }: Props) => {
 
               {user?.driverId && (
                 <MenuLink
-                  to="/ratings/me"
+                  to="/drivers/me"
                   active={
-                    location.pathname.startsWith(`/ratings/${user.driverId}`)
+                    location.pathname.startsWith(`/drivers/${user.driverId}`)
                       ? "active"
                       : "inactive"
                   }
@@ -436,7 +436,7 @@ export const Header = ({ user }: Props) => {
           <SignedIn>
             {user && (
               <styled.div w={8} h={8} rounded="full" overflow="hidden">
-                <Link to={`/ratings/${user.driverId}`}>
+                <Link to={`/drivers/${user.driverId}`}>
                   <styled.img
                     src={user.image ?? "/blank-driver-right.jpg"}
                     w="full"

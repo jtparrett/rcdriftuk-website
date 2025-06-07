@@ -104,7 +104,7 @@ const TournamentStandingsPage = () => {
                       objectFit="cover"
                     />
                   </Box>
-                  <LinkOverlay to={`/ratings/${driver.driverId}`} />
+                  <LinkOverlay to={`/drivers/${driver.driverId}`} />
                   {driver.firstName} {driver.lastName}
                 </Flex>
               </styled.td>

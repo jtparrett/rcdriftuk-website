@@ -183,7 +183,7 @@ const Page = () => {
                   </LinkButton>
                 </SignedOut>
                 <SignedIn>
-                  <LinkButton to="/ratings/me">
+                  <LinkButton to="/drivers/me">
                     <RiUserLine />
                     View My Driver Profile
                   </LinkButton>
@@ -242,7 +242,7 @@ const Page = () => {
                         {i + 1}
                       </styled.td>
                       <styled.td px={1}>
-                        <Link to={`/ratings/${driver.driverId}`}>
+                        <Link to={`/drivers/${driver.driverId}`}>
                           {driver.firstName} {driver.lastName}
                         </Link>
                       </styled.td>
@@ -265,7 +265,7 @@ const Page = () => {
                 </styled.tbody>
               </styled.table>
 
-              <LinkButton to="/ratings" variant="secondary" w="full" mt={4}>
+              <LinkButton to="/ratings/all" variant="secondary" w="full" mt={4}>
                 See All Driver Ratings
               </LinkButton>
             </Card>

@@ -30,7 +30,7 @@ import { Button, LinkButton } from "~/components/Button";
 import type { Values } from "~/utils/values";
 import { format } from "date-fns";
 import { Regions } from "~/utils/enums";
-import type { Route } from "./+types/ratings.$id";
+import type { Route } from "./+types/drivers.$id";
 import { css } from "~/styled-system/css";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -237,8 +237,8 @@ const Page = () => {
     >
       <Container maxW={800} px={4} py={6}>
         <Flex alignItems="center">
-          <LinkButton to="/ratings" variant="ghost" size="sm">
-            <RiArrowLeftLine /> Return to Ratings
+          <LinkButton to="/ratings/all" variant="ghost" size="sm">
+            <RiArrowLeftLine /> View Ratings
           </LinkButton>
 
           <Spacer />
@@ -565,7 +565,7 @@ const Page = () => {
                               {isWinner ? "Won vs" : "Lost vs"}
                             </styled.span>{" "}
                             <Link
-                              to={`/ratings/${
+                              to={`/drivers/${
                                 isLeftDriver
                                   ? battle.driverRight?.user.driverId
                                   : battle.driverLeft?.user.driverId
