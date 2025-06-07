@@ -208,7 +208,7 @@ const TournamentBattlesPage = () => {
       >
         <Box
           overflow="auto"
-          p={8}
+          py={8}
           borderWidth={1}
           borderColor="gray.800"
           rounded="2xl"
