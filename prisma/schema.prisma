@@ -72,7 +72,7 @@ model Tournaments {
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?  @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
   fullInclusion       Boolean             @default(false)
-  region              Regions             @default(EU)
+  region              Regions?
   rated               Boolean             @default(false)
 }
 

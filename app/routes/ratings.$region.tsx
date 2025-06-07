@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { styled, Container, Box, Flex } from "~/styled-system/jsx";
 import {
   getDriverRank,
@@ -13,6 +13,7 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/ratings.$region";
 import { Tab } from "~/components/Tab";
+import { z } from "zod";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -27,9 +28,11 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export const loader = async () => {
-  const drivers = await getDriverRatings(Regions.ALL);
-  return drivers;
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const region = z.nativeEnum(Regions).parse(params.region?.toUpperCase());
+  const drivers = await getDriverRatings(region);
+
+  return { drivers, region };
 };
 
 type LoaderData = typeof loader;
@@ -38,7 +41,7 @@ const Row = ({
   driver,
   rank,
 }: {
-  driver: Awaited<ReturnType<LoaderData>>[number];
+  driver: Awaited<ReturnType<LoaderData>>["drivers"][number];
   rank: number;
 }) => {
   const rankTitle = driver
@@ -249,7 +252,7 @@ const RankSection = () => {
 };
 
 const RatingsPage = () => {
-  const drivers = useLoaderData<LoaderData>();
+  const { drivers, region } = useLoaderData<LoaderData>();
 
   return (
     <Box
@@ -326,19 +329,19 @@ const RatingsPage = () => {
               w="full"
               overflow="hidden"
             >
-              {/* <Flex gap={2} alignItems="center" mb={4}>
-                {Object.values(Regions).map((region) => {
+              <Flex gap={2} alignItems="center" mb={4}>
+                {Object.values(Regions).map((option) => {
                   return (
                     <Tab
-                      key={region}
-                      to={`/ratings/${region}`}
-                      isActive={region === "ALL"}
+                      key={option}
+                      to={`/ratings/${option.toLowerCase()}`}
+                      isActive={option === region}
                     >
-                      {region}
+                      {option}
                     </Tab>
                   );
                 })}
-              </Flex> */}
+              </Flex>
 
               <Flex flexDirection="column" gap={2}>
                 {drivers
