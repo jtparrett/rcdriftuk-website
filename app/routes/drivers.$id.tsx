@@ -47,6 +47,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       image: true,
       team: true,
       elo: true,
+      elo_UK: true,
+      elo_EU: true,
+      elo_NA: true,
+      elo_APAC: true,
+      elo_LATAM: true,
+      elo_MEA: true,
       totalBattles: true,
       TournamentDrivers: {
         where: {
@@ -721,6 +727,8 @@ const Page = () => {
             {Object.values(Regions).map((region) => {
               if (region === Regions.ALL) return null;
 
+              const elo = driver[`elo_${region}`];
+
               return (
                 <Flex
                   key={region}
@@ -735,7 +743,7 @@ const Page = () => {
                 >
                   <styled.span fontWeight="semibold">{region}</styled.span>
                   <Spacer />
-                  <styled.span>-</styled.span>
+                  <styled.span>{elo.toFixed(3)}</styled.span>
                   <styled.img
                     src={`/badges/${getDriverRank(1000, 0)}.png`}
                     w={10}
