@@ -24,7 +24,7 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const driverRatings = await getDriverRatings(Regions.ALL);
+  const driverRatings = await getDriverRatings(Regions.UK);
   const startOfSeason = startOfYear(new Date());
 
   const qualifiedDrivers = await prisma.users.findMany({
@@ -52,7 +52,7 @@ export const loader = async () => {
       return {
         ...driver,
         position: i + 1,
-        rank: getDriverRank(driver.elo, driver.totalBattles),
+        rank: getDriverRank(driver.elo_UK, driver.totalBattles),
       };
     })
     .filter((a) => {
@@ -113,7 +113,7 @@ const StandingsPage = () => {
                     </Flex>
                   </styled.td>
                   <styled.td textAlign="right" fontFamily="mono">
-                    {driver.elo.toFixed(3)}
+                    {driver.elo_UK.toFixed(3)}
                   </styled.td>
                   <styled.td textAlign="right">
                     <styled.img
