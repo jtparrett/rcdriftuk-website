@@ -22,8 +22,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       judges: true,
       battles: {
         orderBy: [
+          { round: "asc" },
+          { bracket: "asc" },
           {
-            id: "desc",
+            id: "asc",
           },
         ],
         include: {

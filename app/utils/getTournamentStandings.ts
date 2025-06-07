@@ -105,28 +105,98 @@ export const getTournamentStandings = (
     }
   });
 
-  // Convert map to array and sort by battle count, win count, and qualifying position
-  const sortedDrivers = Array.from(driverMap.values()).sort((a, b) => {
-    // First sort by battle count (descending)
-    if (
-      b.battleCount !== a.battleCount &&
-      tournament.format !== TournamentsFormat.DRIFT_WARS
-    ) {
+  // Convert map to array
+  const allDrivers = Array.from(driverMap.values());
+
+  // For drift_wars format, use standard sorting for all positions
+  if (tournament.format === TournamentsFormat.DRIFT_WARS) {
+    return allDrivers.sort((a, b) => {
+      // Sort by battle count (descending)
+      if (b.battleCount !== a.battleCount) {
+        return b.battleCount - a.battleCount;
+      }
+      // Then sort by win count (descending)
+      if (b.winCount !== a.winCount) {
+        return b.winCount - a.winCount;
+      }
+      // Then sort by qualifying position (ascending, null treated as high value)
+      const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+      const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+      if (aQualPos !== bQualPos) {
+        return aQualPos - bQualPos;
+      }
+      // Finally sort by name (ascending)
+      return `${a.lastName}${a.firstName}`.localeCompare(
+        `${b.lastName}${b.firstName}`,
+      );
+    });
+  }
+
+  // For other formats, handle special top 3 positions
+  const finalStandings: typeof allDrivers = [];
+  const remainingDrivers = [...allDrivers];
+
+  // Find last battle (final)
+  const lastBattle = battles[battles.length - 1];
+  if (lastBattle && lastBattle.winnerId) {
+    // First place: winner of last battle
+    const winnerIndex = remainingDrivers.findIndex(
+      (d) => d.id === lastBattle.winnerId,
+    );
+    if (winnerIndex !== -1) {
+      finalStandings.push(remainingDrivers.splice(winnerIndex, 1)[0]);
+    }
+
+    // Second place: loser of last battle
+    const loserId =
+      lastBattle.driverLeft?.id === lastBattle.winnerId
+        ? lastBattle.driverRight?.id
+        : lastBattle.driverLeft?.id;
+
+    if (loserId) {
+      const loserIndex = remainingDrivers.findIndex((d) => d.id === loserId);
+      if (loserIndex !== -1) {
+        finalStandings.push(remainingDrivers.splice(loserIndex, 1)[0]);
+      }
+    }
+  }
+
+  // Find second to last battle (semi-final)
+  if (battles.length >= 2) {
+    const secondLastBattle = battles[battles.length - 2];
+    if (secondLastBattle && secondLastBattle.winnerId) {
+      // Third place: winner of second to last battle (if not already placed)
+      const semiWinnerIndex = remainingDrivers.findIndex(
+        (d) => d.id === secondLastBattle.winnerId,
+      );
+      if (semiWinnerIndex !== -1) {
+        finalStandings.push(remainingDrivers.splice(semiWinnerIndex, 1)[0]);
+      }
+    }
+  }
+
+  // Sort remaining drivers by standard criteria
+  const sortedRemainingDrivers = remainingDrivers.sort((a, b) => {
+    // Sort by battle count (descending)
+    if (b.battleCount !== a.battleCount) {
       return b.battleCount - a.battleCount;
     }
     // Then sort by win count (descending)
     if (b.winCount !== a.winCount) {
       return b.winCount - a.winCount;
     }
-    // Then sort by qualifying position (ascending)
-    if ((a.qualifyingPosition ?? 0) !== (b.qualifyingPosition ?? 0)) {
-      return (a.qualifyingPosition ?? 0) - (b.qualifyingPosition ?? 0);
+    // Then sort by qualifying position (ascending, null treated as high value)
+    const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+    const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+    if (aQualPos !== bQualPos) {
+      return aQualPos - bQualPos;
     }
-    // Finally sort by last name, then first name (ascending)
+    // Finally sort by name (ascending)
     return `${a.lastName}${a.firstName}`.localeCompare(
       `${b.lastName}${b.firstName}`,
     );
   });
 
-  return sortedDrivers;
+  // Combine final standings with remaining drivers
+  return [...finalStandings, ...sortedRemainingDrivers];
 };

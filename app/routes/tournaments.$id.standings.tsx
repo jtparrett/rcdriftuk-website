@@ -23,6 +23,13 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         ],
       },
     },
+    orderBy: [
+      { round: "asc" },
+      { bracket: "asc" },
+      {
+        id: "asc",
+      },
+    ],
     select: {
       id: true,
       winnerId: true,
