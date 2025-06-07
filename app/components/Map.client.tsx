@@ -17,9 +17,9 @@ interface Props {
 
 const REGION_LOCATIONS = {
   [Regions.ALL]: {
-    lat: 20,
-    lng: 0,
-    zoom: 2,
+    lat: 52.3555,
+    lng: -1,
+    zoom: 1,
   },
   [Regions.UK]: {
     lat: 52.3555,

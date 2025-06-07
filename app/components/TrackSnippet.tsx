@@ -1,5 +1,5 @@
 import pluralize from "pluralize";
-import { Box, styled } from "~/styled-system/jsx";
+import { Box, Center, styled } from "~/styled-system/jsx";
 import type { TrackTypes } from "~/utils/enums";
 
 interface Props {
@@ -17,7 +17,11 @@ export const TrackSnippet = ({ track }: Props) => {
   return (
     <>
       <Box pos="relative" mb={-16} zIndex={-1} bgColor="gray.900" minH="100px">
-        {track.cover && <styled.img src={track.cover} w="full" />}
+        {track.cover && (
+          <Center overflow="hidden" maxH="280px">
+            <styled.img src={track.cover} w="full" />
+          </Center>
+        )}
         <Box
           pos="absolute"
           inset={0}
