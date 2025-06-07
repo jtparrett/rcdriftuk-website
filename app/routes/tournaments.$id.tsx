@@ -215,6 +215,20 @@ const TournamentPage = () => {
 
   const isOwner = user?.id === tournament.userId;
 
+  const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
+
+  const leftVotes =
+    tournament.nextBattle?.BattleVotes.filter(
+      (vote) => vote.winnerId === tournament.nextBattle?.driverLeftId,
+    ) ?? [];
+  const rightVotes =
+    tournament.nextBattle?.BattleVotes.filter(
+      (vote) => vote.winnerId === tournament.nextBattle?.driverRightId,
+    ) ?? [];
+
+  const isOMT =
+    leftVotes.length < winThreshold && rightVotes.length < winThreshold;
+
   const judgingCompleteForNextBattle =
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
     tournament.judges.length;
@@ -328,7 +342,8 @@ const TournamentPage = () => {
                 {isOwner &&
                   tournament.state === TournamentsState.BATTLES &&
                   tournament.format === TournamentsFormat.DRIFT_WARS &&
-                  judgingCompleteForNextBattle && (
+                  judgingCompleteForNextBattle &&
+                  !isOMT && (
                     <>
                       <LinkButton
                         to={`/tournaments/${tournament.id}/battles/create`}

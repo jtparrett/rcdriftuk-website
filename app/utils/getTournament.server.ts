@@ -31,6 +31,8 @@ export const getTournament = (id: string, userId: string | null) => {
       },
       nextBattle: {
         select: {
+          driverLeftId: true,
+          driverRightId: true,
           BattleVotes: {
             distinct: ["judgeId"],
           },

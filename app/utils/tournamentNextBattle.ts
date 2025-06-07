@@ -114,12 +114,12 @@ export const tournamentNextBattle = async (id: string) => {
     distinct: ["judgeId"],
   });
 
-  const winnerThreshold = Math.floor(tournament.judges.length / 2 + 1);
+  const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
 
   const winnerId =
-    battleVotesLeft.length >= winnerThreshold
+    battleVotesLeft.length >= winThreshold
       ? tournament.nextBattle.driverLeftId
-      : battleVotesRight.length >= winnerThreshold
+      : battleVotesRight.length >= winThreshold
         ? tournament.nextBattle.driverRightId
         : undefined;
 
