@@ -1,8 +1,9 @@
 import clc from "cli-color";
 import { calculateElos } from "~/utils/calculateElos";
+import { Regions } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 
-const run = async () => {
+const computeRatingsForRegion = async (region: Regions) => {
   console.log(clc.green("Computing ratings..."));
 
   // Get all battles ordered by creation date
@@ -11,6 +12,7 @@ const run = async () => {
     where: {
       tournament: {
         rated: true,
+        ...(region !== Regions.ALL && { region }),
       },
     },
     select: {
@@ -124,7 +126,7 @@ const run = async () => {
       winnerStartingElo,
       loserStartingElo,
       winnersK,
-      losersK
+      losersK,
     );
 
     // Update driver ELOs
@@ -132,34 +134,46 @@ const run = async () => {
     driverElos[loserId] = loserElo;
 
     // Update battle with points
-    await prisma.tournamentBattles.update({
-      where: { id: battle.id },
-      data: {
-        winnerElo,
-        loserElo,
-        winnerStartingElo,
-        loserStartingElo,
-      },
-    });
+    if (region == Regions.ALL) {
+      await prisma.tournamentBattles.update({
+        where: { id: battle.id },
+        data: {
+          winnerElo,
+          loserElo,
+          winnerStartingElo,
+          loserStartingElo,
+        },
+      });
+    } else {
+      await prisma.tournamentBattles.update({
+        where: { id: battle.id },
+        data: {
+          winnerRegionalElo: winnerElo,
+          loserRegionalElo: loserElo,
+          winnerRegionalStartingElo: winnerStartingElo,
+          loserRegionalStartingElo: loserStartingElo,
+        },
+      });
+    }
 
     const winnerPoints = winnerElo - winnerStartingElo;
     const loserPoints = loserElo - loserStartingElo;
 
     console.log(
       clc.bgMagenta(
-        `Battle ${battle.id}, ${battle.tournament.name} (totalwins: ${winnerTotalBattles}) (${battle.round}):`
-      )
+        `Battle ${battle.id}, ${battle.tournament.name} (totalwins: ${winnerTotalBattles}) (${battle.round}):`,
+      ),
     );
     console.log(
       clc.green(
-        `   ${winner.user.firstName} ${winner.user.lastName} won ${winnerPoints} points (Total: ${winnerElo.toFixed(3)})`
-      )
+        `   ${winner.user.firstName} ${winner.user.lastName} won ${winnerPoints} points (Total: ${winnerElo.toFixed(3)})`,
+      ),
     );
 
     console.log(
       clc.red(
-        `   ${loser.user.firstName} ${loser.user.lastName} lost ${loserPoints} points (Total: ${loserElo.toFixed(3)})`
-      )
+        `   ${loser.user.firstName} ${loser.user.lastName} lost ${loserPoints} points (Total: ${loserElo.toFixed(3)})`,
+      ),
     );
   }
 
@@ -174,19 +188,31 @@ const run = async () => {
       );
     }).length;
 
+    const eloField = region === Regions.ALL ? "elo" : `elo_${region}`;
+
     await prisma.users.update({
       where: { driverId: parseInt(driverId) },
       data: {
-        elo,
+        [eloField]: elo,
         totalBattles,
       },
     });
     console.log(
-      clc.blue(`Updated driver ${driverId} with ELO: ${elo.toFixed(3)}`)
+      clc.blue(`Updated driver ${driverId} with ELO: ${elo.toFixed(3)}`),
     );
   }
 
   console.log(clc.green("Rating computation complete!"));
+};
+
+const run = async () => {
+  await computeRatingsForRegion(Regions.ALL);
+  await computeRatingsForRegion(Regions.UK);
+  await computeRatingsForRegion(Regions.EU);
+  await computeRatingsForRegion(Regions.NA);
+  await computeRatingsForRegion(Regions.APAC);
+  await computeRatingsForRegion(Regions.LATAM);
+  await computeRatingsForRegion(Regions.MEA);
 };
 
 run().catch((error) => {

@@ -323,27 +323,28 @@ const RatingsPage = () => {
             <Box
               borderWidth={1}
               borderColor="gray.900"
-              p={4}
               rounded="xl"
               bgColor="gray.950"
               w="full"
               overflow="hidden"
             >
-              <Flex gap={2} alignItems="center" mb={4}>
-                {Object.values(Regions).map((option) => {
-                  return (
-                    <Tab
-                      key={option}
-                      to={`/ratings/${option.toLowerCase()}`}
-                      isActive={option === region}
-                    >
-                      {option}
-                    </Tab>
-                  );
-                })}
-              </Flex>
+              <Box overflow="auto">
+                <Flex gap={2} alignItems="center" p={4}>
+                  {Object.values(Regions).map((option) => {
+                    return (
+                      <Tab
+                        key={option}
+                        to={`/ratings/${option.toLowerCase()}`}
+                        isActive={option === region}
+                      >
+                        {option}
+                      </Tab>
+                    );
+                  })}
+                </Flex>
+              </Box>
 
-              <Flex flexDirection="column" gap={2}>
+              <Flex flexDirection="column" gap={2} px={4} pb={4}>
                 {drivers
                   .filter((driver) => driver.driverId !== 0)
                   .map((driver, i) => {

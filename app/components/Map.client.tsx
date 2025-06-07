@@ -175,6 +175,7 @@ export const Map = ({ tracks }: Props) => {
               <Button
                 key={item}
                 px={3}
+                flex="none"
                 rounded="lg"
                 variant={item === region ? "secondary" : "ghost"}
                 onClick={() => setRegion(item)}

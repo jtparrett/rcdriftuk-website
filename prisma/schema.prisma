@@ -205,6 +205,12 @@ model Users {
   lastName            String?
   team                String?
   elo                 Float                 @default(1000)
+  elo_UK              Float                 @default(1000)
+  elo_EU              Float                 @default(1000)
+  elo_NA              Float                 @default(1000)
+  elo_APAC            Float                 @default(1000)
+  elo_LATAM           Float                 @default(1000)
+  elo_MEA             Float                 @default(1000)
   totalBattles        Int                   @default(0)
   events              EventResponses[]
   Tournaments         Tournaments[]
