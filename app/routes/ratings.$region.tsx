@@ -40,14 +40,17 @@ type LoaderData = typeof loader;
 const Row = ({
   driver,
   rank,
+  region,
 }: {
   driver: Awaited<ReturnType<LoaderData>>["drivers"][number];
   rank: number;
+  region: Regions;
 }) => {
   const rankTitle = driver
     ? getDriverRank(driver.elo, driver.totalBattles)
     : RANKS.UNRANKED;
 
+  const elo = region === Regions.ALL ? driver.elo : driver[`elo_${region}`];
   const [bg, hover] = getRankColor(rankTitle);
 
   return (
@@ -154,7 +157,7 @@ const Row = ({
             fontFamily="mono"
             fontSize={{ base: "sm", md: "md" }}
           >
-            {driver.elo.toFixed(3)}
+            {elo.toFixed(3)}
           </styled.span>
           <styled.span flex="none" textAlign="right">
             <styled.img
@@ -348,7 +351,14 @@ const RatingsPage = () => {
                 {drivers
                   .filter((driver) => driver.driverId !== 0)
                   .map((driver, i) => {
-                    return <Row key={i} driver={driver} rank={i + 1} />;
+                    return (
+                      <Row
+                        key={i}
+                        driver={driver}
+                        rank={i + 1}
+                        region={region}
+                      />
+                    );
                   })}
               </Flex>
             </Box>
