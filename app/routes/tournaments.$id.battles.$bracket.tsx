@@ -9,6 +9,7 @@ import { prisma } from "~/utils/prisma.server";
 import { Glow } from "~/components/Glow";
 import { LinkButton } from "~/components/Button";
 import { sentenceCase } from "change-case";
+import { HiddenEmbed } from "~/utils/EmbedContext";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -175,29 +176,31 @@ const TournamentBattlesPage = () => {
 
   return (
     <>
-      {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
-        <Flex
-          bgColor="gray.900"
-          rounded="xl"
-          gap={1}
-          p={1}
-          display="inline-flex"
-          mb={4}
-        >
-          {Object.values(BattlesBracket).map((sub) => {
-            return (
-              <LinkButton
-                key={sub}
-                to={`/tournaments/${tournament.id}/battles/${sub}`}
-                size="xs"
-                variant={sub === bracket ? "secondary" : "ghost"}
-              >
-                {sentenceCase(sub)} Bracket
-              </LinkButton>
-            );
-          })}
-        </Flex>
-      )}
+      <HiddenEmbed>
+        {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
+          <Flex
+            bgColor="gray.900"
+            rounded="full"
+            gap={1}
+            p={1}
+            display="inline-flex"
+            mb={4}
+          >
+            {Object.values(BattlesBracket).map((sub) => {
+              return (
+                <LinkButton
+                  key={sub}
+                  to={`/tournaments/${tournament.id}/battles/${sub}`}
+                  size="xs"
+                  variant={sub === bracket ? "secondary" : "ghost"}
+                >
+                  {sentenceCase(sub)} Bracket
+                </LinkButton>
+              );
+            })}
+          </Flex>
+        )}
+      </HiddenEmbed>
 
       <Box
         p={1}

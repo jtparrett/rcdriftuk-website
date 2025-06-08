@@ -37,9 +37,14 @@ import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
-import { RiFlagLine, RiRemoteControlLine } from "react-icons/ri";
+import {
+  RiFlagLine,
+  RiFullscreenFill,
+  RiRemoteControlLine,
+} from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { sentenceCase } from "change-case";
+import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -204,6 +209,7 @@ const TournamentPage = () => {
     useLoaderData<typeof loader>();
   const location = useLocation();
   const transition = useNavigation();
+  const isEmbed = useIsEmbed();
   const isLoading =
     transition.state === "submitting" || transition.state === "loading";
   const isSubmitting = transition.state === "submitting";
@@ -238,43 +244,55 @@ const TournamentPage = () => {
 
   return (
     <>
-      <Box py={2} borderBottomWidth={1} borderColor="gray.900">
-        <Container maxW={1100} px={2}>
-          <Flex alignItems="center" gap={2}>
-            <styled.h1
-              fontSize="xl"
-              fontWeight="bold"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              whiteSpace="nowrap"
-            >
-              {tournament.name}
-            </styled.h1>
-            <styled.span
-              fontSize="sm"
-              fontWeight="medium"
-              borderWidth={1}
-              rounded="full"
-              borderColor="gray.700"
-              px={2}
-              color="gray.600"
-              display="block"
-            >
-              {sentenceCase(tournament.format)}
-            </styled.span>
-          </Flex>
-        </Container>
-      </Box>
-
-      {tournament.liveUrl && (
-        <Box borderBottomWidth={1} borderColor="gray.900">
-          <Container maxW={1100} px={2} mt={4}>
-            <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
-              <styled.iframe src={tournament.liveUrl} />
-            </AspectRatio>
+      <HiddenEmbed>
+        <Box py={2} borderBottomWidth={1} borderColor="gray.900">
+          <Container maxW={1100} px={2}>
+            <Flex alignItems="center" gap={2}>
+              <styled.h1
+                fontSize="xl"
+                fontWeight="bold"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+              >
+                {tournament.name}
+              </styled.h1>
+              <styled.span
+                fontSize="sm"
+                fontWeight="medium"
+                borderWidth={1}
+                rounded="full"
+                borderColor="gray.700"
+                px={2}
+                color="gray.600"
+                display="block"
+                whiteSpace="nowrap"
+              >
+                {sentenceCase(tournament.format)}
+              </styled.span>
+              <Spacer />
+              <LinkButton
+                to={location.pathname + "?embed=true"}
+                px={2}
+                target="_blank"
+                variant="ghost"
+              >
+                <RiFullscreenFill />
+              </LinkButton>
+            </Flex>
           </Container>
         </Box>
-      )}
+
+        {tournament.liveUrl && (
+          <Box borderBottomWidth={1} borderColor="gray.900">
+            <Container maxW={1100} px={2} mt={4}>
+              <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
+                <styled.iframe src={tournament.liveUrl} />
+              </AspectRatio>
+            </Container>
+          </Box>
+        )}
+      </HiddenEmbed>
 
       {tournament.state === TournamentsState.START && (
         <Container maxW={1100} px={4}>
@@ -288,141 +306,147 @@ const TournamentPage = () => {
 
       {tournament.state !== TournamentsState.START && (
         <>
-          <Box py={2} borderBottomWidth={1} borderColor="gray.900" mb={4}>
-            <Container maxW={1100} px={2}>
-              <Flex
-                flexDir={{ base: "column", sm: "row" }}
-                gap={1}
-                overflow="auto"
-              >
+          <HiddenEmbed>
+            <Box py={2} borderBottomWidth={1} borderColor="gray.900" mb={4}>
+              <Container maxW={1100} px={2}>
                 <Flex
-                  bgColor="gray.900"
-                  rounded="full"
+                  flexDir={{ base: "column", sm: "row" }}
                   gap={1}
-                  p={1}
-                  w="fit-content"
+                  overflow="auto"
                 >
-                  <LinkButton
-                    to={`/tournaments/${tournament.id}/overview`}
-                    size="xs"
-                    variant={isOverviewTab ? "secondary" : "ghost"}
+                  <Flex
+                    bgColor="gray.900"
+                    rounded="full"
+                    gap={1}
+                    p={1}
+                    w="fit-content"
                   >
-                    Overview
-                  </LinkButton>
-                  {tournament.qualifyingLaps > 0 && (
                     <LinkButton
-                      to={`/tournaments/${tournament.id}/qualifying`}
-                      variant={isQualifyingTab ? "secondary" : "ghost"}
+                      to={`/tournaments/${tournament.id}/overview`}
                       size="xs"
+                      variant={isOverviewTab ? "secondary" : "ghost"}
                     >
-                      Qualifying
+                      Overview
                     </LinkButton>
-                  )}
-                  <LinkButton
-                    to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-                    variant={isBattlesTab ? "secondary" : "ghost"}
-                    size="xs"
-                  >
-                    Battles
-                  </LinkButton>
-                  {(tournament.state === TournamentsState.END ||
-                    tournament.format === TournamentsFormat.DRIFT_WARS) && (
+                    {tournament.qualifyingLaps > 0 && (
+                      <LinkButton
+                        to={`/tournaments/${tournament.id}/qualifying`}
+                        variant={isQualifyingTab ? "secondary" : "ghost"}
+                        size="xs"
+                      >
+                        Qualifying
+                      </LinkButton>
+                    )}
                     <LinkButton
-                      to={`/tournaments/${tournament.id}/standings`}
-                      variant={isStandingsTab ? "secondary" : "ghost"}
+                      to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+                      variant={isBattlesTab ? "secondary" : "ghost"}
                       size="xs"
                     >
-                      Standings
+                      Battles
+                    </LinkButton>
+                    {(tournament.state === TournamentsState.END ||
+                      tournament.format === TournamentsFormat.DRIFT_WARS) && (
+                      <LinkButton
+                        to={`/tournaments/${tournament.id}/standings`}
+                        variant={isStandingsTab ? "secondary" : "ghost"}
+                        size="xs"
+                      >
+                        Standings
+                      </LinkButton>
+                    )}
+                  </Flex>
+
+                  <Spacer />
+
+                  {isOwner &&
+                    tournament.state === TournamentsState.BATTLES &&
+                    tournament.format === TournamentsFormat.DRIFT_WARS &&
+                    judgingCompleteForNextBattle &&
+                    !isOMT && (
+                      <>
+                        <LinkButton
+                          to={`/tournaments/${tournament.id}/battles/create`}
+                        >
+                          Next Battle <RiFlagLine />
+                        </LinkButton>
+                        <LinkButton
+                          to={`/tournaments/${tournament.id}/end`}
+                          variant="outline"
+                        >
+                          End Tournament
+                        </LinkButton>
+                      </>
+                    )}
+
+                  {isOwner &&
+                    tournament.state === TournamentsState.QUALIFYING &&
+                    tournament.nextQualifyingLap &&
+                    tournament.nextQualifyingLap.scores.length ===
+                      tournament.judges.length &&
+                    tournament.nextQualifyingLap && (
+                      <Form method="post">
+                        <Button
+                          type="submit"
+                          w={{ base: "full", sm: "auto" }}
+                          disabled={isLoading || isSubmitting}
+                          isLoading={isSubmitting}
+                        >
+                          Start Next Run <RiFlagLine />
+                        </Button>
+                      </Form>
+                    )}
+
+                  {isOwner &&
+                    tournament.state === TournamentsState.QUALIFYING &&
+                    tournament.nextQualifyingLap === null && (
+                      <Form method="post">
+                        <Button
+                          type="submit"
+                          w={{ base: "full", sm: "auto" }}
+                          disabled={isLoading || isSubmitting}
+                          isLoading={isSubmitting}
+                        >
+                          End Qualifying
+                        </Button>
+                      </Form>
+                    )}
+
+                  {isOwner &&
+                    tournament.state === TournamentsState.BATTLES &&
+                    judgingCompleteForNextBattle &&
+                    tournament.format !== TournamentsFormat.DRIFT_WARS && (
+                      <Form method="post">
+                        <Button
+                          type="submit"
+                          w={{ base: "full", sm: "auto" }}
+                          disabled={isLoading || isSubmitting}
+                          isLoading={isSubmitting}
+                        >
+                          Start Next Battle <RiFlagLine />
+                        </Button>
+                      </Form>
+                    )}
+
+                  {tournamentJudge && (
+                    <LinkButton
+                      to={`/judge/${tournamentJudge.id}`}
+                      variant="outline"
+                    >
+                      Open Judges Remote <RiRemoteControlLine />
                     </LinkButton>
                   )}
                 </Flex>
+              </Container>
+            </Box>
+          </HiddenEmbed>
 
-                <Spacer />
-
-                {isOwner &&
-                  tournament.state === TournamentsState.BATTLES &&
-                  tournament.format === TournamentsFormat.DRIFT_WARS &&
-                  judgingCompleteForNextBattle &&
-                  !isOMT && (
-                    <>
-                      <LinkButton
-                        to={`/tournaments/${tournament.id}/battles/create`}
-                      >
-                        Next Battle <RiFlagLine />
-                      </LinkButton>
-                      <LinkButton
-                        to={`/tournaments/${tournament.id}/end`}
-                        variant="outline"
-                      >
-                        End Tournament
-                      </LinkButton>
-                    </>
-                  )}
-
-                {isOwner &&
-                  tournament.state === TournamentsState.QUALIFYING &&
-                  tournament.nextQualifyingLap &&
-                  tournament.nextQualifyingLap.scores.length ===
-                    tournament.judges.length &&
-                  tournament.nextQualifyingLap && (
-                    <Form method="post">
-                      <Button
-                        type="submit"
-                        w={{ base: "full", sm: "auto" }}
-                        disabled={isLoading || isSubmitting}
-                        isLoading={isSubmitting}
-                      >
-                        Start Next Run <RiFlagLine />
-                      </Button>
-                    </Form>
-                  )}
-
-                {isOwner &&
-                  tournament.state === TournamentsState.QUALIFYING &&
-                  tournament.nextQualifyingLap === null && (
-                    <Form method="post">
-                      <Button
-                        type="submit"
-                        w={{ base: "full", sm: "auto" }}
-                        disabled={isLoading || isSubmitting}
-                        isLoading={isSubmitting}
-                      >
-                        End Qualifying
-                      </Button>
-                    </Form>
-                  )}
-
-                {isOwner &&
-                  tournament.state === TournamentsState.BATTLES &&
-                  judgingCompleteForNextBattle &&
-                  tournament.format !== TournamentsFormat.DRIFT_WARS && (
-                    <Form method="post">
-                      <Button
-                        type="submit"
-                        w={{ base: "full", sm: "auto" }}
-                        disabled={isLoading || isSubmitting}
-                        isLoading={isSubmitting}
-                      >
-                        Start Next Battle <RiFlagLine />
-                      </Button>
-                    </Form>
-                  )}
-
-                {tournamentJudge && (
-                  <LinkButton
-                    to={`/judge/${tournamentJudge.id}`}
-                    variant="outline"
-                  >
-                    Open Judges Remote <RiRemoteControlLine />
-                  </LinkButton>
-                )}
-              </Flex>
-            </Container>
-          </Box>
-
-          <Container pb={12} px={2} maxW={1100}>
+          {isEmbed ? (
             <Outlet />
-          </Container>
+          ) : (
+            <Container pb={12} px={2} maxW={1100}>
+              <Outlet />
+            </Container>
+          )}
         </>
       )}
     </>

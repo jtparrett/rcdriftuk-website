@@ -10,6 +10,7 @@ import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
 import { RiTrophyFill } from "react-icons/ri";
 import { getTournamentStandings } from "~/utils/getTournamentStandings";
+import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -197,6 +198,7 @@ const FinalResults = () => {
 };
 const TournamentsOverviewPage = () => {
   const tournament = useLoaderData<typeof loader>();
+  const isEmbed = useIsEmbed();
 
   const qualiJudgingComplete =
     (tournament.nextQualifyingLap?.scores.length ?? 0) ===
@@ -212,15 +214,16 @@ const TournamentsOverviewPage = () => {
     ) ?? 0) + 1;
 
   return (
-    <Box
+    <Flex
       p={1}
       borderWidth={1}
       rounded="3xl"
       bgColor="gray.900"
       borderColor="gray.800"
+      minH={isEmbed ? "100dvh" : "60dvh"}
     >
       <Center
-        minH="60dvh"
+        flexGrow={1}
         bgColor="black"
         bgImage="url(/dot-bg.svg)"
         bgRepeat="repeat"
@@ -443,7 +446,7 @@ const TournamentsOverviewPage = () => {
           </Box>
         </Box>
       </Center>
-    </Box>
+    </Flex>
   );
 };
 

@@ -24,6 +24,7 @@ import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
 import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { EmbedProvider, HiddenEmbed } from "./utils/EmbedContext";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "https://fonts.cdnfonts.com/css/sf-pro-display" },
@@ -31,6 +32,7 @@ export const links: LinksFunction = () => [
 
 export const loader = (args: LoaderFunctionArgs) =>
   rootAuthLoader(args, async ({ request }) => {
+    const isEmbed = new URL(request.url).searchParams.get("embed") === "true";
     const cookieHeader = request.headers.get("Cookie");
     const cookie = (await userPrefs.parse(cookieHeader)) || {};
 
@@ -40,12 +42,14 @@ export const loader = (args: LoaderFunctionArgs) =>
       const user = await getUser(userId);
       return {
         user,
+        isEmbed,
         hideBanner: cookie.hideBanner,
       };
     }
 
     return {
       user: null,
+      isEmbed,
       hideBanner: cookie.hideBanner,
     };
   });
@@ -119,7 +123,7 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { hideBanner } = loaderData || {};
+  const { hideBanner, isEmbed } = loaderData || {};
   const { user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
@@ -146,11 +150,20 @@ function App({
         },
       }}
     >
-      <AnnouncementBanner />
-      {!hideBanner && <CookieBanner />}
-      <Header user={user} />
-      <Outlet />
-      {!isMap && <Footer />}
+      <EmbedProvider value={isEmbed}>
+        <HiddenEmbed>
+          <AnnouncementBanner />
+          {!hideBanner && <CookieBanner />}
+          <Header user={user} />
+        </HiddenEmbed>
+
+        <Outlet />
+        {!isMap && (
+          <HiddenEmbed>
+            <Footer />
+          </HiddenEmbed>
+        )}
+      </EmbedProvider>
     </ClerkProvider>
   );
 }
