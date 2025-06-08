@@ -131,8 +131,9 @@ const Row = ({
             h={12}
             rounded="full"
             overflow="hidden"
-            bgColor="rgba(255, 255, 255, 0.1)"
+            bgColor="rgba(255, 255, 255, 0.2)"
             p={1}
+            shadow="inset 0 -1px 0 rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(0, 0, 0, 0.5)"
           >
             <styled.img
               rounded="full"
@@ -170,7 +171,13 @@ const Row = ({
             flex="none"
             textAlign="right"
             fontFamily="mono"
-            fontSize={{ base: "sm", md: "md" }}
+            fontSize="xs"
+            display="block"
+            rounded="full"
+            px={2}
+            py={1}
+            borderWidth={1}
+            borderColor="white"
           >
             {elo.toFixed(3)}
           </styled.span>
