@@ -224,6 +224,7 @@ const TournamentsOverviewPage = () => {
     >
       <Center
         flexGrow={1}
+        w="full"
         bgColor="black"
         bgImage="url(/dot-bg.svg)"
         bgRepeat="repeat"
