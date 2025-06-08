@@ -30,7 +30,7 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
   useEffect(() => {
     const updateCountdown = () => {
       const duration = intervalToDuration({
-        start: new Date(),
+        start: toZonedTime(new Date(), "Europe/London"),
         end: releaseDate,
       });
 
@@ -62,8 +62,6 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
     return () => clearInterval(interval);
   }, [releaseDate, revalidator]);
 
-  const formatNumber = (num: number) => String(num).padStart(2, "0");
-
   return (
     <styled.div
       textAlign="center"
@@ -74,9 +72,8 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
     >
       Tickets release in{" "}
       <styled.span fontSize="lg">
-        {timeUntilRelease.days}d {formatNumber(timeUntilRelease.hours)}:
-        {formatNumber(timeUntilRelease.minutes)}:
-        {formatNumber(timeUntilRelease.seconds)}
+        {timeUntilRelease.days}d {timeUntilRelease.hours}hr{" "}
+        {timeUntilRelease.minutes}min {timeUntilRelease.seconds}s
       </styled.span>
     </styled.div>
   );
@@ -84,12 +81,14 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
 
 export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
   const clerk = useClerk();
+
+  // We write this as london time in the db, but it's stored as UTC
   const releaseDate = event?.ticketReleaseDate
     ? toZonedTime(new Date(event.ticketReleaseDate), "UTC")
     : null;
 
   const isBeforeRelease = releaseDate
-    ? isBefore(new Date(), releaseDate)
+    ? isBefore(toZonedTime(new Date(), "Europe/London"), releaseDate)
     : false;
 
   if (!event || !event.enableTicketing) {
