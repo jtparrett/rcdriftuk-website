@@ -95,6 +95,7 @@ const Row = ({
         shadow="inset 0 1px 0 rgba(255, 255, 255, 0.2)"
         pos="relative"
         overflow="hidden"
+        zIndex={1}
         _after={{
           filter: "blur(3px)",
           opacity: 0,
@@ -109,6 +110,15 @@ const Row = ({
           transform: "skewX(-25deg) translateX(-300px)",
           boxShadow:
             "14px 0 0 rgba(255, 255, 255, 0.1), 28px 0 0 rgba(255, 255, 255, 0.05)",
+        }}
+        _before={{
+          content: '""',
+          pos: "absolute",
+          inset: 0,
+          bgGradient: "to-b",
+          gradientFrom: "transparent",
+          gradientTo: "rgba(0, 0, 0, 0.4)",
+          zIndex: -1,
         }}
       >
         <LinkOverlay to={`/drivers/${driver.driverId}`} />

@@ -33,7 +33,7 @@ export const getRankColor = (rank: Values<typeof RANKS>): [string, string] => {
     case RANKS.GOLD:
       return ["#856d3d", "#644f25"];
     case RANKS.PLATINUM:
-      return ["#2B3B4D", "#1E2A38"];
+      return ["#1f4978", "#16375c"];
     case RANKS.DIAMOND:
       return ["#102B45", "#0C1F31"];
     default:
