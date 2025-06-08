@@ -21,7 +21,13 @@ export const loader = async () => {
     },
   });
 
-  return tracks;
+  return tracks.sort((a, b) => {
+    if (a.slug === "rcduk") return 1;
+    if (b.slug === "rcduk") return -1;
+    if (a.slug === "drift-essex") return 1;
+    if (b.slug === "drift-essex") return -1;
+    return a.name.localeCompare(b.name);
+  });
 };
 
 const Page = () => {
