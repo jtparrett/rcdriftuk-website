@@ -6,6 +6,7 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
+import notFoundInvariant from "~/utils/notFoundInvariant";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -51,17 +52,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  invariant(tournament, "Tournament not found");
-  invariant(
-    tournament.state === TournamentsState.QUALIFYING,
-    "Tournament is not in qualifying",
-  );
-  invariant(tournament.drivers.length > 0, "Driver not found");
+  notFoundInvariant(tournament);
+  notFoundInvariant(tournament.state === TournamentsState.QUALIFYING);
+  notFoundInvariant(tournament.drivers.length > 0);
 
   const driver = tournament.drivers[0];
   const lap = driver.laps[Number(index)];
 
-  invariant(lap, "Lap not found");
+  notFoundInvariant(lap);
 
   return {
     tournament,
