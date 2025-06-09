@@ -174,10 +174,10 @@ const Row = ({
             fontSize="xs"
             display="block"
             rounded="full"
-            px={2}
+            px={2.5}
             py={1}
-            borderWidth={1}
-            borderColor="white"
+            bgColor="rgba(255, 255, 255, 0.1)"
+            shadow="inset 0 -1px 0 rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(0, 0, 0, 0.5)"
           >
             {elo.toFixed(3)}
           </styled.span>
