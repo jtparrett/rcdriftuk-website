@@ -161,6 +161,7 @@ model TournamentBattleVotes {
 }
 
 model Tracks {
+  createdAt   DateTime      @default(now())
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
