@@ -37,8 +37,8 @@ const REGION_LOCATIONS = {
     zoom: 3,
   },
   [Regions.APAC]: {
-    lat: 13.5,
-    lng: 121.0,
+    lat: 35.936876,
+    lng: 138.362503,
     zoom: 3,
   },
   [Regions.LATAM]: {
@@ -133,6 +133,12 @@ export const Map = ({ tracks }: Props) => {
         lng: 144.032135,
         image: "/zerofeel-source.png",
         href: "https://zerofeel.co.uk",
+      },
+      {
+        lat: 41.71803,
+        lng: -132.120209,
+        image: "/damn-millenials-source.jpg",
+        href: "https://www.instagram.com/damnmillennials.rc",
       },
     ].forEach((data) => {
       // Create marker element
