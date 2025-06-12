@@ -56,7 +56,7 @@ const TracksPage = () => {
             <Spacer />
             <SignedIn>
               <LinkButton to="/tracks/new" variant="outline">
-                Register a new Track <RiAddCircleFill />
+                Register a Track <RiAddCircleFill />
               </LinkButton>
             </SignedIn>
           </Flex>

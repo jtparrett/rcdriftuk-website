@@ -10,6 +10,7 @@ import { Link, useLocation } from "react-router";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
 import {
+  RiAddCircleFill,
   RiAddLine,
   RiCalendar2Line,
   RiFlagLine,
@@ -108,44 +109,63 @@ const Menu = ({ user }: Props) => {
             <styled.p fontSize="sm" fontWeight="semibold" mb={1}>
               Your Tracks
             </styled.p>
-            <Flex flexWrap="wrap" gap={2}>
-              {user?.Tracks.map(({ track }) => (
-                <Box key={track.id} w={12} overflow="hidden" textAlign="center">
-                  <Box w="full" h={12} overflow="hidden" rounded="full">
-                    <Link to={`/tracks/${track.slug}`}>
-                      <styled.img
-                        src={track.image}
-                        w="full"
-                        h="full"
-                        alt={track.name}
-                      />
-                    </Link>
-                  </Box>
-                  <styled.span
-                    fontSize="xs"
-                    mt={1}
-                    w="full"
-                    display="block"
-                    overflow="hidden"
-                    whiteSpace="nowrap"
-                    textOverflow="ellipsis"
-                  >
-                    {track.name}
-                  </styled.span>
-                </Box>
-              ))}
 
-              <Box w={12} textAlign="center">
-                <Link to="/tracks/new">
-                  <Center w="full" h={12} rounded="full" bgColor="gray.800">
-                    <RiAddLine />
-                  </Center>
-                  <styled.span fontSize="xs" mt={1}>
-                    New
-                  </styled.span>
-                </Link>
-              </Box>
-            </Flex>
+            {(user?.Tracks.length ?? 0) <= 0 && (
+              <LinkButton
+                to="/tracks/new"
+                variant="outline"
+                size="xs"
+                fontSize="xs"
+              >
+                Register a Track <RiAddCircleFill />
+              </LinkButton>
+            )}
+
+            {(user?.Tracks.length ?? 0) > 0 && (
+              <Flex flexWrap="wrap" gap={2}>
+                {user?.Tracks.map(({ track }) => (
+                  <Box
+                    key={track.id}
+                    w={12}
+                    overflow="hidden"
+                    textAlign="center"
+                  >
+                    <Box w="full" h={12} overflow="hidden" rounded="full">
+                      <Link to={`/tracks/${track.slug}`}>
+                        <styled.img
+                          src={track.image}
+                          w="full"
+                          h="full"
+                          alt={track.name}
+                        />
+                      </Link>
+                    </Box>
+                    <styled.span
+                      fontSize="xs"
+                      mt={1}
+                      w="full"
+                      display="block"
+                      overflow="hidden"
+                      whiteSpace="nowrap"
+                      textOverflow="ellipsis"
+                    >
+                      {track.name}
+                    </styled.span>
+                  </Box>
+                ))}
+
+                <Box w={12} textAlign="center">
+                  <Link to="/tracks/new">
+                    <Center w="full" h={12} rounded="full" bgColor="gray.800">
+                      <RiAddLine />
+                    </Center>
+                    <styled.span fontSize="xs" mt={1}>
+                      Add
+                    </styled.span>
+                  </Link>
+                </Box>
+              </Flex>
+            )}
           </Box>
         )}
 
@@ -435,14 +455,16 @@ export const Header = ({ user }: Props) => {
 
           <SignedIn>
             {user && (
-              <styled.div w={8} h={8} rounded="full" overflow="hidden">
-                <Link to={`/drivers/${user.driverId}`}>
+              <Link to={`/drivers/${user.driverId}`}>
+                <styled.div w={8} h={8} rounded="full" overflow="hidden">
                   <styled.img
                     src={user.image ?? "/blank-driver-right.jpg"}
                     w="full"
+                    h="full"
+                    objectFit="cover"
                   />
-                </Link>
-              </styled.div>
+                </styled.div>
+              </Link>
             )}
           </SignedIn>
 
