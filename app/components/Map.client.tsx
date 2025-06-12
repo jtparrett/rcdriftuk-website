@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { Box, Container, Flex } from "~/styled-system/jsx";
 import { Outlet, useNavigate, useParams } from "react-router";
-import { getTabParam } from "~/utils/getTabParam";
 import type { Tracks } from "@prisma/client";
 import { Regions, TrackTypes } from "~/utils/enums";
-import { Tab } from "./Tab";
-import { sentenceCase } from "change-case";
-import { Button } from "./Button";
+import { Button, LinkButton } from "./Button";
+import { oneOf } from "~/utils/oneOf";
 
 export type Values<T> = T[keyof T];
 
@@ -57,10 +55,10 @@ export const Map = ({ tracks }: Props) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const params = useParams();
-  const tab = getTabParam(params.tab);
   const navigate = useNavigate();
-  const [region, setRegion] = useState<Regions>(Regions.ALL);
+  const params = useParams();
+  const region =
+    oneOf(params.region?.toUpperCase(), Object.values(Regions)) ?? Regions.ALL;
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -81,29 +79,8 @@ export const Map = ({ tracks }: Props) => {
     // Add navigation controls
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Cleanup
-    return () => {
-      map.current?.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!map.current) return;
-
-    // Clear existing markers
-    markers.current.forEach((marker) => marker.remove());
-    markers.current = [];
-
-    // Filter tracks based on tab
-    const filteredTracks = tracks.filter((item) => {
-      if (tab === TrackTypes.ALL) {
-        return true;
-      }
-      return item.types.includes(tab);
-    });
-
     // Add markers for each track
-    filteredTracks.forEach((track) => {
+    tracks.forEach((track) => {
       // Create marker element
       const el = document.createElement("div");
       el.className = "marker";
@@ -159,7 +136,12 @@ export const Map = ({ tracks }: Props) => {
 
       markers.current.push(marker);
     });
-  }, [tracks, tab, navigate]);
+
+    // Cleanup
+    return () => {
+      map.current?.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (!map.current) return;
@@ -178,16 +160,16 @@ export const Map = ({ tracks }: Props) => {
         <Container px={2} w="full" maxW={1100} overflowX="auto">
           <Flex gap={0.5} py={2}>
             {Object.values(Regions).map((item) => (
-              <Button
+              <LinkButton
                 key={item}
                 px={3}
                 flex="none"
                 rounded="lg"
                 variant={item === region ? "secondary" : "ghost"}
-                onClick={() => setRegion(item)}
+                to={`/map/${item}`}
               >
                 {item}
-              </Button>
+              </LinkButton>
             ))}
           </Flex>
         </Container>

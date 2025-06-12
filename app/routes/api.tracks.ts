@@ -21,8 +21,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   const tracks = await prisma.tracks.findMany({
-    skip: page * 50,
-    take: 50,
+    skip: page * 25,
+    take: 25,
     where: {
       status: TrackStatus.ACTIVE,
     },

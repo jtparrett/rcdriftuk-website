@@ -5,7 +5,7 @@ import { Map } from "~/components/Map.client";
 
 import { Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import type { Route } from "./+types/map.$tab";
+import type { Route } from "./+types/map.$region";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -15,11 +15,7 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const tracks = await prisma.tracks.findMany({
-    where: {
-      status: TrackStatus.ACTIVE,
-    },
-  });
+  const tracks = await prisma.tracks.findMany();
 
   return tracks.sort((a, b) => {
     if (a.slug === "rcduk") return 1;
