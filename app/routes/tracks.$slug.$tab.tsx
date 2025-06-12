@@ -190,6 +190,16 @@ const TrackPage = () => {
                   <RiLink />
                 )}
               </LinkButton>
+              <LinkButton
+                w="full"
+                mt={2}
+                to={`https://www.google.com/maps?q=${data.track.address ?? `${data.track.lat},${data.track.lng}`}`}
+                variant="outline"
+                target="_blank"
+                size="sm"
+              >
+                Open in Google Maps
+              </LinkButton>
             </Box>
 
             {isOwner && (
@@ -207,7 +217,6 @@ const TrackPage = () => {
                   variant="outline"
                   w="full"
                   size="sm"
-                  mb={2}
                   to={`/tracks/${data?.track?.slug}/events/new`}
                 >
                   Create Event <RiAddCircleFill />

@@ -3,14 +3,16 @@ import mapboxgl from "mapbox-gl";
 import { Box, Container, Flex } from "~/styled-system/jsx";
 import { Outlet, useNavigate, useParams } from "react-router";
 import type { Tracks } from "@prisma/client";
-import { Regions, TrackTypes } from "~/utils/enums";
-import { Button, LinkButton } from "./Button";
+import { Regions } from "~/utils/enums";
+import { LinkButton } from "./Button";
 import { oneOf } from "~/utils/oneOf";
 
 export type Values<T> = T[keyof T];
 
 interface Props {
-  tracks: Tracks[];
+  tracks: (Tracks & {
+    hasUpcomingEvent: boolean;
+  })[];
 }
 
 const REGION_LOCATIONS = {
@@ -89,6 +91,12 @@ export const Map = ({ tracks }: Props) => {
       img.src = track.image;
 
       el.appendChild(img);
+
+      if (track.hasUpcomingEvent) {
+        const eventDot = document.createElement("div");
+        eventDot.className = "event-dot";
+        el.appendChild(eventDot);
+      }
 
       // Create and add marker
       const marker = new mapboxgl.Marker(el)

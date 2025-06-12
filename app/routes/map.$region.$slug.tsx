@@ -1,8 +1,10 @@
+import { startOfDay } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
+import { EventCard } from "~/components/EventCard";
 import { TrackSnippet } from "~/components/TrackSnippet";
 import { css } from "~/styled-system/css";
 import { Box } from "~/styled-system/jsx";
@@ -16,6 +18,21 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const track = await prisma.tracks.findUnique({
     where: {
       slug,
+    },
+    include: {
+      events: {
+        where: {
+          startDate: {
+            gte: startOfDay(new Date()),
+          },
+        },
+        include: {
+          eventTrack: true,
+        },
+        orderBy: {
+          startDate: "asc",
+        },
+      },
     },
   });
 
@@ -70,6 +87,12 @@ const MapTrackDrawer = () => {
 
         <Box flex={1}>
           <TrackSnippet track={track} />
+
+          {track.events[0] && (
+            <Box m={4} pos="relative" zIndex={0}>
+              <EventCard event={track.events[0]} showAvatar={false} />
+            </Box>
+          )}
         </Box>
 
         <Box

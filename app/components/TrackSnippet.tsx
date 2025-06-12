@@ -66,7 +66,14 @@ export const TrackSnippet = ({ track }: Props) => {
       </Box>
 
       {track.description && (
-        <Box p={4} bgColor="gray.900" rounded="lg" mx={4}>
+        <Box
+          p={4}
+          bgColor="gray.900"
+          rounded="lg"
+          mx={4}
+          borderWidth={1}
+          borderColor="gray.800"
+        >
           <styled.p
             color="gray.500"
             fontSize="sm"
