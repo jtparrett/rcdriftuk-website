@@ -47,7 +47,7 @@ const REGION_LOCATIONS = {
   [Regions.MEA]: {
     lat: 25,
     lng: 45,
-    zoom: 3,
+    zoom: 2,
   },
 };
 
