@@ -3,11 +3,14 @@ import type { Route } from "./+types/_index";
 import { Link, useLoaderData } from "react-router";
 import { endOfDay, format, startOfDay } from "date-fns";
 import {
+  RiAddCircleFill,
   RiArrowRightLine,
   RiCalendarLine,
+  RiCodeFill,
   RiListOrdered2,
   RiMapPin2Fill,
   RiRocketLine,
+  RiStockLine,
   RiTrophyLine,
   RiUserLine,
 } from "react-icons/ri";
@@ -22,15 +25,33 @@ import { prisma } from "~/utils/prisma.server";
 import { motion } from "motion/react";
 import { css } from "~/styled-system/css";
 import { SignedIn, SignedOut } from "@clerk/react-router";
+import { MockPhone } from "~/components/MockPhone";
 
 const Card = styled("article", {
   base: {
-    rounded: "lg",
+    rounded: "xl",
     borderWidth: 1,
     borderColor: "gray.800",
     p: 4,
     bgColor: "gray.950",
-    shadow: "2xl",
+    shadow:
+      "0 6px 16px rgba(0, 0, 0, 0.2), inset 0 0 24px rgba(255, 255, 255, 0.05)",
+    bgGradient: "to-b",
+    gradientFrom: "gray.900",
+    gradientTo: "black",
+  },
+});
+
+const IconBox = styled("div", {
+  base: {
+    rounded: "full",
+    bgColor: "brand.500",
+    p: 2,
+    w: 8,
+    h: 8,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
@@ -114,14 +135,14 @@ const Page = () => {
                     borderColor="brand.800"
                     rounded="full"
                     px={4}
-                    py={1}
+                    py={2}
                     bgColor="brand.900"
                     fontWeight="medium"
                     fontSize="sm"
                     display="inline-flex"
                     alignItems="center"
                     gap={2}
-                    shadow="0 6px 24px rgba(242, 12, 78, 0.4)"
+                    shadow="0 6px 24px rgba(242, 12, 78, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.2)"
                   >
                     <RiTrophyLine />
                     RC Drift UK 2025
@@ -151,7 +172,7 @@ const Page = () => {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5 }}
               >
-                The complete platform for RC Drifting.
+                Your Online Home for RC Drifting
               </motion.h1>
               <motion.p
                 className={css({
@@ -167,9 +188,8 @@ const Page = () => {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                We're empowering the RC drift community with powerful tools,
-                major events, beginner guides, and our innovative driver
-                ratings.
+                We're empowering the RC Drift community with powerful tools,
+                major events, beginner guides, and innovative driver analytics.
               </motion.p>
 
               <Flex
@@ -196,7 +216,198 @@ const Page = () => {
           </Container>
         </Box>
 
-        <Container maxW={1100} px={2}>
+        <styled.section
+          bgGradient="to-b"
+          gradientFrom="black"
+          gradientVia="gray.900"
+          gradientTo="black"
+          pb={4}
+        >
+          <Container maxW={1100} px={2}>
+            <Flex gap={4} flexDir={{ base: "column", md: "row" }} mb={4}>
+              <Box pos="relative" flex={1}>
+                <Card p={0} overflow="hidden">
+                  <styled.img
+                    src="/shine.png"
+                    pos="absolute"
+                    top={0}
+                    w="full"
+                    transform="translateY(-50%)"
+                    zIndex={1}
+                  />
+                  <Flex
+                    align="center"
+                    px={{ base: 8, md: 12 }}
+                    gap={{ base: 4, md: 12 }}
+                    flexDir={{ base: "column-reverse", md: "row" }}
+                  >
+                    <MockPhone src="/home/driver-profile.jpg" />
+
+                    <Box flex={1} py={8}>
+                      <IconBox mb={2}>
+                        <RiStockLine size={16} />
+                      </IconBox>
+                      <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
+                        Driver Analytics
+                      </styled.h1>
+                      <styled.p color="gray.400" textWrap="balance">
+                        Track your rank with real-time driver ratings. From
+                        grassroots events to pro-level tournaments.
+                      </styled.p>
+                      <LinkButton to="/ratings/all" variant="outline" mt={4}>
+                        See All Driver Ratings
+                        <RiArrowRightLine />
+                      </LinkButton>
+                    </Box>
+                  </Flex>
+                </Card>
+              </Box>
+
+              <Card
+                bgColor="gray.900"
+                overflow="hidden"
+                py={12}
+                w={{ base: "full", md: "30%" }}
+                flex="none"
+                display="flex"
+                flexDir="column"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Box textAlign="center">
+                  <IconBox mb={2} mx="auto">
+                    <RiMapPin2Fill size={16} />
+                  </IconBox>
+                  <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
+                    200+ Tracks
+                  </styled.h1>
+                  <styled.p color="gray.400" textWrap="balance">
+                    Find your local track with our global Drift Map.
+                  </styled.p>
+                  <LinkButton to="/map/all" variant="secondary" mt={4}>
+                    View The Map
+                    <RiArrowRightLine />
+                  </LinkButton>
+                </Box>
+              </Card>
+            </Flex>
+
+            <Flex gap={4} flexDir={{ base: "column-reverse", md: "row" }}>
+              <Card
+                bgColor="gray.900"
+                overflow="hidden"
+                py={12}
+                w={{ base: "full", md: "30%" }}
+                flex="none"
+                display="flex"
+                flexDir="column"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Box textAlign="center">
+                  <IconBox mb={2} mx="auto">
+                    <RiCalendarLine size={16} />
+                  </IconBox>
+                  <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
+                    1.5K Events
+                  </styled.h1>
+                  <styled.p color="gray.400" textWrap="balance">
+                    Plan your next drift day with our packed-out calendar.
+                  </styled.p>
+                  <LinkButton to="/calendar" variant="secondary" mt={4}>
+                    View The Calendar
+                    <RiArrowRightLine />
+                  </LinkButton>
+                </Box>
+              </Card>
+
+              <Box flex={1}>
+                <Card p={0} overflow="hidden">
+                  <Flex
+                    align="center"
+                    px={{ base: 8, md: 12 }}
+                    gap={{ base: 4, md: 12 }}
+                    flexDir={{ base: "column-reverse", md: "row" }}
+                  >
+                    <MockPhone src="/home/tournament-battles.jpg" />
+
+                    <Box flex={1} py={8}>
+                      <IconBox mb={2}>
+                        <RiCodeFill size={16} />
+                      </IconBox>
+                      <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
+                        Beskpoke Software
+                      </styled.h1>
+                      <styled.p color="gray.400" textWrap="balance">
+                        Host your own RC Drift tournaments with our free online
+                        software.
+                      </styled.p>
+                      <LinkButton to="/tournaments/new" mt={4}>
+                        Create a Tournament
+                        <RiAddCircleFill />
+                      </LinkButton>
+                    </Box>
+                  </Flex>
+                </Card>
+              </Box>
+            </Flex>
+          </Container>
+        </styled.section>
+
+        <Container px={2} maxW={1100}>
+          <styled.section pos="relative" bgColor="#090909" py={24} mb={8}>
+            <styled.video
+              src="/2025-spinner.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              w={{ base: "240px", md: "380px" }}
+              mx="auto"
+            />
+
+            <Box textAlign="center" mt={8} pos="relative" zIndex={3}>
+              <styled.h1 fontWeight="bold" fontSize="4xl">
+                RC Drift UK 2025
+              </styled.h1>
+              <styled.p color="gray.400" textWrap="balance" mb={4}>
+                The UK's professional RC Drifting Series.
+              </styled.p>
+              <LinkButton to="/2025" variant="secondary">
+                Learn More
+                <RiArrowRightLine />
+              </LinkButton>
+            </Box>
+
+            <Box
+              bgImage="url(/dot-bg.svg)"
+              bgRepeat="repeat"
+              bgSize="16px"
+              bgPosition="center"
+              pos="absolute"
+              top={0}
+              left={0}
+              w="full"
+              h="full"
+              zIndex={1}
+              mixBlendMode="lighten"
+            />
+            <Box
+              pos="absolute"
+              top={0}
+              left={0}
+              w="full"
+              h="full"
+              zIndex={1}
+              className={css({
+                backgroundImage:
+                  "radial-gradient(circle, transparent, #0c0c0c)",
+              })}
+            />
+          </styled.section>
+        </Container>
+
+        <Container maxW={1100} px={2} pb={12}>
           <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
             <Card flex={1}>
               <Flex align="center" gap={2} mb={2}>
@@ -221,12 +432,7 @@ const Page = () => {
               </Flex>
             </Card>
 
-            <Card
-              flex={1}
-              bgGradient="to-b"
-              gradientFrom="gray.900"
-              gradientTo="black"
-            >
+            <Card flex={1}>
               <Flex align="center" gap={2} mb={2}>
                 <RiListOrdered2 />
                 <styled.h1 fontWeight="bold" fontSize="lg">
@@ -272,14 +478,6 @@ const Page = () => {
           </Flex>
         </Container>
       </Box>
-
-      <Container px={2} maxW={1100}>
-        <Link to="/2025">
-          <ImageContainer maxW="full" mb={8}>
-            <styled.img src="/2025-cover.jpg" w="full" />
-          </ImageContainer>
-        </Link>
-      </Container>
     </>
   );
 };

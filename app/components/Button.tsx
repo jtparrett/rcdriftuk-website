@@ -18,6 +18,7 @@ const ButtonStyles = cva({
     color: "white !important",
     borderWidth: 1,
     position: "relative",
+    shadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.2)",
     _disabled: {
       opacity: 0.5,
       cursor: "not-allowed",
@@ -75,6 +76,7 @@ const ButtonStyles = cva({
       ghost: {
         bg: "transparent",
         borderColor: "transparent",
+        shadow: "none",
         _hover: {
           md: {
             bgColor: "gray.800",
@@ -86,6 +88,7 @@ const ButtonStyles = cva({
         bg: "transparent",
         borderWidth: 1,
         borderColor: "gray.800",
+        shadow: "none",
         _hover: {
           md: {
             bgColor: "gray.800",

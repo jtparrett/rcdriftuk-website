@@ -18,7 +18,7 @@ import {
   RiListOrdered2,
   RiLogoutBoxRLine,
   RiMapPin2Line,
-  RiMenu2Line,
+  RiMenuFill,
   RiRocketLine,
   RiSearch2Line,
   RiSettings3Line,
@@ -408,7 +408,7 @@ export const Header = ({ user }: Props) => {
       pos="sticky"
       top={0}
       zIndex={10}
-      bgColor="rgba(12, 12, 12, 0.8)"
+      bgColor="rgba(12, 12, 12, 0.75)"
       backdropFilter="blur(10px)"
       shadow="2xl"
       borderBottomWidth={1}
@@ -433,7 +433,7 @@ export const Header = ({ user }: Props) => {
               pos="relative"
               overflow="visible"
             >
-              <RiMenu2Line />
+              <RiMenuFill />
               Menu
               {menu.isOpen && (
                 <styled.span
@@ -456,7 +456,14 @@ export const Header = ({ user }: Props) => {
           <SignedIn>
             {user && (
               <Link to={`/drivers/${user.driverId}`}>
-                <styled.div w={8} h={8} rounded="full" overflow="hidden">
+                <styled.div
+                  w={10}
+                  h={10}
+                  rounded="full"
+                  overflow="hidden"
+                  borderWidth={1}
+                  borderColor="gray.800"
+                >
                   <styled.img
                     src={user.image ?? "/blank-driver-right.jpg"}
                     w="full"
