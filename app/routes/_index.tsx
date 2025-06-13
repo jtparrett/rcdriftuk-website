@@ -409,7 +409,7 @@ const Page = () => {
         </Container>
 
         <Container maxW={1100} px={2} pb={12}>
-          <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
+          <Flex gap={4} flexDir={{ base: "column-reverse", md: "row" }}>
             <Card flex={1}>
               <Flex align="center" gap={2} mb={2}>
                 <RiCalendarLine />
