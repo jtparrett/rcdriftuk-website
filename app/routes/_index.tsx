@@ -156,7 +156,7 @@ const Page = () => {
                 className={css({
                   mt: 4,
                   fontWeight: "medium",
-                  fontSize: { base: "5xl", md: "7xl" },
+                  fontSize: { base: "4xl", md: "7xl" },
                   lineHeight: 1.1,
                   textWrap: "balance",
                   maxW: 700,
