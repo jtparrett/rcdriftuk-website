@@ -10,17 +10,17 @@ import { Button, LinkButton } from "~/components/Button";
 import { ProductCard } from "~/components/ProductCard";
 import { styled, Box, Flex, Spacer, Center, Grid } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import type { Route } from "./+types/catalogue";
+import type { Route } from "./+types/marketplace._index";
 
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `RC Drift UK | Catalogue`,
+      title: `RC Drift UK | Marketplace`,
       description:
-        "We've scraped shops from across the UK to bring you a comprehensive parts catalogue.",
-      "og:title": "RC Drift UK | Catalogue",
+        "We've scraped shops from across the UK to bring you a comprehensive parts marketplace.",
+      "og:title": "RC Drift UK | Marketplace",
       "og:description":
-        "We've scraped shops from across the UK to bring you a comprehensive parts catalogue.",
+        "We've scraped shops from across the UK to bring you a comprehensive parts marketplace.",
     },
   ];
 };
@@ -86,11 +86,11 @@ const Page = () => {
 
   return (
     <>
-      <styled.h1 srOnly>Catalogue</styled.h1>
+      <styled.h1 srOnly>Marketplace</styled.h1>
 
       <Box mt={4}>
-        <Form action="/catalogue">
-          <Flex rounded="xl" p={1} borderWidth={1} borderColor="gray.800">
+        <Form action="/marketplace">
+          <Flex rounded="full" p={1} borderWidth={1} borderColor="gray.800">
             <Center pl={4} color="gray.500">
               <RiSearchLine />
             </Center>
@@ -105,7 +105,9 @@ const Page = () => {
               color="inherit"
               outline="none"
             />
-            <Button type="submit">Go</Button>
+            <Button type="submit" variant="secondary">
+              Go
+            </Button>
           </Flex>
         </Form>
       </Box>
@@ -129,7 +131,7 @@ const Page = () => {
       <Flex pt={6}>
         {page > 1 && (
           <LinkButton
-            to={`/catalogue?query=${query}&page=${page - 1}`}
+            to={`/marketplace?query=${query}&page=${page - 1}`}
             variant="secondary"
           >
             <RiArrowLeftSLine /> Previous
@@ -140,7 +142,7 @@ const Page = () => {
 
         {products.length >= 20 && (
           <LinkButton
-            to={`/catalogue?query=${query}&page=${page + 1}`}
+            to={`/marketplace?query=${query}&page=${page + 1}`}
             variant="secondary"
           >
             Next <RiArrowRightSLine />

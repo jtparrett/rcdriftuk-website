@@ -12,7 +12,8 @@ import { format } from "date-fns";
 import {
   RiAddCircleFill,
   RiAddLine,
-  RiCalendar2Line,
+  RiCalendarLine,
+  RiCameraLensLine,
   RiFlagLine,
   RiHome2Line,
   RiListOrdered2,
@@ -20,15 +21,14 @@ import {
   RiMapPin2Line,
   RiMenuFill,
   RiRocketLine,
-  RiSearch2Line,
   RiSettings3Line,
   RiShoppingBagLine,
   RiTicketLine,
   RiTrophyLine,
+  RiTShirtLine,
   RiUserLine,
   RiVipCrown2Line,
 } from "react-icons/ri";
-import { GiCogLock } from "react-icons/gi";
 import { useEffect } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/react-router";
@@ -180,9 +180,26 @@ const Menu = ({ user }: Props) => {
               </MenuIcon>
               Home
             </MenuLink>
+
+            <MenuLink
+              to="/getting-started"
+              active={
+                location.pathname.startsWith("/getting-started")
+                  ? "active"
+                  : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiRocketLine />
+              </MenuIcon>
+              Getting Started
+            </MenuLink>
+
             <MenuLink
               to="/ratings/all"
-              active={location.pathname === "/ratings" ? "active" : "inactive"}
+              active={
+                location.pathname === "/ratings/all" ? "active" : "inactive"
+              }
             >
               <MenuIcon>
                 <RiListOrdered2 />
@@ -232,7 +249,7 @@ const Menu = ({ user }: Props) => {
               }
             >
               <MenuIcon>
-                <RiCalendar2Line />
+                <RiCalendarLine />
               </MenuIcon>
               Calendar
             </MenuLink>
@@ -244,23 +261,23 @@ const Menu = ({ user }: Props) => {
               }
             >
               <MenuIcon>
-                <RiShoppingBagLine />
+                <RiTShirtLine />
               </MenuIcon>
               Merch
             </MenuLink>
 
             <MenuLink
-              to="/catalogue"
+              to="/marketplace"
               active={
-                location.pathname.startsWith("/catalogue")
+                location.pathname.startsWith("/marketplace")
                   ? "active"
                   : "inactive"
               }
             >
               <MenuIcon>
-                <RiSearch2Line />
+                <RiShoppingBagLine />
               </MenuIcon>
-              Catalogue
+              Marketplace
             </MenuLink>
 
             <MenuLink
@@ -270,23 +287,9 @@ const Menu = ({ user }: Props) => {
               }
             >
               <MenuIcon>
-                <GiCogLock />
+                <RiCameraLensLine />
               </MenuIcon>
               FDR Calculator
-            </MenuLink>
-
-            <MenuLink
-              to="/getting-started"
-              active={
-                location.pathname.startsWith("/getting-started")
-                  ? "active"
-                  : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiRocketLine />
-              </MenuIcon>
-              Getting Started
             </MenuLink>
           </Flex>
 

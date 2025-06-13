@@ -5,7 +5,7 @@ import { ProductStatus as Status } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 import { RiLink } from "react-icons/ri";
 import { ProductStatus } from "~/components/ProductStatus";
-import type { Route } from "./+types/catalogue.$slug";
+import type { Route } from "./+types/marketplace.$slug";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
@@ -39,7 +39,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
   return product;
 };
 
-const CatalogueListingPage = () => {
+const MarketplaceListingPage = () => {
   const product = useLoaderData<typeof loader>();
   const inStock = product.status === Status.IN_STOCK;
   const backorder = product.status === Status.BACKORDER;
@@ -125,4 +125,4 @@ const CatalogueListingPage = () => {
   );
 };
 
-export default CatalogueListingPage;
+export default MarketplaceListingPage;

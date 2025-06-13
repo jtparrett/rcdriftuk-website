@@ -2,7 +2,7 @@ import { Flex, AspectRatio, Box, styled } from "~/styled-system/jsx";
 import { ProductStatus } from "./ProductStatus";
 import { LinkOverlay } from "./LinkOverlay";
 import { RiMapPinLine } from "react-icons/ri";
-import type { loader } from "~/routes/catalogue._index";
+import type { loader } from "~/routes/marketplace._index";
 
 interface Props {
   product: Awaited<ReturnType<typeof loader>>[number];
@@ -27,7 +27,7 @@ export const ProductCard = ({ product }: Props) => {
           <styled.img src={product.image} w="full" pos="absolute" inset={0} />
         </AspectRatio>
       </Box>
-      <LinkOverlay to={`/catalogue/${product.slug}`}>
+      <LinkOverlay to={`/marketplace/${product.slug}`}>
         <Flex alignItems="flex-start" gap={4}>
           <Box w={12} h={12} rounded="full" overflow="hidden">
             <styled.img
