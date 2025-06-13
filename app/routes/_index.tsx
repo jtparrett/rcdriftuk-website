@@ -356,7 +356,13 @@ const Page = () => {
         </styled.section>
 
         <Container px={2} maxW={1100}>
-          <styled.section pos="relative" bgColor="#090909" py={24} mb={8}>
+          <styled.section
+            pos="relative"
+            bgColor="#090909"
+            py={24}
+            mb={8}
+            transform="translate3d(0, 0, 0)"
+          >
             <styled.video
               src="/2025-spinner.mp4"
               autoPlay
