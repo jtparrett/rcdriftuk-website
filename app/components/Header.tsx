@@ -6,7 +6,7 @@ import {
   Container,
   Center,
 } from "~/styled-system/jsx";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigation } from "react-router";
 import { Button, LinkButton } from "./Button";
 import { format } from "date-fns";
 import {
@@ -29,14 +29,31 @@ import {
   RiUserLine,
   RiVipCrown2Line,
 } from "react-icons/ri";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
-import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/react-router";
+import { SignedIn, SignedOut, useAuth } from "@clerk/react-router";
 import type { GetUser } from "~/utils/getUser.server";
 
 const today = format(new Date(), "dd-MM-yy");
 
 export const HEADER_HEIGHT = 64;
+
+function useDelayedLoader() {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (navigation.state === "loading") {
+      timer = setTimeout(() => setIsLoading(true), 200);
+    } else {
+      setIsLoading(false);
+    }
+    return () => clearTimeout(timer);
+  }, [navigation.state]);
+
+  return isLoading;
+}
 
 const MenuIcon = styled("span", {
   base: {
@@ -399,7 +416,7 @@ interface Props {
 export const Header = ({ user }: Props) => {
   const location = useLocation();
   const menu = useDisclosure();
-  const clerkUser = useUser();
+  const isNavigating = useDelayedLoader();
 
   useEffect(() => {
     menu.onClose();
@@ -424,6 +441,18 @@ export const Header = ({ user }: Props) => {
           <Link to="/">
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
           </Link>
+
+          {isNavigating && (
+            <Box
+              w={5}
+              h={5}
+              rounded="full"
+              borderWidth={2}
+              borderColor="gray.800"
+              borderTopColor="brand.500"
+              animation="spin 1s linear infinite"
+            />
+          )}
 
           <Spacer />
 
