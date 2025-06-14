@@ -18,6 +18,7 @@ import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { TrackStatus } from "~/utils/enums";
+import { toZonedTime } from "date-fns-tz";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
@@ -66,7 +67,7 @@ const CalendarWeeksPage = () => {
 
   invariant(params.date);
 
-  const date = parse(params.date, "dd-MM-yy", new Date());
+  const date = toZonedTime(parse(params.date, "dd-MM-yy", new Date()), "UTC");
 
   const startWeekDate = startOfWeek(date, {
     weekStartsOn: 1,
@@ -108,11 +109,17 @@ const CalendarWeeksPage = () => {
       <Flex py={2} flexDir="column" gap={2}>
         {Array.from(new Array(7)).map((_, i) => {
           const day = add(startWeekDate, { days: i });
-          const dayEvents = events.filter(
-            (event) =>
-              startOfDay(new Date(event.endDate)) >= startOfDay(day) &&
-              startOfDay(new Date(event.startDate)) <= endOfDay(day),
-          );
+          const dayEvents = events.filter((event) => {
+            const startDateUTC = toZonedTime(event.startDate, "UTC");
+            const endDateUTC = toZonedTime(event.endDate, "UTC");
+
+            return (
+              (startOfDay(startDateUTC) >= startOfDay(day) &&
+                endOfDay(endDateUTC) <= endOfDay(day)) ||
+              (startOfDay(startDateUTC) <= startOfDay(day) &&
+                endOfDay(endDateUTC) >= endOfDay(day))
+            );
+          });
 
           return (
             <Box

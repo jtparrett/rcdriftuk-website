@@ -17,6 +17,7 @@ import {
 import invariant from "tiny-invariant";
 import { styled, Box, Flex, Center } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { toZonedTime } from "date-fns-tz";
 
 const LinkOverlay = styled(Link, {
   base: {
@@ -66,7 +67,7 @@ const Page = () => {
 
   invariant(params.date);
 
-  const date = parse(params.date, "dd-MM-yy", new Date());
+  const date = toZonedTime(parse(params.date, "dd-MM-yy", new Date()), "UTC");
   const monthStartDate = startOfMonth(date);
 
   return (
@@ -89,11 +90,17 @@ const Page = () => {
           days: i,
         });
 
-        const dayEvents = events.filter(
-          (event) =>
-            startOfDay(new Date(event.endDate)) >= startOfDay(day) &&
-            startOfDay(new Date(event.startDate)) <= endOfDay(day),
-        );
+        const dayEvents = events.filter((event) => {
+          const startDateUTC = toZonedTime(event.startDate, "UTC");
+          const endDateUTC = toZonedTime(event.endDate, "UTC");
+
+          return (
+            (startOfDay(startDateUTC) >= startOfDay(day) &&
+              endOfDay(endDateUTC) <= endOfDay(day)) ||
+            (startOfDay(startDateUTC) <= startOfDay(day) &&
+              endOfDay(endDateUTC) >= endOfDay(day))
+          );
+        });
 
         return (
           <Box key={i} w={`${100 / 7}%`} pl={1} mb={1}>

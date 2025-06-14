@@ -9,6 +9,7 @@ import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { TrackStatus } from "~/utils/enums";
+import { toZonedTime } from "date-fns-tz";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
@@ -55,7 +56,7 @@ const CalendarDaysPage = () => {
 
   invariant(params.date);
 
-  const date = parse(params.date, "dd-MM-yy", new Date());
+  const date = toZonedTime(parse(params.date, "dd-MM-yy", new Date()), "UTC");
 
   return (
     <>
