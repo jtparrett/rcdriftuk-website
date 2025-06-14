@@ -8,7 +8,6 @@ import { EventCard } from "~/components/EventCard";
 import { TrackSnippet } from "~/components/TrackSnippet";
 import { css } from "~/styled-system/css";
 import { Box } from "~/styled-system/jsx";
-import { TrackTypes } from "~/utils/enums";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 
@@ -106,8 +105,7 @@ const MapTrackDrawer = () => {
           gradientTo="transparent"
         >
           <LinkButton to={`/tracks/${track.slug}`} w="full">
-            View {track.types.includes(TrackTypes.SHOPS) ? "Shop" : "Track"}{" "}
-            Profile
+            View Profile
           </LinkButton>
         </Box>
       </motion.div>

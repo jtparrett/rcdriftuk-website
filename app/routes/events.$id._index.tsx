@@ -421,7 +421,7 @@ const Page = () => {
                   to={`/tracks/${event.eventTrack.slug}`}
                   variant="secondary"
                 >
-                  More Info
+                  View Profile
                 </LinkButton>
 
                 {isTrackOwner && event.enableTicketing && (

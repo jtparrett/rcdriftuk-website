@@ -222,7 +222,7 @@ const TournamentBattlesPage = () => {
           bgPosition="center"
         >
           {tournament.battles.length <= 0 && (
-            <styled.p>No battles constructed yet.</styled.p>
+            <styled.p textAlign="center">No battles constructed yet.</styled.p>
           )}
 
           <Flex

@@ -88,7 +88,7 @@ const TracksPage = () => {
               >
                 <Box pos="absolute" inset={0} zIndex={-1}>
                   <styled.img
-                    src={track.image}
+                    src={track.cover ?? track.image}
                     w="full"
                     h="full"
                     objectFit="cover"

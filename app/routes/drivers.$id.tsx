@@ -643,7 +643,7 @@ const Page = () => {
                     </Flex>
 
                     {isExpanded && (
-                      <Box borderTop="1px solid" borderColor={color}>
+                      <Box borderTopWidth={1} borderColor={color}>
                         <Flex>
                           <Box p={4} flex={1}>
                             <styled.h4
