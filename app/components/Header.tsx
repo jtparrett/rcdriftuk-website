@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import {
   RiAddCircleFill,
   RiAddLine,
+  RiBook2Line,
   RiCalendarLine,
   RiCameraLensLine,
   RiFlagLine,
@@ -272,18 +273,6 @@ const Menu = ({ user }: Props) => {
             </MenuLink>
 
             <MenuLink
-              to="/merch"
-              active={
-                location.pathname.startsWith("/merch") ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiTShirtLine />
-              </MenuIcon>
-              Merch
-            </MenuLink>
-
-            <MenuLink
               to="/marketplace"
               active={
                 location.pathname.startsWith("/marketplace")
@@ -307,6 +296,30 @@ const Menu = ({ user }: Props) => {
                 <RiCameraLensLine />
               </MenuIcon>
               FDR Calculator
+            </MenuLink>
+
+            <MenuLink
+              to="/blog"
+              active={
+                location.pathname.startsWith("/blog") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiBook2Line />
+              </MenuIcon>
+              Insights Blog
+            </MenuLink>
+
+            <MenuLink
+              to="/merch"
+              active={
+                location.pathname.startsWith("/merch") ? "active" : "inactive"
+              }
+            >
+              <MenuIcon>
+                <RiTShirtLine />
+              </MenuIcon>
+              Merch
             </MenuLink>
           </Flex>
 
