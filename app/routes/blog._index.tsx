@@ -53,7 +53,11 @@ const BlogListingPage = () => {
             <Box borderTopWidth={1} borderColor="gray.800" p={8}>
               <Markdown>{article.content.split("\n")[0] + "..."}</Markdown>
 
-              <Flex gap={3} alignItems="center">
+              <Flex
+                gap={3}
+                alignItems={{ base: "flex-start", md: "center" }}
+                flexDir={{ base: "column", md: "row" }}
+              >
                 <Spacer />
                 <styled.p
                   fontSize="sm"

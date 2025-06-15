@@ -69,6 +69,7 @@ export const Markdown = ({ children }: Props) => {
           return (
             <styled.li
               color="gray.400"
+              lineHeight={1.5}
               _before={{
                 content: '""',
                 display: "inline-block",
