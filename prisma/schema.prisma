@@ -99,6 +99,8 @@ model TournamentJudges {
   user         Users                   @relation(fields: [driverId], references: [driverId])
   scores       LapScores[]
   BattleVotes  TournamentBattleVotes[]
+
+  @@unique([tournamentId, driverId])
 }
 
 model Laps {

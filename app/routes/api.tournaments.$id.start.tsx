@@ -55,6 +55,7 @@ export const action = async (args: ActionFunctionArgs) => {
         tournamentId: id,
       };
     }),
+    skipDuplicates: true,
   });
 
   // Create drivers
