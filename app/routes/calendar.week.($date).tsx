@@ -106,7 +106,7 @@ const CalendarWeeksPage = () => {
         </LinkButton>
       </Flex>
 
-      <Flex py={2} flexDir="column" gap={2}>
+      <Flex py={2} flexDir="column" gap={2} key={date.toISOString()}>
         {Array.from(new Array(7)).map((_, i) => {
           const day = add(startWeekDate, { days: i });
           const dayEvents = events.filter((event) => {
