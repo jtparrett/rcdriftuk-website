@@ -1,5 +1,5 @@
 import { redirect } from "react-router";
-import { useLoaderData, useParams } from "react-router";
+import { useLoaderData } from "react-router";
 import {
   add,
   endOfWeek,
@@ -12,7 +12,6 @@ import {
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import type { LoaderFunctionArgs } from "react-router";
-import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
@@ -58,16 +57,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return events;
+  return { events, date };
 };
 
 const CalendarWeeksPage = () => {
-  const params = useParams();
-  const events = useLoaderData<typeof loader>();
-
-  invariant(params.date);
-
-  const date = toZonedTime(parse(params.date, "dd-MM-yy", new Date()), "UTC");
+  const { events, date } = useLoaderData<typeof loader>();
 
   const startWeekDate = startOfWeek(date, {
     weekStartsOn: 1,
@@ -77,7 +71,7 @@ const CalendarWeeksPage = () => {
   });
 
   return (
-    <>
+    <Box>
       <Flex gap={2}>
         <styled.h1 fontWeight="bold" alignSelf="center">
           {format(startWeekDate, "do")}-{format(endWeekDate, "do MMMM, yyyy")}
@@ -106,7 +100,7 @@ const CalendarWeeksPage = () => {
         </LinkButton>
       </Flex>
 
-      <Flex py={2} flexDir="column" gap={2} key={date.toISOString()}>
+      <Flex py={2} flexDir="column" gap={2}>
         {Array.from(new Array(7)).map((_, i) => {
           const day = add(startWeekDate, { days: i });
           const dayEvents = events.filter((event) => {
@@ -148,7 +142,7 @@ const CalendarWeeksPage = () => {
           );
         })}
       </Flex>
-    </>
+    </Box>
   );
 };
 

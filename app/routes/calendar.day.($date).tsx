@@ -1,15 +1,13 @@
-import { useLoaderData, useParams } from "react-router";
+import { useLoaderData } from "react-router";
 import { add, endOfDay, format, parse, startOfDay, sub } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import invariant from "tiny-invariant";
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { TrackStatus } from "~/utils/enums";
-import { toZonedTime } from "date-fns-tz";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
@@ -47,16 +45,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     ],
   });
 
-  return events;
+  return { events, date };
 };
 
 const CalendarDaysPage = () => {
-  const params = useParams();
-  const events = useLoaderData<typeof loader>();
-
-  invariant(params.date);
-
-  const date = toZonedTime(parse(params.date, "dd-MM-yy", new Date()), "UTC");
+  const { events, date } = useLoaderData<typeof loader>();
 
   return (
     <>

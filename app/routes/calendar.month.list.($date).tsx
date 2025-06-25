@@ -35,11 +35,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     ],
   });
 
-  return events;
+  return { events };
 };
 
 const Page = () => {
-  const events = useLoaderData<typeof loader>();
+  const { events } = useLoaderData<typeof loader>();
 
   return (
     <Flex flexDir="column" gap={2} py={2}>

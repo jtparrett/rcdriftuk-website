@@ -1,7 +1,7 @@
 import { TrackStatus } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { Link, useLoaderData, useParams } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import {
   add,
   differenceInDays,
@@ -14,7 +14,6 @@ import {
   startOfDay,
   endOfDay,
 } from "date-fns";
-import invariant from "tiny-invariant";
 import { styled, Box, Flex, Center } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { toZonedTime } from "date-fns-tz";
@@ -58,16 +57,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return events;
+  return { events, date };
 };
 
 const Page = () => {
-  const params = useParams();
-  const events = useLoaderData<typeof loader>();
-
-  invariant(params.date);
-
-  const date = toZonedTime(parse(params.date, "dd-MM-yy", new Date()), "UTC");
+  const { events, date } = useLoaderData<typeof loader>();
   const monthStartDate = startOfMonth(date);
 
   return (
