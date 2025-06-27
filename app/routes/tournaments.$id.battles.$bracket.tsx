@@ -209,7 +209,7 @@ const TournamentBattlesPage = () => {
         borderWidth={1}
         borderColor="gray.800"
       >
-        <Box
+        <Flex
           overflow="auto"
           py={8}
           borderWidth={1}
@@ -220,116 +220,115 @@ const TournamentBattlesPage = () => {
           bgRepeat="repeat"
           bgSize="16px"
           bgPosition="center"
+          scrollSnapType="x proximity"
+          justifyContent={
+            tournament.format === TournamentsFormat.DRIFT_WARS
+              ? "center"
+              : undefined
+          }
         >
           {tournament.battles.length <= 0 && (
-            <styled.p textAlign="center">No battles constructed yet.</styled.p>
+            <styled.p textAlign="center" w="full">
+              No battles constructed yet.
+            </styled.p>
           )}
 
-          <Flex
-            justifyContent={
-              tournament.format === TournamentsFormat.DRIFT_WARS
-                ? "center"
-                : undefined
-            }
-          >
-            {battlesInRound.map((battles, i) => {
-              return (
-                <Box key={i} w={240} flex="none">
-                  {tournament.format !== TournamentsFormat.DRIFT_WARS && (
-                    <styled.p
-                      fontSize="sm"
-                      textAlign="center"
-                      textTransform="uppercase"
-                      fontWeight="bold"
-                    >
-                      {getBracketName(
-                        battles[0].round,
-                        battles[0].bracket,
-                        tournament.format,
-                      )}
-                    </styled.p>
-                  )}
-
-                  <Flex
-                    flexDir="column"
-                    style={{
-                      height:
-                        Math.ceil(battlesByRound[1]?.length ?? 0) * 54 + "px",
-                    }}
+          {battlesInRound.map((battles, i) => {
+            return (
+              <Box key={i} w={240} flex="none" scrollSnapAlign="start">
+                {tournament.format !== TournamentsFormat.DRIFT_WARS && (
+                  <styled.p
+                    fontSize="sm"
+                    textAlign="center"
+                    textTransform="uppercase"
+                    fontWeight="bold"
                   >
-                    <Spacer />
-                    {battles.map((battle, i) => {
-                      const isNextBattle =
-                        tournament.nextBattleId === battle?.id;
-                      return (
-                        <Fragment key={battle.id}>
-                          <Box position="relative" flex="none" zIndex={1}>
-                            {(battles.length <= 1 ||
-                              tournament.format ===
-                                TournamentsFormat.DRIFT_WARS) && (
-                              <Box
-                                pos="absolute"
-                                top="50%"
-                                borderBottomWidth={1}
-                                borderColor="gray.700"
-                                w="full"
-                                borderStyle="dashed"
-                                zIndex={1}
-                              />
-                            )}
-                            <Box
-                              mx={4}
-                              h={12}
-                              rounded="lg"
-                              borderWidth={1}
-                              borderColor={
-                                isNextBattle ? "brand.500" : "gray.700"
-                              }
-                              position="relative"
-                              overflow="hidden"
-                              bgColor="gray.950"
-                              shadow="0 4px 12px black"
-                              zIndex={0}
-                            >
-                              {isNextBattle && <Glow size="sm" />}
-                              <Driver
-                                driver={battle.driverLeft}
-                                winnerId={battle.winnerId}
-                              />
-                              <Driver
-                                driver={battle.driverRight}
-                                winnerId={battle.winnerId}
-                              />
-                            </Box>
-                          </Box>
+                    {getBracketName(
+                      battles[0].round,
+                      battles[0].bracket,
+                      tournament.format,
+                    )}
+                  </styled.p>
+                )}
 
-                          {i % 2 === 0 &&
-                          battles.length > 1 &&
-                          tournament.format !== TournamentsFormat.DRIFT_WARS ? (
+                <Flex
+                  flexDir="column"
+                  style={{
+                    height:
+                      Math.ceil(battlesByRound[1]?.length ?? 0) * 54 + "px",
+                  }}
+                >
+                  <Spacer />
+                  {battles.map((battle, i) => {
+                    const isNextBattle = tournament.nextBattleId === battle?.id;
+                    return (
+                      <Fragment key={battle.id}>
+                        <Box position="relative" flex="none" zIndex={1}>
+                          {(battles.length <= 1 ||
+                            tournament.format ===
+                              TournamentsFormat.DRIFT_WARS) && (
                             <Box
-                              borderRightWidth={1}
-                              borderTopWidth={1}
+                              pos="absolute"
+                              top="50%"
                               borderBottomWidth={1}
+                              borderColor="gray.700"
+                              w="full"
                               borderStyle="dashed"
-                              borderColor="gray.600"
-                              flex={1}
-                              my={-6}
-                              borderRightRadius="lg"
-                              position="relative"
-                              zIndex={4}
+                              zIndex={1}
                             />
-                          ) : (
-                            <Spacer />
                           )}
-                        </Fragment>
-                      );
-                    })}
-                  </Flex>
-                </Box>
-              );
-            })}
-          </Flex>
-        </Box>
+                          <Box
+                            mx={4}
+                            h={12}
+                            rounded="lg"
+                            borderWidth={1}
+                            borderColor={
+                              isNextBattle ? "brand.500" : "gray.700"
+                            }
+                            position="relative"
+                            overflow="hidden"
+                            bgColor="gray.950"
+                            shadow="0 4px 12px black"
+                            zIndex={0}
+                          >
+                            {isNextBattle && <Glow size="sm" />}
+                            <Driver
+                              driver={battle.driverLeft}
+                              winnerId={battle.winnerId}
+                            />
+                            <Driver
+                              driver={battle.driverRight}
+                              winnerId={battle.winnerId}
+                            />
+                          </Box>
+                        </Box>
+
+                        {i % 2 === 0 &&
+                        battles.length > 1 &&
+                        tournament.format !== TournamentsFormat.DRIFT_WARS ? (
+                          <Box
+                            borderRightWidth={1}
+                            borderTopWidth={1}
+                            borderBottomWidth={1}
+                            borderStyle="dashed"
+                            borderColor="gray.600"
+                            flex={1}
+                            my={-6}
+                            borderRightRadius="lg"
+                            position="relative"
+                            zIndex={4}
+                          />
+                        ) : (
+                          <Spacer />
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </Flex>
+              </Box>
+            );
+          })}
+        </Flex>
       </Box>
     </>
   );
