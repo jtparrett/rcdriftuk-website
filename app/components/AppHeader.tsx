@@ -1,8 +1,25 @@
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { useDelayedLoader } from "./Header";
+import { useLocation, useNavigate } from "react-router";
+import { Button } from "./Button";
+import { RiArrowLeftSLine } from "react-icons/ri";
+import { Regions } from "~/utils/enums";
+
+const TAB_ROUTES = [
+  "/",
+  "/ratings/*",
+  "/map/*",
+  "/calendar/*",
+  "/marketplace",
+  "/user-menu",
+  "/sign-in",
+  "/sign-up",
+];
 
 export const AppHeader = () => {
   const isNavigating = useDelayedLoader();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -21,9 +38,29 @@ export const AppHeader = () => {
         h="200px"
         transform="translate3d(0, 0, 0)"
       >
-        <Flex h="65px" alignItems="center" px={4}>
-          <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
+        <Flex h="65px" alignItems="center" px={4} pos="relative">
+          {!TAB_ROUTES.some((route) =>
+            route.endsWith("*")
+              ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
+              : location.pathname.toLowerCase() === route,
+          ) && (
+            <styled.button onClick={() => navigate(-1)} type="button">
+              <RiArrowLeftSLine size={24} />
+            </styled.button>
+          )}
+
           <Spacer />
+
+          <styled.img
+            w={140}
+            src="/rcdriftuk-26.svg"
+            alt="RC Drift UK"
+            pos="absolute"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            top="50%"
+          />
+
           {isNavigating && (
             <Box
               w={5}

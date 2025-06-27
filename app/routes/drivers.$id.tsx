@@ -242,11 +242,7 @@ const Page = () => {
       }}
     >
       <Container maxW={800} px={4} py={6}>
-        <Flex alignItems="center">
-          <LinkButton to="/ratings/all" variant="ghost" size="sm">
-            <RiArrowLeftLine /> View Ratings
-          </LinkButton>
-
+        <Flex>
           <Spacer />
 
           {driver && (
