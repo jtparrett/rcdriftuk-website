@@ -143,6 +143,8 @@ export default defineConfig({
       fontFamily: "body",
       scrollBehavior: "smooth",
       minH: "100dvh",
+      WebkitOverflowScrolling: "touch",
+      overflowScrolling: "touch",
     },
   },
 });

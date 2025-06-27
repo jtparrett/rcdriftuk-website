@@ -72,13 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         {process.env.NODE_ENV === "production" && (
-          <>
-            <script src="https://cdn.splitbee.io/sb.js"></script>
-            <script
-              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8123266196289449"
-              crossOrigin="anonymous"
-            ></script>
-          </>
+          <script src="https://cdn.splitbee.io/sb.js"></script>
         )}
       </head>
       <body>

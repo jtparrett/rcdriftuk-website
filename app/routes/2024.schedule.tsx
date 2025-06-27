@@ -1,5 +1,4 @@
 import { useLoaderData } from "react-router";
-import { Advert } from "~/components/Advert";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { LinkButton } from "~/components/Button";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
@@ -107,8 +106,6 @@ const Page = () => {
           </Flex>
         </Box>
       </styled.main>
-
-      <Advert />
     </Container>
   );
 };
