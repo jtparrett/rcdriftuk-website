@@ -17,6 +17,8 @@ import { Link, useLocation } from "react-router";
 const Tab = styled(Link, {
   base: {
     color: "gray.200",
+    py: 4,
+    px: 4,
   },
   variants: {
     isActive: {
@@ -43,15 +45,14 @@ export const AppNav = () => {
         zIndex={15}
         bgColor="rgba(12, 12, 12, 0.75)"
         backdropFilter="blur(10px)"
-        px={8}
         pb="100px"
+        px={4}
       >
         <Flex
           w="full"
           h="65px"
           justifyContent="space-between"
           alignItems="center"
-          gap={8}
         >
           <Tab to="/" isActive={location.pathname === "/"}>
             {location.pathname === "/" ? (
