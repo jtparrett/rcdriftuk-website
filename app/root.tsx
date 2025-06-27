@@ -163,7 +163,7 @@ function App({
           {!isEmbed && (
             <>
               {!isApp && <AnnouncementBanner />}
-              {!hideBanner && <CookieBanner />}
+              {!hideBanner && !isApp && <CookieBanner />}
               {!isApp && <Header user={user} />}
             </>
           )}
