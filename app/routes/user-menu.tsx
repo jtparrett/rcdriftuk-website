@@ -28,7 +28,7 @@ const UserMenuPage = () => {
   const { user } = useLoaderData<typeof loader>();
 
   return (
-    <Box>
+    <Box px={2}>
       <Flex
         alignItems="center"
         gap={4}
