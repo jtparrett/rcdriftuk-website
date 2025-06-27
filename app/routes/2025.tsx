@@ -7,7 +7,15 @@ const Page = () => {
 
   return (
     <styled.main>
-      <Box borderBottomWidth={1} borderColor="gray.900">
+      <Box
+        borderBottomWidth={1}
+        borderColor="gray.900"
+        pos="sticky"
+        top="65px"
+        zIndex={10}
+        bgColor="rgba(12, 12, 12, 0.75)"
+        backdropFilter="blur(10px)"
+      >
         <Container px={2} maxW={1100}>
           <Box overflowX="auto" w="full">
             <Flex gap={2} py={2} alignItems="center">

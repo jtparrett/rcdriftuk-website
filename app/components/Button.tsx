@@ -54,22 +54,27 @@ const ButtonStyles = cva({
     },
     variant: {
       primary: {
-        bg: "brand.500",
-        borderColor: "brand.500",
+        bgGradient: "to-b",
+        gradientFrom: "brand.500",
+        gradientTo: "brand.600",
+        borderColor: "brand.600",
         _hover: {
           md: {
-            backgroundColor: "brand.700",
+            gradientFrom: "brand.600",
+            gradientTo: "brand.700",
             borderColor: "brand.700",
           },
         },
       },
       secondary: {
-        bg: "gray.800",
+        bgGradient: "to-b",
+        gradientFrom: "gray.800",
+        gradientTo: "gray.900",
         borderColor: "gray.800",
         _hover: {
           md: {
-            backgroundColor: "gray.700",
-            borderColor: "gray.700",
+            gradientFrom: "gray.700",
+            gradientTo: "gray.800",
           },
         },
       },

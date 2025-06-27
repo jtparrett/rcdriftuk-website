@@ -142,6 +142,7 @@ export default defineConfig({
       backgroundColor: "black",
       fontFamily: "body",
       scrollBehavior: "smooth",
+      minH: "100dvh",
     },
   },
 });

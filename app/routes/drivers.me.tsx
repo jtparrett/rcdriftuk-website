@@ -6,7 +6,9 @@ import { prisma } from "~/utils/prisma.server";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  if (!userId) {
+    throw redirect("/sign-in");
+  }
 
   const user = await prisma.users.findFirst({
     where: {

@@ -26,6 +26,7 @@ import { motion } from "motion/react";
 import { css } from "~/styled-system/css";
 import { SignedIn, SignedOut } from "@clerk/react-router";
 import { MockPhone } from "~/components/MockPhone";
+import { HiddenApp } from "~/utils/AppContext";
 
 const Card = styled("article", {
   base: {
@@ -98,8 +99,8 @@ const Page = () => {
   const today = format(new Date(), "dd-MM-yy");
 
   return (
-    <>
-      <Box pos="relative" zIndex={1} w="full" overflow="hidden">
+    <Box pos="relative" zIndex={1} w="full" overflow="hidden">
+      <HiddenApp>
         <Box
           w="full"
           bgImage="url(/bg.png)"
@@ -359,7 +360,8 @@ const Page = () => {
           borderTopWidth={1}
           borderBottomWidth={1}
           borderColor="gray.800"
-          my={12}
+          mt={8}
+          mb={12}
         >
           <Container px={2} maxW={1100}>
             <styled.section
@@ -420,79 +422,79 @@ const Page = () => {
             </styled.section>
           </Container>
         </styled.section>
+      </HiddenApp>
 
-        <Container maxW={1100} px={2} pb={12}>
-          <Flex gap={4} flexDir={{ base: "column-reverse", md: "row" }}>
-            <Card flex={1}>
-              <Flex align="center" gap={2} mb={2}>
-                <RiCalendarLine />
-                <styled.h1 fontWeight="bold" fontSize="lg">
-                  Today's Events
-                </styled.h1>
-              </Flex>
+      <Container maxW={1100} px={2} pb={12} mt={4}>
+        <Flex gap={4} flexDir={{ base: "column-reverse", md: "row" }}>
+          <Card flex={1}>
+            <Flex align="center" gap={2} mb={2}>
+              <RiCalendarLine />
+              <styled.h1 fontWeight="bold" fontSize="lg">
+                Today's Events
+              </styled.h1>
+            </Flex>
 
-              <Flex gap={2} flexDir="column">
-                {events.length <= 0 && (
-                  <styled.p mb={4}>There are no events on today.</styled.p>
-                )}
+            <Flex gap={2} flexDir="column">
+              {events.length <= 0 && (
+                <styled.p mb={4}>There are no events on today.</styled.p>
+              )}
 
-                {events.map((event) => {
-                  return <EventCard key={event.id} event={event} showAvatar />;
-                })}
+              {events.map((event) => {
+                return <EventCard key={event.id} event={event} showAvatar />;
+              })}
 
-                <LinkButton to={`/calendar/week/${today}`} variant="secondary">
-                  See All Events
-                </LinkButton>
-              </Flex>
-            </Card>
-
-            <Card flex={1}>
-              <Flex align="center" gap={2} mb={2}>
-                <RiListOrdered2 />
-                <styled.h1 fontWeight="bold" fontSize="lg">
-                  Top Driver Ratings
-                </styled.h1>
-              </Flex>
-
-              <styled.table w="full">
-                <styled.tbody>
-                  {drivers.map((driver, i) => (
-                    <styled.tr key={i}>
-                      <styled.td textAlign="center" fontFamily="mono">
-                        {i + 1}
-                      </styled.td>
-                      <styled.td px={1}>
-                        <Link to={`/drivers/${driver.driverId}`}>
-                          {driver.firstName} {driver.lastName}
-                        </Link>
-                      </styled.td>
-                      <styled.td textAlign="right" fontFamily="mono">
-                        {driver.elo.toFixed(3)}
-                      </styled.td>
-                      <styled.td textAlign="center">
-                        <styled.img
-                          w={8}
-                          display="inline-block"
-                          src={`/badges/${getDriverRank(
-                            driver.elo,
-                            driver.totalBattles,
-                          )}.png`}
-                          alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
-                        />
-                      </styled.td>
-                    </styled.tr>
-                  ))}
-                </styled.tbody>
-              </styled.table>
-
-              <LinkButton to="/ratings/all" variant="secondary" w="full" mt={4}>
-                See All Driver Ratings
+              <LinkButton to={`/calendar/week/${today}`} variant="secondary">
+                See All Events
               </LinkButton>
-            </Card>
-          </Flex>
-        </Container>
-      </Box>
-    </>
+            </Flex>
+          </Card>
+
+          <Card flex={1}>
+            <Flex align="center" gap={2} mb={2}>
+              <RiListOrdered2 />
+              <styled.h1 fontWeight="bold" fontSize="lg">
+                Top Driver Ratings
+              </styled.h1>
+            </Flex>
+
+            <styled.table w="full">
+              <styled.tbody>
+                {drivers.map((driver, i) => (
+                  <styled.tr key={i}>
+                    <styled.td textAlign="center" fontFamily="mono">
+                      {i + 1}
+                    </styled.td>
+                    <styled.td px={1}>
+                      <Link to={`/drivers/${driver.driverId}`}>
+                        {driver.firstName} {driver.lastName}
+                      </Link>
+                    </styled.td>
+                    <styled.td textAlign="right" fontFamily="mono">
+                      {driver.elo.toFixed(3)}
+                    </styled.td>
+                    <styled.td textAlign="center">
+                      <styled.img
+                        w={8}
+                        display="inline-block"
+                        src={`/badges/${getDriverRank(
+                          driver.elo,
+                          driver.totalBattles,
+                        )}.png`}
+                        alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
+                      />
+                    </styled.td>
+                  </styled.tr>
+                ))}
+              </styled.tbody>
+            </styled.table>
+
+            <LinkButton to="/ratings/all" variant="secondary" w="full" mt={4}>
+              See All Driver Ratings
+            </LinkButton>
+          </Card>
+        </Flex>
+      </Container>
+    </Box>
   );
 };
 

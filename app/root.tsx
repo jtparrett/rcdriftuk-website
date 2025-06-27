@@ -25,6 +25,9 @@ import { Footer } from "./components/Footer";
 import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { EmbedProvider, HiddenEmbed } from "./utils/EmbedContext";
+import { AppProvider } from "./utils/AppContext";
+import { AppNav } from "./components/AppNav";
+import { AppHeader } from "./components/AppHeader";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "https://fonts.cdnfonts.com/css/sf-pro-display" },
@@ -32,6 +35,7 @@ export const links: LinksFunction = () => [
 
 export const loader = (args: LoaderFunctionArgs) =>
   rootAuthLoader(args, async ({ request }) => {
+    const isApp = request.headers.get("User-Agent") === "rcdrift-app";
     const isEmbed = new URL(request.url).searchParams.get("embed") === "true";
     const cookieHeader = request.headers.get("Cookie");
     const cookie = (await userPrefs.parse(cookieHeader)) || {};
@@ -43,6 +47,7 @@ export const loader = (args: LoaderFunctionArgs) =>
       return {
         user,
         isEmbed,
+        isApp,
         hideBanner: cookie.hideBanner,
       };
     }
@@ -50,6 +55,7 @@ export const loader = (args: LoaderFunctionArgs) =>
     return {
       user: null,
       isEmbed,
+      isApp,
       hideBanner: cookie.hideBanner,
     };
   });
@@ -123,7 +129,7 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { hideBanner, isEmbed } = loaderData || {};
+  const { hideBanner, isEmbed, isApp } = loaderData || {};
   const { user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
@@ -150,20 +156,24 @@ function App({
         },
       }}
     >
-      <EmbedProvider value={isEmbed}>
-        <HiddenEmbed>
-          <AnnouncementBanner />
-          {!hideBanner && <CookieBanner />}
-          <Header user={user} />
-        </HiddenEmbed>
+      <AppProvider value={isApp}>
+        <EmbedProvider value={isEmbed}>
+          {isApp && <AppHeader />}
 
-        <Outlet />
-        {!isMap && (
-          <HiddenEmbed>
-            <Footer />
-          </HiddenEmbed>
-        )}
-      </EmbedProvider>
+          {!isEmbed && (
+            <>
+              {!isApp && <AnnouncementBanner />}
+              {!hideBanner && <CookieBanner />}
+              {!isApp && <Header user={user} />}
+            </>
+          )}
+
+          <Outlet />
+
+          {isApp && <AppNav />}
+          {!isMap && !isEmbed && !isApp && <Footer />}
+        </EmbedProvider>
+      </AppProvider>
     </ClerkProvider>
   );
 }

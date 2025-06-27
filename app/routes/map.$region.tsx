@@ -52,7 +52,14 @@ const Page = () => {
   const tracks = useLoaderData<typeof loader>();
 
   return (
-    <Flex h="calc(100dvh - 100px)" flexDir="column">
+    <Flex
+      h={{
+        base: "calc(100dvh - 145px)",
+        md: "calc(100dvh - 100px)",
+      }}
+      overflow="hidden"
+      flexDir="column"
+    >
       <ClientOnly>
         <Map tracks={tracks} />
       </ClientOnly>

@@ -8,38 +8,16 @@ import {
 } from "~/styled-system/jsx";
 import { Link, useLocation, useNavigation } from "react-router";
 import { Button, LinkButton } from "./Button";
-import { format } from "date-fns";
-import {
-  RiAddCircleFill,
-  RiAddLine,
-  RiBook2Line,
-  RiCalendarLine,
-  RiCameraLensLine,
-  RiFlagLine,
-  RiHome2Line,
-  RiListOrdered2,
-  RiLogoutBoxRLine,
-  RiMapPin2Line,
-  RiMenuFill,
-  RiRocketLine,
-  RiSettings3Line,
-  RiShoppingBagLine,
-  RiTicketLine,
-  RiTrophyLine,
-  RiTShirtLine,
-  RiUserLine,
-  RiVipCrown2Line,
-} from "react-icons/ri";
+import { RiAddCircleFill, RiAddLine, RiMenuFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
-import { SignedIn, SignedOut, useAuth } from "@clerk/react-router";
+import { SignedIn, SignedOut } from "@clerk/react-router";
 import type { GetUser } from "~/utils/getUser.server";
-
-const today = format(new Date(), "dd-MM-yy");
+import { Menu, UserMenu } from "./Menu";
 
 export const HEADER_HEIGHT = 64;
 
-function useDelayedLoader() {
+export function useDelayedLoader() {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
@@ -56,56 +34,7 @@ function useDelayedLoader() {
   return isLoading;
 }
 
-const MenuIcon = styled("span", {
-  base: {
-    rounded: "md",
-    bgColor: "rgba(255, 255, 255, 0.2)",
-    w: 7,
-    h: 7,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    shadow: "md",
-  },
-});
-
-const MenuLink = styled(Link, {
-  base: {
-    rounded: "lg",
-    py: 2,
-    pl: 2,
-    display: "flex",
-    gap: 3,
-    alignItems: "center",
-    fontSize: "sm",
-    fontWeight: "semibold",
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    overflow: "hidden",
-    maxW: "full",
-  },
-  variants: {
-    active: {
-      inactive: {
-        _hover: {
-          md: {
-            bgColor: "gray.800",
-          },
-        },
-      },
-      active: {
-        bgColor: "brand.500",
-      },
-    },
-  },
-  defaultVariants: {
-    active: "inactive",
-  },
-});
-
-const Menu = ({ user }: Props) => {
-  const { signOut } = useAuth();
-
+const MenuDropdown = ({ user }: Props) => {
   return (
     <Box
       borderWidth={1}
@@ -189,215 +118,13 @@ const Menu = ({ user }: Props) => {
 
         <Flex minH="full">
           <Flex gap="1px" flexDir="column" flex={1} p={{ base: 2, md: 4 }}>
-            <MenuLink
-              to="/"
-              active={location.pathname === "/" ? "active" : "inactive"}
-            >
-              <MenuIcon>
-                <RiHome2Line />
-              </MenuIcon>
-              Home
-            </MenuLink>
-
-            <MenuLink
-              to="/getting-started"
-              active={
-                location.pathname.startsWith("/getting-started")
-                  ? "active"
-                  : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiRocketLine />
-              </MenuIcon>
-              Getting Started
-            </MenuLink>
-
-            <MenuLink
-              to="/ratings/all"
-              active={
-                location.pathname === "/ratings/all" ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiListOrdered2 />
-              </MenuIcon>
-              Driver Ratings
-            </MenuLink>
-            <MenuLink
-              to="/competitions"
-              active={
-                location.pathname.startsWith("/competitions")
-                  ? "active"
-                  : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiTrophyLine />
-              </MenuIcon>
-              Competitions
-            </MenuLink>
-
-            <MenuLink
-              to="/map/all"
-              active={
-                location.pathname.startsWith("/map") ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiMapPin2Line />
-              </MenuIcon>
-              Drift Map
-            </MenuLink>
-            <MenuLink
-              to="/tracks"
-              active={location.pathname === "/tracks" ? "active" : "inactive"}
-            >
-              <MenuIcon>
-                <RiFlagLine />
-              </MenuIcon>
-              Tracks
-            </MenuLink>
-            <MenuLink
-              to={`/calendar/week/${today}`}
-              active={
-                location.pathname.startsWith("/calendar")
-                  ? "active"
-                  : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiCalendarLine />
-              </MenuIcon>
-              Calendar
-            </MenuLink>
-
-            <MenuLink
-              to="/marketplace"
-              active={
-                location.pathname.startsWith("/marketplace")
-                  ? "active"
-                  : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiShoppingBagLine />
-              </MenuIcon>
-              Marketplace
-            </MenuLink>
-
-            <MenuLink
-              to="/fdr"
-              active={
-                location.pathname.startsWith("/fdr") ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiCameraLensLine />
-              </MenuIcon>
-              FDR Calculator
-            </MenuLink>
-
-            <MenuLink
-              to="/blog"
-              active={
-                location.pathname.startsWith("/blog") ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiBook2Line />
-              </MenuIcon>
-              Insights Blog
-            </MenuLink>
-
-            <MenuLink
-              to="/merch"
-              active={
-                location.pathname.startsWith("/merch") ? "active" : "inactive"
-              }
-            >
-              <MenuIcon>
-                <RiTShirtLine />
-              </MenuIcon>
-              Merch
-            </MenuLink>
+            <Menu />
           </Flex>
 
           <SignedIn>
             <Box w="1px" bgColor="gray.800" />
             <Flex gap="1px" flexDir="column" flex={1} p={{ base: 2, md: 4 }}>
-              {user && (
-                <MenuLink
-                  to={`/tickets`}
-                  active={
-                    location.pathname.startsWith("/tickets")
-                      ? "active"
-                      : "inactive"
-                  }
-                >
-                  <MenuIcon>
-                    <RiTicketLine />
-                  </MenuIcon>
-                  My Tickets
-                </MenuLink>
-              )}
-
-              {user?.driverId && (
-                <MenuLink
-                  to="/drivers/me"
-                  active={
-                    location.pathname.startsWith(`/drivers/${user.driverId}`)
-                      ? "active"
-                      : "inactive"
-                  }
-                >
-                  <MenuIcon>
-                    <RiUserLine />
-                  </MenuIcon>
-                  My Driver Profile
-                </MenuLink>
-              )}
-
-              <MenuLink
-                to="/tournaments"
-                active={
-                  location.pathname.startsWith("/tournaments")
-                    ? "active"
-                    : "inactive"
-                }
-              >
-                <MenuIcon>
-                  <RiVipCrown2Line />
-                </MenuIcon>
-                My Tournaments
-              </MenuLink>
-
-              <MenuLink
-                to="/user/profile"
-                active={
-                  location.pathname.startsWith("/user/profile")
-                    ? "active"
-                    : "inactive"
-                }
-              >
-                <MenuIcon>
-                  <RiSettings3Line />
-                </MenuIcon>
-                Account Settings
-              </MenuLink>
-
-              <MenuLink
-                to="/"
-                onClick={(e) => {
-                  e.preventDefault();
-                  signOut();
-                }}
-              >
-                <MenuIcon>
-                  <RiLogoutBoxRLine />
-                </MenuIcon>
-                Sign Out
-              </MenuLink>
+              <UserMenu />
             </Flex>
           </SignedIn>
         </Flex>
@@ -437,19 +164,23 @@ export const Header = ({ user }: Props) => {
   }, [location.pathname]);
 
   return (
-    <Box
+    <Flex
       pos="sticky"
-      top={0}
-      zIndex={10}
+      top="-135px"
+      zIndex={15}
       bgColor="rgba(12, 12, 12, 0.75)"
       backdropFilter="blur(10px)"
       shadow="2xl"
       borderBottomWidth={1}
       borderColor="gray.900"
       overflow="visible"
-      h="65px"
+      h="200px"
+      mt="-135px"
+      flexDir="column"
+      justifyContent="flex-end"
+      transform="translate3d(0, 0, 0)"
     >
-      <Container maxW={1100} px={4}>
+      <Container maxW={1100} w="full" px={4} h="65px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={2}>
           <Link to="/">
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
@@ -527,8 +258,8 @@ export const Header = ({ user }: Props) => {
           </SignedOut>
         </Flex>
 
-        {menu.isOpen && <Menu user={user} />}
+        {menu.isOpen && <MenuDropdown user={user} />}
       </Container>
-    </Box>
+    </Flex>
   );
 };

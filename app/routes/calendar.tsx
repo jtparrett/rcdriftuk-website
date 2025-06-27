@@ -49,7 +49,17 @@ const CalendarPage = () => {
 
   return (
     <>
-      <Box mb={2} py={2} borderBottomWidth={1} borderColor="gray.900">
+      <Box
+        mb={2}
+        py={2}
+        borderBottomWidth={1}
+        borderColor="gray.900"
+        position="sticky"
+        top="65px"
+        zIndex={10}
+        bgColor="rgba(12, 12, 12, 0.75)"
+        backdropFilter="blur(10px)"
+      >
         <Container px={2} maxW={1100}>
           <Flex gap={2} alignItems="center">
             <Tab
