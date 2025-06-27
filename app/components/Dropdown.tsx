@@ -18,15 +18,18 @@ export const Dropdown = styled("div", {
   },
 });
 
-export const Option = styled(Button, {
+export const Option = styled("button", {
   base: {
     px: 2,
     py: 1,
-    bgColor: "transparent",
-    borderWidth: 0,
     w: "full",
-    justifyContent: "flex-start",
-    rounded: "none",
+    cursor: "pointer",
+    fontSize: "md",
+    fontWeight: "normal",
     textAlign: "left",
+    color: "gray.200",
+    _hover: {
+      bgColor: "gray.700",
+    },
   },
 });

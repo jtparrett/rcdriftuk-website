@@ -74,7 +74,7 @@ export const AddressInput = ({ address, lat, lng, onChange }: Props) => {
           )}
 
           {options.length <= 0 && (
-            <styled.p px={2} py={1} fontSize="sm">
+            <styled.p px={2} py={1}>
               No results found, try a different search
             </styled.p>
           )}
