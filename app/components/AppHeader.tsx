@@ -1,9 +1,9 @@
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { useDelayedLoader } from "./Header";
 import { useLocation, useNavigate } from "react-router";
-import { Button } from "./Button";
 import { RiArrowLeftSLine } from "react-icons/ri";
-import { Regions } from "~/utils/enums";
+import { useScroll, motion, useTransform } from "motion/react";
+import { css } from "~/styled-system/css";
 
 const TAB_ROUTES = [
   "/",
@@ -20,25 +20,47 @@ export const AppHeader = () => {
   const isNavigating = useDelayedLoader();
   const location = useLocation();
   const navigate = useNavigate();
+  const { scrollY } = useScroll();
+
+  const scale = useTransform(scrollY, [0, 84], [1, 0.65]);
+  const height = useTransform(scrollY, [0, 84], [64, 48]);
+  const translateY = useTransform(scrollY, [0, 84], ["0px", "-16px"]);
 
   return (
     <>
-      <Flex
-        pos="fixed"
-        top="-135px"
-        w="full"
-        zIndex={15}
-        bgColor="rgba(12, 12, 12, 0.75)"
-        backdropFilter="blur(10px)"
-        shadow="2xl"
-        borderBottomWidth={1}
-        borderColor="gray.900"
-        flexDir="column"
-        justifyContent="flex-end"
-        h="200px"
-        transform="translate3d(0, 0, 0)"
+      <motion.div
+        className={css({
+          display: "flex",
+          flexDir: "column",
+          justifyContent: "flex-end",
+          h: "200px",
+          pos: "fixed",
+          top: "-135px",
+          w: "full",
+          zIndex: 15,
+          bgColor: "rgba(12, 12, 12, 0.75)",
+          backdropFilter: "blur(10px)",
+          shadow: "2xl",
+          transform: "translate3d(0, 0, 0)",
+          borderBottomWidth: 1,
+          borderColor: "gray.900",
+        })}
+        style={{
+          translateY,
+        }}
       >
-        <Flex h="65px" alignItems="center" px={4} pos="relative">
+        <motion.div
+          className={css({
+            h: "65px",
+            display: "flex",
+            alignItems: "center",
+            px: 4,
+            pos: "relative",
+          })}
+          style={{
+            height,
+          }}
+        >
           {!TAB_ROUTES.some((route) =>
             route.endsWith("*")
               ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
@@ -51,15 +73,23 @@ export const AppHeader = () => {
 
           <Spacer />
 
-          <styled.img
-            w={140}
-            src="/rcdriftuk-26.svg"
-            alt="RC Drift UK"
+          <Box
             pos="absolute"
-            left="50%"
             transform="translate(-50%, -50%)"
             top="50%"
-          />
+            left="50%"
+          >
+            <motion.img
+              className={css({
+                w: 140,
+              })}
+              style={{
+                scale,
+              }}
+              src="/rcdriftuk-26.svg"
+              alt="RC Drift UK"
+            />
+          </Box>
 
           {isNavigating && (
             <Box
@@ -72,8 +102,8 @@ export const AppHeader = () => {
               animation="spin 1s linear infinite"
             />
           )}
-        </Flex>
-      </Flex>
+        </motion.div>
+      </motion.div>
 
       <Box h="65px" w="full" />
     </>
