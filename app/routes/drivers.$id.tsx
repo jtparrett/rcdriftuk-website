@@ -242,25 +242,41 @@ const Page = () => {
       }}
     >
       <Container maxW={800} px={4} py={6}>
-        <Flex>
-          <Spacer />
-
-          {driver && (
-            <Flex alignItems="center" gap={2}>
-              <Box w={12} h={12} perspective="200px">
-                <styled.img
-                  src={`/badges/${rank}.png`}
-                  w="full"
-                  alt={rank}
-                  animation="badge 2s linear infinite"
-                />
-              </Box>
-              <styled.span fontSize="lg" fontWeight="bold">
-                {driver.elo.toFixed(3)}
-              </styled.span>
-            </Flex>
-          )}
-        </Flex>
+        {driver && (
+          <Flex>
+            <Spacer />
+            <Box
+              p={0.5}
+              rounded="full"
+              bg="gray.950"
+              borderWidth={1}
+              borderColor="gray.800"
+              shadow="lg"
+            >
+              <Flex
+                rounded="full"
+                borderWidth={1}
+                borderColor="gray.800"
+                py={1}
+                px={2}
+                alignItems="center"
+                gap={1}
+              >
+                <styled.span fontSize="md" fontWeight="medium" pl={2}>
+                  {driver.elo.toFixed(3)}
+                </styled.span>
+                <Box w={8} h={8} perspective="200px">
+                  <styled.img
+                    src={`/badges/${rank}.png`}
+                    w="full"
+                    alt={rank}
+                    animation="badge 4s linear infinite"
+                  />
+                </Box>
+              </Flex>
+            </Box>
+          </Flex>
+        )}
 
         <Flex textAlign="center" alignItems="center" flexDir="column" pb={12}>
           <Box p={2} rounded="full" bg="rgba(255, 255, 255, 0.1)" mb={4}>
