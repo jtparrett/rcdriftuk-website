@@ -54,7 +54,7 @@ export const AppNav = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Tab to="/" isActive={location.pathname === "/"}>
+          <Tab to="/" isActive={location.pathname === "/"} viewTransition>
             {location.pathname === "/" ? (
               <RiHomeFill size={24} />
             ) : (
@@ -64,10 +64,15 @@ export const AppNav = () => {
           <Tab
             to="/ratings"
             isActive={location.pathname.startsWith("/ratings")}
+            viewTransition
           >
             <RiListOrdered2 size={24} />
           </Tab>
-          <Tab to="/map" isActive={location.pathname.startsWith("/map")}>
+          <Tab
+            to="/map"
+            isActive={location.pathname.startsWith("/map")}
+            viewTransition
+          >
             {location.pathname.startsWith("/map") ? (
               <RiMapPin2Fill size={24} />
             ) : (
@@ -77,6 +82,7 @@ export const AppNav = () => {
           <Tab
             to="/calendar"
             isActive={location.pathname.startsWith("/calendar")}
+            viewTransition
           >
             {location.pathname.startsWith("/calendar") ? (
               <RiCalendarFill size={24} />
@@ -87,6 +93,7 @@ export const AppNav = () => {
           <Tab
             to="/marketplace"
             isActive={location.pathname.startsWith("/marketplace")}
+            viewTransition
           >
             {location.pathname.startsWith("/marketplace") ? (
               <RiShoppingBagFill size={24} />
@@ -97,6 +104,7 @@ export const AppNav = () => {
           <Tab
             to="/user-menu"
             isActive={location.pathname.startsWith("/user-menu")}
+            viewTransition
           >
             {location.pathname.startsWith("/user-menu") ? (
               <RiAccountCircleFill size={24} />

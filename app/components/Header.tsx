@@ -120,7 +120,7 @@ export const Header = ({ user }: Props) => {
     >
       <Container maxW={1100} w="full" px={4} h="65px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={2}>
-          <Link to="/">
+          <Link to="/" viewTransition>
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
           </Link>
 
