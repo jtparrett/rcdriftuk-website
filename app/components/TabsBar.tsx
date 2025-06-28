@@ -1,0 +1,35 @@
+import { motion, useScroll, useTransform } from "motion/react";
+import { css } from "~/styled-system/css";
+import { Box, Container, Flex } from "~/styled-system/jsx";
+import { useIsApp } from "~/utils/AppContext";
+
+export const TabsBar = ({ children }: { children: React.ReactNode }) => {
+  const isApp = useIsApp();
+  const { scrollY } = useScroll();
+  const top = useTransform(scrollY, [0, 84], ["64px", isApp ? "48px" : "64px"]);
+
+  return (
+    <motion.div
+      className={css({
+        borderBottomWidth: 1,
+        borderColor: "gray.900",
+        pos: "sticky",
+        top: "64px",
+        zIndex: 10,
+        bgColor: "rgba(12, 12, 12, 0.75)",
+        backdropFilter: "blur(10px)",
+      })}
+      style={{
+        top,
+      }}
+    >
+      <Container px={2} maxW={1100}>
+        <Box overflowX="auto" w="full">
+          <Flex gap={2} py={2} alignItems="center">
+            {children}
+          </Flex>
+        </Box>
+      </Container>
+    </motion.div>
+  );
+};

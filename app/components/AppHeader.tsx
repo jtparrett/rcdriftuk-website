@@ -35,7 +35,7 @@ export const AppHeader = () => {
           justifyContent: "flex-end",
           h: "200px",
           pos: "fixed",
-          top: "-135px",
+          top: "-136px",
           w: "full",
           zIndex: 15,
           bgColor: "rgba(12, 12, 12, 0.75)",
@@ -51,7 +51,7 @@ export const AppHeader = () => {
       >
         <motion.div
           className={css({
-            h: "65px",
+            h: "64px",
             display: "flex",
             alignItems: "center",
             px: 4,
@@ -105,7 +105,7 @@ export const AppHeader = () => {
         </motion.div>
       </motion.div>
 
-      <Box h="65px" w="full" />
+      <Box h="64px" w="full" />
     </>
   );
 };

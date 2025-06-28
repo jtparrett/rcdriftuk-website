@@ -34,7 +34,7 @@ export const AppNav = () => {
 
   return (
     <>
-      <Box h="calc(65px + var(--spacing-4))" w="full" />
+      <Box h="calc(64px + var(--spacing-4))" w="full" />
       <Flex
         position="fixed"
         bottom="-70px"
@@ -50,7 +50,7 @@ export const AppNav = () => {
       >
         <Flex
           w="full"
-          h="65px"
+          h="64px"
           justifyContent="space-between"
           alignItems="center"
         >

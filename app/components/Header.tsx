@@ -104,7 +104,7 @@ export const Header = ({ user }: Props) => {
   return (
     <Flex
       pos="sticky"
-      top="-135px"
+      top="-136px"
       zIndex={15}
       bgColor="rgba(12, 12, 12, 0.75)"
       backdropFilter="blur(10px)"
@@ -113,12 +113,12 @@ export const Header = ({ user }: Props) => {
       borderColor="gray.900"
       overflow="visible"
       h="200px"
-      mt="-135px"
+      mt="-136px"
       flexDir="column"
       justifyContent="flex-end"
       transform="translate3d(0, 0, 0)"
     >
-      <Container maxW={1100} w="full" px={4} h="65px">
+      <Container maxW={1100} w="full" px={4} h="64px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={2}>
           <Link to="/" viewTransition>
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />

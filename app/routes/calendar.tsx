@@ -3,8 +3,9 @@ import { redirect } from "react-router";
 import { Outlet, useLocation, useParams } from "react-router";
 import { format, isThisWeek, parse } from "date-fns";
 import { Tab } from "~/components/Tab";
-import { Flex, Container, Box } from "~/styled-system/jsx";
+import { Container } from "~/styled-system/jsx";
 import type { Route } from "./+types/calendar";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = ({ params }) => {
   const today = format(new Date(), "dd-MM-yy");
@@ -49,40 +50,26 @@ const CalendarPage = () => {
 
   return (
     <>
-      <Box
-        mb={2}
-        py={2}
-        borderBottomWidth={1}
-        borderColor="gray.900"
-        position="sticky"
-        top="65px"
-        zIndex={10}
-        bgColor="rgba(12, 12, 12, 0.75)"
-        backdropFilter="blur(10px)"
-      >
-        <Container px={2} maxW={1100}>
-          <Flex gap={2} alignItems="center">
-            <Tab
-              isActive={location.pathname.includes("/calendar/day")}
-              to={`/calendar/day/${dateParam}`}
-            >
-              Day
-            </Tab>
-            <Tab
-              isActive={location.pathname.includes("/calendar/week")}
-              to={`/calendar/week/${dateParam}`}
-            >
-              Week
-            </Tab>
-            <Tab
-              isActive={location.pathname.includes("/calendar/month")}
-              to={`/calendar/month/${dateParam}`}
-            >
-              Month
-            </Tab>
-          </Flex>
-        </Container>
-      </Box>
+      <TabsBar>
+        <Tab
+          isActive={location.pathname.includes("/calendar/day")}
+          to={`/calendar/day/${dateParam}`}
+        >
+          Day
+        </Tab>
+        <Tab
+          isActive={location.pathname.includes("/calendar/week")}
+          to={`/calendar/week/${dateParam}`}
+        >
+          Week
+        </Tab>
+        <Tab
+          isActive={location.pathname.includes("/calendar/month")}
+          to={`/calendar/month/${dateParam}`}
+        >
+          Month
+        </Tab>
+      </TabsBar>
 
       <Container px={2} pb={100} maxW={1100}>
         <Outlet />

@@ -3,7 +3,7 @@ import type { Route } from "./+types/2024";
 import { redirect } from "react-router";
 import { Outlet, useLocation } from "react-router";
 import { Tab } from "~/components/Tab";
-import { Box, Flex, Container } from "~/styled-system/jsx";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -34,27 +34,23 @@ const Page = () => {
 
   return (
     <>
-      <Box borderBottomWidth={1} borderColor="gray.800">
-        <Container px={2} maxW={1100}>
-          <Flex gap={2} py={2} alignItems="center">
-            <Tab
-              to="/2024/schedule"
-              isActive={
-                location.pathname === "/2024/schedule" ||
-                location.pathname === "/2024/schedule/"
-              }
-            >
-              Schedule
-            </Tab>
-            <Tab
-              to="/2024/standings"
-              isActive={location.pathname.startsWith("/2024/standings")}
-            >
-              Standings
-            </Tab>
-          </Flex>
-        </Container>
-      </Box>
+      <TabsBar>
+        <Tab
+          to="/2024/schedule"
+          isActive={
+            location.pathname === "/2024/schedule" ||
+            location.pathname === "/2024/schedule/"
+          }
+        >
+          Schedule
+        </Tab>
+        <Tab
+          to="/2024/standings"
+          isActive={location.pathname.startsWith("/2024/standings")}
+        >
+          Standings
+        </Tab>
+      </TabsBar>
 
       <Outlet />
     </>
