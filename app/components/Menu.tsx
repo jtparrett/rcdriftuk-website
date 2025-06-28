@@ -17,7 +17,7 @@ import {
   RiUserLine,
   RiVipCrown2Line,
 } from "react-icons/ri";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Flex, styled } from "~/styled-system/jsx";
 
 export const MenuIcon = styled("span", {
@@ -68,6 +68,8 @@ export const MenuLink = styled(Link, {
 });
 
 export const Menu = () => {
+  const location = useLocation();
+
   return (
     <>
       <MenuLink
@@ -192,6 +194,7 @@ export const Menu = () => {
 
 export const UserMenu = () => {
   const { signOut } = useAuth();
+  const location = useLocation();
 
   return (
     <>

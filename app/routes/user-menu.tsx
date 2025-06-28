@@ -5,6 +5,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import { UserMenu } from "~/components/Menu";
+import { UserTracks } from "~/components/UserTracks";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUser } from "~/utils/getUser.server";
@@ -28,16 +29,8 @@ const UserMenuPage = () => {
   const { user } = useLoaderData<typeof loader>();
 
   return (
-    <Box px={2}>
-      <Flex
-        alignItems="center"
-        gap={4}
-        p={2}
-        mx={2}
-        my={4}
-        bgColor="gray.800"
-        rounded="xl"
-      >
+    <Box p={4}>
+      <Flex alignItems="center" gap={4} p={2} bgColor="gray.800" rounded="xl">
         <Link to={`/drivers/${user.driverId}`}>
           <styled.div
             w={14}
@@ -60,6 +53,10 @@ const UserMenuPage = () => {
           {user.firstName} {user.lastName}
         </styled.h1>
       </Flex>
+
+      <UserTracks user={user} />
+
+      <Box h={4} />
 
       <UserMenu />
     </Box>
