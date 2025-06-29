@@ -74,6 +74,7 @@ model Tournaments {
   fullInclusion       Boolean             @default(false)
   region              Regions?
   rated               Boolean             @default(false)
+  tracks              TrackTournaments[]
 }
 
 model TournamentDrivers {
@@ -163,8 +164,8 @@ model TournamentBattleVotes {
 }
 
 model Tracks {
-  createdAt   DateTime      @default(now())
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt   DateTime           @default(now())
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
   image       String
@@ -173,12 +174,13 @@ model Tracks {
   lng         Float
   types       TrackTypes[]
   url         String
-  slug        String        @unique
+  slug        String             @unique
   events      Events[]
   Products    Products[]
   Owners      TrackOwners[]
-  status      TrackStatus   @default(PENDING)
+  status      TrackStatus        @default(PENDING)
   address     String?
+  tournaments TrackTournaments[]
 }
 
 model TrackOwners {
@@ -188,6 +190,15 @@ model TrackOwners {
   user    Users  @relation(fields: [userId], references: [id])
 
   @@unique([trackId, userId])
+}
+
+model TrackTournaments {
+  trackId      String      @db.Uuid
+  tournamentId String      @db.Uuid
+  track        Tracks      @relation(fields: [trackId], references: [id])
+  tournament   Tournaments @relation(fields: [tournamentId], references: [id])
+
+  @@unique([trackId, tournamentId])
 }
 
 model Users {
