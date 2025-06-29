@@ -4,8 +4,8 @@ import { Box, Container, Flex } from "~/styled-system/jsx";
 import { Outlet, useNavigate, useParams } from "react-router";
 import type { Tracks } from "@prisma/client";
 import { Regions } from "~/utils/enums";
-import { LinkButton } from "./Button";
 import { oneOf } from "~/utils/oneOf";
+import { Tab } from "./Tab";
 
 export type Values<T> = T[keyof T];
 
@@ -166,18 +166,11 @@ export const Map = ({ tracks }: Props) => {
     <>
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} w="full" maxW={1100} overflowX="auto">
-          <Flex gap={0.5} py={2}>
+          <Flex gap="1px" py={2}>
             {Object.values(Regions).map((item) => (
-              <LinkButton
-                key={item}
-                px={3}
-                flex="none"
-                rounded="lg"
-                variant={item === region ? "secondary" : "ghost"}
-                to={`/map/${item}`}
-              >
+              <Tab key={item} isActive={item === region} to={`/map/${item}`}>
                 {item}
-              </LinkButton>
+              </Tab>
             ))}
           </Flex>
         </Container>
