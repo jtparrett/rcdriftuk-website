@@ -26,6 +26,16 @@ export const getUserOwnedTrackBySlug = async (slug: string, userId: string) => {
       url: true,
       lat: true,
       lng: true,
+      tournaments: {
+        select: {
+          tournament: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 

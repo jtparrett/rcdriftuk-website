@@ -45,6 +45,7 @@ import {
 import type { Route } from "./+types/tournaments.$id";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
+import { Tab } from "~/components/Tab";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -313,46 +314,37 @@ const TournamentPage = () => {
                   flexDir={{ base: "column", sm: "row" }}
                   gap={1}
                   overflow="auto"
+                  flexWrap="wrap"
                 >
-                  <Flex
-                    bgColor="gray.900"
-                    rounded="full"
-                    gap={1}
-                    p={1}
-                    w="fit-content"
-                  >
-                    <LinkButton
+                  <Flex gap={0.5} w="fit-content">
+                    <Tab
                       to={`/tournaments/${tournament.id}/overview`}
-                      size="xs"
-                      variant={isOverviewTab ? "secondary" : "ghost"}
+                      isActive={isOverviewTab}
                     >
                       Overview
-                    </LinkButton>
+                    </Tab>
                     {tournament.qualifyingLaps > 0 && (
-                      <LinkButton
+                      <Tab
                         to={`/tournaments/${tournament.id}/qualifying`}
-                        variant={isQualifyingTab ? "secondary" : "ghost"}
-                        size="xs"
+                        isActive={isQualifyingTab}
                       >
                         Qualifying
-                      </LinkButton>
+                      </Tab>
                     )}
-                    <LinkButton
+                    <Tab
                       to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-                      variant={isBattlesTab ? "secondary" : "ghost"}
-                      size="xs"
+                      isActive={isBattlesTab}
                     >
                       Battles
-                    </LinkButton>
+                    </Tab>
                     {(tournament.state === TournamentsState.END ||
                       tournament.format === TournamentsFormat.DRIFT_WARS) && (
-                      <LinkButton
+                      <Tab
                         to={`/tournaments/${tournament.id}/standings`}
-                        variant={isStandingsTab ? "secondary" : "ghost"}
-                        size="xs"
+                        isActive={isStandingsTab}
                       >
                         Standings
-                      </LinkButton>
+                      </Tab>
                     )}
                   </Flex>
 

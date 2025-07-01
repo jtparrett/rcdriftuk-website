@@ -126,7 +126,7 @@ const TrackPage = () => {
                   w="full"
                   mb={2}
                   size="sm"
-                  to={`/edit-track/${track?.slug}`}
+                  to={`/edit/track/${track?.slug}`}
                 >
                   Edit Track <RiEditCircleFill />
                 </LinkButton>
@@ -134,7 +134,7 @@ const TrackPage = () => {
                   variant="outline"
                   w="full"
                   size="sm"
-                  to={`/create-event/${track?.slug}`}
+                  to={`/create/event/${track?.slug}`}
                 >
                   Create Event <RiAddCircleFill />
                 </LinkButton>

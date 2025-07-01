@@ -23,5 +23,6 @@ export const getUsers = async () => {
       },
     ],
   });
+
   return users;
 };
