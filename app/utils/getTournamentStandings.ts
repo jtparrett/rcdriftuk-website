@@ -58,8 +58,8 @@ export const getTournamentStandings = (
 
     if (leftDriver && !leftDriver.isBye) {
       // Process left driver
-      if (!driverMap.has(leftDriver.id)) {
-        driverMap.set(leftDriver.id, {
+      if (!driverMap.has(leftDriver.user.driverId)) {
+        driverMap.set(leftDriver.user.driverId, {
           id: leftDriver.id,
           driverId: leftDriver.user.driverId,
           firstName: leftDriver.user.firstName,
@@ -70,7 +70,7 @@ export const getTournamentStandings = (
           image: leftDriver.user.image,
         });
       } else {
-        const driver = driverMap.get(leftDriver.id);
+        const driver = driverMap.get(leftDriver.user.driverId);
         if (driver) {
           driver.battleCount++;
           if (battle.winnerId === leftDriver.id) {
@@ -82,8 +82,8 @@ export const getTournamentStandings = (
 
     if (rightDriver && !rightDriver.isBye) {
       // Process right driver
-      if (!driverMap.has(rightDriver.id)) {
-        driverMap.set(rightDriver.id, {
+      if (!driverMap.has(rightDriver.user.driverId)) {
+        driverMap.set(rightDriver.user.driverId, {
           id: rightDriver.id,
           driverId: rightDriver.user.driverId,
           firstName: rightDriver.user.firstName,
@@ -94,7 +94,7 @@ export const getTournamentStandings = (
           image: rightDriver.user.image,
         });
       } else {
-        const driver = driverMap.get(rightDriver.id);
+        const driver = driverMap.get(rightDriver.user.driverId);
         if (driver) {
           driver.battleCount++;
           if (battle.winnerId === rightDriver.id) {
