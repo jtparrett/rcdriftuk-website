@@ -26,7 +26,7 @@ export const meta: Route.MetaFunction = ({ params }) => {
       property: "og:image",
       content: thisWeek
         ? "https://rcdrift.uk/thisweek-og-image.png"
-        : "https://rcdrift.uk/rcdriftuk.svg",
+        : "https://rcdrift.uk/og-image.jpg",
     },
   ];
 };

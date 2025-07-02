@@ -89,7 +89,7 @@ export const meta: Route.MetaFunction = () => {
     { name: "description", content: "Welcome to RCDrift.uk" },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/rcdriftuk-logo.jpg",
+      content: "https://rcdrift.uk/og-image.jpg",
     },
   ];
 };
