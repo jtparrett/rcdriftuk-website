@@ -141,10 +141,9 @@ export default defineConfig({
       color: "white",
       backgroundColor: "black",
       fontFamily: "body",
-      // scrollBehavior: "smooth",
       minH: "100dvh",
-      WebkitOverflowScrolling: "touch",
       overflowScrolling: "touch",
+      userSelect: "none",
     },
   },
 });
