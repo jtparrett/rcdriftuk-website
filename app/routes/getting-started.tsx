@@ -202,7 +202,7 @@ const GettingStartedPage = () => {
               <P>
                 <STRONG>Visit the RCDrift.uk map:</STRONG> Our website has a
                 comprehensive list of all the RC drifting events, tracks, clubs,
-                and shops across the UK.
+                and shops across the world.
               </P>
 
               <P>

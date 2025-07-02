@@ -20,10 +20,10 @@ export const meta: Route.MetaFunction = () => {
     {
       title: `RC Drift UK | Driver Ratings`,
       description:
-        "RC Drift UK Ratings, see where you rank amoungst some of the best drivers in the UK.",
+        "Global RC Drift Driver Ratings, see where you rank amoungst some of the best drivers in the world.",
       "og:title": "RC Drift UK | Driver Ratings",
       "og:description":
-        "RC Drift UK Ratings, see where you rank amoungst some of the best drivers in the UK.",
+        "Global RC Drift Driver Ratings, see where you rank amoungst some of the best drivers in the world.",
     },
   ];
 };

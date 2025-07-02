@@ -13,7 +13,8 @@ export const meta: Route.MetaFunction = () => {
     { title: `RC Drift UK | Tracks` },
     {
       name: "description",
-      content: "Here you can find a list of all the tracks from across the UK.",
+      content:
+        "Here you can find a list of all the tracks from across the world.",
     },
   ];
 };
@@ -49,7 +50,7 @@ const TracksPage = () => {
               </styled.h1>
               <styled.p color="gray.400" maxW={400}>
                 Here you can find a list of all the tracks, clubs and shops from
-                across the UK.
+                across the world.
               </styled.p>
             </Box>
 

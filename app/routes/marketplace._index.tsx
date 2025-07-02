@@ -17,10 +17,10 @@ export const meta: Route.MetaFunction = () => {
     {
       title: `RC Drift UK | Marketplace`,
       description:
-        "We've scraped shops from across the UK to bring you a comprehensive parts marketplace.",
+        "We've scraped shops from across the world to bring you a comprehensive parts marketplace.",
       "og:title": "RC Drift UK | Marketplace",
       "og:description":
-        "We've scraped shops from across the UK to bring you a comprehensive parts marketplace.",
+        "We've scraped shops from across the world to bring you a comprehensive parts marketplace.",
     },
   ];
 };

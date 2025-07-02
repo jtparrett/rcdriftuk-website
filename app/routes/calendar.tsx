@@ -19,7 +19,8 @@ export const meta: Route.MetaFunction = ({ params }) => {
     { title: "RC Drift UK | Calendar" },
     {
       name: "description",
-      content: "RCDrift.uk Calendar. All the events from across the UK.",
+      content:
+        "All of the RC Drifting events from across the world in one calendar.",
     },
     {
       property: "og:image",
