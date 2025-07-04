@@ -37,7 +37,7 @@ export const AppNav = () => {
       <Box h="calc(64px + var(--spacing-4))" w="full" />
       <Flex
         position="fixed"
-        bottom="calc(-100px - env(safe-area-inset-bottom))"
+        bottom={0}
         left={0}
         right={0}
         borderTopWidth={1}
@@ -45,7 +45,7 @@ export const AppNav = () => {
         zIndex={15}
         bgColor="rgba(12, 12, 12, 0.75)"
         backdropFilter="blur(10px)"
-        pb="100px"
+        pb="env(safe-area-inset-bottom)"
         px={4}
       >
         <Flex
