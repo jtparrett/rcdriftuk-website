@@ -30,13 +30,10 @@ export const AppHeader = () => {
     <>
       <motion.div
         className={css({
-          display: "flex",
-          flexDir: "column",
-          justifyContent: "flex-end",
-          h: "200px",
           pos: "fixed",
-          top: "-136px",
+          top: 0,
           w: "full",
+          pt: "env(safe-area-inset-top)",
           zIndex: 15,
           bgColor: "rgba(12, 12, 12, 0.75)",
           backdropFilter: "blur(10px)",
