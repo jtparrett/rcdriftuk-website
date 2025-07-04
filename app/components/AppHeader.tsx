@@ -24,7 +24,6 @@ export const AppHeader = () => {
 
   const scale = useTransform(scrollY, [0, 84], [1, 0.65]);
   const height = useTransform(scrollY, [0, 84], [64, 48]);
-  const translateY = useTransform(scrollY, [0, 84], ["0px", "-16px"]);
 
   return (
     <>
@@ -42,9 +41,6 @@ export const AppHeader = () => {
           borderBottomWidth: 1,
           borderColor: "gray.900",
         })}
-        style={{
-          translateY,
-        }}
       >
         <motion.div
           className={css({
@@ -102,7 +98,7 @@ export const AppHeader = () => {
         </motion.div>
       </motion.div>
 
-      <Box h="64px" w="full" />
+      <Box h="calc(72px + env(safe-area-inset-top))" w="full" />
     </>
   );
 };
