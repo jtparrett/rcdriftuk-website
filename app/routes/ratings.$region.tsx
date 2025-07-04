@@ -14,6 +14,7 @@ import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/ratings.$region";
 import { Tab } from "~/components/Tab";
 import { z } from "zod";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -280,114 +281,90 @@ const RatingsPage = () => {
   const { drivers, region } = useLoaderData<LoaderData>();
 
   return (
-    <Box
-      pos="relative"
-      zIndex={1}
-      _after={{
-        content: '""',
-        pos: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        h: "100dvh",
-        bgImage: "url(/dot-bg.svg)",
-        bgSize: "16px",
-        bgPosition: "center",
-        bgRepeat: "repeat",
-        zIndex: -2,
-      }}
-      _before={{
-        content: '""',
-        pos: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        h: "100dvh",
-        bgGradient: "to-t",
-        gradientFrom: "black",
-        gradientTo: "rgba(12, 12, 12, 0)",
-        zIndex: -1,
-      }}
-    >
-      <Container pb={12} px={4} pt={2} maxW={800}>
-        <Box textAlign="center" py={8} w="full">
-          <styled.h1
-            fontSize={{ base: "4xl", md: "5xl" }}
-            fontWeight="extrabold"
-          >
-            Driver Ratings
-          </styled.h1>
-
-          <styled.p
-            mb={4}
-            color="gray.500"
-            textWrap="balance"
-            maxW={300}
-            mx="auto"
-          >
-            Discover the top rated drivers from across the world.
-          </styled.p>
-        </Box>
-
-        <Flex
-          gap={4}
-          alignItems={{ md: "flex-start" }}
-          flexDirection="column"
-          w="full"
-        >
-          <RankSection />
-
-          <Box
-            p={1}
-            rounded="2xl"
-            borderWidth={1}
-            borderColor="gray.900"
-            w="full"
-            bgColor="black"
-          >
-            <Box
-              borderWidth={1}
-              borderColor="gray.900"
-              rounded="xl"
-              bgColor="gray.950"
-              w="full"
-              overflow="hidden"
+    <>
+      <TabsBar>
+        {Object.values(Regions).map((option) => {
+          return (
+            <Tab
+              key={option}
+              to={`/ratings/${option.toLowerCase()}`}
+              isActive={option === region}
             >
-              <Box overflow="auto">
-                <Flex gap={2} alignItems="center" p={4}>
-                  {Object.values(Regions).map((option) => {
-                    return (
-                      <Tab
-                        key={option}
-                        to={`/ratings/${option.toLowerCase()}`}
-                        isActive={option === region}
-                      >
-                        {option}
-                      </Tab>
-                    );
-                  })}
-                </Flex>
-              </Box>
+              {option}
+            </Tab>
+          );
+        })}
+      </TabsBar>
+      <Box
+        pos="relative"
+        zIndex={1}
+        _after={{
+          content: '""',
+          pos: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          h: "100dvh",
+          bgImage: "url(/dot-bg.svg)",
+          bgSize: "16px",
+          bgPosition: "center",
+          bgRepeat: "repeat",
+          zIndex: -2,
+        }}
+        _before={{
+          content: '""',
+          pos: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          h: "100dvh",
+          bgGradient: "to-t",
+          gradientFrom: "black",
+          gradientTo: "rgba(12, 12, 12, 0)",
+          zIndex: -1,
+        }}
+      >
+        <Container pb={12} px={2} pt={2} maxW={800}>
+          <Box textAlign="center" py={8} w="full">
+            <styled.h1
+              fontSize={{ base: "4xl", md: "5xl" }}
+              fontWeight="extrabold"
+            >
+              Driver Ratings
+            </styled.h1>
 
-              <Flex flexDirection="column" gap={2} px={4} pb={4}>
-                {drivers
-                  .filter((driver) => driver.driverId !== 0)
-                  .map((driver, i) => {
-                    return (
-                      <Row
-                        key={i}
-                        driver={driver}
-                        rank={i + 1}
-                        region={region}
-                      />
-                    );
-                  })}
-              </Flex>
-            </Box>
+            <styled.p
+              mb={4}
+              color="gray.500"
+              textWrap="balance"
+              maxW={300}
+              mx="auto"
+            >
+              Discover the top rated drivers from across the world.
+            </styled.p>
           </Box>
-        </Flex>
-      </Container>
-    </Box>
+
+          <Flex
+            gap={4}
+            alignItems={{ md: "flex-start" }}
+            flexDirection="column"
+            w="full"
+          >
+            <RankSection />
+
+            <Flex flexDirection="column" gap={2} w="full">
+              {drivers
+                .filter((driver) => driver.driverId !== 0)
+                .map((driver, i) => {
+                  return (
+                    <Row key={i} driver={driver} rank={i + 1} region={region} />
+                  );
+                })}
+            </Flex>
+          </Flex>
+        </Container>
+      </Box>
+    </>
   );
 };
 
