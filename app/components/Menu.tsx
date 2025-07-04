@@ -18,7 +18,7 @@ import {
   RiVipCrown2Line,
 } from "react-icons/ri";
 import { Link, useLocation } from "react-router";
-import { Flex, styled } from "~/styled-system/jsx";
+import { styled } from "~/styled-system/jsx";
 
 export const MenuIcon = styled("span", {
   base: {
@@ -73,13 +73,13 @@ export const Menu = () => {
   return (
     <>
       <MenuLink
-        to="/"
-        active={location.pathname === "/" ? "active" : "inactive"}
+        to="/feed"
+        active={location.pathname === "/feed" ? "active" : "inactive"}
       >
         <MenuIcon>
           <RiHomeLine />
         </MenuIcon>
-        Home
+        Home Feed
       </MenuLink>
 
       <MenuLink
@@ -245,7 +245,9 @@ export const UserMenu = () => {
         to="/"
         onClick={(e) => {
           e.preventDefault();
-          signOut();
+          signOut({
+            redirectUrl: "/sign-in",
+          });
         }}
       >
         <MenuIcon>

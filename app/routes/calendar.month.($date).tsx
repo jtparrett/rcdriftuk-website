@@ -111,7 +111,11 @@ const Page = () => {
                 bgColor="gray.800"
                 py={1}
               >
-                <styled.h3 whiteSpace="nowrap" fontWeight="semibold">
+                <styled.h3
+                  whiteSpace="nowrap"
+                  fontWeight="medium"
+                  fontSize={{ base: "xs", md: "sm" }}
+                >
                   {format(day, "E do")}
                 </styled.h3>
               </Box>

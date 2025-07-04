@@ -63,3 +63,9 @@
     width: 980px !important;
   }
 }
+
+@media (max-height: 700px) {
+  .app-nav {
+    display: none !important;
+  }
+}

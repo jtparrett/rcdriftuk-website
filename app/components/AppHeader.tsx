@@ -6,7 +6,7 @@ import { useScroll, motion, useTransform } from "motion/react";
 import { css } from "~/styled-system/css";
 
 const TAB_ROUTES = [
-  "/",
+  "/feed",
   "/ratings/*",
   "/map/*",
   "/calendar/*",

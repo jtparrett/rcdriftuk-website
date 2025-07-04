@@ -1,6 +1,8 @@
 import { RiLink } from "react-icons/ri";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { styled } from "~/styled-system/jsx";
+import rehypeRaw from "rehype-raw";
 
 interface Props {
   children?: string | null;
@@ -9,10 +11,12 @@ interface Props {
 export const Markdown = ({ children }: Props) => {
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
       components={{
         p({ children }) {
           return (
-            <styled.p color="gray.400" whiteSpace="pre-line" mb={4}>
+            <styled.p color="gray.300" whiteSpace="pre-line" mb={4}>
               {children}
             </styled.p>
           );
@@ -27,14 +31,14 @@ export const Markdown = ({ children }: Props) => {
               color="brand.500"
               href={href}
               target="_blank"
-              fontWeight="semibold"
+              fontWeight="medium"
             >
               {children}
               <RiLink />
             </styled.a>
           );
         },
-        hr({ children }) {
+        hr() {
           return <styled.hr borderColor="gray.800" my={6} />;
         },
         h1({ children }) {
@@ -60,7 +64,7 @@ export const Markdown = ({ children }: Props) => {
         },
         ul({ children }) {
           return (
-            <styled.ul color="gray.400" whiteSpace="pre-line" lineHeight={1}>
+            <styled.ul color="gray.300" whiteSpace="pre-line" lineHeight={1}>
               {children}
             </styled.ul>
           );
@@ -68,13 +72,13 @@ export const Markdown = ({ children }: Props) => {
         li({ children }) {
           return (
             <styled.li
-              color="gray.400"
+              color="gray.300"
               lineHeight={1.5}
               _before={{
                 content: '""',
                 display: "inline-block",
-                width: 2,
-                height: 2,
+                width: 1,
+                height: 1,
                 bgColor: "gray.500",
                 borderRadius: "full",
                 verticalAlign: "middle",
@@ -88,7 +92,7 @@ export const Markdown = ({ children }: Props) => {
         blockquote({ children }) {
           return (
             <styled.blockquote
-              color="gray.400"
+              color="gray.300"
               whiteSpace="pre-line"
               borderLeftWidth={4}
               borderLeftColor="gray.800"

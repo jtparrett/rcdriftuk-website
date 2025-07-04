@@ -22,10 +22,11 @@ const CalendarMonthsPage = () => {
 
   return (
     <>
-      <Flex gap={2}>
-        <styled.h1 fontWeight="bold" alignSelf="center">
+      <Flex gap={1}>
+        <styled.h1 fontWeight="medium" alignSelf="center" fontSize="sm">
           {format(date, "MMMM, yyyy")}
         </styled.h1>
+
         <Spacer />
 
         <LinkButton

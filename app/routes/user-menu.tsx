@@ -15,7 +15,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    throw redirect("/sign-in");
+    throw redirect("/sign-in?redirect=/feed");
   }
 
   const user = await getUser(userId);
@@ -29,12 +29,21 @@ const UserMenuPage = () => {
   const { user } = useLoaderData<typeof loader>();
 
   return (
-    <Box p={4}>
-      <Flex alignItems="center" gap={4} p={2} bgColor="gray.800" rounded="xl">
+    <Box p={2}>
+      <Flex
+        alignItems="center"
+        gap={4}
+        py={3}
+        px={4}
+        bgColor="gray.900"
+        rounded="xl"
+        borderWidth={1}
+        borderColor="gray.800"
+      >
         <Link to={`/drivers/${user.driverId}`}>
           <styled.div
-            w={14}
-            h={14}
+            w={10}
+            h={10}
             rounded="full"
             overflow="hidden"
             borderWidth={1}

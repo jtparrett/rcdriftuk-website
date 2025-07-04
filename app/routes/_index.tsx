@@ -157,7 +157,7 @@ const Page = () => {
                 className={css({
                   mt: 4,
                   fontWeight: "medium",
-                  fontSize: { base: "4xl", md: "7xl" },
+                  fontSize: { base: "5xl", md: "7xl" },
                   lineHeight: 1.1,
                   textWrap: "balance",
                   maxW: 700,
@@ -173,7 +173,7 @@ const Page = () => {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5 }}
               >
-                Your Online Home
+                Your online home
                 <br /> for RC Drifting
               </motion.h1>
               <motion.p

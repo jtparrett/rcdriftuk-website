@@ -53,8 +53,8 @@ const CalendarDaysPage = () => {
 
   return (
     <>
-      <Flex gap={2}>
-        <styled.h1 fontWeight="bold" alignSelf="flex-end">
+      <Flex gap={1}>
+        <styled.h1 fontWeight="medium" alignSelf="center" fontSize="sm">
           {format(date, "EEEE do MMMM, yyyy")}
         </styled.h1>
         <Spacer />

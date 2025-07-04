@@ -39,6 +39,8 @@
     "react-markdown": "^10.1.0",
     "react-router": "^7.6.2",
     "recharts": "^2.15.3",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "resend": "^4.1.1",
     "sharp": "^0.34.1",
     "slugify": "^1.6.6",

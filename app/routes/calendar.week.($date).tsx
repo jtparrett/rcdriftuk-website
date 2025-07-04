@@ -72,11 +72,13 @@ const CalendarWeeksPage = () => {
 
   return (
     <Box>
-      <Flex gap={2}>
-        <styled.h1 fontWeight="bold" alignSelf="center">
+      <Flex gap={1}>
+        <styled.h1 fontWeight="medium" alignSelf="center" fontSize="sm">
           {format(startWeekDate, "do")}-{format(endWeekDate, "do MMMM, yyyy")}
         </styled.h1>
+
         <Spacer />
+
         <LinkButton
           size="sm"
           variant="secondary"

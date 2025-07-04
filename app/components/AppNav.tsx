@@ -47,6 +47,7 @@ export const AppNav = () => {
         backdropFilter="blur(10px)"
         pb="env(safe-area-inset-bottom)"
         px={4}
+        className="app-nav"
       >
         <Flex
           w="full"
@@ -54,8 +55,12 @@ export const AppNav = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Tab to="/" isActive={location.pathname === "/"} viewTransition>
-            {location.pathname === "/" ? (
+          <Tab
+            to="/feed"
+            isActive={location.pathname === "/feed"}
+            viewTransition
+          >
+            {location.pathname === "/feed" ? (
               <RiHomeFill size={24} />
             ) : (
               <RiHomeLine size={24} />
