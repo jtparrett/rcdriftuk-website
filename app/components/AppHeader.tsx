@@ -98,7 +98,7 @@ export const AppHeader = () => {
         </motion.div>
       </motion.div>
 
-      <Box h="calc(72px + env(safe-area-inset-top))" w="full" />
+      <Box h="calc(64px + env(safe-area-inset-top))" w="full" />
     </>
   );
 };

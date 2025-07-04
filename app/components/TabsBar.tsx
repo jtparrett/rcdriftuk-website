@@ -6,7 +6,11 @@ import { useIsApp } from "~/utils/AppContext";
 export const TabsBar = ({ children }: { children: React.ReactNode }) => {
   const isApp = useIsApp();
   const { scrollY } = useScroll();
-  const top = useTransform(scrollY, [0, 84], ["64px", isApp ? "48px" : "64px"]);
+  const translateY = useTransform(
+    scrollY,
+    [0, 84],
+    ["0px", isApp ? "-16px" : "0px"],
+  );
 
   return (
     <motion.div
@@ -14,13 +18,13 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
         borderBottomWidth: 1,
         borderColor: "gray.900",
         pos: "sticky",
-        top: "64px",
+        top: "calc(64px + env(safe-area-inset-top))",
         zIndex: 10,
         bgColor: "rgba(12, 12, 12, 0.75)",
         backdropFilter: "blur(10px)",
       })}
       style={{
-        top,
+        translateY,
       }}
     >
       <Container px={2} maxW={1100}>

@@ -34,7 +34,7 @@ export const AppNav = () => {
 
   return (
     <>
-      <Box h="calc(72px + env(safe-area-inset-top))" w="full" />
+      <Box h="calc(64px + env(safe-area-inset-bottom))" w="full" />
       <Flex
         position="fixed"
         bottom={0}

@@ -54,7 +54,7 @@ const Page = () => {
   return (
     <Flex
       h={{
-        base: "calc(100dvh - 145px)",
+        base: "calc(100dvh - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 128px)",
         md: "calc(100dvh - 100px)",
       }}
       overflow="hidden"
