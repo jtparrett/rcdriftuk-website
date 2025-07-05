@@ -10,9 +10,11 @@ export const Textarea = styled("textarea", {
     rounded: "lg",
     color: "white",
     w: "full",
-    minH: "100px",
+    h: "0",
+    minH: "84px",
     resize: "vertical",
     outline: "none",
     maxH: "240px",
+    display: "block",
   },
 });

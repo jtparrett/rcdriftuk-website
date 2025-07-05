@@ -20,6 +20,7 @@
     "@react-router/node": "^7.6.2",
     "@react-router/serve": "^7.6.2",
     "@shopify/storefront-api-client": "^1.0.5",
+    "@tanstack/react-query": "^5.81.5",
     "@vercel/blob": "^1.0.0",
     "ably": "^2.9.0",
     "calendar-link": "^2.8.0",

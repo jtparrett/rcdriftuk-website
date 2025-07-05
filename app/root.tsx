@@ -24,10 +24,12 @@ import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
 import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { EmbedProvider, HiddenEmbed } from "./utils/EmbedContext";
+import { EmbedProvider } from "./utils/EmbedContext";
 import { AppProvider } from "./utils/AppContext";
 import { AppNav } from "./components/AppNav";
 import { AppHeader } from "./components/AppHeader";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./utils/queryClient";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "https://fonts.cdnfonts.com/css/sf-pro-display" },
@@ -153,24 +155,26 @@ function App({
         },
       }}
     >
-      <AppProvider value={isApp}>
-        <EmbedProvider value={isEmbed}>
-          {isApp && <AppHeader />}
+      <QueryClientProvider client={queryClient}>
+        <AppProvider value={isApp}>
+          <EmbedProvider value={isEmbed}>
+            {isApp && <AppHeader />}
 
-          {!isEmbed && (
-            <>
-              {!isApp && <AnnouncementBanner />}
-              {!hideBanner && !isApp && <CookieBanner />}
-              {!isApp && <Header user={user} />}
-            </>
-          )}
+            {!isEmbed && (
+              <>
+                {!isApp && <AnnouncementBanner />}
+                {!hideBanner && !isApp && <CookieBanner />}
+                {!isApp && <Header user={user} />}
+              </>
+            )}
 
-          <Outlet />
+            <Outlet />
 
-          {isApp && <AppNav />}
-          {!isMap && !isEmbed && !isApp && <Footer />}
-        </EmbedProvider>
-      </AppProvider>
+            {isApp && <AppNav />}
+            {!isMap && !isEmbed && !isApp && <Footer />}
+          </EmbedProvider>
+        </AppProvider>
+      </QueryClientProvider>
     </ClerkProvider>
   );
 }

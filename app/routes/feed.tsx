@@ -30,6 +30,15 @@ export const loader = async (args: LoaderFunctionArgs) => {
           comments: true,
         },
       },
+      ...(userId
+        ? {
+            likes: {
+              where: {
+                userId,
+              },
+            },
+          }
+        : {}),
       comments: {
         include: {
           user: true,
@@ -49,42 +58,39 @@ const FeedPage = () => {
   const { posts, user } = useLoaderData<typeof loader>();
 
   return (
-    <Container maxW={680} px={0}>
+    <>
       {user && (
-        <Flex
-          pos="relative"
-          px={6}
-          py={3}
-          borderBottomWidth={1}
-          borderColor="gray.900"
-          alignItems="center"
-          gap={3}
-        >
-          <Box
-            rounded="full"
-            overflow="hidden"
-            w={10}
-            h={10}
-            borderWidth={1}
-            borderColor="gray.800"
-          >
-            <styled.img
-              src={user.image ?? "/blank-driver-right.jpg"}
-              alt={`${user.firstName} ${user.lastName}`}
-            />
-          </Box>
-          <LinkOverlay to="/posts/new">Whats on your mind?</LinkOverlay>
-          <Spacer />
-          <RiImage2Line size={20} />
-        </Flex>
+        <Box borderBottomWidth={1} borderColor="gray.900" mb={2}>
+          <Container maxW={680} px={0}>
+            <Flex pos="relative" px={6} py={3} alignItems="center" gap={3}>
+              <Box
+                rounded="full"
+                overflow="hidden"
+                w={10}
+                h={10}
+                borderWidth={1}
+                borderColor="gray.800"
+              >
+                <styled.img
+                  src={user.image ?? "/blank-driver-right.jpg"}
+                  alt={`${user.firstName} ${user.lastName}`}
+                />
+              </Box>
+              <LinkOverlay to="/posts/new">Whats on your mind?</LinkOverlay>
+              <Spacer />
+              <RiImage2Line size={20} />
+            </Flex>
+          </Container>
+        </Box>
       )}
-
-      <Flex flexDir="column" gap={2} p={2}>
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </Flex>
-    </Container>
+      <Container maxW={680} px={0}>
+        <Flex flexDir="column" gap={2} p={2}>
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </Flex>
+      </Container>
+    </>
   );
 };
 

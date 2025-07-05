@@ -3,7 +3,7 @@ import { prisma } from "./prisma.server";
 
 export type GetPostById = Awaited<ReturnType<typeof getPostById>>;
 
-export const getPostById = async (id: number) => {
+export const getPostById = async (id: number, userId?: string) => {
   const post = await prisma.posts.findUnique({
     where: {
       id,
@@ -16,6 +16,15 @@ export const getPostById = async (id: number) => {
           comments: true,
         },
       },
+      ...(userId
+        ? {
+            likes: {
+              where: {
+                userId,
+              },
+            },
+          }
+        : {}),
       comments: {
         include: {
           user: true,

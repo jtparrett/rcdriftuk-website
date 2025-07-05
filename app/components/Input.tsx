@@ -12,5 +12,6 @@ export const Input = styled("input", {
     w: "full",
     minH: "40px",
     outline: "none",
+    display: "block",
   },
 });
