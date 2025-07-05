@@ -10,9 +10,10 @@ export const getPostById = async (id: number) => {
     },
     include: {
       user: true,
-      likes: {
-        include: {
-          user: true,
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
         },
       },
       comments: {
@@ -20,7 +21,7 @@ export const getPostById = async (id: number) => {
           user: true,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       },
     },

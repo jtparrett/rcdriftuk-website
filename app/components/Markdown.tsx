@@ -31,7 +31,6 @@ export const Markdown = ({ children }: Props) => {
               color="brand.500"
               href={href}
               target="_blank"
-              fontWeight="medium"
             >
               {children}
               <RiLink />

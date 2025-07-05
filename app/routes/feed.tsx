@@ -1,4 +1,3 @@
-import { SignedIn } from "@clerk/react-router";
 import { RiImage2Line } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkOverlay } from "~/components/LinkOverlay";
@@ -28,13 +27,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
       _count: {
         select: {
           likes: true,
+          comments: true,
         },
-      },
-      likes: {
-        include: {
-          user: true,
-        },
-        take: 2,
       },
       comments: {
         include: {
@@ -56,7 +50,7 @@ const FeedPage = () => {
 
   return (
     <Container maxW={680} px={0}>
-      <SignedIn>
+      {user && (
         <Flex
           pos="relative"
           px={6}
@@ -75,15 +69,15 @@ const FeedPage = () => {
             borderColor="gray.800"
           >
             <styled.img
-              src={user?.image ?? "/blank-driver-right.jpg"}
-              alt={`${user?.firstName} ${user?.lastName}`}
+              src={user.image ?? "/blank-driver-right.jpg"}
+              alt={`${user.firstName} ${user.lastName}`}
             />
           </Box>
           <LinkOverlay to="/posts/new">Whats on your mind?</LinkOverlay>
           <Spacer />
           <RiImage2Line size={20} />
         </Flex>
-      </SignedIn>
+      )}
 
       <Flex flexDir="column" gap={2} p={2}>
         {posts.map((post) => (

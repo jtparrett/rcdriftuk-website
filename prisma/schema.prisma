@@ -277,6 +277,7 @@ model PostComments {
   id        Int            @id @default(autoincrement())
   postId    Int
   createdAt DateTime       @default(now())
+  content   String
   Posts     Posts?         @relation(fields: [postId], references: [id], onDelete: Cascade)
   parentId  Int?
   parent    PostComments?  @relation("parentComment", fields: [parentId], references: [id], onDelete: Cascade)
