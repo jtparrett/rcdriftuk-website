@@ -69,9 +69,17 @@ export const tournamentEndQualifying = async (id: string) => {
   invariant(tournament, "Missing tournament");
 
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
+
+  // Helper function to round up to next power of 2, or return same if already power of 2
+  const nextPowerOf2OrSame = (n: number): number => {
+    if (n <= 0) return 1;
+    if (pow2Floor(n) === n) return n; // Already a power of 2
+    return pow2Floor(n * 2); // Same logic as pow2Ceil
+  };
+
   const totalDrivers = pow2Floor(tournament.drivers.length);
   const totalBuysToCreate = tournament.fullInclusion
-    ? totalDrivers * 2 - tournament.drivers.length
+    ? nextPowerOf2OrSame(tournament.drivers.length) - tournament.drivers.length
     : 0;
   const totalDriversWithBuys = pow2Floor(
     tournament.drivers.length + totalBuysToCreate,
