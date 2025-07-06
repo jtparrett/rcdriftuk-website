@@ -79,7 +79,7 @@ export const Menu = () => {
         <MenuIcon>
           <RiHomeLine />
         </MenuIcon>
-        Home Feed
+        Community Feed
       </MenuLink>
 
       <MenuLink
