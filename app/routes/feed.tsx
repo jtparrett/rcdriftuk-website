@@ -86,7 +86,7 @@ const FeedPage = () => {
       <Container maxW={680} px={0}>
         <Flex flexDir="column" gap={2} p={2}>
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} user={user} />
           ))}
         </Flex>
       </Container>
