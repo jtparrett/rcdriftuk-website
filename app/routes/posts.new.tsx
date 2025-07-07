@@ -1,5 +1,6 @@
+import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { RiImageAddLine, RiSendPlaneFill } from "react-icons/ri";
+import { RiDeleteBinFill, RiSendPlaneFill } from "react-icons/ri";
 import {
   redirect,
   useLoaderData,
@@ -21,6 +22,7 @@ import { userIsVerified } from "~/utils/userIsVerified";
 
 const postSchema = z.object({
   content: z.string().min(1),
+  images: z.array(z.string()),
 });
 
 const validationSchema = toFormikValidationSchema(postSchema);
@@ -62,8 +64,9 @@ export const action = async (args: ActionFunctionArgs) => {
 
   await prisma.posts.create({
     data: {
-      content: data.content,
       userId,
+      content: data.content,
+      images: data.images,
     },
   });
 
@@ -77,6 +80,7 @@ const NewPostPage = () => {
   const formik = useFormik({
     initialValues: {
       content: "",
+      images: [],
     },
     validationSchema,
     async onSubmit(values) {
@@ -84,6 +88,25 @@ const NewPostPage = () => {
         method: "POST",
         encType: "application/json",
       });
+    },
+  });
+
+  const fileUploadMutation = useMutation({
+    async mutationFn(file: File) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      return z.object({ url: z.string() }).parse(data);
+    },
+    onSuccess(data) {
+      formik.setFieldValue("images", [...formik.values.images, data.url]);
     },
   });
 
@@ -133,7 +156,47 @@ const NewPostPage = () => {
           />
           <Flex pt={2} gap={2}>
             <Spacer />
-            <ImageInput name="avatar" />
+            {formik.values.images.map((image) => (
+              <Box
+                key={image}
+                w={10}
+                h={10}
+                overflow="hidden"
+                rounded="lg"
+                pos="relative"
+              >
+                <styled.img
+                  src={image}
+                  alt="Uploaded"
+                  w="full"
+                  h="full"
+                  objectFit="cover"
+                />
+                <styled.button
+                  pos="absolute"
+                  inset={0}
+                  type="button"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  onClick={() => {
+                    formik.setFieldValue(
+                      "images",
+                      formik.values.images.filter((i) => i !== image),
+                    );
+                  }}
+                >
+                  <RiDeleteBinFill />
+                </styled.button>
+              </Box>
+            ))}
+            <ImageInput
+              name="avatar"
+              size={10}
+              onChange={fileUploadMutation.mutate}
+              value={null}
+              isLoading={fileUploadMutation.isPending}
+            />
             <Button
               type="submit"
               isLoading={formik.isSubmitting}

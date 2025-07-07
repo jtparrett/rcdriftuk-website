@@ -6,9 +6,17 @@ interface Props {
   name: string;
   onChange: (file: File) => void;
   value: File | string | null;
+  size?: number;
+  isLoading?: boolean;
 }
 
-export const ImageInput = ({ name, onChange, value }: Props) => {
+export const ImageInput = ({
+  name,
+  onChange,
+  value,
+  size = 16,
+  isLoading,
+}: Props) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
@@ -21,14 +29,15 @@ export const ImageInput = ({ name, onChange, value }: Props) => {
 
   return (
     <Box
-      w={16}
-      h={16}
+      w={size}
+      h={size}
       overflow="hidden"
       rounded="2xl"
       pos="relative"
       bgColor="gray.800"
       borderWidth={1}
       borderColor="gray.800"
+      cursor="pointer"
     >
       <Input
         pos="absolute"
@@ -40,6 +49,8 @@ export const ImageInput = ({ name, onChange, value }: Props) => {
         onChange={handleImageChange}
         zIndex={2}
         cursor="pointer"
+        multiple={false}
+        disabled={isLoading}
       />
       {imageUrl && (
         <styled.img
@@ -51,8 +62,26 @@ export const ImageInput = ({ name, onChange, value }: Props) => {
           opacity={0.7}
         />
       )}
-      <Center pos="absolute" inset={0} pointerEvents="none" zIndex={2}>
-        <RiUpload2Line size={24} />
+      <Center
+        pos="absolute"
+        inset={0}
+        pointerEvents="none"
+        zIndex={2}
+        cursor="pointer"
+      >
+        {isLoading ? (
+          <Box
+            w={size / 2}
+            h={size / 2}
+            rounded="full"
+            animation="spin .8s linear infinite"
+            borderWidth={2}
+            borderColor="transparent"
+            borderTopColor="white"
+          />
+        ) : (
+          <RiUpload2Line size={size * 2} />
+        )}
       </Center>
     </Box>
   );

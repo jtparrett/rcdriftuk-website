@@ -100,7 +100,7 @@ const FeedPage = () => {
             bgColor="gray.800"
             flex={1}
             h={10}
-            px={6}
+            px={5}
             rounded="full"
             justifyContent="flex-start"
           >

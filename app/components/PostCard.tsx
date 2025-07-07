@@ -122,7 +122,7 @@ export const PostCard = ({
       </Box>
 
       {post.images.length > 0 && (
-        <Flex gap={2}>
+        <Flex gap={2} borderTopWidth={1} borderColor="gray.800">
           {post.images.map((image) => (
             <styled.img key={image} src={image} alt="Post image" w="full" />
           ))}
