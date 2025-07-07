@@ -19,6 +19,7 @@ import type { GetUser } from "~/utils/getUser.server";
 import { useFormik } from "formik";
 import { LinkOverlay } from "./LinkOverlay";
 import { css } from "~/styled-system/css";
+import { Carousel } from "./Carousel";
 
 const StyledLink = styled(Link, {
   base: {
@@ -123,9 +124,24 @@ export const PostCard = ({
 
       {post.images.length > 0 && (
         <Flex gap={2} borderTopWidth={1} borderColor="gray.800">
-          {post.images.map((image) => (
-            <styled.img key={image} src={image} alt="Post image" w="full" />
-          ))}
+          <Carousel>
+            {post.images.map((image) => (
+              <Center
+                key={image}
+                w="full"
+                flex="none"
+                maxH="800px"
+                pointerEvents="none"
+              >
+                <styled.img
+                  src={image}
+                  alt="Post image"
+                  maxW="full"
+                  maxH="full"
+                />
+              </Center>
+            ))}
+          </Carousel>
         </Flex>
       )}
 
