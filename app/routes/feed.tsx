@@ -1,20 +1,26 @@
+import { RiInformationFill } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { PostCard } from "~/components/PostCard";
-import { Box, Center, Container, Flex, styled } from "~/styled-system/jsx";
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Spacer,
+  styled,
+} from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
+import { getUser, type GetUser } from "~/utils/getUser.server";
 import { prisma } from "~/utils/prisma.server";
+import { userCanPost } from "~/utils/userCanPost";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
-  let user = null;
+  let user: GetUser = null;
 
   if (userId) {
-    user = await prisma.users.findFirst({
-      where: {
-        id: userId,
-      },
-    });
+    user = await getUser(userId);
   }
 
   const posts = await prisma.posts.findMany({
@@ -55,10 +61,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 const FeedPage = () => {
   const { posts, user } = useLoaderData<typeof loader>();
+  const canPost = userCanPost(user);
 
   return (
     <Container maxW={680} px={2}>
-      {user && (
+      {user && canPost && (
         <Flex
           pos="relative"
           px={4}
@@ -101,6 +108,27 @@ const FeedPage = () => {
               What's on your mind, {user.firstName}?
             </LinkOverlay>
           </Center>
+        </Flex>
+      )}
+
+      {!canPost && (
+        <Flex
+          bgColor="brand.900"
+          rounded="xl"
+          px={4}
+          py={2}
+          mt={2}
+          borderWidth={1}
+          borderColor="brand.800"
+          color="brand.500"
+          alignItems="center"
+        >
+          <styled.p fontSize="sm" textWrap="balance">
+            You must be a ranked driver or an approved track owner to post on
+            this feed.
+          </styled.p>
+          <Spacer />
+          <RiInformationFill />
         </Flex>
       )}
 

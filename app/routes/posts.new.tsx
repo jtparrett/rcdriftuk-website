@@ -13,8 +13,10 @@ import { Button } from "~/components/Button";
 import { Textarea } from "~/components/Textarea";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
+import { getUser } from "~/utils/getUser.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { userCanPost } from "~/utils/userCanPost";
 
 const postSchema = z.object({
   content: z.string().min(1),
@@ -29,13 +31,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
     throw redirect("/sign-in");
   }
 
-  const user = await prisma.users.findUnique({
-    where: {
-      id: userId,
-    },
-  });
+  const user = await getUser(userId);
 
   notFoundInvariant(user);
+
+  const canPost = userCanPost(user);
+
+  notFoundInvariant(canPost);
 
   return { user };
 };
@@ -45,6 +47,14 @@ export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   notFoundInvariant(userId);
+
+  const user = await getUser(userId);
+
+  notFoundInvariant(user);
+
+  const canPost = userCanPost(user);
+
+  notFoundInvariant(canPost);
 
   const formData = await request.json();
   const data = postSchema.parse(formData);
