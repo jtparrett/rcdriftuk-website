@@ -13,7 +13,7 @@ import {
 import { getAuth } from "~/utils/getAuth.server";
 import { getUser, type GetUser } from "~/utils/getUser.server";
 import { prisma } from "~/utils/prisma.server";
-import { userCanPost } from "~/utils/userCanPost";
+import { userIsVerified } from "~/utils/userIsVerified";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -61,7 +61,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 const FeedPage = () => {
   const { posts, user } = useLoaderData<typeof loader>();
-  const canPost = userCanPost(user);
+  const canPost = userIsVerified(user);
 
   return (
     <Container maxW={680} px={2}>
@@ -124,8 +124,8 @@ const FeedPage = () => {
           alignItems="center"
         >
           <styled.p fontSize="sm" textWrap="balance">
-            You must be a ranked driver or an approved track owner to post on
-            this feed.
+            To post on this feed, you must have a driver rating or be a verified
+            track owner.
           </styled.p>
           <Spacer />
           <RiInformationFill />

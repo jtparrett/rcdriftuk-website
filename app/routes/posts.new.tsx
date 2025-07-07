@@ -10,13 +10,14 @@ import {
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Button } from "~/components/Button";
+import { ImageInput } from "~/components/ImageInput";
 import { Textarea } from "~/components/Textarea";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUser } from "~/utils/getUser.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
-import { userCanPost } from "~/utils/userCanPost";
+import { userIsVerified } from "~/utils/userIsVerified";
 
 const postSchema = z.object({
   content: z.string().min(1),
@@ -35,7 +36,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   notFoundInvariant(user);
 
-  const canPost = userCanPost(user);
+  const canPost = userIsVerified(user);
 
   notFoundInvariant(canPost);
 
@@ -52,7 +53,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   notFoundInvariant(user);
 
-  const canPost = userCanPost(user);
+  const canPost = userIsVerified(user);
 
   notFoundInvariant(canPost);
 
@@ -132,9 +133,7 @@ const NewPostPage = () => {
           />
           <Flex pt={2} gap={2}>
             <Spacer />
-            <Button px={3} variant="secondary" type="button">
-              <RiImageAddLine />
-            </Button>
+            <ImageInput name="avatar" />
             <Button
               type="submit"
               isLoading={formik.isSubmitting}
