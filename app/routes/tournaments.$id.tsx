@@ -41,6 +41,7 @@ import {
   RiFlagLine,
   RiFullscreenFill,
   RiRemoteControlLine,
+  RiShuffleLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { sentenceCase } from "change-case";
@@ -386,6 +387,16 @@ const TournamentPage = () => {
                           Start Next Run <RiFlagLine />
                         </Button>
                       </Form>
+                    )}
+
+                  {isOwner &&
+                    tournament.state === TournamentsState.QUALIFYING && (
+                      <LinkButton
+                        variant="outline"
+                        to={`/tournaments/${tournament.id}/randomise`}
+                      >
+                        Randomise Qualifying <RiShuffleLine />
+                      </LinkButton>
                     )}
 
                   {isOwner &&

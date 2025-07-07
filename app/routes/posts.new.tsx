@@ -1,4 +1,5 @@
 import { useFormik } from "formik";
+import { RiImageAddLine, RiSendPlaneFill } from "react-icons/ri";
 import {
   redirect,
   useLoaderData,
@@ -119,14 +120,17 @@ const NewPostPage = () => {
             onChange={formik.handleChange}
             autoFocus
           />
-          <Flex pt={2}>
+          <Flex pt={2} gap={2}>
             <Spacer />
+            <Button px={3} variant="secondary" type="button">
+              <RiImageAddLine />
+            </Button>
             <Button
               type="submit"
               isLoading={formik.isSubmitting}
               disabled={formik.isSubmitting || !formik.isValid}
             >
-              Create Post
+              Create Post <RiSendPlaneFill />
             </Button>
           </Flex>
         </form>

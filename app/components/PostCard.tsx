@@ -3,8 +3,7 @@ import { Box, Center, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
 import {
   RiChat3Line,
-  RiImage2Line,
-  RiSendPlane2Line,
+  RiSendPlaneFill,
   RiThumbUpFill,
   RiThumbUpLine,
 } from "react-icons/ri";
@@ -18,6 +17,8 @@ import { SignedIn } from "@clerk/react-router";
 import { useCreateComment, usePostComments } from "~/utils/usePostComments";
 import type { GetUser } from "~/utils/getUser.server";
 import { useFormik } from "formik";
+import { LinkOverlay } from "./LinkOverlay";
+import { css } from "~/styled-system/css";
 
 const StyledLink = styled(Link, {
   base: {
@@ -84,20 +85,29 @@ export const PostCard = ({
             bg="gray.950"
             w={10}
             h={10}
+            pos="relative"
           >
-            <styled.img
-              display="block"
-              src={post.user.image ?? "/blank-driver-right.jpg"}
-              alt={`${post.user.firstName} ${post.user.lastName}`}
-              w="full"
-              h="full"
-              objectFit="cover"
-            />
+            <LinkOverlay to={`/drivers/${post.user.driverId}`}>
+              <styled.img
+                display="block"
+                src={post.user.image ?? "/blank-driver-right.jpg"}
+                alt={`${post.user.firstName} ${post.user.lastName}`}
+                w="full"
+                h="full"
+                objectFit="cover"
+              />
+            </LinkOverlay>
           </Box>
           <Box>
-            <styled.p fontWeight="medium" lineHeight="1.3">
+            <Link
+              to={`/drivers/${post.user.driverId}`}
+              className={css({
+                fontWeight: "medium",
+                lineHeight: "1.3",
+              })}
+            >
               {post.user.firstName} {post.user.lastName}
-            </styled.p>
+            </Link>
             <styled.p fontSize="sm" color="gray.500" lineHeight="1.3">
               <Link to={`/posts/${post.id}`}>
                 {formatDistanceToNow(post.createdAt, { addSuffix: true })}
@@ -273,7 +283,7 @@ export const PostCard = ({
                     disabled={createComment.isPending}
                     isLoading={createComment.isPending}
                   >
-                    <RiSendPlane2Line size={16} />
+                    <RiSendPlaneFill size={16} />
                   </Button>
                 </Flex>
               </Box>
