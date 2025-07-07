@@ -5,6 +5,15 @@ import { Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getPostById } from "~/utils/getPostById.server";
 import { prisma } from "~/utils/prisma.server";
+import type { Route } from "./+types/posts.$id";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    {
+      title: "RC Drift UK | Post",
+    },
+  ];
+};
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.coerce.number().parse(args.params.id);

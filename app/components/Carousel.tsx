@@ -68,7 +68,7 @@ export const Carousel = ({ children }: Props) => {
         <Flex
           w="full"
           overflow="visible"
-          transition="transform 0.2s"
+          transition="transform 0.15s"
           transform="var(--transform)"
           style={{
             // @ts-expect-error

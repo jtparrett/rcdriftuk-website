@@ -14,6 +14,17 @@ import { getAuth } from "~/utils/getAuth.server";
 import { getUser, type GetUser } from "~/utils/getUser.server";
 import { prisma } from "~/utils/prisma.server";
 import { userIsVerified } from "~/utils/userIsVerified";
+import type { Route } from "./+types/feed";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: "RC Drift UK | Community Feed" },
+    {
+      name: "description",
+      content: "Welcome to the RCDrift.uk community feed",
+    },
+  ];
+};
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
