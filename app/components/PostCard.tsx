@@ -60,10 +60,9 @@ export const PostCard = ({
     initialValues: {
       comment: "",
     },
-    async onSubmit(values) {
-      await createComment.mutateAsync(values.comment);
-      alert("GOO");
+    onSubmit(values) {
       formik.resetForm();
+      createComment.mutate(values.comment);
     },
   });
 
@@ -107,7 +106,7 @@ export const PostCard = ({
           </Box>
         </Flex>
 
-        <Box pt={3}>
+        <Box py={3}>
           <Markdown>{post.content}</Markdown>
         </Box>
       </Box>
@@ -172,7 +171,7 @@ export const PostCard = ({
             variant="ghost"
             flex={1}
             rounded="none"
-            to={`/posts/${post.id}`}
+            to={`/posts/${post.id}#comment`}
           >
             <RiChat3Line size={16} />
             Comment
@@ -207,9 +206,7 @@ export const PostCard = ({
                   py={2}
                   w="fit-content"
                 >
-                  <styled.p color="gray.300" fontSize="sm">
-                    {comment.content}
-                  </styled.p>
+                  <Markdown>{comment.content}</Markdown>
                 </Box>
 
                 <Flex gap={4} alignItems="center" pl={3}>
@@ -233,7 +230,7 @@ export const PostCard = ({
 
       {allowComment && (
         <SignedIn>
-          <form onSubmit={formik.handleSubmit}>
+          <form onSubmit={formik.handleSubmit} id="comment">
             <Flex borderTopWidth={1} borderColor="gray.800" p={4} gap={2}>
               <Box
                 w={10}
@@ -259,14 +256,13 @@ export const PostCard = ({
                 borderColor="gray.700"
               >
                 <Textarea
-                  pb="38px"
                   placeholder="Add a comment..."
                   autoFocus
                   name="comment"
                   value={formik.values.comment}
                   onChange={formik.handleChange}
                 />
-                <Flex borderTopWidth={1} borderColor="gray.700" p={2}>
+                <Flex p={2}>
                   <Spacer />
                   <Button
                     px={0}

@@ -10,7 +10,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.coerce.number().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  const post = await getPostById(id);
+  const post = await getPostById(id, userId);
 
   let user = null;
 

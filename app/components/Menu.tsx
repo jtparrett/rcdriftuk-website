@@ -73,16 +73,6 @@ export const Menu = () => {
   return (
     <>
       <MenuLink
-        to="/feed"
-        active={location.pathname === "/feed" ? "active" : "inactive"}
-      >
-        <MenuIcon>
-          <RiHomeLine />
-        </MenuIcon>
-        Community Feed
-      </MenuLink>
-
-      <MenuLink
         to="/getting-started"
         active={
           location.pathname.startsWith("/getting-started")
@@ -94,6 +84,16 @@ export const Menu = () => {
           <RiRocketLine />
         </MenuIcon>
         Getting Started
+      </MenuLink>
+
+      <MenuLink
+        to="/feed"
+        active={location.pathname === "/feed" ? "active" : "inactive"}
+      >
+        <MenuIcon>
+          <RiHomeLine />
+        </MenuIcon>
+        Community Feed
       </MenuLink>
 
       <MenuLink

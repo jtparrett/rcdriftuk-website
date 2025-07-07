@@ -26,20 +26,5 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  const comments = await prisma.postComments.findMany({
-    where: {
-      postId: id,
-    },
-    include: {
-      user: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return {
-    totalComments: comments.length,
-    comments,
-  };
+  return null;
 };

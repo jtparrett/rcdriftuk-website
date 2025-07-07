@@ -1,6 +1,7 @@
 import { styled } from "~/styled-system/jsx";
+import TextareaAutosize from "react-textarea-autosize";
 
-export const Textarea = styled("textarea", {
+export const Textarea = styled(TextareaAutosize, {
   base: {
     py: 2,
     px: 4,
@@ -10,11 +11,8 @@ export const Textarea = styled("textarea", {
     rounded: "lg",
     color: "white",
     w: "full",
-    h: "0",
-    minH: "84px",
-    resize: "vertical",
     outline: "none",
-    maxH: "240px",
     display: "block",
+    resize: "none",
   },
 });

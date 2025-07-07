@@ -3,7 +3,7 @@ import { LinkButton } from "./Button";
 
 export const Footer = () => {
   return (
-    <Box borderTopWidth={1} borderColor="gray.900" py={8} mt={4}>
+    <Box borderTopWidth={1} borderColor="gray.900" py={8}>
       <Container maxW={1100} px={4}>
         <Flex
           alignItems="center"

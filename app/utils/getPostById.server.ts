@@ -3,7 +3,7 @@ import { prisma } from "./prisma.server";
 
 export type GetPostById = Awaited<ReturnType<typeof getPostById>>;
 
-export const getPostById = async (id: number, userId?: string) => {
+export const getPostById = async (id: number, userId?: string | null) => {
   const post = await prisma.posts.findUnique({
     where: {
       id,
@@ -30,7 +30,7 @@ export const getPostById = async (id: number, userId?: string) => {
           user: true,
         },
         orderBy: {
-          createdAt: "asc",
+          id: "asc",
         },
       },
     },

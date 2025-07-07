@@ -29,6 +29,7 @@ export const usePostComments = (
       return initialData;
     },
     initialData,
+    staleTime: 0,
   });
 };
 
@@ -60,27 +61,18 @@ export const useCreateComment = (postId: number, user: User) => {
         },
       };
 
+      const newComments = [...(existingComments?.comments ?? []), newComment];
+      const totalComments = (existingComments?.totalComments ?? 0) + 1;
+
       queryClient.setQueryData(["post", postId, "comments"], {
-        totalComments: (existingComments?.totalComments ?? 0) + 1,
-        comments: [...(existingComments?.comments ?? []), newComment],
+        totalComments,
+        comments: newComments,
       });
 
-      const response = await fetch(`/api/posts/${postId}/comment`, {
+      await fetch(`/api/posts/${postId}/comment`, {
         method: "POST",
         body: JSON.stringify({ comment }),
       });
-
-      const data = await response.json();
-
-      return z
-        .object({
-          totalComments: z.number(),
-          comments: z.array(commentSchema),
-        })
-        .parse(data);
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["post", postId, "comments"], data);
     },
   });
 };
