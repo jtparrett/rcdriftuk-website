@@ -128,10 +128,12 @@ export const PostCard = ({
             {post.images.map((image) => (
               <Center
                 key={image}
-                w="full"
                 flex="none"
                 maxH="800px"
                 pointerEvents="none"
+                style={{
+                  width: `${100 / post.images.length}%`,
+                }}
               >
                 <styled.img
                   src={image}

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import React, { useState } from "react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { Box, Flex, styled } from "~/styled-system/jsx";
-import { motion } from "motion/react";
+import { motion, useTransform } from "motion/react";
 import { css } from "~/styled-system/css";
 
 interface Props {
@@ -56,28 +56,21 @@ export const Carousel = ({ children }: Props) => {
 
   return (
     <Box pos="relative" w="full">
-      <motion.div
-        className={css({
-          w: "full",
-          overflow: "hidden",
-        })}
-        onDragEnd={handleDragEnd}
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-      >
-        <Flex
-          w="full"
-          overflow="visible"
-          transition="transform 0.15s"
-          transform="var(--transform)"
+      <Box w="full" overflow="hidden">
+        <motion.div
+          className={css({
+            display: "flex",
+          })}
+          onDragEnd={handleDragEnd}
+          drag={arrayChildren.length > 1 ? "x" : false}
+          animate={{ x: (-100 / arrayChildren.length) * currentIndex + "%" }}
           style={{
-            // @ts-expect-error
-            "--transform": `translateX(-${currentIndex * 100}%)`,
+            width: `${arrayChildren.length * 100}%`,
           }}
         >
           {children}
-        </Flex>
-      </motion.div>
+        </motion.div>
+      </Box>
       {arrayChildren.length > 1 && (
         <Flex
           p={1}
