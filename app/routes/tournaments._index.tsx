@@ -2,7 +2,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { format } from "date-fns";
-import { RiAddFill, RiBookOpenFill } from "react-icons/ri";
+import { RiAddFill, RiBookOpenFill, RiDeleteBinFill } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
@@ -44,6 +44,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       ],
+      archived: false,
     },
     orderBy: {
       createdAt: "desc",
@@ -97,19 +98,35 @@ const Page = () => {
             <Flex>
               <Box>
                 <LinkOverlay to={`/tournaments/${tournament.id}/overview`}>
-                  <styled.span fontWeight="bold" fontSize="lg">
+                  <styled.span fontWeight="medium" fontSize="lg">
                     {tournament.name}
                   </styled.span>
                 </LinkOverlay>
 
-                <styled.p fontSize="sm" color="gray.500">
-                  {format(new Date(tournament.createdAt), "MMM d, yyyy")}
-                </styled.p>
+                <Flex
+                  gap={1}
+                  alignItems="center"
+                  color="gray.500"
+                  fontSize="sm"
+                >
+                  <styled.p>
+                    {format(new Date(tournament.createdAt), "MMM d, yyyy")}
+                  </styled.p>
+                  <Box>&middot;</Box>
+                  <styled.p>
+                    {sentenceCase(tournament.state.toLocaleLowerCase())}
+                  </styled.p>
+                </Flex>
               </Box>
               <Spacer />
-              <styled.span fontSize="sm" color="gray.500">
-                {sentenceCase(tournament.state.toLocaleLowerCase())}
-              </styled.span>
+              <LinkButton
+                variant="ghost"
+                pos="relative"
+                zIndex={3}
+                to={`/tournaments/${tournament.id}/archive`}
+              >
+                <RiDeleteBinFill />
+              </LinkButton>
             </Flex>
           </Box>
         ))}
