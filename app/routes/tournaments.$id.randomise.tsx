@@ -6,8 +6,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import { z } from "zod";
-import { Button, LinkButton } from "~/components/Button";
-import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { ConfirmationForm } from "~/components/ConfirmationForm";
 import { TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
@@ -98,41 +97,12 @@ const RandomiseQualifyingPage = () => {
   const id = z.string().parse(params.id);
 
   return (
-    <Box
-      maxW={600}
-      mx="auto"
-      p={6}
-      borderWidth={1}
-      borderColor="gray.800"
-      rounded="xl"
-      bg="gray.900"
-    >
-      <styled.h1
-        fontSize="2xl"
-        fontWeight="semibold"
-        lineHeight="1.2"
-        mb={4}
-        textWrap="balance"
-      >
-        Are you sure you want to randomise qualifying?
-      </styled.h1>
-      <styled.p mb={2} color="gray.400">
-        This will randomise the qualifying results for all drivers and allow for
-        random battle pairings to be generated.
-      </styled.p>
-      <styled.p color="brand.500" fontWeight="semibold" mb={4}>
-        This action cannot be undone.
-      </styled.p>
-      <Flex gap={2} pt={4} borderTopWidth={1} borderColor="gray.800">
-        <Spacer />
-        <LinkButton variant="outline" to={`/tournaments/${id}/qualifying`}>
-          Cancel
-        </LinkButton>
-        <Form method="post">
-          <Button type="submit">Yes, Randomise</Button>
-        </Form>
-      </Flex>
-    </Box>
+    <ConfirmationForm
+      title="Are you sure you want to randomise qualifying?"
+      confirmText="Yes, Randomise"
+      disclaimer="This will randomise the qualifying results for all drivers and allow for random battle pairings to be generated."
+      cancelTo={`/tournaments/${id}/qualifying`}
+    />
   );
 };
 

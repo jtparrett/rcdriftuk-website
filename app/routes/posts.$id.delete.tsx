@@ -1,60 +1,61 @@
 import {
-  Form,
-  redirect,
   type ActionFunctionArgs,
+  redirect,
   type LoaderFunctionArgs,
+  useLoaderData,
 } from "react-router";
 import { z } from "zod";
+import { ConfirmationForm } from "~/components/ConfirmationForm";
 import { Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
-import { ConfirmationForm } from "~/components/ConfirmationForm";
 
 export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.coerce.number().parse(args.params.id);
   const { userId } = await getAuth(args);
-  const id = z.string().parse(args.params.id);
 
-  const tournament = await prisma.tournaments.findUnique({
+  notFoundInvariant(userId);
+
+  const post = await prisma.posts.findUnique({
     where: {
       id,
       userId,
     },
   });
 
-  notFoundInvariant(tournament);
+  notFoundInvariant(post);
 
-  return null;
+  return post;
 };
 
 export const action = async (args: ActionFunctionArgs) => {
+  const id = z.coerce.number().parse(args.params.id);
   const { userId } = await getAuth(args);
-  const id = z.string().parse(args.params.id);
 
-  await prisma.tournaments.update({
+  notFoundInvariant(userId);
+
+  await prisma.posts.delete({
     where: {
       id,
       userId,
     },
-    data: {
-      archived: true,
-    },
   });
 
-  return redirect("/tournaments");
+  return redirect("/feed");
 };
 
-const TournamentArchivePage = () => {
+const PostDeletePage = () => {
+  const post = useLoaderData<typeof loader>();
   return (
     <Container maxW={1100} px={2} py={10}>
       <ConfirmationForm
-        title="Are you sure you want to archive this tournament?"
-        disclaimer="This action cannot be undone."
-        confirmText="Yes, Archive this tournament"
-        cancelTo="/tournaments"
+        title="Are you sure you want to delete this post?"
+        confirmText="Yes, Delete"
+        cancelTo={`/posts/${post.id}`}
       />
     </Container>
   );
 };
 
-export default TournamentArchivePage;
+export default PostDeletePage;

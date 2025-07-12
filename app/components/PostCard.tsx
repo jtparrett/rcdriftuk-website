@@ -3,6 +3,8 @@ import { Box, Center, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
 import {
   RiChat3Line,
+  RiDeleteBinFill,
+  RiPencilFill,
   RiSendPlaneFill,
   RiThumbUpFill,
   RiThumbUpLine,
@@ -13,7 +15,7 @@ import { Link } from "react-router";
 import pluralize from "pluralize";
 import { useLikePost, usePostLikes } from "~/utils/usePostLikes";
 import { Textarea } from "./Textarea";
-import { SignedIn } from "@clerk/react-router";
+import { SignedIn, useUser } from "@clerk/react-router";
 import { useCreateComment, usePostComments } from "~/utils/usePostComments";
 import type { GetUser } from "~/utils/getUser.server";
 import { useFormik } from "formik";
@@ -77,7 +79,7 @@ export const PostCard = ({
       overflow="hidden"
     >
       <Box px={4} pt={3}>
-        <Flex gap={2} alignItems="center">
+        <Flex alignItems="center" gap={0.5}>
           <Box
             rounded="full"
             overflow="hidden"
@@ -87,6 +89,7 @@ export const PostCard = ({
             w={10}
             h={10}
             pos="relative"
+            mr={1.5}
           >
             <LinkOverlay to={`/drivers/${post.user.driverId}`}>
               <styled.img
@@ -115,6 +118,32 @@ export const PostCard = ({
               </Link>
             </styled.p>
           </Box>
+
+          <Spacer />
+
+          {user?.id === post.userId && (
+            <>
+              <LinkButton
+                variant="ghost"
+                to={`/posts/${post.id}/delete`}
+                px={2}
+                color="gray.400"
+                aria-label="Edit post"
+              >
+                <RiPencilFill size={14} />
+              </LinkButton>
+
+              <LinkButton
+                variant="ghost"
+                to={`/posts/${post.id}/delete`}
+                px={2}
+                color="gray.400"
+                aria-label="Delete post"
+              >
+                <RiDeleteBinFill size={14} />
+              </LinkButton>
+            </>
+          )}
         </Flex>
 
         <Box py={3}>
