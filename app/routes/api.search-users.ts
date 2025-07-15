@@ -47,7 +47,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       firstName: true,
       lastName: true,
     },
-    take: 10,
+    take: 15,
     orderBy: [
       {
         firstName: "asc",

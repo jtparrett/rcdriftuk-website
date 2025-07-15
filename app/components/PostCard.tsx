@@ -22,6 +22,7 @@ import { LinkOverlay } from "./LinkOverlay";
 import { css } from "~/styled-system/css";
 import { Carousel } from "./Carousel";
 import { Fragment } from "react/jsx-runtime";
+import { UserTaggingInput } from "./UserTaggingInput";
 const StyledLink = styled(Link, {
   base: {
     color: "gray.500",
@@ -70,13 +71,7 @@ export const PostCard = ({
   });
 
   return (
-    <Box
-      rounded="xl"
-      borderWidth={1}
-      borderColor="gray.800"
-      bg="gray.900"
-      overflow="hidden"
-    >
+    <Box rounded="xl" borderWidth={1} borderColor="gray.800" bg="gray.900">
       <Box px={4} pt={3}>
         <Flex alignItems="center" gap={0.5}>
           <Box
@@ -315,16 +310,16 @@ export const PostCard = ({
                 flex={1}
                 bgColor="gray.800"
                 rounded="xl"
-                overflow="hidden"
                 borderWidth={1}
                 borderColor="gray.700"
               >
-                <Textarea
+                <UserTaggingInput
                   placeholder="Add a comment..."
                   autoFocus
                   name="comment"
                   value={formik.values.comment}
-                  onChange={formik.handleChange}
+                  onChange={(value) => formik.setFieldValue("comment", value)}
+                  rounded="xl"
                 />
                 <Flex p={2}>
                   <Spacer />
