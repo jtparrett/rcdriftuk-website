@@ -15,6 +15,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const data = z
     .object({
       comment: z.string(),
+      replyId: z.coerce.number().nullable(),
     })
     .parse(formData);
 
@@ -23,6 +24,7 @@ export const action = async (args: ActionFunctionArgs) => {
       content: data.comment,
       postId: id,
       userId,
+      parentId: data.replyId,
     },
   });
 

@@ -3,6 +3,7 @@ import { Box, Center, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
 import {
   RiChat3Line,
+  RiCloseLine,
   RiDeleteBinFill,
   RiSendPlaneFill,
   RiThumbUpFill,
@@ -10,7 +11,7 @@ import {
 } from "react-icons/ri";
 import type { GetPostById } from "~/utils/getPostById.server";
 import { Markdown } from "./Markdown";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import pluralize from "pluralize";
 import { useLikePost, usePostLikes } from "~/utils/usePostLikes";
 import { Textarea } from "./Textarea";
@@ -23,6 +24,8 @@ import { css } from "~/styled-system/css";
 import { Carousel } from "./Carousel";
 import { Fragment } from "react/jsx-runtime";
 import { UserTaggingInput } from "./UserTaggingInput";
+import { useEffect } from "react";
+
 const StyledLink = styled(Link, {
   base: {
     color: "gray.500",
@@ -58,17 +61,32 @@ export const PostCard = ({
     totalComments: post._count.comments,
     comments: post.comments,
   });
+
+  const [searchParams] = useSearchParams();
+  const initialComment = searchParams.get("comment");
+  const replyId = searchParams.get("reply");
   const createComment = useCreateComment(post.id, user);
 
   const formik = useFormik({
     initialValues: {
-      comment: "",
+      comment: initialComment ?? "",
     },
     onSubmit(values) {
       formik.resetForm();
-      createComment.mutate(values.comment);
+      createComment.mutate({
+        comment: values.comment,
+        replyId,
+      });
     },
   });
+
+  useEffect(() => {
+    formik.setFieldValue("comment", initialComment ?? "");
+  }, [searchParams]);
+
+  const replyComment = replyId
+    ? comments.find((comment) => comment.id === Number(replyId))
+    : null;
 
   return (
     <Box rounded="xl" borderWidth={1} borderColor="gray.800" bg="gray.900">
@@ -258,7 +276,10 @@ export const PostCard = ({
                     <StyledLink to={`/posts/${post.id}`} fontSize="sm">
                       Like
                     </StyledLink>
-                    <StyledLink to={`/posts/${post.id}`} fontSize="sm">
+                    <StyledLink
+                      to={`/posts/${post.id}?reply=${comment.id}&comment=@${comment.user.driverId}(${comment.user.firstName} ${comment.user.lastName})#comment`}
+                      fontSize="sm"
+                    >
                       Reply
                     </StyledLink>
                   </Flex>
@@ -313,6 +334,30 @@ export const PostCard = ({
                 borderWidth={1}
                 borderColor="gray.700"
               >
+                {replyComment && (
+                  <Flex
+                    pl={4}
+                    pr={1}
+                    py={0.5}
+                    bgColor="gray.900"
+                    borderTopRadius="xl"
+                    alignItems="center"
+                  >
+                    <styled.p color="gray.500" fontSize="sm">
+                      Replying to {replyComment.user.firstName}{" "}
+                      {replyComment.user.lastName}
+                    </styled.p>
+                    <Spacer />
+                    <Link
+                      to={`/posts/${post.id}#comment`}
+                      className={css({
+                        p: 1,
+                      })}
+                    >
+                      <RiCloseLine />
+                    </Link>
+                  </Flex>
+                )}
                 <UserTaggingInput
                   placeholder="Add a comment..."
                   autoFocus

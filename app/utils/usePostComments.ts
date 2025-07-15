@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { GetUser } from "./getUser.server";
 
 const userSchema = z.object({
+  driverId: z.number().nullable(),
   id: z.string().nullable(),
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
@@ -51,7 +52,9 @@ export const useCreateComment = (postId: number, user: User) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (comment: string) => {
+    mutationFn: async (data: { comment: string; replyId: string | null }) => {
+      const { comment, replyId } = data;
+
       if (!user) {
         throw new Error("User not found");
       }
@@ -70,6 +73,7 @@ export const useCreateComment = (postId: number, user: User) => {
           firstName: user.firstName,
           lastName: user.lastName,
           image: user.image,
+          driverId: user.driverId,
         },
       };
 
@@ -83,7 +87,7 @@ export const useCreateComment = (postId: number, user: User) => {
 
       await fetch(`/api/posts/${postId}/comment`, {
         method: "POST",
-        body: JSON.stringify({ comment }),
+        body: JSON.stringify({ comment, replyId }),
       });
     },
   });
