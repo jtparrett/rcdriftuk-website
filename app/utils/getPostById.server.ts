@@ -1,8 +1,6 @@
 import notFoundInvariant from "./notFoundInvariant";
 import { prisma } from "./prisma.server";
 
-export type GetPostById = Awaited<ReturnType<typeof getPostById>>;
-
 export const getPostById = async (id: number, userId?: string | null) => {
   const post = await prisma.posts.findUnique({
     where: {
@@ -26,8 +24,16 @@ export const getPostById = async (id: number, userId?: string | null) => {
           }
         : {}),
       comments: {
+        where: {
+          parentId: null,
+        },
         include: {
           user: true,
+          replies: {
+            include: {
+              user: true,
+            },
+          },
         },
         orderBy: {
           id: "asc",
@@ -40,3 +46,5 @@ export const getPostById = async (id: number, userId?: string | null) => {
 
   return post;
 };
+
+export type GetPostById = Awaited<ReturnType<typeof getPostById>>;

@@ -13,7 +13,10 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Button } from "~/components/Button";
 import { ImageInput } from "~/components/ImageInput";
 import { Textarea } from "~/components/Textarea";
+import { UserTaggingInput } from "~/components/UserTaggingInput";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { extractFirstUrl } from "~/utils/extractFirstUrl";
+import { fetchAndUploadOgImage } from "~/utils/fetchAndUploadOgImage.server";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUser } from "~/utils/getUser.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
@@ -62,11 +65,23 @@ export const action = async (args: ActionFunctionArgs) => {
   const formData = await request.json();
   const data = postSchema.parse(formData);
 
+  // Extract first URL from content and fetch og:image if no images are provided
+  let finalImages = data.images;
+  if (data.images.length === 0) {
+    const firstUrl = extractFirstUrl(data.content);
+    if (firstUrl) {
+      const ogImageUrl = await fetchAndUploadOgImage(firstUrl);
+      if (ogImageUrl) {
+        finalImages = [ogImageUrl];
+      }
+    }
+  }
+
   await prisma.posts.create({
     data: {
       userId,
       content: data.content,
-      images: data.images,
+      images: finalImages,
     },
   });
 
@@ -147,11 +162,11 @@ const NewPostPage = () => {
         </Flex>
 
         <form onSubmit={formik.handleSubmit}>
-          <Textarea
+          <UserTaggingInput
             placeholder={`What's on your mind, ${user.firstName}?`}
             name="content"
             value={formik.values.content}
-            onChange={formik.handleChange}
+            onChange={(value) => formik.setFieldValue("content", value)}
             autoFocus
           />
           <Flex pt={2} gap={2}>

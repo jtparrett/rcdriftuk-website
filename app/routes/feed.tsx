@@ -56,8 +56,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
           }
         : {}),
       comments: {
+        where: {
+          parentId: null,
+        },
         include: {
           user: true,
+          replies: {
+            include: {
+              user: true,
+            },
+          },
         },
         orderBy: {
           id: "asc",

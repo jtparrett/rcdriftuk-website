@@ -4,7 +4,6 @@ import { Button, LinkButton } from "./Button";
 import {
   RiChat3Line,
   RiDeleteBinFill,
-  RiPencilFill,
   RiSendPlaneFill,
   RiThumbUpFill,
   RiThumbUpLine,
@@ -15,14 +14,14 @@ import { Link } from "react-router";
 import pluralize from "pluralize";
 import { useLikePost, usePostLikes } from "~/utils/usePostLikes";
 import { Textarea } from "./Textarea";
-import { SignedIn, useUser } from "@clerk/react-router";
+import { SignedIn } from "@clerk/react-router";
 import { useCreateComment, usePostComments } from "~/utils/usePostComments";
 import type { GetUser } from "~/utils/getUser.server";
 import { useFormik } from "formik";
 import { LinkOverlay } from "./LinkOverlay";
 import { css } from "~/styled-system/css";
 import { Carousel } from "./Carousel";
-
+import { Fragment } from "react/jsx-runtime";
 const StyledLink = styled(Link, {
   base: {
     color: "gray.500",
@@ -122,27 +121,15 @@ export const PostCard = ({
           <Spacer />
 
           {user?.id === post.userId && (
-            <>
-              <LinkButton
-                variant="ghost"
-                to={`/posts/${post.id}/delete`}
-                px={2}
-                color="gray.400"
-                aria-label="Edit post"
-              >
-                <RiPencilFill size={14} />
-              </LinkButton>
-
-              <LinkButton
-                variant="ghost"
-                to={`/posts/${post.id}/delete`}
-                px={2}
-                color="gray.400"
-                aria-label="Delete post"
-              >
-                <RiDeleteBinFill size={14} />
-              </LinkButton>
-            </>
+            <LinkButton
+              variant="ghost"
+              to={`/posts/${post.id}/delete`}
+              px={2}
+              color="gray.400"
+              aria-label="Delete post"
+            >
+              <RiDeleteBinFill size={14} />
+            </LinkButton>
           )}
         </Flex>
 
@@ -239,48 +226,68 @@ export const PostCard = ({
       {comments.length > 0 && (
         <Box borderTopWidth={1} borderColor="gray.800" px={4} pt={4} pb={1}>
           {comments.map((comment) => (
-            <Flex key={comment.id} alignItems="flex-start" gap={2} mb={1}>
-              <Box
-                rounded="full"
-                overflow="hidden"
-                borderWidth={1}
-                borderColor="gray.700"
-                bg="gray.950"
-                w={8}
-                h={8}
-              >
-                <styled.img
-                  src={comment.user.image ?? "/blank-driver-right.jpg"}
-                  alt={`${comment.user.firstName} ${comment.user.lastName}`}
-                />
-              </Box>
-
-              <Box flex={1}>
+            <Fragment key={comment.id}>
+              <Flex alignItems="flex-start" gap={2} mb={1}>
                 <Box
-                  bgColor="gray.800"
-                  rounded="xl"
-                  px={3}
-                  py={2}
-                  w="fit-content"
+                  rounded="full"
+                  overflow="hidden"
+                  borderWidth={1}
+                  borderColor="gray.700"
+                  bg="gray.950"
+                  w={8}
+                  h={8}
                 >
-                  <Markdown>{comment.content}</Markdown>
+                  <styled.img
+                    src={comment.user.image ?? "/blank-driver-right.jpg"}
+                    alt={`${comment.user.firstName} ${comment.user.lastName}`}
+                  />
                 </Box>
 
-                <Flex gap={4} alignItems="center" pl={3}>
-                  <styled.p color="gray.500" fontSize="sm" py={1}>
-                    {formatDistanceToNow(comment.createdAt, {
-                      addSuffix: true,
-                    })}
-                  </styled.p>
-                  <StyledLink to={`/posts/${post.id}`} fontSize="sm">
-                    Like
-                  </StyledLink>
-                  <StyledLink to={`/posts/${post.id}`} fontSize="sm">
-                    Reply
-                  </StyledLink>
-                </Flex>
-              </Box>
-            </Flex>
+                <Box flex={1}>
+                  <Box
+                    bgColor="gray.800"
+                    rounded="xl"
+                    px={3}
+                    py={2}
+                    w="fit-content"
+                  >
+                    <Markdown>{comment.content}</Markdown>
+                  </Box>
+
+                  <Flex gap={4} alignItems="center" pl={3}>
+                    <styled.p color="gray.500" fontSize="sm" py={1}>
+                      {formatDistanceToNow(comment.createdAt, {
+                        addSuffix: true,
+                      })}
+                    </styled.p>
+                    <StyledLink to={`/posts/${post.id}`} fontSize="sm">
+                      Like
+                    </StyledLink>
+                    <StyledLink to={`/posts/${post.id}`} fontSize="sm">
+                      Reply
+                    </StyledLink>
+                  </Flex>
+                </Box>
+              </Flex>
+
+              {(comment.replies?.length ?? 0) > 0 && (
+                <Box pl={12}>
+                  {comment.replies?.map((reply) => (
+                    <Box key={reply.id}>
+                      <Box
+                        bgColor="gray.800"
+                        rounded="xl"
+                        px={3}
+                        py={2}
+                        w="fit-content"
+                      >
+                        <Markdown>{reply.content}</Markdown>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Fragment>
           ))}
         </Box>
       )}

@@ -30,6 +30,18 @@ import { AppNav } from "./components/AppNav";
 import { AppHeader } from "./components/AppHeader";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
+import type { Route } from "./+types/root";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: "RC Drift UK" },
+    { name: "description", content: "Welcome to RCDrift.uk" },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
+  ];
+};
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "https://fonts.cdnfonts.com/css/sf-pro-display" },

@@ -2,16 +2,29 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import type { GetUser } from "./getUser.server";
 
+const userSchema = z.object({
+  id: z.string().nullable(),
+  firstName: z.string().nullable(),
+  lastName: z.string().nullable(),
+  image: z.string().nullable(),
+});
+
 export const commentSchema = z.object({
   id: z.number(),
   content: z.string(),
   createdAt: z.coerce.date(),
-  user: z.object({
-    id: z.string().nullable(),
-    firstName: z.string().nullable(),
-    lastName: z.string().nullable(),
-    image: z.string().nullable(),
-  }),
+  user: userSchema,
+  replies: z
+    .array(
+      z.object({
+        id: z.number(),
+        content: z.string(),
+        createdAt: z.coerce.date(),
+        user: userSchema,
+      }),
+    )
+    .optional()
+    .nullable(),
 });
 
 export type Comment = z.infer<typeof commentSchema>;
@@ -29,7 +42,6 @@ export const usePostComments = (
       return initialData;
     },
     initialData,
-    staleTime: 0,
   });
 };
 

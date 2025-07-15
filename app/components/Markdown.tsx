@@ -2,12 +2,23 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Flex, styled } from "~/styled-system/jsx";
 import rehypeRaw from "rehype-raw";
+import { Link } from "react-router";
+import { css } from "~/styled-system/css";
 
 interface Props {
   children?: string | null;
 }
 
+const processUserMentions = (text: string): string => {
+  if (!text) return text;
+
+  // Replace @userid(firstname lastname) with [firstname lastname](/drivers/userid)
+  return text.replace(/@(\d+)\(([^)]+)\)/g, "[$2](/drivers/$1)");
+};
+
 export const Markdown = ({ children }: Props) => {
+  const processedContent = processUserMentions(children || "");
+
   return (
     <Flex flexDir="column" gap={4}>
       <ReactMarkdown
@@ -22,6 +33,20 @@ export const Markdown = ({ children }: Props) => {
             );
           },
           a({ children, href }) {
+            // Check if this is an internal link (starts with /)
+            if (href?.startsWith("/")) {
+              return (
+                <Link
+                  to={href}
+                  className={css({
+                    color: "brand.500",
+                  })}
+                >
+                  {children}
+                </Link>
+              );
+            }
+
             return (
               <styled.a color="brand.500" href={href} target="_blank">
                 {children}
@@ -95,7 +120,7 @@ export const Markdown = ({ children }: Props) => {
           },
         }}
       >
-        {children}
+        {processedContent}
       </ReactMarkdown>
     </Flex>
   );

@@ -5,7 +5,7 @@ import { Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getPostById } from "~/utils/getPostById.server";
 import { prisma } from "~/utils/prisma.server";
-import type { Route } from "./+types/posts.$id";
+import type { Route } from "./+types/posts.$id._index";
 
 export const meta: Route.MetaFunction = () => {
   return [

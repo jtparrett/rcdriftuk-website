@@ -282,7 +282,7 @@ model PostComments {
   Posts     Posts?         @relation(fields: [postId], references: [id], onDelete: Cascade)
   parentId  Int?
   parent    PostComments?  @relation("parentComment", fields: [parentId], references: [id], onDelete: Cascade)
-  children  PostComments[] @relation("parentComment")
+  replies   PostComments[] @relation("parentComment")
   userId    String
   user      Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
