@@ -24,6 +24,17 @@ export const Markdown = ({ children }: Props) => {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
+        allowedElements={[
+          "p",
+          "a",
+          "h1",
+          "h2",
+          "h3",
+          "ul",
+          "li",
+          "blockquote",
+          "hr",
+        ]}
         components={{
           p({ children }) {
             return (

@@ -71,7 +71,7 @@ export default function JudgingCriteriaPage() {
         </Box>
 
         <Stack gap={4}>
-          <CollapsibleCard title="1. Scoring System" defaultOpen={true}>
+          <CollapsibleCard title="1. Scoring System">
             <P>
               The tournament consists of{" "}
               <Highlight>solo qualifying runs</Highlight> and{" "}

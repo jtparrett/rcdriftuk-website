@@ -70,7 +70,7 @@ export default function RulesPage() {
         </Box>
 
         <Stack gap={4}>
-          <CollapsibleCard title="1. General Conduct" defaultOpen={true}>
+          <CollapsibleCard title="1. General Conduct">
             <H3>Sportsmanship</H3>
             <UL>
               <styled.li>
