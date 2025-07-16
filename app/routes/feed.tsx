@@ -62,6 +62,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
         include: {
           user: true,
           replies: {
+            take: 1,
+            orderBy: {
+              createdAt: "desc",
+            },
             include: {
               user: true,
             },

@@ -77,13 +77,33 @@ export const useCreateComment = (postId: number, user: User) => {
         },
       };
 
-      const newComments = [...(existingComments?.comments ?? []), newComment];
-      const totalComments = (existingComments?.totalComments ?? 0) + 1;
+      if (!replyId) {
+        const newComments = [...(existingComments?.comments ?? []), newComment];
+        const totalComments = (existingComments?.totalComments ?? 0) + 1;
+        queryClient.setQueryData(["post", postId, "comments"], {
+          totalComments,
+          comments: newComments,
+        });
+      } else {
+        const replyComment = existingComments?.comments.find(
+          (comment) => comment.id === Number(replyId),
+        )?.replies;
+        if (replyComment) {
+          const newReplies = [...(replyComment ?? []), newComment];
 
-      queryClient.setQueryData(["post", postId, "comments"], {
-        totalComments,
-        comments: newComments,
-      });
+          queryClient.setQueryData(["post", postId, "comments"], {
+            totalComments: existingComments?.totalComments ?? 0,
+            comments: existingComments?.comments.map((comment) =>
+              comment.id === Number(replyId)
+                ? {
+                    ...comment,
+                    replies: newReplies,
+                  }
+                : comment,
+            ),
+          });
+        }
+      }
 
       await fetch(`/api/posts/${postId}/comment`, {
         method: "POST",

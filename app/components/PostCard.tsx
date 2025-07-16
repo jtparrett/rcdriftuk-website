@@ -87,6 +87,9 @@ export const PostCard = ({
   const replyComment = replyId
     ? comments.find((comment) => comment.id === Number(replyId))
     : null;
+  const replyCommentIndex = replyId
+    ? comments.findIndex((comment) => comment.id === Number(replyId))
+    : null;
 
   return (
     <Box rounded="xl" borderWidth={1} borderColor="gray.800" bg="gray.900">
@@ -236,11 +239,35 @@ export const PostCard = ({
         </Flex>
       </SignedIn>
 
-      {comments.length > 0 && (
-        <Box borderTopWidth={1} borderColor="gray.800" px={4} pt={4} pb={1}>
-          {comments.map((comment) => (
-            <Fragment key={comment.id}>
-              <Flex alignItems="flex-start" gap={2} mb={1}>
+      {(allowComment || comments.length > 0) && (
+        <Flex
+          flexDir="column"
+          borderTopWidth={1}
+          borderColor="gray.800"
+          gap={1}
+          pt={2}
+        >
+          {comments.length <= 0 && (
+            <Box textAlign="center" pb={4}>
+              <styled.p color="gray.500" fontSize="sm">
+                This post has no comments yet.
+              </styled.p>
+            </Box>
+          )}
+
+          {comments.map((comment, index) => (
+            <Flex
+              flexDir="column"
+              gap={1}
+              key={comment.id}
+              px={4}
+              style={{
+                // @ts-ignore
+                "--order": index,
+              }}
+              order="var(--order)"
+            >
+              <Flex alignItems="flex-start" gap={2}>
                 <Box
                   rounded="full"
                   overflow="hidden"
@@ -249,6 +276,7 @@ export const PostCard = ({
                   bg="gray.950"
                   w={8}
                   h={8}
+                  mt={1}
                 >
                   <styled.img
                     src={comment.user.image ?? "/blank-driver-right.jpg"}
@@ -287,103 +315,154 @@ export const PostCard = ({
               </Flex>
 
               {(comment.replies?.length ?? 0) > 0 && (
-                <Box pl={12}>
+                <Flex flexDir="column" gap={1} pl={4}>
                   {comment.replies?.map((reply) => (
-                    <Box key={reply.id}>
+                    <Flex key={reply.id} alignItems="flex-start" gap={2}>
                       <Box
-                        bgColor="gray.800"
-                        rounded="xl"
-                        px={3}
-                        py={2}
-                        w="fit-content"
+                        w={6}
+                        h={6}
+                        flex="none"
+                        borderBottomLeftRadius="xl"
+                        borderLeftWidth={2}
+                        borderColor="gray.800"
+                        borderBottomWidth={2}
+                      />
+                      <Box
+                        rounded="full"
+                        overflow="hidden"
+                        borderWidth={1}
+                        borderColor="gray.700"
+                        bg="gray.950"
+                        w={8}
+                        h={8}
+                        mt={1}
                       >
-                        <Markdown>{reply.content}</Markdown>
+                        <styled.img
+                          src={reply.user.image ?? "/blank-driver-right.jpg"}
+                          alt={`${reply.user.firstName} ${reply.user.lastName}`}
+                        />
                       </Box>
-                    </Box>
+                      <Box flex={1}>
+                        <Box
+                          bgColor="gray.800"
+                          rounded="xl"
+                          px={3}
+                          py={2}
+                          w="fit-content"
+                        >
+                          <Markdown>{reply.content}</Markdown>
+                        </Box>
+                        <styled.p color="gray.500" fontSize="sm" py={1} pl={3}>
+                          {formatDistanceToNow(reply.createdAt, {
+                            addSuffix: true,
+                          })}
+                        </styled.p>
+                      </Box>
+                    </Flex>
                   ))}
-                </Box>
-              )}
-            </Fragment>
-          ))}
-        </Box>
-      )}
-
-      {allowComment && (
-        <SignedIn>
-          <form onSubmit={formik.handleSubmit} id="comment">
-            <Flex borderTopWidth={1} borderColor="gray.800" p={4} gap={2}>
-              <Box
-                w={10}
-                h={10}
-                rounded="full"
-                overflow="hidden"
-                borderWidth={1}
-                borderColor="gray.700"
-              >
-                <styled.img
-                  w="full"
-                  h="full"
-                  src={user?.image ?? "/blank-driver-right.jpg"}
-                  objectFit="cover"
-                />
-              </Box>
-              <Box
-                flex={1}
-                bgColor="gray.800"
-                rounded="xl"
-                borderWidth={1}
-                borderColor="gray.700"
-              >
-                {replyComment && (
-                  <Flex
-                    pl={4}
-                    pr={1}
-                    py={0.5}
-                    bgColor="gray.900"
-                    borderTopRadius="xl"
-                    alignItems="center"
-                  >
-                    <styled.p color="gray.500" fontSize="sm">
-                      Replying to {replyComment.user.firstName}{" "}
-                      {replyComment.user.lastName}
-                    </styled.p>
-                    <Spacer />
-                    <Link
-                      to={`/posts/${post.id}#comment`}
-                      className={css({
-                        p: 1,
-                      })}
-                    >
-                      <RiCloseLine />
-                    </Link>
-                  </Flex>
-                )}
-                <UserTaggingInput
-                  placeholder="Add a comment..."
-                  autoFocus
-                  name="comment"
-                  value={formik.values.comment}
-                  onChange={(value) => formik.setFieldValue("comment", value)}
-                  rounded="xl"
-                />
-                <Flex p={2}>
-                  <Spacer />
-                  <Button
-                    px={0}
-                    py={0}
-                    w={8}
-                    h={8}
-                    type="submit"
-                    disabled={createComment.isPending}
-                    isLoading={createComment.isPending}
-                  >
-                    <RiSendPlaneFill size={16} />
-                  </Button>
                 </Flex>
-              </Box>
+              )}
             </Flex>
-          </form>
-        </SignedIn>
+          ))}
+
+          {allowComment && (
+            <SignedIn>
+              <form
+                onSubmit={formik.handleSubmit}
+                id="comment"
+                style={{
+                  // @ts-ignore
+                  "--order":
+                    replyCommentIndex !== null ? replyCommentIndex : -1,
+                }}
+                className={css({
+                  order: "var(--order)",
+                })}
+              >
+                <Flex
+                  borderBottomWidth={1}
+                  borderColor="gray.800"
+                  px={4}
+                  pb={2}
+                  gap={2}
+                  mb={2}
+                >
+                  <Box
+                    w={10}
+                    h={10}
+                    rounded="full"
+                    overflow="hidden"
+                    borderWidth={1}
+                    borderColor="gray.700"
+                  >
+                    <styled.img
+                      w="full"
+                      h="full"
+                      src={user?.image ?? "/blank-driver-right.jpg"}
+                      objectFit="cover"
+                    />
+                  </Box>
+                  <Box
+                    flex={1}
+                    bgColor="gray.800"
+                    rounded="xl"
+                    borderWidth={1}
+                    borderColor="gray.700"
+                  >
+                    {replyComment && (
+                      <Flex
+                        pl={4}
+                        pr={1}
+                        py={0.5}
+                        bgColor="gray.900"
+                        borderTopRadius="xl"
+                        alignItems="center"
+                      >
+                        <styled.p color="gray.500" fontSize="sm">
+                          Replying to {replyComment.user.firstName}{" "}
+                          {replyComment.user.lastName}
+                        </styled.p>
+                        <Spacer />
+                        <Link
+                          to={`/posts/${post.id}#comment`}
+                          className={css({
+                            p: 1,
+                          })}
+                        >
+                          <RiCloseLine />
+                        </Link>
+                      </Flex>
+                    )}
+                    <UserTaggingInput
+                      placeholder="Add a comment..."
+                      autoFocus
+                      name="comment"
+                      value={formik.values.comment}
+                      onChange={(value) =>
+                        formik.setFieldValue("comment", value)
+                      }
+                      rounded="xl"
+                    />
+                    <Flex p={2}>
+                      <Spacer />
+                      <Button
+                        px={0}
+                        py={0}
+                        w={8}
+                        h={8}
+                        type="submit"
+                        disabled={createComment.isPending}
+                        isLoading={createComment.isPending}
+                      >
+                        <RiSendPlaneFill size={16} />
+                      </Button>
+                    </Flex>
+                  </Box>
+                </Flex>
+              </form>
+            </SignedIn>
+          )}
+        </Flex>
       )}
     </Box>
   );
