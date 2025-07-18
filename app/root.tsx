@@ -28,6 +28,19 @@ import { EmbedProvider, HiddenEmbed } from "./utils/EmbedContext";
 import { AppProvider } from "./utils/AppContext";
 import { AppNav } from "./components/AppNav";
 import { AppHeader } from "./components/AppHeader";
+import type { Route } from "./+types/root";
+import { AppSplash } from "./components/AppSplash";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: "RC Drift UK" },
+    { name: "description", content: "Welcome to RCDrift.uk" },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
+  ];
+};
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "https://fonts.cdnfonts.com/css/sf-pro-display" },
@@ -155,6 +168,7 @@ function App({
     >
       <AppProvider value={isApp}>
         <EmbedProvider value={isEmbed}>
+          {isApp && <AppSplash />}
           {isApp && <AppHeader />}
 
           {!isEmbed && (
