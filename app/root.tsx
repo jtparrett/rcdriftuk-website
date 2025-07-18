@@ -31,6 +31,7 @@ import { AppHeader } from "./components/AppHeader";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
+import { AppSplash } from "./components/AppSplash";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -170,6 +171,7 @@ function App({
       <QueryClientProvider client={queryClient}>
         <AppProvider value={isApp}>
           <EmbedProvider value={isEmbed}>
+            {isApp && <AppSplash />}
             {isApp && <AppHeader />}
 
             {!isEmbed && (
