@@ -21,7 +21,7 @@ export const AppSplash = () => {
       })}
       initial={{ opacity: 1 }}
       animate={{ opacity: 0, filter: "blur(16px)" }}
-      transition={{ duration: 0.4, delay: 0.2, ease: "easeInOut" }}
+      transition={{ duration: 0.4, delay: 1.5, ease: "easeInOut" }}
       onAnimationComplete={() => {
         setIsVisible(false);
       }}
