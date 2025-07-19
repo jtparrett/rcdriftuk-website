@@ -29,7 +29,6 @@ import { AppProvider } from "./utils/AppContext";
 import { AppNav } from "./components/AppNav";
 import { AppHeader } from "./components/AppHeader";
 import type { Route } from "./+types/root";
-import { AppSplash } from "./components/AppSplash";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -168,7 +167,6 @@ function App({
     >
       <AppProvider value={isApp}>
         <EmbedProvider value={isEmbed}>
-          {isApp && <AppSplash />}
           {isApp && <AppHeader />}
 
           {!isEmbed && (
