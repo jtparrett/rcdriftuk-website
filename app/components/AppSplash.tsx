@@ -20,8 +20,8 @@ export const AppSplash = () => {
         alignItems: "center",
       })}
       initial={{ opacity: 1 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 0.3, delay: 1.5, ease: "easeInOut" }}
+      animate={{ opacity: 0, filter: "blur(16px)" }}
+      transition={{ duration: 0.4, delay: 0.2, ease: "easeInOut" }}
       onAnimationComplete={() => {
         setIsVisible(false);
       }}
