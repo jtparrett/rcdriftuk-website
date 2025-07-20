@@ -42,7 +42,7 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
         ROUND(
           (
             (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-            GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1)
+            POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.8)
           ) * (
             0.7 + 0.6 * (
               -- Use post id and seed to create deterministic randomness
@@ -67,18 +67,18 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
           ROUND(
             (
               (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-              GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1)
+              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.5)
             ) * (
               0.7 + 0.6 * (
                 (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
               )
             ), 4
-          ) < ${cursorScore}::decimal
+          ) < ${cursorScore}
         ) OR (
           ROUND(
             (
               (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-              GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1)
+              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.5)
             ) * (
               0.7 + 0.6 * (
                 (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
