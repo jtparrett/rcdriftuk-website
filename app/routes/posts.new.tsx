@@ -77,7 +77,7 @@ export const action = async (args: ActionFunctionArgs) => {
     }
   }
 
-  await prisma.posts.create({
+  const post = await prisma.posts.create({
     data: {
       userId,
       content: data.content,
@@ -85,7 +85,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/feed`);
+  return redirect(`/posts/${post.id}`);
 };
 
 const NewPostPage = () => {
