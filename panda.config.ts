@@ -129,6 +129,11 @@ export default defineConfig({
             transform: "translateY(-8px)",
           },
         },
+        logo: {
+          "100%": {
+            strokeDashoffset: "-200",
+          },
+        },
       },
     },
   },

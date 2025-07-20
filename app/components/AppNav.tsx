@@ -13,6 +13,7 @@ import {
   RiShoppingBagLine,
 } from "react-icons/ri";
 import { Link, useLocation } from "react-router";
+import { APP_TAB_ROUTES } from "./AppHeader";
 
 const Tab = styled(Link, {
   base: {
@@ -31,6 +32,16 @@ const Tab = styled(Link, {
 
 export const AppNav = () => {
   const location = useLocation();
+
+  const isMainTab = APP_TAB_ROUTES.some((route) =>
+    route.endsWith("*")
+      ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
+      : location.pathname.toLowerCase() === route,
+  );
+
+  if (!isMainTab) {
+    return null;
+  }
 
   return (
     <>

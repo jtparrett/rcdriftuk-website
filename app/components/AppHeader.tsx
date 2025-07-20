@@ -1,11 +1,12 @@
-import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Box, Center, Spacer, styled } from "~/styled-system/jsx";
 import { useDelayedLoader } from "./Header";
 import { useLocation, useNavigate } from "react-router";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useScroll, motion, useTransform } from "motion/react";
 import { css } from "~/styled-system/css";
+import { LogoLoader } from "./LogoLoader";
 
-const TAB_ROUTES = [
+export const APP_TAB_ROUTES = [
   "/feed",
   "/ratings/*",
   "/map/*",
@@ -54,7 +55,7 @@ export const AppHeader = () => {
             height,
           }}
         >
-          {!TAB_ROUTES.some((route) =>
+          {!APP_TAB_ROUTES.some((route) =>
             route.endsWith("*")
               ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
               : location.pathname.toLowerCase() === route,
@@ -99,6 +100,12 @@ export const AppHeader = () => {
       </motion.div>
 
       <Box h="calc(64px + env(safe-area-inset-top))" w="full" />
+
+      {isNavigating && (
+        <Center pos="fixed" inset={0} bgColor="black" zIndex={14}>
+          <LogoLoader />
+        </Center>
+      )}
     </>
   );
 };
