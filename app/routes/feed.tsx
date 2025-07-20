@@ -1,7 +1,9 @@
 import { RiInformationFill } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { PostCard } from "~/components/PostCard";
+import { Button } from "~/components/Button";
 import {
   Box,
   Center,
@@ -12,7 +14,6 @@ import {
 } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUser, type GetUser } from "~/utils/getUser.server";
-import { prisma } from "~/utils/prisma.server";
 import { userIsVerified } from "~/utils/userIsVerified";
 import type { Route } from "./+types/feed";
 
@@ -34,57 +35,57 @@ export const loader = async (args: LoaderFunctionArgs) => {
     user = await getUser(userId);
   }
 
-  const posts = await prisma.posts.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      user: true,
-      _count: {
-        select: {
-          likes: true,
-          comments: true,
-        },
-      },
-      ...(userId
-        ? {
-            likes: {
-              where: {
-                userId,
-              },
-            },
-          }
-        : {}),
-      comments: {
-        where: {
-          parentId: null,
-        },
-        include: {
-          user: true,
-          replies: {
-            take: 1,
-            orderBy: {
-              createdAt: "desc",
-            },
-            include: {
-              user: true,
-            },
-          },
-        },
-        orderBy: {
-          id: "asc",
-        },
-        take: 1,
-      },
-    },
-  });
-
-  return { posts, user };
+  return { user };
 };
 
 const FeedPage = () => {
-  const { posts, user } = useLoaderData<typeof loader>();
+  const { user } = useLoaderData<typeof loader>();
   const canPost = userIsVerified(user);
+
+  // Helper function to calculate cursor values from a post
+  const getCursorFromPost = (post: any) => {
+    const cursor = {
+      cursorScore: (post as any)._score,
+      cursorId: post.id,
+    };
+
+    return cursor;
+  };
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["feed-posts"],
+      queryFn: async ({ pageParam }) => {
+        // All pages - fetch from API
+        const searchParams = new URLSearchParams();
+
+        if (pageParam) {
+          searchParams.set("cursorScore", pageParam.cursorScore.toString());
+          searchParams.set("cursorId", pageParam.cursorId.toString());
+          searchParams.set("timestamp", pageParam.timestamp);
+        }
+
+        const response = await fetch(`/api/feed/posts?${searchParams}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+
+        return response.json();
+      },
+      initialPageParam: null as any,
+      getNextPageParam: (lastPage) => {
+        if (!lastPage.posts.length) return undefined;
+        const lastPost = lastPage.posts[lastPage.posts.length - 1];
+        return {
+          ...getCursorFromPost(lastPost),
+          timestamp: lastPage.timestamp,
+        };
+      },
+    });
+
+  // Flatten all pages into a single array of posts
+  const allPosts = data?.pages.flatMap((page) => page.posts) ?? [];
 
   return (
     <Container maxW={680} px={2}>
@@ -156,10 +157,23 @@ const FeedPage = () => {
       )}
 
       <Flex flexDir="column" gap={2} py={2}>
-        {posts.map((post) => (
+        {allPosts.map((post) => (
           <PostCard key={post.id} post={post} user={user} />
         ))}
       </Flex>
+
+      {hasNextPage && (
+        <Center py={4}>
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            isLoading={isFetchingNextPage}
+            variant="outline"
+          >
+            Load More
+          </Button>
+        </Center>
+      )}
     </Container>
   );
 };
