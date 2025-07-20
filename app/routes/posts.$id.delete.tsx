@@ -2,7 +2,6 @@ import {
   type ActionFunctionArgs,
   redirect,
   type LoaderFunctionArgs,
-  useLoaderData,
 } from "react-router";
 import { z } from "zod";
 import { ConfirmationForm } from "~/components/ConfirmationForm";
@@ -46,13 +45,11 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const PostDeletePage = () => {
-  const post = useLoaderData<typeof loader>();
   return (
     <Container maxW={1100} px={2} py={10}>
       <ConfirmationForm
         title="Are you sure you want to delete this post?"
         confirmText="Yes, Delete"
-        cancelTo={`/posts/${post.id}`}
       />
     </Container>
   );

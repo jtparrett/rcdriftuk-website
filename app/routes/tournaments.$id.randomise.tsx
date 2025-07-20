@@ -101,7 +101,6 @@ const RandomiseQualifyingPage = () => {
       title="Are you sure you want to randomise qualifying?"
       confirmText="Yes, Randomise"
       disclaimer="This will randomise the qualifying results for all drivers and allow for random battle pairings to be generated."
-      cancelTo={`/tournaments/${id}/qualifying`}
     />
   );
 };

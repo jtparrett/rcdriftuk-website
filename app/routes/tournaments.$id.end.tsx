@@ -65,7 +65,6 @@ const TournamentEndPage = () => {
       <ConfirmationForm
         title="Are you sure you want to end this tournament?"
         confirmText="Yes, End this tournament"
-        cancelTo={`/tournaments/${tournament.id}/overview`}
       />
     </Container>
   );

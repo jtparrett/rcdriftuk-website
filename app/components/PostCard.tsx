@@ -310,6 +310,14 @@ export const PostCard = ({
                     >
                       Reply
                     </StyledLink>
+                    {user?.id === comment.user.id && (
+                      <StyledLink
+                        to={`/comments/${comment.id}/delete`}
+                        fontSize="sm"
+                      >
+                        Delete
+                      </StyledLink>
+                    )}
                   </Flex>
                 </Box>
               </Flex>
@@ -352,11 +360,32 @@ export const PostCard = ({
                         >
                           <Markdown>{reply.content}</Markdown>
                         </Box>
-                        <styled.p color="gray.500" fontSize="sm" py={1} pl={3}>
-                          {formatDistanceToNow(reply.createdAt, {
-                            addSuffix: true,
-                          })}
-                        </styled.p>
+
+                        <Flex gap={4} alignItems="center" pl={3}>
+                          <styled.p
+                            color="gray.500"
+                            fontSize="sm"
+                            py={1}
+                            pl={3}
+                          >
+                            {formatDistanceToNow(reply.createdAt, {
+                              addSuffix: true,
+                            })}
+                          </styled.p>
+
+                          <StyledLink to={`/posts/${post.id}`} fontSize="sm">
+                            Like
+                          </StyledLink>
+
+                          {user?.id === reply.user.id && (
+                            <StyledLink
+                              to={`/comments/${reply.id}/delete`}
+                              fontSize="sm"
+                            >
+                              Delete
+                            </StyledLink>
+                          )}
+                        </Flex>
                       </Box>
                     </Flex>
                   ))}

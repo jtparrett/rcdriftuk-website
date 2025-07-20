@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useNavigate } from "react-router";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
 
@@ -6,15 +6,10 @@ interface Props {
   title: string;
   disclaimer?: string;
   confirmText: string;
-  cancelTo: string;
 }
 
-export const ConfirmationForm = ({
-  title,
-  disclaimer,
-  confirmText,
-  cancelTo,
-}: Props) => {
+export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
+  const navigate = useNavigate();
   return (
     <Box
       bg="gray.900"
@@ -34,9 +29,9 @@ export const ConfirmationForm = ({
           </styled.p>
         )}
         <Flex gap={2} justifyContent="center" mt={6}>
-          <LinkButton to={cancelTo} variant="secondary">
+          <Button variant="secondary" onClick={() => navigate(-1)}>
             Cancel
-          </LinkButton>
+          </Button>
           <Button type="submit">{confirmText}</Button>
         </Flex>
       </Form>
