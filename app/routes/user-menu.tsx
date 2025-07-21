@@ -15,7 +15,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    throw redirect("/sign-in?redirect=/feed");
+    throw redirect("/sign-in?redirect=/app");
   }
 
   const user = await getUser(userId);

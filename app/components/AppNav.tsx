@@ -67,11 +67,13 @@ export const AppNav = () => {
           alignItems="center"
         >
           <Tab
-            to="/feed"
-            isActive={location.pathname === "/feed"}
+            to="/app"
+            isActive={
+              location.pathname === "/feed" || location.pathname === "/"
+            }
             viewTransition
           >
-            {location.pathname === "/feed" ? (
+            {location.pathname === "/feed" || location.pathname === "/" ? (
               <RiHomeFill size={24} />
             ) : (
               <RiHomeLine size={24} />
