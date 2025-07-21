@@ -65,9 +65,6 @@ export const loader = async (params: LoaderFunctionArgs) => {
       {
         title: "asc",
       },
-      {
-        shop: "asc",
-      },
     ],
     include: {
       Tracks: true,

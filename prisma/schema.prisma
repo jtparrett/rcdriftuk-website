@@ -235,7 +235,6 @@ model Products {
   title       String
   image       String
   description String?
-  shop        Shops
   url         String
   trackId     String?       @db.Uuid
   status      ProductStatus @default(UNKNOWN)
@@ -292,17 +291,6 @@ enum TrackTypes {
   TRACKS
   CLUBS
   SHOPS
-}
-
-enum Shops {
-  ASBO
-  RCKITOUT
-  A0_RCKITOUT
-  DRIFTMANJI
-  SLIDEDYNAMICS
-  RCPACE
-  MODELSHOPDIRECT
-  SLIDEHOUSE
 }
 
 enum ProductStatus {
