@@ -85,18 +85,6 @@ export const AppHeader = () => {
               alt="RC Drift UK"
             />
           </Box>
-
-          {isNavigating && (
-            <Box
-              w={5}
-              h={5}
-              rounded="full"
-              borderWidth={2}
-              borderColor="gray.800"
-              borderTopColor="brand.500"
-              animation="spin 1s linear infinite"
-            />
-          )}
         </motion.div>
       </motion.div>
 
