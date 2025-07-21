@@ -7,6 +7,7 @@ import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 
 export const APP_TAB_ROUTES = [
+  "/",
   "/feed",
   "/ratings/*",
   "/map/*",
