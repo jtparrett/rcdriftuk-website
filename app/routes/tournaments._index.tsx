@@ -51,11 +51,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return { tournaments };
+  return { tournaments, userId };
 };
 
 const Page = () => {
-  const { tournaments } = useLoaderData<typeof loader>();
+  const { tournaments, userId } = useLoaderData<typeof loader>();
 
   return (
     <Container maxW={1100} px={4} py={8}>
@@ -119,14 +119,16 @@ const Page = () => {
                 </Flex>
               </Box>
               <Spacer />
-              <LinkButton
-                variant="ghost"
-                pos="relative"
-                zIndex={3}
-                to={`/tournaments/${tournament.id}/archive`}
-              >
-                <RiDeleteBinFill />
-              </LinkButton>
+              {tournament.userId === userId && (
+                <LinkButton
+                  variant="ghost"
+                  pos="relative"
+                  zIndex={3}
+                  to={`/tournaments/${tournament.id}/archive`}
+                >
+                  <RiDeleteBinFill />
+                </LinkButton>
+              )}
             </Flex>
           </Box>
         ))}
