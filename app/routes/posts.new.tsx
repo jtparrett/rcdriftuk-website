@@ -27,6 +27,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import { getUser } from "~/utils/getUser.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { resizeImage } from "~/utils/resizeImage";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { userIsVerified } from "~/utils/userIsVerified";
 
@@ -130,7 +131,10 @@ const NewPostPage = () => {
   const fileUploadMutation = useMutation({
     async mutationFn(file: File) {
       const formData = new FormData();
-      formData.append("file", file);
+
+      const result = await resizeImage(file);
+
+      formData.append("file", result);
 
       const response = await fetch("/api/upload-image", {
         method: "POST",
