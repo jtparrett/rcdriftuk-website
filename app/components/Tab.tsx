@@ -1,30 +1,28 @@
 import { Link } from "react-router";
 import type { ReactNode } from "react";
 import { styled } from "~/styled-system/jsx";
+import { cva } from "~/styled-system/css";
 
-interface Props {
-  children?: ReactNode;
-  isActive?: boolean;
-  to: string;
-}
+const TabStyle = cva({
+  base: {
+    px: 3,
+    py: 2,
+    flex: "none",
+    rounded: "lg",
+    fontWeight: "semibold",
+    fontSize: "sm",
+    transition: "background-color .3s",
+    whiteSpace: "nowrap",
+    cursor: "pointer",
+  },
+  variants: {
+    isActive: {
+      true: {
+        bgColor: "gray.800",
+      },
+    },
+  },
+});
 
-const TabBase = styled(Link);
-
-export const Tab = ({ children, isActive, to }: Props) => {
-  return (
-    <TabBase
-      to={to}
-      px={3}
-      py={2}
-      flex="none"
-      bgColor={isActive ? "gray.800" : undefined}
-      rounded="lg"
-      fontWeight="semibold"
-      fontSize="sm"
-      transition="background-color .3s"
-      whiteSpace="nowrap"
-    >
-      {children}
-    </TabBase>
-  );
-};
+export const Tab = styled(Link, TabStyle);
+export const TabButton = styled("button", TabStyle);

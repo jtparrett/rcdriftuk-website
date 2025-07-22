@@ -32,6 +32,7 @@ import { format } from "date-fns";
 import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/drivers.$id";
 import { css } from "~/styled-system/css";
+import { Tab, TabButton } from "~/components/Tab";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const driverId = z.coerce.number().parse(params.id);
@@ -182,6 +183,7 @@ const TABS = {
   battleHistory: "Battle History",
   ratingHistory: "Rating History",
   regionalRatings: "Regional Ratings",
+  posts: "Posts",
 };
 
 const Page = () => {
@@ -245,36 +247,28 @@ const Page = () => {
         {driver && (
           <Flex>
             <Spacer />
-            <Box
-              p={0.5}
+            <Flex
+              p={1}
               rounded="full"
               bg="gray.950"
               borderWidth={1}
               borderColor="gray.800"
               shadow="lg"
+              alignItems="center"
+              gap={1}
             >
-              <Flex
-                rounded="full"
-                borderWidth={1}
-                borderColor="gray.800"
-                py={1}
-                px={2}
-                alignItems="center"
-                gap={1}
-              >
-                <styled.span fontSize="md" fontWeight="medium" pl={2}>
-                  {driver.elo.toFixed(3)}
-                </styled.span>
-                <Box w={8} h={8} perspective="200px">
-                  <styled.img
-                    src={`/badges/${rank}.png`}
-                    w="full"
-                    alt={rank}
-                    animation="badge 4s linear infinite"
-                  />
-                </Box>
-              </Flex>
-            </Box>
+              <styled.span fontSize="md" fontWeight="medium" pl={2}>
+                {driver.elo.toFixed(3)}
+              </styled.span>
+              <Box w={8} h={8} perspective="200px">
+                <styled.img
+                  src={`/badges/${rank}.png`}
+                  w="full"
+                  alt={rank}
+                  animation="badge 4s linear infinite"
+                />
+              </Box>
+            </Flex>
           </Flex>
         )}
 
@@ -337,31 +331,40 @@ const Page = () => {
           )}
         </Flex>
 
-        <Flex gap={0.5} pb={4} alignItems="center" mx={1}>
-          <Button
-            flex={1}
+        <Flex
+          p={2}
+          borderWidth={1}
+          borderColor="gray.800"
+          rounded="xl"
+          mb={2}
+          gap={0.5}
+          overflowX="auto"
+          bgColor="gray.950"
+        >
+          <TabButton
+            isActive={tab === TABS.battleHistory}
             onClick={() => setTab(TABS.battleHistory)}
-            variant={tab === TABS.battleHistory ? "secondary" : "ghost"}
-            px={0}
           >
             Battle History
-          </Button>
-          <Button
-            flex={1}
+          </TabButton>
+          <TabButton
+            isActive={tab === TABS.ratingHistory}
             onClick={() => setTab(TABS.ratingHistory)}
-            variant={tab === TABS.ratingHistory ? "secondary" : "ghost"}
-            px={0}
           >
             Rating History
-          </Button>
-          <Button
-            flex={1}
+          </TabButton>
+          <TabButton
+            isActive={tab === TABS.regionalRatings}
             onClick={() => setTab(TABS.regionalRatings)}
-            variant={tab === TABS.regionalRatings ? "secondary" : "ghost"}
-            px={0}
           >
             Regional Ratings
-          </Button>
+          </TabButton>
+          <TabButton
+            isActive={tab === TABS.posts}
+            onClick={() => setTab(TABS.posts)}
+          >
+            Posts
+          </TabButton>
         </Flex>
 
         {tab === TABS.ratingHistory &&
