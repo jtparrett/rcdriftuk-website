@@ -1,6 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { RiDeleteBinFill, RiSendPlaneFill } from "react-icons/ri";
+import {
+  RiArrowDownSLine,
+  RiDeleteBinFill,
+  RiSendPlaneFill,
+} from "react-icons/ri";
 import {
   redirect,
   useLoaderData,
@@ -11,7 +15,9 @@ import {
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Button } from "~/components/Button";
+import { Dropdown, Option } from "~/components/Dropdown";
 import { ImageInput } from "~/components/ImageInput";
+import { Label } from "~/components/Label";
 import { Textarea } from "~/components/Textarea";
 import { UserTaggingInput } from "~/components/UserTaggingInput";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
@@ -21,11 +27,13 @@ import { getAuth } from "~/utils/getAuth.server";
 import { getUser } from "~/utils/getUser.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { useDisclosure } from "~/utils/useDisclosure";
 import { userIsVerified } from "~/utils/userIsVerified";
 
 const postSchema = z.object({
   content: z.string().min(1),
   images: z.array(z.string()),
+  trackId: z.string().nullable(),
 });
 
 const validationSchema = toFormikValidationSchema(postSchema);
@@ -45,7 +53,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   notFoundInvariant(canPost);
 
-  return { user };
+  const userTracks = await prisma.tracks.findMany({
+    where: {
+      Owners: {
+        some: {
+          userId,
+        },
+      },
+    },
+  });
+
+  return { user, userTracks };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -82,6 +100,7 @@ export const action = async (args: ActionFunctionArgs) => {
       userId,
       content: data.content,
       images: finalImages,
+      trackId: data.trackId,
     },
   });
 
@@ -90,12 +109,14 @@ export const action = async (args: ActionFunctionArgs) => {
 
 const NewPostPage = () => {
   const submit = useSubmit();
-  const { user } = useLoaderData<typeof loader>();
+  const { user, userTracks } = useLoaderData<typeof loader>();
+  const dropdownDisclosure = useDisclosure();
 
   const formik = useFormik({
     initialValues: {
       content: "",
       images: [],
+      trackId: null,
     },
     validationSchema,
     async onSubmit(values) {
@@ -125,6 +146,13 @@ const NewPostPage = () => {
     },
   });
 
+  const postAsTrack = userTracks.find(
+    (track) => track.id === formik.values.trackId,
+  );
+  const postAsAvatar =
+    postAsTrack?.image ?? user.image ?? "/blank-driver-right.jpg";
+  const postAsName = postAsTrack?.name ?? `${user.firstName} ${user.lastName}`;
+
   return (
     <Container maxW={680} px={2} py={2}>
       <Box
@@ -135,33 +163,89 @@ const NewPostPage = () => {
         borderWidth={1}
         borderColor="gray.800"
       >
-        <Flex gap={2} alignItems="center" mb={3}>
-          <Box
-            rounded="full"
-            overflow="hidden"
-            borderWidth={1}
-            borderColor="gray.700"
-            bg="gray.950"
-            w={10}
-            h={10}
+        <Box pos="relative" mb={3}>
+          <styled.button
+            onClick={dropdownDisclosure.toggle}
+            cursor="pointer"
+            type="button"
           >
-            <styled.img
-              display="block"
-              src={user.image ?? "/blank-driver-right.jpg"}
-              alt={`${user.firstName} ${user.lastName}`}
-              w="full"
-              h="full"
-              objectFit="cover"
-            />
-          </Box>
-          <Box>
-            <styled.p fontWeight="medium" lineHeight="1.3">
-              {user.firstName} {user.lastName}
-            </styled.p>
-          </Box>
-        </Flex>
+            <Flex
+              gap={2}
+              alignItems="center"
+              w="fit-content"
+              borderWidth={1}
+              borderColor="gray.800"
+              rounded="lg"
+              p={2}
+            >
+              <Box
+                rounded="full"
+                overflow="hidden"
+                borderWidth={1}
+                borderColor="gray.700"
+                bg="gray.950"
+                w={10}
+                h={10}
+              >
+                <styled.img
+                  display="block"
+                  src={postAsAvatar}
+                  alt="Profile image"
+                  w="full"
+                  h="full"
+                  objectFit="cover"
+                />
+              </Box>
+              <Box>
+                <styled.p fontWeight="medium" lineHeight="1.3">
+                  {postAsName}
+                </styled.p>
+              </Box>
+              <RiArrowDownSLine />
+            </Flex>
+          </styled.button>
+
+          {dropdownDisclosure.isOpen && (
+            <Dropdown role="listbox">
+              <styled.p
+                color="gray.400"
+                fontSize="sm"
+                px={2}
+                borderBottomWidth={1}
+                borderColor="gray.700"
+              >
+                Post as...
+              </styled.p>
+              <Option
+                onClick={() => {
+                  formik.setFieldValue("trackId", null);
+                  dropdownDisclosure.onClose();
+                }}
+              >
+                {user.firstName} {user.lastName}
+              </Option>
+              {userTracks.map((track) => (
+                <Option
+                  key={track.id}
+                  onClick={() => {
+                    formik.setFieldValue("trackId", track.id);
+                    dropdownDisclosure.onClose();
+                  }}
+                >
+                  {track.name}
+                </Option>
+              ))}
+            </Dropdown>
+          )}
+        </Box>
 
         <form onSubmit={formik.handleSubmit}>
+          <styled.input
+            type="hidden"
+            name="trackId"
+            value={formik.values.trackId ?? ""}
+          />
+
           <UserTaggingInput
             placeholder={`What's on your mind, ${user.firstName}?`}
             name="content"

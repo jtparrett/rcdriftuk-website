@@ -91,6 +91,14 @@ export const PostCard = ({
     ? comments.findIndex((comment) => comment.id === Number(replyId))
     : null;
 
+  const postAuthorName =
+    post.track?.name ?? `${post.user.firstName} ${post.user.lastName}`;
+  const postAuthorAvatar =
+    post.track?.image ?? post.user.image ?? "/blank-driver-right.jpg";
+  const postAuthorLink = post.track?.slug
+    ? `/tracks/${post.track.slug}`
+    : `/drivers/${post.user.driverId}`;
+
   return (
     <Box rounded="xl" borderWidth={1} borderColor="gray.800" bg="gray.900">
       <Box px={4} pt={3}>
@@ -106,11 +114,11 @@ export const PostCard = ({
             pos="relative"
             mr={1.5}
           >
-            <LinkOverlay to={`/drivers/${post.user.driverId}`}>
+            <LinkOverlay to={postAuthorLink}>
               <styled.img
                 display="block"
-                src={post.user.image ?? "/blank-driver-right.jpg"}
-                alt={`${post.user.firstName} ${post.user.lastName}`}
+                src={postAuthorAvatar}
+                alt={postAuthorName}
                 w="full"
                 h="full"
                 objectFit="cover"
@@ -119,13 +127,13 @@ export const PostCard = ({
           </Box>
           <Box>
             <Link
-              to={`/drivers/${post.user.driverId}`}
+              to={postAuthorLink}
               className={css({
                 fontWeight: "medium",
                 lineHeight: "1.3",
               })}
             >
-              {post.user.firstName} {post.user.lastName}
+              {postAuthorName}
             </Link>
             <styled.p fontSize="sm" color="gray.500" lineHeight="1.3">
               <Link to={`/posts/${post.id}`}>

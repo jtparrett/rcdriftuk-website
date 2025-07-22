@@ -108,6 +108,14 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
           comments: true,
         },
       },
+      track: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          image: true,
+        },
+      },
       ...(userId
         ? {
             likes: {

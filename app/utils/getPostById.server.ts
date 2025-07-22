@@ -14,6 +14,14 @@ export const getPostById = async (id: number, userId?: string | null) => {
           comments: true,
         },
       },
+      track: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          image: true,
+        },
+      },
       ...(userId
         ? {
             likes: {

@@ -182,6 +182,7 @@ model Tracks {
   status      TrackStatus        @default(PENDING)
   address     String?
   tournaments TrackTournaments[]
+  posts       Posts[]
 }
 
 model TrackOwners {
@@ -262,7 +263,9 @@ model Posts {
   likes     PostLikes[]
   comments  PostComments[]
   userId    String
+  trackId   String?        @db.Uuid
   user      Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track     Tracks?        @relation(fields: [trackId], references: [id], onDelete: Cascade)
 }
 
 model PostLikes {

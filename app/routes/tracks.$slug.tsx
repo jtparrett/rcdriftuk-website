@@ -159,8 +159,8 @@ const TrackPage = () => {
             >
               Events
             </Tab>
-            <Tab to={`/tracks/${track?.slug}/feed`} isActive={tab === "feed"}>
-              Feed
+            <Tab to={`/tracks/${track?.slug}/posts`} isActive={tab === "posts"}>
+              Posts
             </Tab>
             {track?.types.includes(TrackTypes.SHOPS) && (
               <Tab

@@ -1,5 +1,4 @@
 import { styled } from "~/styled-system/jsx";
-import { Button } from "./Button";
 
 export const Dropdown = styled("div", {
   base: {
