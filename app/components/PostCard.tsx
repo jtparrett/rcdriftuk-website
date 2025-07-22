@@ -300,6 +300,11 @@ export const PostCard = ({
                     py={2}
                     w="fit-content"
                   >
+                    <Link to={`/drivers/${comment.user.driverId}`}>
+                      <styled.p fontSize="sm" fontWeight="medium">
+                        {comment.user.firstName} {comment.user.lastName}
+                      </styled.p>
+                    </Link>
                     <Markdown>{comment.content}</Markdown>
                   </Box>
 
@@ -366,6 +371,11 @@ export const PostCard = ({
                           py={2}
                           w="fit-content"
                         >
+                          <Link to={`/drivers/${reply.user.driverId}`}>
+                            <styled.p fontSize="sm" fontWeight="medium">
+                              {reply.user.firstName} {reply.user.lastName}
+                            </styled.p>
+                          </Link>
                           <Markdown>{reply.content}</Markdown>
                         </Box>
 
