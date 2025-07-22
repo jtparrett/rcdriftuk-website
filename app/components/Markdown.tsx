@@ -27,6 +27,8 @@ export const Markdown = ({ children }: Props) => {
         allowedElements={[
           "p",
           "a",
+          "b",
+          "strong",
           "h1",
           "h2",
           "h3",
