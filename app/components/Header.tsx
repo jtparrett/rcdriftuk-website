@@ -1,14 +1,7 @@
-import {
-  styled,
-  Flex,
-  Spacer,
-  Box,
-  Container,
-  Center,
-} from "~/styled-system/jsx";
+import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
 import { Link, useLocation, useNavigation } from "react-router";
 import { Button, LinkButton } from "./Button";
-import { RiAddCircleFill, RiAddLine, RiMenuFill } from "react-icons/ri";
+import { RiMenuFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { SignedIn, SignedOut } from "@clerk/react-router";

@@ -6,10 +6,10 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router";
-import { Button } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
-import { Box, Container, Flex, VStack } from "~/styled-system/jsx";
+import { Box, Container, Flex, styled, VStack } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/user.profile";
@@ -132,57 +132,81 @@ const UserProfilePage = () => {
 
   return (
     <Container maxW={1100} px={2} py={10}>
-      <Box p={6} bgColor="gray.900" rounded="2xl" maxW="580px" mx="auto">
-        <form onSubmit={formik.handleSubmit}>
-          <VStack gap={4} alignItems="stretch">
-            <FormControl error={formik.errors.avatar}>
-              <Label>Avatar</Label>
-              <ImageInput
-                name="avatar"
-                value={formik.values.avatar ?? null}
-                onChange={(file) => {
-                  formik.setFieldValue("avatar", file);
-                }}
-              />
-            </FormControl>
+      <Box maxW="580px" mx="auto">
+        <styled.h2>Account Details</styled.h2>
+        <Box
+          p={6}
+          mt={2}
+          bgColor="gray.900"
+          rounded="2xl"
+          borderWidth={1}
+          borderColor="gray.800"
+        >
+          <form onSubmit={formik.handleSubmit}>
+            <VStack gap={4} alignItems="stretch">
+              <FormControl error={formik.errors.avatar}>
+                <Label>Avatar</Label>
+                <ImageInput
+                  name="avatar"
+                  value={formik.values.avatar ?? null}
+                  onChange={(file) => {
+                    formik.setFieldValue("avatar", file);
+                  }}
+                />
+              </FormControl>
 
-            <Flex gap={4}>
-              <FormControl flex={1} error={formik.errors.firstName}>
-                <Label>First Name</Label>
+              <Flex gap={4}>
+                <FormControl flex={1} error={formik.errors.firstName}>
+                  <Label>First Name</Label>
+                  <Input
+                    name="firstName"
+                    value={formik.values.firstName}
+                    onChange={formik.handleChange}
+                  />
+                </FormControl>
+                <FormControl flex={1} error={formik.errors.lastName}>
+                  <Label>Last Name</Label>
+                  <Input
+                    name="lastName"
+                    value={formik.values.lastName}
+                    onChange={formik.handleChange}
+                  />
+                </FormControl>
+              </Flex>
+
+              <FormControl error={formik.errors.team}>
+                <Label>Team(s)</Label>
                 <Input
-                  name="firstName"
-                  value={formik.values.firstName}
+                  name="team"
+                  value={formik.values.team ?? ""}
                   onChange={formik.handleChange}
                 />
               </FormControl>
-              <FormControl flex={1} error={formik.errors.lastName}>
-                <Label>Last Name</Label>
-                <Input
-                  name="lastName"
-                  value={formik.values.lastName}
-                  onChange={formik.handleChange}
-                />
-              </FormControl>
-            </Flex>
 
-            <FormControl error={formik.errors.team}>
-              <Label>Team(s)</Label>
-              <Input
-                name="team"
-                value={formik.values.team ?? ""}
-                onChange={formik.handleChange}
-              />
-            </FormControl>
+              <Button
+                type="submit"
+                disabled={formik.isSubmitting || !formik.isValid}
+                isLoading={formik.isSubmitting}
+              >
+                Save Changes
+              </Button>
+            </VStack>
+          </form>
+        </Box>
 
-            <Button
-              type="submit"
-              disabled={formik.isSubmitting || !formik.isValid}
-              isLoading={formik.isSubmitting}
-            >
-              Save Changes
-            </Button>
-          </VStack>
-        </form>
+        <styled.h2 mt={6}>Danger Zone</styled.h2>
+
+        <Box
+          bgColor="brand.900"
+          p={6}
+          rounded="2xl"
+          mt={2}
+          borderWidth={1}
+          borderColor="brand.800"
+          borderStyle="dashed"
+        >
+          <LinkButton to="/user/delete">Delete My Account</LinkButton>
+        </Box>
       </Box>
     </Container>
   );

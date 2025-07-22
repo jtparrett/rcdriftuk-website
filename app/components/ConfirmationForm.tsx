@@ -29,7 +29,11 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
           </styled.p>
         )}
         <Flex gap={2} justifyContent="center" mt={6}>
-          <Button variant="secondary" onClick={() => navigate(-1)}>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </Button>
           <Button type="submit">{confirmText}</Button>
