@@ -14,7 +14,6 @@ import { Markdown } from "./Markdown";
 import { Link, useSearchParams } from "react-router";
 import pluralize from "pluralize";
 import { useLikePost, usePostLikes } from "~/utils/usePostLikes";
-import { Textarea } from "./Textarea";
 import { SignedIn } from "@clerk/react-router";
 import { useCreateComment, usePostComments } from "~/utils/usePostComments";
 import type { GetUser } from "~/utils/getUser.server";
@@ -314,9 +313,6 @@ export const PostCard = ({
                         addSuffix: true,
                       })}
                     </styled.p>
-                    <StyledLink to={`/posts/${post.id}`} fontSize="sm">
-                      Like
-                    </StyledLink>
                     <StyledLink
                       to={`/posts/${post.id}?reply=${comment.id}&comment=@${comment.user.driverId}(${comment.user.firstName} ${comment.user.lastName})#comment`}
                       fontSize="sm"
@@ -390,10 +386,6 @@ export const PostCard = ({
                               addSuffix: true,
                             })}
                           </styled.p>
-
-                          <StyledLink to={`/posts/${post.id}`} fontSize="sm">
-                            Like
-                          </StyledLink>
 
                           {user?.id === reply.user.id && (
                             <StyledLink
