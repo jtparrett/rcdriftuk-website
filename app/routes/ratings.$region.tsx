@@ -289,6 +289,7 @@ const RatingsPage = () => {
               key={option}
               to={`/ratings/${option.toLowerCase()}`}
               isActive={option === region}
+              replace
             >
               {option}
             </Tab>

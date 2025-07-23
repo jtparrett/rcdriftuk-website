@@ -156,16 +156,22 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/events`}
               isActive={tab === "events"}
+              replace
             >
               Events
             </Tab>
-            <Tab to={`/tracks/${track?.slug}/posts`} isActive={tab === "posts"}>
+            <Tab
+              to={`/tracks/${track?.slug}/posts`}
+              isActive={tab === "posts"}
+              replace
+            >
               Posts
             </Tab>
             {track?.types.includes(TrackTypes.SHOPS) && (
               <Tab
                 to={`/tracks/${track?.slug}/products`}
                 isActive={tab === "products"}
+                replace
               >
                 Products
               </Tab>
@@ -173,6 +179,7 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/leaderboard`}
               isActive={tab === "leaderboard"}
+              replace
             >
               Leaderboard
             </Tab>

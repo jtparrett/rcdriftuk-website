@@ -18,7 +18,7 @@ export function useDelayedLoader() {
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (navigation.state === "loading") {
-      timer = setTimeout(() => setIsLoading(true), 150);
+      timer = setTimeout(() => setIsLoading(true), 200);
     } else {
       setIsLoading(false);
     }

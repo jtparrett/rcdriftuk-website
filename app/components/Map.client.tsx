@@ -168,7 +168,12 @@ export const Map = ({ tracks }: Props) => {
         <Container px={2} w="full" maxW={1100} overflowX="auto">
           <Flex gap="1px" py={2}>
             {Object.values(Regions).map((item) => (
-              <Tab key={item} isActive={item === region} to={`/map/${item}`}>
+              <Tab
+                key={item}
+                isActive={item === region}
+                to={`/map/${item}`}
+                replace
+              >
                 {item}
               </Tab>
             ))}

@@ -321,6 +321,7 @@ const TournamentPage = () => {
                     <Tab
                       to={`/tournaments/${tournament.id}/overview`}
                       isActive={isOverviewTab}
+                      replace
                     >
                       Overview
                     </Tab>
@@ -328,6 +329,7 @@ const TournamentPage = () => {
                       <Tab
                         to={`/tournaments/${tournament.id}/qualifying`}
                         isActive={isQualifyingTab}
+                        replace
                       >
                         Qualifying
                       </Tab>
@@ -335,6 +337,7 @@ const TournamentPage = () => {
                     <Tab
                       to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
                       isActive={isBattlesTab}
+                      replace
                     >
                       Battles
                     </Tab>
@@ -343,6 +346,7 @@ const TournamentPage = () => {
                       <Tab
                         to={`/tournaments/${tournament.id}/standings`}
                         isActive={isStandingsTab}
+                        replace
                       >
                         Standings
                       </Tab>

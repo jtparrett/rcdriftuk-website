@@ -55,18 +55,21 @@ const CalendarPage = () => {
         <Tab
           isActive={location.pathname.includes("/calendar/day")}
           to={`/calendar/day/${dateParam}`}
+          replace
         >
           Day
         </Tab>
         <Tab
           isActive={location.pathname.includes("/calendar/week")}
           to={`/calendar/week/${dateParam}`}
+          replace
         >
           Week
         </Tab>
         <Tab
           isActive={location.pathname.includes("/calendar/month")}
           to={`/calendar/month/${dateParam}`}
+          replace
         >
           Month
         </Tab>
