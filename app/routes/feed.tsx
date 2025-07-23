@@ -82,6 +82,7 @@ const FeedPage = () => {
 
       return response.json();
     },
+    refetchOnMount: false,
     initialPageParam: null as any,
     getNextPageParam: (lastPage) => {
       if (!lastPage.posts.length) return undefined;
