@@ -51,7 +51,10 @@ const MarketplaceListingPage = () => {
 
   return (
     <Box pt={4}>
-      <Flex flexDir={{ base: "column", md: "row" }} alignItems="flex-start">
+      <Flex
+        flexDir={{ base: "column", md: "row" }}
+        alignItems={{ base: "stretch", md: "flex-start" }}
+      >
         <Box flex={1} overflow="hidden" rounded="lg">
           <styled.img src={product.image} w="full" />
         </Box>
@@ -78,12 +81,13 @@ const MarketplaceListingPage = () => {
 
           <Flex
             gap={4}
-            alignItems="center"
+            alignItems={{ base: "stretch", md: "center" }}
             rounded="xl"
             borderWidth={1}
             p={4}
             mt={6}
             borderColor="gray.700"
+            flexDir={{ base: "column", md: "row" }}
           >
             <Link to={`/tracks/${product.Tracks?.slug}`}>
               <Flex gap={2} alignItems="center">
@@ -108,8 +112,6 @@ const MarketplaceListingPage = () => {
                 </Box>
               </Flex>
             </Link>
-
-            <Spacer />
 
             <LinkButton
               to={product.url}

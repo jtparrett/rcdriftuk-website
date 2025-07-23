@@ -1,7 +1,6 @@
 import { Flex, AspectRatio, Box, styled } from "~/styled-system/jsx";
 import { ProductStatus } from "./ProductStatus";
 import { LinkOverlay } from "./LinkOverlay";
-import { RiMapPinLine } from "react-icons/ri";
 import type { loader } from "~/routes/marketplace._index";
 
 interface Props {
@@ -47,12 +46,6 @@ export const ProductCard = ({ product }: Props) => {
             >
               {product.title}
             </styled.h1>
-            <Flex alignItems="center" gap={1} color="gray.400">
-              <styled.p fontSize="sm">{product.Tracks?.name}</styled.p>
-              <styled.span fontSize="sm">
-                <RiMapPinLine />
-              </styled.span>
-            </Flex>
           </Box>
         </Flex>
       </LinkOverlay>

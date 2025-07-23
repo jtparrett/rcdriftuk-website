@@ -23,6 +23,7 @@ const ButtonStyles = cva({
       opacity: 0.5,
       cursor: "not-allowed",
     },
+    whiteSpace: "nowrap",
   },
   variants: {
     size: {
