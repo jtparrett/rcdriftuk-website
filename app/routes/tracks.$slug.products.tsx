@@ -52,6 +52,7 @@ const TrackProductsPage = () => {
           <LinkButton
             to={`/tracks/${slug}/products?page=${page - 1}`}
             variant="secondary"
+            replace
           >
             <RiArrowLeftSLine /> Previous
           </LinkButton>
@@ -63,6 +64,7 @@ const TrackProductsPage = () => {
           <LinkButton
             to={`/tracks/${slug}/products?page=${page + 1}`}
             variant="secondary"
+            replace
           >
             Next <RiArrowRightSLine />
           </LinkButton>
