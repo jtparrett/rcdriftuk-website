@@ -46,6 +46,7 @@ export const useLikePost = (id: number) => {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["post", id, "likes"], data);
+      queryClient.invalidateQueries({ queryKey: ["feed-posts"] });
     },
   });
 };
