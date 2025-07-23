@@ -8,6 +8,7 @@ import {
 import {
   redirect,
   useLoaderData,
+  useNavigate,
   useSubmit,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
@@ -103,11 +104,12 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/app`);
+  return { success: true };
 };
 
 const NewPostPage = () => {
   const submit = useSubmit();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, userTracks } = useLoaderData<typeof loader>();
   const dropdownDisclosure = useDisclosure();
@@ -125,8 +127,14 @@ const NewPostPage = () => {
         encType: "application/json",
       });
 
-      // Invalidate feed cache so the new post appears at the top
-      queryClient.invalidateQueries({ queryKey: ["feed-posts"] });
+      // Invalidate and refetch feed cache so the new post appears at the top
+      await queryClient.invalidateQueries({
+        queryKey: ["feed-posts"],
+        refetchType: "all",
+      });
+
+      // Navigate to the app page after cache invalidation
+      navigate("/app");
     },
   });
 
