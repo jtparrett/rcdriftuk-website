@@ -22,14 +22,14 @@ export const ProductCard = ({ product }: Props) => {
           pos="relative"
           overflow="hidden"
           rounded="md"
-          mb={4}
+          mb={2}
         >
           <styled.img src={product.image} w="full" pos="absolute" inset={0} />
         </AspectRatio>
       </Box>
       <LinkOverlay to={`/marketplace/${product.slug}`}>
-        <Flex alignItems="flex-start" gap={4}>
-          <Box w={12} h={12} rounded="full" overflow="hidden">
+        <Flex alignItems="flex-start" gap={2}>
+          <Box w={8} h={8} rounded="full" overflow="hidden">
             <styled.img
               src={product.Tracks?.image ?? ""}
               w="full"
@@ -39,7 +39,12 @@ export const ProductCard = ({ product }: Props) => {
             />
           </Box>
           <Box flex={1}>
-            <styled.h1 fontWeight="semibold" mb={1} textWrap="balance">
+            <styled.h1
+              fontWeight="semibold"
+              textWrap="balance"
+              fontSize="sm"
+              lineHeight={1.2}
+            >
               {product.title}
             </styled.h1>
             <Flex alignItems="center" gap={1} color="gray.400">
