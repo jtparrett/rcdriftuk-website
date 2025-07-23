@@ -49,9 +49,9 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
               (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
             )
           ) + 
-          -- Add fresh post boost: 1000 points if created within last 5 minutes (300 seconds)
+          -- Add fresh post boost: 1000 points if created within last 15 minutes (900 seconds)
           CASE 
-            WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 300 
+            WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 900 
             THEN 1000 
             ELSE 0 
           END, 4
@@ -81,7 +81,7 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
             ) + 
             -- Add fresh post boost in WHERE clause too
             CASE 
-              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 300 
+              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 900 
               THEN 1000 
               ELSE 0 
             END, 4
@@ -98,7 +98,7 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
             ) + 
             -- Add fresh post boost in WHERE clause too
             CASE 
-              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 300 
+              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 900 
               THEN 1000 
               ELSE 0 
             END, 4
