@@ -48,7 +48,13 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
               -- Use post id and seed to create deterministic randomness
               (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
             )
-          ), 4
+          ) + 
+          -- Add fresh post boost: 1000 points if created within last 5 minutes (300 seconds)
+          CASE 
+            WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 300 
+            THEN 1000 
+            ELSE 0 
+          END, 4
         ) as score
       FROM "Posts" p
       LEFT JOIN (
@@ -67,23 +73,35 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
           ROUND(
             (
               (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.5)
+              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.8)
             ) * (
               0.7 + 0.6 * (
                 (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
               )
-            ), 4
+            ) + 
+            -- Add fresh post boost in WHERE clause too
+            CASE 
+              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 300 
+              THEN 1000 
+              ELSE 0 
+            END, 4
           ) < ${cursorScore}
         ) OR (
           ROUND(
             (
               (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.5)
+              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.8)
             ) * (
               0.7 + 0.6 * (
                 (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
               )
-            ), 4
+            ) + 
+            -- Add fresh post boost in WHERE clause too
+            CASE 
+              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 300 
+              THEN 1000 
+              ELSE 0 
+            END, 4
           ) = ${cursorScore}::decimal AND p.id < ${cursorId || 0}
         )
       )

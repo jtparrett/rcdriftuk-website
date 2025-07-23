@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import {
   RiArrowDownSLine,
@@ -17,8 +17,6 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Button } from "~/components/Button";
 import { Dropdown, Option } from "~/components/Dropdown";
 import { ImageInput } from "~/components/ImageInput";
-import { Label } from "~/components/Label";
-import { Textarea } from "~/components/Textarea";
 import { UserTaggingInput } from "~/components/UserTaggingInput";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { extractFirstUrl } from "~/utils/extractFirstUrl";
@@ -96,7 +94,7 @@ export const action = async (args: ActionFunctionArgs) => {
     }
   }
 
-  const post = await prisma.posts.create({
+  await prisma.posts.create({
     data: {
       userId,
       content: data.content,
@@ -105,11 +103,12 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/posts/${post.id}`);
+  return redirect(`/app`);
 };
 
 const NewPostPage = () => {
   const submit = useSubmit();
+  const queryClient = useQueryClient();
   const { user, userTracks } = useLoaderData<typeof loader>();
   const dropdownDisclosure = useDisclosure();
 
@@ -125,6 +124,9 @@ const NewPostPage = () => {
         method: "POST",
         encType: "application/json",
       });
+
+      // Invalidate feed cache so the new post appears at the top
+      queryClient.invalidateQueries({ queryKey: ["feed-posts"] });
     },
   });
 
