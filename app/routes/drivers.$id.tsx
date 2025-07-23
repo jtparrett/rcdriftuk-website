@@ -21,21 +21,27 @@ import {
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { prisma } from "~/utils/prisma.server";
 import { useState } from "react";
-import {
-  RiArrowDownSLine,
-  RiArrowUpSLine,
-  RiArrowLeftLine,
-} from "react-icons/ri";
-import { Button, LinkButton } from "~/components/Button";
+import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import type { Values } from "~/utils/values";
 import { format } from "date-fns";
 import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/drivers.$id";
 import { css } from "~/styled-system/css";
-import { Tab, TabButton } from "~/components/Tab";
+import { TabButton } from "~/components/Tab";
+import { getAuth } from "~/utils/getAuth.server";
+import { PostCard } from "~/components/PostCard";
+import { getUser, type GetUser } from "~/utils/getUser.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { params } = args;
   const driverId = z.coerce.number().parse(params.id);
+  const { userId } = await getAuth(args);
+
+  let user: GetUser | null = null;
+
+  if (userId) {
+    user = await getUser(userId);
+  }
 
   const driver = await prisma.users.findFirstOrThrow({
     where: {
@@ -55,6 +61,53 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       elo_LATAM: true,
       elo_MEA: true,
       totalBattles: true,
+      Posts: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          user: true,
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
+          },
+          track: {
+            select: {
+              id: true,
+              slug: true,
+              name: true,
+              image: true,
+            },
+          },
+          ...(userId
+            ? {
+                likes: {
+                  where: {
+                    userId,
+                  },
+                },
+              }
+            : {}),
+          comments: {
+            where: {
+              parentId: null,
+            },
+            include: {
+              user: true,
+              replies: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+            orderBy: {
+              id: "asc",
+            },
+          },
+        },
+      },
       TournamentDrivers: {
         where: {
           tournament: {
@@ -166,7 +219,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return driver;
+  return { driver, user };
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -174,7 +227,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
 
   return [
     {
-      title: `RC Drift UK | Driver Ratings | ${data.firstName} ${data.lastName}`,
+      title: `RC Drift UK | Driver Ratings | ${data.driver.firstName} ${data.driver.lastName}`,
     },
   ];
 };
@@ -187,7 +240,7 @@ const TABS = {
 };
 
 const Page = () => {
-  const driver = useLoaderData<typeof loader>();
+  const { driver, user } = useLoaderData<typeof loader>();
   const battles = driver.TournamentDrivers.flatMap((item) => {
     return [...item.leftBattles, ...item.rightBattles];
   }).sort(
@@ -444,7 +497,7 @@ const Page = () => {
           )}
 
         {tab === TABS.battleHistory && battles.length > 0 && (
-          <VStack gap={4} mt={2}>
+          <VStack gap={4} mt={4}>
             {battles.map((battle, i) => {
               const isLeftDriver =
                 battle.driverLeft?.driverId === driver.driverId;
@@ -767,6 +820,14 @@ const Page = () => {
               );
             })}
           </Grid>
+        )}
+
+        {tab === TABS.posts && driver.Posts.length > 0 && (
+          <Flex gap={4} mt={2} flexDir="column">
+            {driver.Posts.map((post) => (
+              <PostCard key={post.id} post={post} user={user} />
+            ))}
+          </Flex>
         )}
       </Container>
     </Box>
