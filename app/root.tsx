@@ -127,7 +127,7 @@ export function ErrorBoundary() {
               ? error.message
               : "Unknown Error"}
         </styled.h1>
-        <LinkButton to="/">
+        <LinkButton to="/app">
           Go Home <RiHome2Line />
         </LinkButton>
       </Box>

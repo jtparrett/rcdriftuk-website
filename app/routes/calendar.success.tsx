@@ -15,7 +15,7 @@ const CalendarSuccessPage = () => {
         <styled.p mb={8}>
           Thank you for your submission. Your event is now live on the calendar.
         </styled.p>
-        <LinkButton to="/">Go Home</LinkButton>
+        <LinkButton to="/app">Go Home</LinkButton>
       </Box>
     </Box>
   );
