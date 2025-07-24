@@ -18,6 +18,7 @@ import { userIsVerified } from "~/utils/userIsVerified";
 import type { Route } from "./+types/feed";
 import { useEffect, useRef } from "react";
 import { useInView } from "motion/react";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -98,82 +99,74 @@ const FeedPage = () => {
   const allPosts = data?.pages.flatMap((page) => page.posts) ?? [];
 
   return (
-    <Container maxW={680} px={2}>
+    <>
       {user && canPost && (
-        <Flex
-          pos="relative"
-          px={4}
-          py={3}
-          alignItems="center"
-          gap={3}
-          bgColor="gray.900"
-          mt={2}
-          rounded="xl"
-          borderWidth={1}
-          borderColor="gray.800"
-          overflow="hidden"
-        >
-          <Box
-            rounded="full"
-            overflow="hidden"
-            w={10}
-            h={10}
+        <TabsBar>
+          <Flex gap={1.5} w="664px" maxW="full" mx="auto">
+            <Box
+              rounded="full"
+              overflow="hidden"
+              w={10}
+              h={10}
+              borderWidth={1}
+              borderColor="gray.800"
+            >
+              <styled.img
+                src={user.image ?? "/blank-driver-right.jpg"}
+                alt={`${user.firstName} ${user.lastName}`}
+                display="block"
+                w="full"
+                h="full"
+                objectFit="cover"
+              />
+            </Box>
+            <Center
+              bgColor="gray.800"
+              flex={1}
+              h={10}
+              px={5}
+              rounded="full"
+              justifyContent="flex-start"
+            >
+              <LinkOverlay to="/posts/new">
+                What's on your mind, {user.firstName}?
+              </LinkOverlay>
+            </Center>
+          </Flex>
+        </TabsBar>
+      )}
+
+      <Container maxW={680} px={2}>
+        {!canPost && (
+          <Flex
+            bgColor="brand.900"
+            rounded="xl"
+            px={4}
+            py={2}
+            mt={2}
             borderWidth={1}
-            borderColor="gray.800"
+            borderColor="brand.800"
+            color="brand.500"
+            alignItems="center"
           >
-            <styled.img
-              src={user.image ?? "/blank-driver-right.jpg"}
-              alt={`${user.firstName} ${user.lastName}`}
-              display="block"
-              w="full"
-              h="full"
-              objectFit="cover"
-            />
-          </Box>
-          <Center
-            bgColor="gray.800"
-            flex={1}
-            h={10}
-            px={5}
-            rounded="full"
-            justifyContent="flex-start"
-          >
-            <LinkOverlay to="/posts/new">
-              What's on your mind, {user.firstName}?
-            </LinkOverlay>
-          </Center>
+            <styled.p fontSize="sm" textWrap="balance">
+              To post on this feed, you must have a driver rating or be a
+              verified track owner.
+            </styled.p>
+            <Spacer />
+            <RiInformationFill />
+          </Flex>
+        )}
+
+        <Flex flexDir="column" gap={2} py={2}>
+          {allPosts.map((post) => (
+            <PostCard key={post.id} post={post} user={user} />
+          ))}
         </Flex>
-      )}
 
-      {!canPost && (
-        <Flex
-          bgColor="brand.900"
-          rounded="xl"
-          px={4}
-          py={2}
-          mt={2}
-          borderWidth={1}
-          borderColor="brand.800"
-          color="brand.500"
-          alignItems="center"
-        >
-          <styled.p fontSize="sm" textWrap="balance">
-            To post on this feed, you must have a driver rating or be a verified
-            track owner.
-          </styled.p>
-          <Spacer />
-          <RiInformationFill />
-        </Flex>
-      )}
-
-      <Flex flexDir="column" gap={2} py={2}>
-        {allPosts.map((post) => (
-          <PostCard key={post.id} post={post} user={user} />
-        ))}
-      </Flex>
-
-      <Box ref={loadMoreRef} h={10} />
-    </Container>
+        <Box ref={loadMoreRef} h={10} />
+      </Container>
+    </>
   );
 };
 

@@ -22,6 +22,7 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
         zIndex: 10,
         bgColor: "rgba(12, 12, 12, 0.75)",
         backdropFilter: "blur(10px)",
+        scrollbar: "hidden",
       })}
       style={{
         translateY,

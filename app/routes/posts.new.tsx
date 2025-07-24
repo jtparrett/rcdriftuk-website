@@ -171,7 +171,7 @@ const NewPostPage = () => {
     <Container maxW={680} px={2} py={2}>
       <Box
         bgColor="gray.900"
-        rounded="xl"
+        rounded="2xl"
         py={3}
         px={4}
         borderWidth={1}
@@ -187,10 +187,11 @@ const NewPostPage = () => {
               gap={2}
               alignItems="center"
               w="fit-content"
-              borderWidth={1}
-              borderColor="gray.800"
               rounded="lg"
-              p={2}
+              bgColor="gray.800"
+              py={2}
+              pl={2}
+              pr={4}
             >
               <Box
                 rounded="full"

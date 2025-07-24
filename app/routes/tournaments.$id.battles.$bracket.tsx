@@ -211,6 +211,7 @@ const TournamentBattlesPage = () => {
       >
         <Flex
           overflow="auto"
+          scrollbar="hidden"
           py={8}
           borderWidth={1}
           borderColor="gray.800"
@@ -220,7 +221,6 @@ const TournamentBattlesPage = () => {
           bgRepeat="repeat"
           bgSize="16px"
           bgPosition="center"
-          scrollSnapType="x proximity"
           justifyContent={
             tournament.format === TournamentsFormat.DRIFT_WARS
               ? "center"
@@ -235,7 +235,7 @@ const TournamentBattlesPage = () => {
 
           {battlesInRound.map((battles, i) => {
             return (
-              <Box key={i} w={240} flex="none" scrollSnapAlign="start">
+              <Box key={i} w={240} flex="none">
                 {tournament.format !== TournamentsFormat.DRIFT_WARS && (
                   <styled.p
                     fontSize="sm"
