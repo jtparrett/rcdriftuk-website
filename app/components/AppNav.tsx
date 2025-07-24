@@ -20,7 +20,7 @@ const Tab = styled(Link, {
   base: {
     color: "gray.200",
     py: 4,
-    px: 4,
+    px: 2,
   },
   variants: {
     isActive: {
@@ -58,12 +58,11 @@ export const AppNav = () => {
         bgColor="rgba(12, 12, 12, 0.75)"
         backdropFilter="blur(10px)"
         pb="env(safe-area-inset-bottom)"
-        px={4}
-        className="app-nav"
       >
         <Flex
           w="full"
           h="64px"
+          px={2}
           justifyContent="space-between"
           alignItems="center"
         >
