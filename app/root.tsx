@@ -140,12 +140,10 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  let { hideBanner, isEmbed, isApp } = loaderData || {};
+  const { hideBanner, isEmbed, isApp } = loaderData || {};
   const { user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
-
-  isApp = true;
 
   return (
     <ClerkProvider
