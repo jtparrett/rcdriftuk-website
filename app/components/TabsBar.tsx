@@ -22,7 +22,6 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
         zIndex: 10,
         bgColor: "rgba(12, 12, 12, 0.75)",
         backdropFilter: "blur(10px)",
-        scrollbar: "hidden",
       })}
       style={{
         translateY,
@@ -30,7 +29,7 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
     >
       <Container px={2} maxW={1100}>
         <Box overflowX="auto" w="full">
-          <Flex gap={1} py={2} alignItems="center">
+          <Flex gap={0.5} py={2} alignItems="center">
             {children}
           </Flex>
         </Box>

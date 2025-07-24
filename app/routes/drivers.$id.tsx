@@ -385,32 +385,34 @@ const Page = () => {
         </Flex>
       </Container>
 
-      <Box bgColor="gray.950" borderTopWidth={1} borderColor="gray.800">
+      <Box bgColor="gray.950" borderTopWidth={1} borderColor="gray.900">
         <TabsBar>
-          <TabButton
-            isActive={tab === TABS.battleHistory}
-            onClick={() => setTab(TABS.battleHistory)}
-          >
-            Battle History
-          </TabButton>
-          <TabButton
-            isActive={tab === TABS.ratingHistory}
-            onClick={() => setTab(TABS.ratingHistory)}
-          >
-            Rating History
-          </TabButton>
-          <TabButton
-            isActive={tab === TABS.regionalRatings}
-            onClick={() => setTab(TABS.regionalRatings)}
-          >
-            Regional Ratings
-          </TabButton>
-          <TabButton
-            isActive={tab === TABS.posts}
-            onClick={() => setTab(TABS.posts)}
-          >
-            Posts
-          </TabButton>
+          <Flex gap={0.5} alignItems="center" w={784} mx="auto">
+            <TabButton
+              isActive={tab === TABS.battleHistory}
+              onClick={() => setTab(TABS.battleHistory)}
+            >
+              Battle History
+            </TabButton>
+            <TabButton
+              isActive={tab === TABS.ratingHistory}
+              onClick={() => setTab(TABS.ratingHistory)}
+            >
+              Rating History
+            </TabButton>
+            <TabButton
+              isActive={tab === TABS.regionalRatings}
+              onClick={() => setTab(TABS.regionalRatings)}
+            >
+              Regional Ratings
+            </TabButton>
+            <TabButton
+              isActive={tab === TABS.posts}
+              onClick={() => setTab(TABS.posts)}
+            >
+              Posts
+            </TabButton>
+          </Flex>
         </TabsBar>
 
         <Container maxW={800} px={2} py={6}>
