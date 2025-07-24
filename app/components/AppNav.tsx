@@ -11,6 +11,7 @@ import {
   RiMapPin2Line,
   RiShoppingBagFill,
   RiShoppingBagLine,
+  RiVipCrown2Fill,
   RiVipCrown2Line,
 } from "react-icons/ri";
 import { Link, useLocation } from "react-router";
@@ -91,7 +92,11 @@ export const AppNav = () => {
             isActive={location.pathname.startsWith("/tournaments")}
             viewTransition
           >
-            <RiVipCrown2Line size={24} />
+            {location.pathname.startsWith("/tournaments") ? (
+              <RiVipCrown2Fill size={24} />
+            ) : (
+              <RiVipCrown2Line size={24} />
+            )}
           </Tab>
           <Tab
             to="/map"
