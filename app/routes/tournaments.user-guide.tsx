@@ -132,15 +132,15 @@ const Page = () => {
   return (
     <Container maxW={800} px={2} pt={8} pb={20}>
       <Box mb={12} textAlign="center" maxW={600} mx="auto">
-        <H1>My Tournaments - User Guide</H1>
+        <H1>Tournaments: User Guide</H1>
         <P>
           RCDrift.uk have built a free online platform to help assist with
           running Radio-Controlled Drifting tournaments and competitions.
         </P>
       </Box>
 
-      <Flex flexDir="column" gap={8}>
-        <CollapsibleCard title="1. Getting Started" defaultOpen>
+      <Flex flexDir="column" gap={2}>
+        <CollapsibleCard title="1. Getting Started">
           <P mt={4}>To begin using the tournament software:</P>
 
           <OL mt={2}>
@@ -149,10 +149,10 @@ const Page = () => {
             </styled.li>
             <styled.li>
               Once logged in, <B>open the menu (≡)</B> at the top of the page{" "}
-              and select <B>"My Tournaments"</B>
+              and select <B>"Tournaments"</B>
             </styled.li>
             <styled.li>
-              Then select the <B>"+ New Tournament"</B> button to create a new
+              Then select the <B>"+ Create New"</B> button to create a new
               tournament
             </styled.li>
             <styled.li>
@@ -236,7 +236,7 @@ const Page = () => {
           <OL>
             <styled.li>Login to your RCDrift.uk account.</styled.li>
             <styled.li>
-              Navigate to the <B>“My Tournaments”</B> page.
+              Navigate to the <B>“Tournaments”</B> page.
             </styled.li>
             <styled.li>
               Then select the relevant tournament to open its page.

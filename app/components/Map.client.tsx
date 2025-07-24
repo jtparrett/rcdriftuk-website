@@ -166,7 +166,7 @@ export const Map = ({ tracks }: Props) => {
     <>
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} w="full" maxW={1100} overflowX="auto">
-          <Flex gap="1px" py={2}>
+          <Flex gap={1} py={2}>
             {Object.values(Regions).map((item) => (
               <Tab
                 key={item}

@@ -300,7 +300,13 @@ const Page = () => {
               )}
 
               {event.link && (
-                <LinkButton to={event.link} target="_blank" variant="outline">
+                <LinkButton
+                  to={event.link}
+                  target={
+                    event.link.includes("/tournaments") ? undefined : "_blank"
+                  }
+                  variant="outline"
+                >
                   {event.link.includes("/tournaments")
                     ? "View Results"
                     : "More Info"}

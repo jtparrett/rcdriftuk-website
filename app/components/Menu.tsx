@@ -105,6 +105,7 @@ export const Menu = () => {
         </MenuIcon>
         Driver Ratings
       </MenuLink>
+
       <MenuLink
         to="/competitions"
         active={
@@ -115,6 +116,18 @@ export const Menu = () => {
           <RiTrophyLine />
         </MenuIcon>
         Competitions
+      </MenuLink>
+
+      <MenuLink
+        to="/tournaments"
+        active={
+          location.pathname.startsWith("/tournaments") ? "active" : "inactive"
+        }
+      >
+        <MenuIcon>
+          <RiVipCrown2Line />
+        </MenuIcon>
+        Tournaments
       </MenuLink>
 
       <MenuLink
@@ -157,16 +170,6 @@ export const Menu = () => {
           <RiShoppingBagLine />
         </MenuIcon>
         Marketplace
-      </MenuLink>
-
-      <MenuLink
-        to="/fdr"
-        active={location.pathname.startsWith("/fdr") ? "active" : "inactive"}
-      >
-        <MenuIcon>
-          <RiCameraLensLine />
-        </MenuIcon>
-        FDR Calculator
       </MenuLink>
 
       <MenuLink
@@ -218,15 +221,13 @@ export const UserMenu = () => {
       </MenuLink>
 
       <MenuLink
-        to="/tournaments"
-        active={
-          location.pathname.startsWith("/tournaments") ? "active" : "inactive"
-        }
+        to="/fdr"
+        active={location.pathname.startsWith("/fdr") ? "active" : "inactive"}
       >
         <MenuIcon>
-          <RiVipCrown2Line />
+          <RiCameraLensLine />
         </MenuIcon>
-        My Tournaments
+        FDR Calculator
       </MenuLink>
 
       <MenuLink

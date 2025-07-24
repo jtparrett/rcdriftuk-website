@@ -30,7 +30,7 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
     >
       <Container px={2} maxW={1100}>
         <Box overflowX="auto" w="full">
-          <Flex gap={2} py={2} alignItems="center">
+          <Flex gap={1} py={2} alignItems="center">
             {children}
           </Flex>
         </Box>

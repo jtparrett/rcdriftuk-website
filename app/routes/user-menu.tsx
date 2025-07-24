@@ -1,10 +1,12 @@
+import { RiCameraLensLine, RiRocketLine, RiTrophyLine } from "react-icons/ri";
 import {
   Link,
   redirect,
   useLoaderData,
   type LoaderFunctionArgs,
 } from "react-router";
-import { UserMenu } from "~/components/Menu";
+import { LinkOverlay } from "~/components/LinkOverlay";
+import { MenuIcon, MenuLink, UserMenu } from "~/components/Menu";
 import { UserTracks } from "~/components/UserTracks";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
@@ -39,8 +41,10 @@ const UserMenuPage = () => {
         rounded="xl"
         borderWidth={1}
         borderColor="gray.800"
+        pos="relative"
+        overflow="hidden"
       >
-        <Link to={`/drivers/${user.driverId}`}>
+        <LinkOverlay to={`/drivers/${user.driverId}`}>
           <styled.div
             w={10}
             h={10}
@@ -56,7 +60,7 @@ const UserMenuPage = () => {
               objectFit="cover"
             />
           </styled.div>
-        </Link>
+        </LinkOverlay>
 
         <styled.h1 fontWeight="semibold">
           {user.firstName} {user.lastName}
@@ -66,6 +70,20 @@ const UserMenuPage = () => {
       <UserTracks user={user} />
 
       <Box h={4} />
+
+      <MenuLink to="/getting-started">
+        <MenuIcon>
+          <RiRocketLine />
+        </MenuIcon>
+        Getting Started
+      </MenuLink>
+
+      <MenuLink to="/competitions">
+        <MenuIcon>
+          <RiTrophyLine />
+        </MenuIcon>
+        Competitions
+      </MenuLink>
 
       <UserMenu />
     </Box>

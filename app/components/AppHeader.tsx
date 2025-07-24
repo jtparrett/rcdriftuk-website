@@ -10,6 +10,7 @@ export const APP_TAB_ROUTES = [
   "/",
   "/feed",
   "/ratings/*",
+  "/tournaments",
   "/map/*",
   "/calendar/*",
   "/marketplace",
