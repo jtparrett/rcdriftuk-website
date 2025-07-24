@@ -13,37 +13,32 @@ import { TabsBar } from "~/components/TabsBar";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  if (!userId) {
-    throw new Response(null, {
-      status: 404,
-      statusText: "Not Found",
-    });
-  }
-
   const tournaments = await prisma.tournaments.findMany({
     where: {
       OR: [
-        {
-          userId,
-        },
-        {
-          judges: {
-            some: {
-              user: {
-                id: userId,
+        ...(userId
+          ? [
+              { userId },
+              {
+                judges: {
+                  some: {
+                    user: {
+                      id: userId,
+                    },
+                  },
+                },
               },
-            },
-          },
-        },
-        {
-          drivers: {
-            some: {
-              user: {
-                id: userId,
+              {
+                drivers: {
+                  some: {
+                    user: {
+                      id: userId,
+                    },
+                  },
+                },
               },
-            },
-          },
-        },
+            ]
+          : []),
         {
           rated: true,
         },
@@ -71,7 +66,8 @@ const Page = () => {
         <LinkButton to="/tournaments/user-guide" variant="outline" size="sm">
           Guide <RiBookOpenFill />
         </LinkButton>
-        <LinkButton to="/tournaments/new" size="sm">
+
+        <LinkButton to={userId ? "/tournaments/new" : "/sign-in"} size="sm">
           Create New <RiAddFill />
         </LinkButton>
       </TabsBar>
