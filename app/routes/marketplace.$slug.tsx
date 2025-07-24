@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router";
-import { styled, Flex, Box, Spacer } from "~/styled-system/jsx";
+import { styled, Flex, Box, Spacer, Container } from "~/styled-system/jsx";
 import { LinkButton } from "~/components/Button";
 import { ProductStatus as Status } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
@@ -50,7 +50,7 @@ const MarketplaceListingPage = () => {
       : "View Product";
 
   return (
-    <Box pt={4}>
+    <Container maxW={1100} px={4} py={4}>
       <Flex
         flexDir={{ base: "column", md: "row" }}
         alignItems={{ base: "stretch", md: "flex-start" }}
@@ -58,7 +58,7 @@ const MarketplaceListingPage = () => {
         <Box flex={1} overflow="hidden" rounded="lg">
           <styled.img src={product.image} w="full" />
         </Box>
-        <Box px={{ base: 4, md: 12 }} flex={1}>
+        <Box px={{ base: 4, md: 8 }} flex={1}>
           <ProductStatus status={product.status} />
 
           <styled.h1
@@ -123,7 +123,7 @@ const MarketplaceListingPage = () => {
           </Flex>
         </Box>
       </Flex>
-    </Box>
+    </Container>
   );
 };
 

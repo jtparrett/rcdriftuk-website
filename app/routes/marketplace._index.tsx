@@ -1,16 +1,25 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { Form, useLoaderData, useSearchParams } from "react-router";
+import { useLoaderData, useSearchParams } from "react-router";
+import { useCallback, useState } from "react";
 import {
   RiArrowLeftSLine,
   RiArrowRightSLine,
   RiSearchLine,
 } from "react-icons/ri";
 import { z } from "zod";
-import { Button, LinkButton } from "~/components/Button";
+import { LinkButton } from "~/components/Button";
 import { ProductCard } from "~/components/ProductCard";
-import { styled, Box, Flex, Spacer, Center, Grid } from "~/styled-system/jsx";
+import {
+  styled,
+  Flex,
+  Spacer,
+  Center,
+  Grid,
+  Container,
+} from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/marketplace._index";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -74,78 +83,106 @@ export const loader = async (params: LoaderFunctionArgs) => {
 
 const Page = () => {
   const products = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("query") ?? "",
+  );
   const query = searchParams.get("query") ?? "";
   const page = Math.max(
     z.coerce.number().nullable().parse(searchParams.get("page")) ?? 1,
     1,
   );
 
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (value: string) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          const newSearchParams = new URLSearchParams(searchParams);
+          if (value.trim()) {
+            newSearchParams.set("query", value.trim());
+          } else {
+            newSearchParams.delete("query");
+          }
+          // Reset to page 1 when searching
+          newSearchParams.delete("page");
+          setSearchParams(newSearchParams);
+        }, 300); // 300ms debounce
+      };
+    })(),
+    [searchParams, setSearchParams],
+  );
+
+  // Handle input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    debouncedSearch(value);
+  };
+
   return (
     <>
       <styled.h1 srOnly>Marketplace</styled.h1>
 
-      <Box mt={4}>
-        <Form action="/marketplace">
-          <Flex rounded="full" p={1} borderWidth={1} borderColor="gray.800">
-            <Center pl={4} color="gray.500">
-              <RiSearchLine />
-            </Center>
-            <styled.input
-              name="query"
-              defaultValue={query ?? ""}
-              bgColor="inherit"
-              px={4}
-              py={2}
-              w="full"
-              placeholder="What are you looking for?"
-              color="inherit"
-              outline="none"
-            />
-            <Button type="submit" variant="secondary">
-              Go
-            </Button>
-          </Flex>
-        </Form>
-      </Box>
+      <TabsBar>
+        <Flex w="full">
+          <styled.input
+            value={searchValue}
+            onChange={handleSearchChange}
+            bgColor="inherit"
+            px={4}
+            py={2}
+            w="full"
+            placeholder="What are you looking for?"
+            color="inherit"
+            outline="none"
+          />
+          <Center pr={4} color="gray.500">
+            <RiSearchLine />
+          </Center>
+        </Flex>
+      </TabsBar>
 
-      {products.length <= 0 && (
-        <styled.p fontWeight="extrabold" fontSize="3xl" my={8}>
-          No Results Found...
-        </styled.p>
-      )}
-
-      <Grid
-        gridTemplateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }}
-        gap={4}
-        mt={4}
-      >
-        {products.map((product) => {
-          return <ProductCard product={product} key={product.slug} />;
-        })}
-      </Grid>
-
-      <Flex pt={6}>
-        {page > 1 && (
-          <LinkButton
-            to={`/marketplace?query=${query}&page=${page - 1}`}
-            variant="secondary"
-          >
-            <RiArrowLeftSLine /> Previous
-          </LinkButton>
+      <Container maxW={1100} px={2} py={4}>
+        {products.length <= 0 && (
+          <styled.p fontWeight="medium" textAlign="center">
+            No results were found for this search...
+          </styled.p>
         )}
 
-        <Spacer />
+        <Grid
+          gridTemplateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }}
+          gap={4}
+        >
+          {products.map((product) => {
+            return <ProductCard product={product} key={product.slug} />;
+          })}
+        </Grid>
 
-        {products.length >= 20 && (
-          <LinkButton
-            to={`/marketplace?query=${query}&page=${page + 1}`}
-            variant="secondary"
-          >
-            Next <RiArrowRightSLine />
-          </LinkButton>
-        )}
-      </Flex>
+        <Flex pt={6}>
+          {page > 1 && (
+            <LinkButton
+              to={`/marketplace?query=${query}&page=${page - 1}`}
+              variant="secondary"
+            >
+              <RiArrowLeftSLine /> Previous
+            </LinkButton>
+          )}
+
+          <Spacer />
+
+          {products.length >= 20 && (
+            <LinkButton
+              to={`/marketplace?query=${query}&page=${page + 1}`}
+              variant="secondary"
+            >
+              Next <RiArrowRightSLine />
+            </LinkButton>
+          )}
+        </Flex>
+      </Container>
     </>
   );
 };
