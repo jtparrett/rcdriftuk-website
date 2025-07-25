@@ -115,7 +115,7 @@ const Page = () => {
                     variant="ghost"
                     pos="relative"
                     zIndex={3}
-                    to={`/tournaments/${tournament.id}/archive`}
+                    to={`/tournaments-archive/${tournament.id}`}
                   >
                     <RiDeleteBinFill />
                   </LinkButton>

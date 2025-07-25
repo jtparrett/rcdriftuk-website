@@ -85,9 +85,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
-        {process.env.NODE_ENV === "production" && (
-          <script src="https://cdn.splitbee.io/sb.js"></script>
-        )}
       </head>
       <body>
         {children}

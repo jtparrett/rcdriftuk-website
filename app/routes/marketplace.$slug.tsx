@@ -113,11 +113,7 @@ const MarketplaceListingPage = () => {
               </Flex>
             </Link>
 
-            <LinkButton
-              to={product.url}
-              target="_blank"
-              data-splitbee-event="Clicked to Buy"
-            >
+            <LinkButton to={product.url} target="_blank">
               {buttonText} <RiLink />
             </LinkButton>
           </Flex>
