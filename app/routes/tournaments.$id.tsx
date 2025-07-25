@@ -460,7 +460,7 @@ const TournamentPage = () => {
                 >
                   <Spacer />
 
-                  {isOwner && !hasProtest && secondsRemaining > 0 && (
+                  {isOwner && secondsRemaining > 0 && (
                     <Box
                       rounded="full"
                       borderWidth={1}
