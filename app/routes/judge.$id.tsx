@@ -1,12 +1,17 @@
 import { TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, redirect, useLoaderData, useNavigation } from "react-router";
+import {
+  Form,
+  Link,
+  redirect,
+  useLoaderData,
+  useNavigation,
+} from "react-router";
 import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
-import { RiArrowLeftLine } from "react-icons/ri";
 import invariant from "tiny-invariant";
 import { z } from "zod";
-import { Button, LinkButton } from "~/components/Button";
+import { Button } from "~/components/Button";
 import { Glow } from "~/components/Glow";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
@@ -24,6 +29,7 @@ import { ably as AblyClient } from "~/utils/ably";
 import { prisma } from "~/utils/prisma.server";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
+import { css } from "~/styled-system/css";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);
@@ -366,18 +372,6 @@ const JudgePage = () => {
 
   return (
     <>
-      <Box borderBottomWidth={1} borderColor="gray.800">
-        <Container maxW={1100} px={2}>
-          <LinkButton
-            py={3}
-            variant="ghost"
-            w="full"
-            to={`/tournaments/${tournament.id}/overview`}
-          >
-            <RiArrowLeftLine /> Return to Tournament
-          </LinkButton>
-        </Container>
-      </Box>
       <Center
         minH="60dvh"
         bgImage="url(/dot-bg.svg)"
@@ -422,11 +416,19 @@ const JudgePage = () => {
                 gradientFrom="brand.500"
                 gradientTo="brand.700"
               >
-                <styled.h1 fontWeight="extrabold">
+                <styled.h1 fontSize="sm">
                   {judge.user.firstName} {judge.user.lastName}
                 </styled.h1>
                 <Spacer />
-                <styled.h2 fontSize="sm">{tournament.name}</styled.h2>
+                <Link
+                  to={`/tournaments/${tournament.id}/overview`}
+                  className={css({
+                    fontSize: "sm",
+                  })}
+                  replace
+                >
+                  {tournament.name}
+                </Link>
               </Flex>
               <Box p={4} pb={8}>
                 {tournament.state === TournamentsState.QUALIFYING && (

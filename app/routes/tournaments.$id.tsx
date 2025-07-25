@@ -22,6 +22,7 @@ import { TournamentStartForm } from "~/components/TournamentStartForm";
 import {
   AspectRatio,
   Box,
+  Center,
   Container,
   Flex,
   Spacer,
@@ -40,6 +41,7 @@ import { useReloader } from "~/utils/useReloader";
 import {
   RiFlagLine,
   RiFullscreenFill,
+  RiOpenArmLine,
   RiRemoteControlLine,
   RiShuffleLine,
 } from "react-icons/ri";
@@ -47,11 +49,14 @@ import type { Route } from "./+types/tournaments.$id";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab } from "~/components/Tab";
+import { TabsBar } from "~/components/TabsBar";
+import { getUser, type GetUser } from "~/utils/getUser.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
+  let user: GetUser | null = null;
   const tournament = await getTournament(id, userId);
 
   if (!tournament) {
@@ -63,9 +68,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const users = await getUsers();
 
+  if (userId) {
+    user = await getUser(userId);
+  }
+
   const tournamentJudge = tournament.judges.find(
     (judge) => judge.user.id === userId,
   );
+  const isBattlingDriver =
+    tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
+    tournament.nextBattle?.driverRight?.driverId === user?.driverId;
 
   const url = new URL(args.request.url);
   const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
@@ -101,6 +113,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     users,
     tournamentJudge,
     eventDrivers,
+    isBattlingDriver,
   };
 };
 
@@ -122,6 +135,16 @@ export const action = async (args: ActionFunctionArgs) => {
           scores: true,
         },
       },
+      nextBattle: {
+        select: {
+          BattleProtests: {
+            where: {
+              resolved: false,
+            },
+            take: 1,
+          },
+        },
+      },
     },
   });
 
@@ -130,6 +153,11 @@ export const action = async (args: ActionFunctionArgs) => {
       .channels.get(tournament.id)
       .publish("update", new Date().toISOString());
   };
+
+  invariant(
+    (tournament.nextBattle?.BattleProtests.length ?? 0) === 0,
+    "Protests must be resolved before continuing",
+  );
 
   if (
     tournament.state === TournamentsState.QUALIFYING &&
@@ -207,7 +235,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
 };
 
 const TournamentPage = () => {
-  const { tournament, users, tournamentJudge, eventDrivers } =
+  const { tournament, users, tournamentJudge, eventDrivers, isBattlingDriver } =
     useLoaderData<typeof loader>();
   const location = useLocation();
   const transition = useNavigation();
@@ -222,7 +250,6 @@ const TournamentPage = () => {
   const { user } = useUser();
 
   const isOwner = user?.id === tournament.userId;
-
   const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
 
   const leftVotes =
@@ -236,6 +263,11 @@ const TournamentPage = () => {
 
   const isOMT =
     leftVotes.length < winThreshold && rightVotes.length < winThreshold;
+  const hasProtest = (tournament.nextBattle?.BattleProtests.length ?? 0) > 0;
+  const hasUnresolvedProtest =
+    tournament.nextBattle?.BattleProtests.some(
+      (protest) => !protest.resolved,
+    ) ?? false;
 
   const judgingCompleteForNextBattle =
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
@@ -287,8 +319,8 @@ const TournamentPage = () => {
 
         {tournament.liveUrl && (
           <Box borderBottomWidth={1} borderColor="gray.900">
-            <Container maxW={1100} px={2} mt={4}>
-              <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden" mb={4}>
+            <Container maxW={1100} px={2} my={2}>
+              <AspectRatio ratio={16 / 9} rounded="xl" overflow="hidden">
                 <styled.iframe src={tournament.liveUrl} />
               </AspectRatio>
             </Container>
@@ -309,57 +341,100 @@ const TournamentPage = () => {
       {tournament.state !== TournamentsState.START && (
         <>
           <HiddenEmbed>
-            <Box py={2} borderBottomWidth={1} borderColor="gray.900" mb={4}>
+            <TabsBar>
+              <Tab
+                to={`/tournaments/${tournament.id}/overview`}
+                isActive={isOverviewTab}
+                replace
+              >
+                Overview
+              </Tab>
+              {tournament.qualifyingLaps > 0 && (
+                <Tab
+                  to={`/tournaments/${tournament.id}/qualifying`}
+                  isActive={isQualifyingTab}
+                  replace
+                >
+                  Qualifying
+                </Tab>
+              )}
+              <Tab
+                to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+                isActive={isBattlesTab}
+                replace
+              >
+                Battles
+              </Tab>
+              {(tournament.state === TournamentsState.END ||
+                tournament.format === TournamentsFormat.DRIFT_WARS) && (
+                <Tab
+                  to={`/tournaments/${tournament.id}/standings`}
+                  isActive={isStandingsTab}
+                  replace
+                >
+                  Standings
+                </Tab>
+              )}
+            </TabsBar>
+
+            <Box py={2}>
               <Container maxW={1100} px={2}>
+                {hasUnresolvedProtest && isOwner && (
+                  <Form
+                    method="post"
+                    action={`/api/protest/${tournament.nextBattle?.BattleProtests[0].id}/resolve`}
+                  >
+                    <Box rounded="2xl" p={1} bgColor="brand.900" mb={2}>
+                      <Flex
+                        p={4}
+                        rounded="xl"
+                        borderWidth={1}
+                        borderColor="brand.600"
+                        borderStyle="dashed"
+                        alignItems="center"
+                        gap={4}
+                      >
+                        <Center
+                          w={10}
+                          h={10}
+                          bgColor="brand.600"
+                          rounded="lg"
+                          flex="none"
+                        >
+                          <RiOpenArmLine size={24} />
+                        </Center>
+                        <styled.p
+                          fontWeight="medium"
+                          lineHeight="1.2"
+                          maxW="340px"
+                          flex={1}
+                        >
+                          A protest has been raised. It must be resolved before
+                          continuing.
+                        </styled.p>
+
+                        <Button ml="auto" type="submit">
+                          Resolve Protest
+                        </Button>
+                      </Flex>
+                    </Box>
+                  </Form>
+                )}
+
                 <Flex
                   flexDir={{ base: "column", sm: "row" }}
                   gap={1}
                   overflow="auto"
                   flexWrap="wrap"
                 >
-                  <Flex gap={0.5} w="fit-content">
-                    <Tab
-                      to={`/tournaments/${tournament.id}/overview`}
-                      isActive={isOverviewTab}
-                      replace
-                    >
-                      Overview
-                    </Tab>
-                    {tournament.qualifyingLaps > 0 && (
-                      <Tab
-                        to={`/tournaments/${tournament.id}/qualifying`}
-                        isActive={isQualifyingTab}
-                        replace
-                      >
-                        Qualifying
-                      </Tab>
-                    )}
-                    <Tab
-                      to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-                      isActive={isBattlesTab}
-                      replace
-                    >
-                      Battles
-                    </Tab>
-                    {(tournament.state === TournamentsState.END ||
-                      tournament.format === TournamentsFormat.DRIFT_WARS) && (
-                      <Tab
-                        to={`/tournaments/${tournament.id}/standings`}
-                        isActive={isStandingsTab}
-                        replace
-                      >
-                        Standings
-                      </Tab>
-                    )}
-                  </Flex>
-
                   <Spacer />
 
                   {isOwner &&
                     tournament.state === TournamentsState.BATTLES &&
                     tournament.format === TournamentsFormat.DRIFT_WARS &&
                     judgingCompleteForNextBattle &&
-                    !isOMT && (
+                    !isOMT &&
+                    !hasUnresolvedProtest && (
                       <>
                         <LinkButton
                           to={`/tournaments/${tournament.id}/battles/create`}
@@ -373,6 +448,18 @@ const TournamentPage = () => {
                           End Tournament
                         </LinkButton>
                       </>
+                    )}
+
+                  {isBattlingDriver &&
+                    judgingCompleteForNextBattle &&
+                    !location.pathname.includes("/protest") &&
+                    !hasProtest && (
+                      <LinkButton
+                        to={`/tournaments/${tournament.id}/protest`}
+                        w={{ base: "full", sm: "auto" }}
+                      >
+                        Protest Decision <RiOpenArmLine />
+                      </LinkButton>
                     )}
 
                   {isOwner &&
@@ -421,7 +508,8 @@ const TournamentPage = () => {
                   {isOwner &&
                     tournament.state === TournamentsState.BATTLES &&
                     judgingCompleteForNextBattle &&
-                    tournament.format !== TournamentsFormat.DRIFT_WARS && (
+                    tournament.format !== TournamentsFormat.DRIFT_WARS &&
+                    !hasUnresolvedProtest && (
                       <Form method="post">
                         <Button
                           type="submit"

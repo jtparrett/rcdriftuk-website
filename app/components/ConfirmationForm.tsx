@@ -18,6 +18,8 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
       mx="auto"
       maxW={500}
       textAlign="center"
+      borderWidth={1}
+      borderColor="gray.800"
     >
       <Form method="post">
         <styled.h1 mb={2} fontWeight="medium" fontSize="2xl" lineHeight="1.2">
@@ -28,7 +30,12 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
             {disclaimer}
           </styled.p>
         )}
-        <Flex gap={2} justifyContent="center" mt={6}>
+        <Flex
+          gap={2}
+          justifyContent="center"
+          mt={6}
+          flexDir={{ base: "column", sm: "row" }}
+        >
           <Button
             variant="secondary"
             type="button"

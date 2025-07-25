@@ -105,6 +105,18 @@ model TournamentJudges {
   @@unique([tournamentId, driverId])
 }
 
+model BattleProtests {
+  id        Int               @id @default(autoincrement())
+  battleId  Int
+  driverId  Int
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @default(now()) @updatedAt
+  resolved  Boolean           @default(false)
+  battle    TournamentBattles @relation(fields: [battleId], references: [id])
+
+  @@unique([battleId, driverId])
+}
+
 model Laps {
   id                 Int               @id @default(autoincrement())
   tournamentDriverId Int
@@ -144,12 +156,13 @@ model TournamentBattles {
   loserRegionalStartingElo Float?
   loserRegionalElo         Float?
 
-  tournament   Tournaments             @relation(fields: [tournamentId], references: [id])
-  driverLeft   TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
-  driverRight  TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
-  isNextBattle Tournaments?            @relation("tournamentNextBattle")
-  bracket      BattlesBracket          @default(UPPER)
-  BattleVotes  TournamentBattleVotes[]
+  tournament     Tournaments             @relation(fields: [tournamentId], references: [id])
+  driverLeft     TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
+  driverRight    TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
+  isNextBattle   Tournaments?            @relation("tournamentNextBattle")
+  bracket        BattlesBracket          @default(UPPER)
+  BattleVotes    TournamentBattleVotes[]
+  BattleProtests BattleProtests[]
 }
 
 model TournamentBattleVotes {

@@ -31,10 +31,27 @@ export const getTournament = (id: string, userId: string | null) => {
       },
       nextBattle: {
         select: {
+          id: true,
           driverLeftId: true,
           driverRightId: true,
           BattleVotes: {
             distinct: ["judgeId"],
+          },
+          driverLeft: {
+            select: {
+              driverId: true,
+            },
+          },
+          driverRight: {
+            select: {
+              driverId: true,
+            },
+          },
+          BattleProtests: {
+            select: {
+              id: true,
+              resolved: true,
+            },
           },
         },
       },

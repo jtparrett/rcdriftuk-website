@@ -1,5 +1,6 @@
 import { redirect } from "react-router";
 import { useLoaderData } from "react-router";
+import { useEffect, useRef } from "react";
 import {
   add,
   endOfWeek,
@@ -9,6 +10,7 @@ import {
   sub,
   startOfDay,
   endOfDay,
+  isSameDay,
 } from "date-fns";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import type { LoaderFunctionArgs } from "react-router";
@@ -105,6 +107,7 @@ const CalendarWeeksPage = () => {
       <Flex py={2} flexDir="column" gap={2}>
         {Array.from(new Array(7)).map((_, i) => {
           const day = add(startWeekDate, { days: i });
+          const isToday = isSameDay(day, new Date());
           const dayEvents = events.filter((event) => {
             const startDateUTC = toZonedTime(event.startDate, "UTC");
             const endDateUTC = toZonedTime(event.endDate, "UTC");
@@ -123,9 +126,9 @@ const CalendarWeeksPage = () => {
               rounded="2xl"
               overflow="hidden"
               borderWidth={1}
-              borderColor="gray.900"
+              borderColor={isToday ? "brand.500" : "gray.900"}
             >
-              <Box py={1} px={4} bgColor="gray.900">
+              <Box py={1} px={4} bgColor={isToday ? "brand.500" : "gray.900"}>
                 <styled.h3 fontWeight="bold">
                   {format(day, "EEEE do")}
                 </styled.h3>

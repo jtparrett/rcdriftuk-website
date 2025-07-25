@@ -1,7 +1,5 @@
 import {
-  Form,
   redirect,
-  useParams,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router";
@@ -93,9 +91,6 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const RandomiseQualifyingPage = () => {
-  const params = useParams();
-  const id = z.string().parse(params.id);
-
   return (
     <ConfirmationForm
       title="Are you sure you want to randomise qualifying?"

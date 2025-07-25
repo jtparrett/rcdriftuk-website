@@ -221,6 +221,7 @@ const TournamentsOverviewPage = () => {
       bgColor="gray.900"
       borderColor="gray.800"
       minH={isEmbed ? "100dvh" : "60dvh"}
+      className="main"
     >
       <Center
         flexGrow={1}
@@ -233,6 +234,7 @@ const TournamentsOverviewPage = () => {
         borderWidth={1}
         rounded="2xl"
         borderColor="gray.800"
+        className="bg"
       >
         <Box
           bgColor="black"
@@ -324,7 +326,7 @@ const TournamentsOverviewPage = () => {
 
             {tournament?.state === TournamentsState.BATTLES &&
               tournament.nextBattle && (
-                <Flex w={700} maxW="full">
+                <Flex w={isEmbed ? 1100 : 700} maxW="full">
                   <Box
                     flex={1}
                     borderRightWidth={1}
@@ -357,6 +359,15 @@ const TournamentsOverviewPage = () => {
                     py={{ base: 8, md: 12 }}
                     pos="relative"
                     zIndex={1}
+                    _after={{
+                      content: '""',
+                      pos: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      w: "1px",
+                      bgColor: "gray.800",
+                      zIndex: -1,
+                    }}
                   >
                     {battleJudgingComplete && (
                       <>

@@ -79,7 +79,7 @@ const Page = () => {
                 <Label>Tournament Name</Label>
                 <Input
                   name="name"
-                  placeholder="Type here..."
+                  placeholder="e.g. Round 5 | The Final Showdown"
                   value={formik.values.name}
                   onChange={formik.handleChange}
                 />
