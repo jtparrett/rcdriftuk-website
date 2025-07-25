@@ -1,202 +1,180 @@
-import { TournamentsFormat } from "./enums";
+import { TournamentsFormat, BattlesBracket } from "./enums";
 
-export const getTournamentStandings = (
-  battles: {
-    winnerId: number | null;
-    tournament: {
-      format: TournamentsFormat;
-    };
-    driverLeft: {
-      isBye: boolean;
-      id: number;
-      qualifyingPosition: number | null;
-      user: {
-        firstName: string | null;
-        lastName: string | null;
-        image: string | null;
-        driverId: number;
-      };
-    } | null;
-    driverRight: {
-      isBye: boolean;
-      id: number;
-      qualifyingPosition: number | null;
-      user: {
-        firstName: string | null;
-        lastName: string | null;
-        image: string | null;
-        driverId: number;
-      };
-    } | null;
-  }[],
-) => {
+type Driver = {
+  isBye: boolean;
+  id: number;
+  qualifyingPosition: number | null;
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    image: string | null;
+    driverId: number;
+  };
+};
+
+type Battle = {
+  winnerId: number | null;
+  tournament: {
+    format: TournamentsFormat;
+  };
+  driverLeft: Driver | null;
+  driverRight: Driver | null;
+  bracket?: string;
+  round?: number;
+};
+
+type DriverStats = {
+  id: number;
+  driverId: number;
+  firstName: string | null;
+  lastName: string | null;
+  battleCount: number;
+  winCount: number;
+  qualifyingPosition: number | null;
+  image: string | null;
+};
+
+export const getTournamentStandings = (battles: Battle[]) => {
   if (battles.length === 0) {
     return [];
   }
 
   const tournament = battles[0].tournament;
+  const driverMap = new Map<number, DriverStats>();
 
-  // Create a map to track unique drivers and their battle counts
-  const driverMap: Map<
-    number,
-    {
-      id: number;
-      driverId: number;
-      firstName: string | null;
-      lastName: string | null;
-      battleCount: number;
-      winCount: number;
-      qualifyingPosition: number | null;
-      image: string | null;
+  // Helper function to process a driver
+  const processDriver = (driver: Driver, isWinner: boolean) => {
+    if (driver.isBye) return;
+
+    const driverId = driver.user.driverId;
+    const existing = driverMap.get(driverId);
+
+    if (existing) {
+      existing.battleCount++;
+      if (isWinner) existing.winCount++;
+    } else {
+      driverMap.set(driverId, {
+        id: driver.id,
+        driverId,
+        firstName: driver.user.firstName,
+        lastName: driver.user.lastName,
+        battleCount: 1,
+        winCount: isWinner ? 1 : 0,
+        qualifyingPosition: driver.qualifyingPosition,
+        image: driver.user.image,
+      });
     }
-  > = new Map();
+  };
 
-  // Loop through battles to count appearances and store qualifying positions
+  // Process all battles to build driver stats
   battles.forEach((battle) => {
-    const leftDriver = battle.driverLeft;
-    const rightDriver = battle.driverRight;
-
-    if (leftDriver && !leftDriver.isBye) {
-      // Process left driver
-      if (!driverMap.has(leftDriver.user.driverId)) {
-        driverMap.set(leftDriver.user.driverId, {
-          id: leftDriver.id,
-          driverId: leftDriver.user.driverId,
-          firstName: leftDriver.user.firstName,
-          lastName: leftDriver.user.lastName,
-          battleCount: 1,
-          winCount: battle.winnerId === leftDriver.id ? 1 : 0,
-          qualifyingPosition: leftDriver.qualifyingPosition,
-          image: leftDriver.user.image,
-        });
-      } else {
-        const driver = driverMap.get(leftDriver.user.driverId);
-        if (driver) {
-          driver.battleCount++;
-          if (battle.winnerId === leftDriver.id) {
-            driver.winCount++;
-          }
-        }
-      }
+    if (battle.driverLeft) {
+      processDriver(
+        battle.driverLeft,
+        battle.winnerId === battle.driverLeft.id,
+      );
     }
-
-    if (rightDriver && !rightDriver.isBye) {
-      // Process right driver
-      if (!driverMap.has(rightDriver.user.driverId)) {
-        driverMap.set(rightDriver.user.driverId, {
-          id: rightDriver.id,
-          driverId: rightDriver.user.driverId,
-          firstName: rightDriver.user.firstName,
-          lastName: rightDriver.user.lastName,
-          battleCount: 1,
-          winCount: battle.winnerId === rightDriver.id ? 1 : 0,
-          qualifyingPosition: rightDriver.qualifyingPosition,
-          image: rightDriver.user.image,
-        });
-      } else {
-        const driver = driverMap.get(rightDriver.user.driverId);
-        if (driver) {
-          driver.battleCount++;
-          if (battle.winnerId === rightDriver.id) {
-            driver.winCount++;
-          }
-        }
-      }
+    if (battle.driverRight) {
+      processDriver(
+        battle.driverRight,
+        battle.winnerId === battle.driverRight.id,
+      );
     }
   });
 
-  // Convert map to array
   const allDrivers = Array.from(driverMap.values());
 
-  // For drift_wars format, use standard sorting for all positions
-  if (tournament.format === TournamentsFormat.DRIFT_WARS) {
-    return allDrivers.sort((a, b) => {
+  // Helper function for standard driver sorting
+  const sortDrivers = (drivers: DriverStats[]) => {
+    return drivers.sort((a, b) => {
       // Sort by battle count (descending)
       if (b.battleCount !== a.battleCount) {
         return b.battleCount - a.battleCount;
       }
-      // Then sort by win count (descending)
+      // Then by win count (descending)
       if (b.winCount !== a.winCount) {
         return b.winCount - a.winCount;
       }
-      // Then sort by qualifying position (ascending, null treated as high value)
+      // Then by qualifying position (ascending, null treated as high value)
       const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
       const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
       if (aQualPos !== bQualPos) {
         return aQualPos - bQualPos;
       }
-      // Finally sort by name (ascending)
+      // Finally by name (ascending)
       return `${a.lastName}${a.firstName}`.localeCompare(
         `${b.lastName}${b.firstName}`,
       );
     });
+  };
+
+  // For drift wars format, use standard sorting for all positions
+  if (tournament.format === TournamentsFormat.DRIFT_WARS) {
+    return sortDrivers(allDrivers);
   }
 
-  // For other formats, handle special top 3 positions
-  const finalStandings: typeof allDrivers = [];
+  // For other formats, handle special top positions
+  const finalStandings: DriverStats[] = [];
   const remainingDrivers = [...allDrivers];
 
-  // Find last battle (final)
-  const lastBattle = battles[battles.length - 1];
-  if (lastBattle && lastBattle.winnerId) {
-    // First place: winner of last battle
-    const winnerIndex = remainingDrivers.findIndex(
-      (d) => d.id === lastBattle.winnerId,
-    );
-    if (winnerIndex !== -1) {
-      finalStandings.push(remainingDrivers.splice(winnerIndex, 1)[0]);
-    }
+  // Helper function to move driver from remaining to final standings
+  const moveDriverToStandings = (driverId: number | null | undefined) => {
+    if (!driverId) return false;
+    const index = remainingDrivers.findIndex((d) => d.id === driverId);
+    if (index === -1) return false;
+    finalStandings.push(remainingDrivers.splice(index, 1)[0]);
+    return true;
+  };
 
-    // Second place: loser of last battle
+  // Find final battle and determine 1st and 2nd place
+  const finalBattle = battles[battles.length - 1];
+  if (finalBattle?.winnerId) {
+    // 1st place: winner of final battle
+    moveDriverToStandings(finalBattle.winnerId);
+
+    // 2nd place: loser of final battle
     const loserId =
-      lastBattle.driverLeft?.id === lastBattle.winnerId
-        ? lastBattle.driverRight?.id
-        : lastBattle.driverLeft?.id;
-
-    if (loserId) {
-      const loserIndex = remainingDrivers.findIndex((d) => d.id === loserId);
-      if (loserIndex !== -1) {
-        finalStandings.push(remainingDrivers.splice(loserIndex, 1)[0]);
-      }
-    }
+      finalBattle.driverLeft?.id === finalBattle.winnerId
+        ? finalBattle.driverRight?.id
+        : finalBattle.driverLeft?.id;
+    moveDriverToStandings(loserId);
   }
 
-  // Find second to last battle (semi-final)
-  if (battles.length >= 2) {
-    const secondLastBattle = battles[battles.length - 2];
-    if (secondLastBattle && secondLastBattle.winnerId) {
-      // Third place: winner of second to last battle (if not already placed)
-      const semiWinnerIndex = remainingDrivers.findIndex(
-        (d) => d.id === secondLastBattle.winnerId,
-      );
-      if (semiWinnerIndex !== -1) {
-        finalStandings.push(remainingDrivers.splice(semiWinnerIndex, 1)[0]);
-      }
-    }
-  }
-
-  // Sort remaining drivers by standard criteria
-  const sortedRemainingDrivers = remainingDrivers.sort((a, b) => {
-    // Sort by battle count (descending)
-    if (b.battleCount !== a.battleCount) {
-      return b.battleCount - a.battleCount;
-    }
-    // Then sort by win count (descending)
-    if (b.winCount !== a.winCount) {
-      return b.winCount - a.winCount;
-    }
-    // Then sort by qualifying position (ascending, null treated as high value)
-    const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
-    const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
-    if (aQualPos !== bQualPos) {
-      return aQualPos - bQualPos;
-    }
-    // Finally sort by name (ascending)
-    return `${a.lastName}${a.firstName}`.localeCompare(
-      `${b.lastName}${b.firstName}`,
+  // Handle 3rd and 4th place based on tournament format
+  if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+    // Find final lower bracket battle for 3rd/4th place
+    const lowerBracketBattles = battles.filter(
+      (battle) =>
+        battle.bracket === BattlesBracket.LOWER && battle.winnerId !== null,
     );
-  });
 
-  // Combine final standings with remaining drivers
-  return [...finalStandings, ...sortedRemainingDrivers];
+    if (lowerBracketBattles.length > 0) {
+      const finalLowerBattle = lowerBracketBattles.reduce((latest, current) =>
+        (current.round || 0) > (latest.round || 0) ? current : latest,
+      );
+
+      if (finalLowerBattle.winnerId) {
+        // 3rd place: winner of final lower bracket battle
+        moveDriverToStandings(finalLowerBattle.winnerId);
+
+        // 4th place: loser of final lower bracket battle
+        const lowerLoserId =
+          finalLowerBattle.driverLeft?.id === finalLowerBattle.winnerId
+            ? finalLowerBattle.driverRight?.id
+            : finalLowerBattle.driverLeft?.id;
+        moveDriverToStandings(lowerLoserId);
+      }
+    }
+  } else {
+    // For standard format, use second-to-last battle for 3rd place
+    if (battles.length >= 2) {
+      const semiFinalBattle = battles[battles.length - 2];
+      if (semiFinalBattle?.winnerId) {
+        moveDriverToStandings(semiFinalBattle.winnerId);
+      }
+    }
+  }
+
+  // Sort remaining drivers and combine with final standings
+  return [...finalStandings, ...sortDrivers(remainingDrivers)];
 };

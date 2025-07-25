@@ -33,6 +33,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     select: {
       id: true,
       winnerId: true,
+      bracket: true,
+      round: true,
       tournament: {
         select: {
           format: true,
