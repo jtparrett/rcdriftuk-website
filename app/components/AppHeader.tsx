@@ -1,6 +1,6 @@
 import { Box, Center, Spacer, styled } from "~/styled-system/jsx";
 import { useDelayedLoader } from "./Header";
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useScroll, motion, useTransform } from "motion/react";
 import { css } from "~/styled-system/css";
@@ -75,16 +75,18 @@ export const AppHeader = () => {
             top="50%"
             left="50%"
           >
-            <motion.img
-              className={css({
-                w: 140,
-              })}
-              style={{
-                scale,
-              }}
-              src="/rcdriftuk-26.svg"
-              alt="RC Drift UK"
-            />
+            <Link to="/app">
+              <motion.img
+                className={css({
+                  w: 140,
+                })}
+                style={{
+                  scale,
+                }}
+                src="/rcdriftuk-26.svg"
+                alt="RC Drift UK"
+              />
+            </Link>
           </Box>
         </motion.div>
       </motion.div>

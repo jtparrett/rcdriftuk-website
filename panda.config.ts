@@ -131,7 +131,7 @@ export default defineConfig({
         },
         logo: {
           "100%": {
-            strokeDashoffset: "-200",
+            strokeDashoffset: "-200px",
           },
         },
       },

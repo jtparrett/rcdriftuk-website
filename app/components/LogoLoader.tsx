@@ -6,9 +6,9 @@ export const LogoLoader = () => {
     <styled.svg viewBox="0 0 89.39 84" w="64px" h="64px">
       <path
         fill="none"
-        strokeWidth={1}
+        strokeWidth="2px"
         stroke="var(--colors-brand\.500)"
-        strokeDasharray="100"
+        strokeDasharray="100px"
         className={css({
           animation: "logo 1.8s linear infinite",
         })}
