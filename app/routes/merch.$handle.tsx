@@ -385,6 +385,7 @@ const MerchDetailPage = () => {
             <styled.label display="block" mb={1} fontWeight="medium">
               Select a size
             </styled.label>
+
             <Select
               value={selectedVariantId}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>

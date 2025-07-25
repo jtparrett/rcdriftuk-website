@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import type { ReactNode } from "react";
 import { styled } from "~/styled-system/jsx";
 import { cva } from "~/styled-system/css";
 
@@ -26,3 +25,12 @@ const TabStyle = cva({
 
 export const Tab = styled(Link, TabStyle);
 export const TabButton = styled("button", TabStyle);
+
+export const TabGroup = styled("div", {
+  base: {
+    display: "inline-flex",
+    bgColor: "gray.900",
+    rounded: "xl",
+    p: 1,
+  },
+});

@@ -10,6 +10,7 @@ import { Glow } from "~/components/Glow";
 import { LinkButton } from "~/components/Button";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed } from "~/utils/EmbedContext";
+import { Tab, TabGroup } from "~/components/Tab";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -178,27 +179,19 @@ const TournamentBattlesPage = () => {
     <>
       <HiddenEmbed>
         {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
-          <Flex
-            bgColor="gray.900"
-            rounded="full"
-            gap={1}
-            p={1}
-            display="inline-flex"
-            mb={4}
-          >
+          <TabGroup mb={4}>
             {Object.values(BattlesBracket).map((sub) => {
               return (
-                <LinkButton
+                <Tab
                   key={sub}
                   to={`/tournaments/${tournament.id}/battles/${sub}`}
-                  size="xs"
-                  variant={sub === bracket ? "secondary" : "ghost"}
+                  isActive={sub === bracket}
                 >
                   {sentenceCase(sub)} Bracket
-                </LinkButton>
+                </Tab>
               );
             })}
-          </Flex>
+          </TabGroup>
         )}
       </HiddenEmbed>
 

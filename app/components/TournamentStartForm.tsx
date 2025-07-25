@@ -3,15 +3,14 @@ import { styled, Box, Flex } from "~/styled-system/jsx";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { Input } from "./Input";
 import { Button } from "./Button";
-import { Select } from "./Select";
-import { TournamentsFormat } from "~/utils/enums";
+import { Regions, TournamentsFormat } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
 import { RiDeleteBinFill } from "react-icons/ri";
-import { isOneOf } from "~/utils/oneOf";
 import { StepDot } from "./StepDot";
 import { Dropdown, Option } from "./Dropdown";
+import { TabButton, TabGroup } from "./Tab";
 
 interface Props {
   tournament: GetTournament;
@@ -156,6 +155,7 @@ export const TournamentStartForm = ({
   eventDrivers,
 }: Props) => {
   const [fullInclusion, setFullInclusion] = useState(false);
+  const [region, setRegion] = useState<Regions>(Regions.UK);
   const [format, setFormat] = useState(
     tournament?.format ?? TournamentsFormat.STANDARD,
   );
@@ -169,23 +169,21 @@ export const TournamentStartForm = ({
             <styled.label mb={2} display="block">
               What format is this tournament?
             </styled.label>
-            <Select
-              name="format"
-              value={format}
-              onChange={(e) => {
-                if (isOneOf(e.target.value, Object.values(TournamentsFormat))) {
-                  setFormat(e.target.value);
-                }
-              }}
-            >
-              {Object.values(TournamentsFormat).map((format) => {
+            <input type="hidden" name="format" value={format} />
+            <TabGroup>
+              {Object.values(TournamentsFormat).map((item) => {
                 return (
-                  <styled.option key={format} value={format}>
-                    {capitalCase(format)}
-                  </styled.option>
+                  <TabButton
+                    key={item}
+                    type="button"
+                    isActive={format === item}
+                    onClick={() => setFormat(item)}
+                  >
+                    {capitalCase(item)}
+                  </TabButton>
                 );
               })}
-            </Select>
+            </TabGroup>
           </Box>
         </Flex>
 
@@ -271,30 +269,55 @@ export const TournamentStartForm = ({
                 value={fullInclusion ? "true" : "false"}
               />
 
-              <Flex
-                p={1}
-                display="inline-flex"
-                bgColor="gray.800"
-                rounded="full"
-              >
-                <Button
+              <TabGroup>
+                <TabButton
                   type="button"
-                  variant={!fullInclusion ? "primary" : "ghost"}
+                  isActive={!fullInclusion}
                   onClick={() => setFullInclusion(false)}
                 >
                   No
-                </Button>
-                <Button
+                </TabButton>
+                <TabButton
                   type="button"
-                  variant={fullInclusion ? "primary" : "ghost"}
+                  isActive={fullInclusion}
                   onClick={() => setFullInclusion(true)}
                 >
                   Yes
-                </Button>
-              </Flex>
+                </TabButton>
+              </TabGroup>
             </Box>
           </Flex>
         )}
+
+        <Flex gap={4}>
+          <StepDot />
+          <Box flex={1}>
+            <styled.label mb={2} display="block">
+              Which region is this tournament in?
+            </styled.label>
+
+            <input type="hidden" name="region" value={region} />
+
+            <TabGroup>
+              {Object.values(Regions).map((item) => {
+                if (item === Regions.ALL) {
+                  return null;
+                }
+
+                return (
+                  <TabButton
+                    type="button"
+                    key={item}
+                    isActive={region === item}
+                    onClick={() => setRegion(item)}
+                  >
+                    {item}
+                  </TabButton>
+                );
+              })}
+            </TabGroup>
+          </Box>
+        </Flex>
 
         <Flex gap={4}>
           <StepDot />

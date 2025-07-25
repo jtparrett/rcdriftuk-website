@@ -23,7 +23,7 @@ import { prisma } from "~/utils/prisma.server";
 import { useState } from "react";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import type { Values } from "~/utils/values";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { Regions } from "~/utils/enums";
 import type { Route } from "./+types/drivers.$id";
 import { css } from "~/styled-system/css";
@@ -494,7 +494,7 @@ const Page = () => {
 
           {tab === TABS.battleHistory && battles.length > 0 && (
             <VStack gap={4}>
-              {battles.map((battle, i) => {
+              {battles.reverse().map((battle, i) => {
                 const isLeftDriver =
                   battle.driverLeft?.driverId === driver.driverId;
                 const isWinner = isLeftDriver
@@ -577,7 +577,9 @@ const Page = () => {
                         lineHeight={1}
                         transform="translateY(-50%)"
                       >
-                        Battle #{i + 1}
+                        {formatDistanceToNow(battle.createdAt, {
+                          addSuffix: true,
+                        })}
                       </styled.span>
 
                       <Flex p={4} alignItems="center" gap={3}>

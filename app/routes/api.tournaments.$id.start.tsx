@@ -1,4 +1,4 @@
-import { TournamentsFormat, TournamentsState } from "~/utils/enums";
+import { Regions, TournamentsFormat, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import invariant from "tiny-invariant";
@@ -32,6 +32,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
   const fullInclusion =
     z.string().parse(formData.get("fullInclusion") || "false") === "true";
+  const region = z.nativeEnum(Regions).parse(formData.get("region"));
 
   if (judges.length <= 0) {
     throw new Error("Please add at least one judge to the tournament");
@@ -156,6 +157,7 @@ export const action = async (args: ActionFunctionArgs) => {
       qualifyingLaps,
       format,
       fullInclusion,
+      region,
     },
   });
 
