@@ -282,11 +282,14 @@ export const PostCard = ({
                   w={8}
                   h={8}
                   mt={1}
+                  pos="relative"
                 >
-                  <styled.img
-                    src={comment.user.image ?? "/blank-driver-right.jpg"}
-                    alt={`${comment.user.firstName} ${comment.user.lastName}`}
-                  />
+                  <LinkOverlay to={`/drivers/${comment.user.driverId}`}>
+                    <styled.img
+                      src={comment.user.image ?? "/blank-driver-right.jpg"}
+                      alt={`${comment.user.firstName} ${comment.user.lastName}`}
+                    />
+                  </LinkOverlay>
                 </Box>
 
                 <Box flex={1}>
@@ -354,11 +357,14 @@ export const PostCard = ({
                         w={8}
                         h={8}
                         mt={1}
+                        pos="relative"
                       >
-                        <styled.img
-                          src={reply.user.image ?? "/blank-driver-right.jpg"}
-                          alt={`${reply.user.firstName} ${reply.user.lastName}`}
-                        />
+                        <LinkOverlay to={`/drivers/${reply.user.driverId}`}>
+                          <styled.img
+                            src={reply.user.image ?? "/blank-driver-right.jpg"}
+                            alt={`${reply.user.firstName} ${reply.user.lastName}`}
+                          />
+                        </LinkOverlay>
                       </Box>
                       <Box flex={1}>
                         <Box
