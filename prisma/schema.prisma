@@ -166,13 +166,15 @@ model TournamentBattles {
 }
 
 model TournamentBattleVotes {
-  id       Int               @id @default(autoincrement())
-  battleId Int
-  winnerId Int?
-  judgeId  String            @db.Uuid
-  omt      Boolean           @default(false)
-  battle   TournamentBattles @relation(fields: [battleId], references: [id])
-  judge    TournamentJudges  @relation(fields: [judgeId], references: [id])
+  id        Int               @id @default(autoincrement())
+  battleId  Int
+  winnerId  Int?
+  judgeId   String            @db.Uuid
+  omt       Boolean           @default(false)
+  battle    TournamentBattles @relation(fields: [battleId], references: [id])
+  judge     TournamentJudges  @relation(fields: [judgeId], references: [id])
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @default(now()) @updatedAt
 
   @@unique([judgeId, battleId])
 }

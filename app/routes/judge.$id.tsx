@@ -184,6 +184,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
       update: {
         winnerId: driverId,
         omt: isOMT,
+        updatedAt: new Date(),
       },
     });
   }

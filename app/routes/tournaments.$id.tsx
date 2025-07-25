@@ -51,6 +51,8 @@ import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab } from "~/components/Tab";
 import { TabsBar } from "~/components/TabsBar";
 import { getUser, type GetUser } from "~/utils/getUser.server";
+import { useEffect, useState } from "react";
+import pluralize from "pluralize";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -272,6 +274,35 @@ const TournamentPage = () => {
   const judgingCompleteForNextBattle =
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
     tournament.judges.length;
+  const judgingCompleteAt = judgingCompleteForNextBattle
+    ? tournament.nextBattle?.BattleVotes.sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
+      )[0].updatedAt
+    : null;
+
+  const getProtestSecondsRemaining = () => {
+    return judgingCompleteAt
+      ? Math.max(
+          0,
+          20 -
+            Math.floor(
+              (new Date().getTime() - judgingCompleteAt.getTime()) / 1000,
+            ),
+        )
+      : 0;
+  };
+
+  const [secondsRemaining, setSecondsRemaining] = useState(
+    getProtestSecondsRemaining(),
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const protestSecondsRemaining = getProtestSecondsRemaining();
+      setSecondsRemaining(protestSecondsRemaining);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [judgingCompleteAt]);
 
   useReloader();
   useAblyRealtimeReloader(tournament.id);
@@ -429,6 +460,22 @@ const TournamentPage = () => {
                 >
                   <Spacer />
 
+                  {isOwner && !hasProtest && secondsRemaining > 0 && (
+                    <Box
+                      rounded="full"
+                      borderWidth={1}
+                      borderColor="gray.700"
+                      bgColor="gray.800"
+                      py={1.5}
+                      px={4}
+                    >
+                      <p>
+                        Waiting for protests:{" "}
+                        {pluralize("second", secondsRemaining, true)} remaining
+                      </p>
+                    </Box>
+                  )}
+
                   {isOwner &&
                     tournament.state === TournamentsState.BATTLES &&
                     tournament.format === TournamentsFormat.DRIFT_WARS &&
@@ -439,7 +486,7 @@ const TournamentPage = () => {
                         <LinkButton
                           to={`/tournaments/${tournament.id}/battles/create`}
                         >
-                          Next Battle <RiFlagLine />
+                          Create Next Battle <RiFlagLine />
                         </LinkButton>
                         <LinkButton
                           to={`/tournaments/${tournament.id}/end`}
@@ -509,7 +556,8 @@ const TournamentPage = () => {
                     tournament.state === TournamentsState.BATTLES &&
                     judgingCompleteForNextBattle &&
                     tournament.format !== TournamentsFormat.DRIFT_WARS &&
-                    !hasUnresolvedProtest && (
+                    !hasUnresolvedProtest &&
+                    secondsRemaining <= 0 && (
                       <Form method="post">
                         <Button
                           type="submit"
