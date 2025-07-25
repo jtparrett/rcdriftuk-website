@@ -1,13 +1,12 @@
 import { BattlesBracket, TournamentsFormat } from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { z } from "zod";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
 import { prisma } from "~/utils/prisma.server";
 import { Glow } from "~/components/Glow";
-import { LinkButton } from "~/components/Button";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
@@ -51,6 +50,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
             },
@@ -61,6 +61,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
             },
@@ -131,7 +132,9 @@ const Driver = ({
         }
         pr={2}
       >
-        {driver?.user.firstName} {driver?.user.lastName}
+        <Link to={`/drivers/${driver?.user.driverId}`}>
+          {driver?.user.firstName} {driver?.user.lastName}
+        </Link>
       </styled.p>
     </Flex>
   );
@@ -310,6 +313,7 @@ const TournamentBattlesPage = () => {
                             borderRightRadius="lg"
                             position="relative"
                             zIndex={4}
+                            pointerEvents="none"
                           />
                         ) : (
                           <Spacer />

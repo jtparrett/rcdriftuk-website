@@ -52,6 +52,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
             select: {
               firstName: true,
               lastName: true,
+              driverId: true,
             },
           },
           laps: {
@@ -174,7 +175,9 @@ const Table = ({
                     }
                     whiteSpace="nowrap"
                   >
-                    {driver.user.firstName} {driver.user.lastName}
+                    <Link to={`/drivers/${driver.user.driverId}`}>
+                      {driver.user.firstName} {driver.user.lastName}
+                    </Link>
                   </styled.td>
 
                   <styled.td fontWeight="semibold" textAlign="center">
