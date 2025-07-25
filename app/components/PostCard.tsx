@@ -14,14 +14,12 @@ import { Markdown } from "./Markdown";
 import { Link, useSearchParams } from "react-router";
 import pluralize from "pluralize";
 import { useLikePost, usePostLikes } from "~/utils/usePostLikes";
-import { SignedIn } from "@clerk/react-router";
 import { useCreateComment, usePostComments } from "~/utils/usePostComments";
 import type { GetUser } from "~/utils/getUser.server";
 import { useFormik } from "formik";
 import { LinkOverlay } from "./LinkOverlay";
 import { css } from "~/styled-system/css";
 import { Carousel } from "./Carousel";
-import { Fragment } from "react/jsx-runtime";
 import { UserTaggingInput } from "./UserTaggingInput";
 import { useEffect } from "react";
 
@@ -216,7 +214,7 @@ export const PostCard = ({
         </Flex>
       )}
 
-      <SignedIn>
+      {user && (
         <Flex gap={2} borderTopWidth={1} borderColor="gray.800">
           <Button
             variant="ghost"
@@ -244,7 +242,7 @@ export const PostCard = ({
             Comment
           </LinkButton>
         </Flex>
-      </SignedIn>
+      )}
 
       {(allowComment || comments.length > 0) && (
         <Flex
@@ -313,12 +311,15 @@ export const PostCard = ({
                         addSuffix: true,
                       })}
                     </styled.p>
-                    <StyledLink
-                      to={`/posts/${post.id}?reply=${comment.id}&comment=@${comment.user.driverId}(${comment.user.firstName} ${comment.user.lastName})#comment`}
-                      fontSize="sm"
-                    >
-                      Reply
-                    </StyledLink>
+
+                    {user && (
+                      <StyledLink
+                        to={`/posts/${post.id}?reply=${comment.id}&comment=@${comment.user.driverId}(${comment.user.firstName} ${comment.user.lastName})#comment`}
+                        fontSize="sm"
+                      >
+                        Reply
+                      </StyledLink>
+                    )}
                     {user?.id === comment.user.id && (
                       <StyledLink
                         to={`/comments/${comment.id}/delete`}
@@ -404,102 +405,97 @@ export const PostCard = ({
             </Flex>
           ))}
 
-          {allowComment && (
-            <SignedIn>
-              <form
-                onSubmit={formik.handleSubmit}
-                id="comment"
-                style={{
-                  // @ts-ignore
-                  "--order":
-                    replyCommentIndex !== null ? replyCommentIndex : -1,
-                }}
-                className={css({
-                  order: "var(--order)",
-                })}
+          {allowComment && user && (
+            <form
+              onSubmit={formik.handleSubmit}
+              id="comment"
+              style={{
+                // @ts-ignore
+                "--order": replyCommentIndex !== null ? replyCommentIndex : -1,
+              }}
+              className={css({
+                order: "var(--order)",
+              })}
+            >
+              <Flex
+                borderBottomWidth={1}
+                borderColor="gray.800"
+                px={4}
+                pb={2}
+                gap={2}
+                mb={2}
               >
-                <Flex
-                  borderBottomWidth={1}
-                  borderColor="gray.800"
-                  px={4}
-                  pb={2}
-                  gap={2}
-                  mb={2}
+                <Box
+                  w={10}
+                  h={10}
+                  rounded="full"
+                  overflow="hidden"
+                  borderWidth={1}
+                  borderColor="gray.700"
                 >
-                  <Box
-                    w={10}
-                    h={10}
-                    rounded="full"
-                    overflow="hidden"
-                    borderWidth={1}
-                    borderColor="gray.700"
-                  >
-                    <styled.img
-                      w="full"
-                      h="full"
-                      src={user?.image ?? "/blank-driver-right.jpg"}
-                      objectFit="cover"
-                    />
-                  </Box>
-                  <Box
-                    flex={1}
-                    bgColor="gray.800"
-                    rounded="xl"
-                    borderWidth={1}
-                    borderColor="gray.700"
-                  >
-                    {replyComment && (
-                      <Flex
-                        pl={4}
-                        pr={1}
-                        py={0.5}
-                        bgColor="gray.900"
-                        borderTopRadius="xl"
-                        alignItems="center"
-                      >
-                        <styled.p color="gray.500" fontSize="sm">
-                          Replying to {replyComment.user.firstName}{" "}
-                          {replyComment.user.lastName}
-                        </styled.p>
-                        <Spacer />
-                        <Link
-                          to={`/posts/${post.id}#comment`}
-                          className={css({
-                            p: 1,
-                          })}
-                        >
-                          <RiCloseLine />
-                        </Link>
-                      </Flex>
-                    )}
-                    <UserTaggingInput
-                      placeholder="Add a comment..."
-                      autoFocus
-                      name="comment"
-                      value={formik.values.comment}
-                      onChange={(value) =>
-                        formik.setFieldValue("comment", value)
-                      }
-                      rounded="xl"
-                    />
-                    <Flex p={2}>
+                  <styled.img
+                    w="full"
+                    h="full"
+                    src={user?.image ?? "/blank-driver-right.jpg"}
+                    objectFit="cover"
+                  />
+                </Box>
+                <Box
+                  flex={1}
+                  bgColor="gray.800"
+                  rounded="xl"
+                  borderWidth={1}
+                  borderColor="gray.700"
+                >
+                  {replyComment && (
+                    <Flex
+                      pl={4}
+                      pr={1}
+                      py={0.5}
+                      bgColor="gray.900"
+                      borderTopRadius="xl"
+                      alignItems="center"
+                    >
+                      <styled.p color="gray.500" fontSize="sm">
+                        Replying to {replyComment.user.firstName}{" "}
+                        {replyComment.user.lastName}
+                      </styled.p>
                       <Spacer />
-                      <Button
-                        px={0}
-                        py={0}
-                        w={8}
-                        h={8}
-                        type="submit"
-                        disabled={createComment.isPending}
-                        isLoading={createComment.isPending}
+                      <Link
+                        to={`/posts/${post.id}#comment`}
+                        className={css({
+                          p: 1,
+                        })}
                       >
-                        <RiSendPlaneFill size={16} />
-                      </Button>
+                        <RiCloseLine />
+                      </Link>
                     </Flex>
-                  </Box>
-                </Flex>
-              </form>
-            </SignedIn>
+                  )}
+                  <UserTaggingInput
+                    placeholder="Add a comment..."
+                    autoFocus
+                    name="comment"
+                    value={formik.values.comment}
+                    onChange={(value) => formik.setFieldValue("comment", value)}
+                    rounded="xl"
+                  />
+                  <Flex p={2}>
+                    <Spacer />
+                    <Button
+                      px={0}
+                      py={0}
+                      w={8}
+                      h={8}
+                      type="submit"
+                      disabled={createComment.isPending}
+                      isLoading={createComment.isPending}
+                    >
+                      <RiSendPlaneFill size={16} />
+                    </Button>
+                  </Flex>
+                </Box>
+              </Flex>
+            </form>
           )}
         </Flex>
       )}
