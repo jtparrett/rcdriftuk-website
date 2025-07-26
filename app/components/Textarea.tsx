@@ -14,5 +14,6 @@ export const Textarea = styled(TextareaAutosize, {
     outline: "none",
     display: "block",
     resize: "none",
+    maxHeight: 280,
   },
 });

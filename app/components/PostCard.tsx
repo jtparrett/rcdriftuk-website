@@ -3,26 +3,21 @@ import { Box, Center, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
 import {
   RiChat3Line,
-  RiCloseLine,
   RiDeleteBinFill,
-  RiSendPlaneFill,
   RiShareForwardFill,
   RiThumbUpFill,
   RiThumbUpLine,
 } from "react-icons/ri";
 import type { GetPostById } from "~/utils/getPostById.server";
 import { Markdown } from "./Markdown";
-import { Link, useSearchParams } from "react-router";
+import { Link } from "react-router";
 import pluralize from "pluralize";
 import { useLikePost, usePostLikes } from "~/utils/usePostLikes";
-import { useCreateComment, usePostComments } from "~/utils/usePostComments";
+import { usePostComments } from "~/utils/usePostComments";
 import type { GetUser } from "~/utils/getUser.server";
-import { useFormik } from "formik";
 import { LinkOverlay } from "./LinkOverlay";
 import { css } from "~/styled-system/css";
 import { Carousel } from "./Carousel";
-import { UserTaggingInput } from "./UserTaggingInput";
-import { useEffect } from "react";
 
 const StyledLink = styled(Link, {
   base: {
@@ -59,35 +54,6 @@ export const PostCard = ({
     totalComments: post._count.comments,
     comments: post.comments,
   });
-
-  const [searchParams] = useSearchParams();
-  const initialComment = searchParams.get("comment");
-  const replyId = searchParams.get("reply");
-  const createComment = useCreateComment(post.id, user);
-
-  const formik = useFormik({
-    initialValues: {
-      comment: initialComment ?? "",
-    },
-    onSubmit(values) {
-      formik.resetForm();
-      createComment.mutate({
-        comment: values.comment,
-        replyId,
-      });
-    },
-  });
-
-  useEffect(() => {
-    formik.setFieldValue("comment", initialComment ?? "");
-  }, [searchParams]);
-
-  const replyComment = replyId
-    ? comments.find((comment) => comment.id === Number(replyId))
-    : null;
-  const replyCommentIndex = replyId
-    ? comments.findIndex((comment) => comment.id === Number(replyId))
-    : null;
 
   const postAuthorName =
     post.track?.name ?? `${post.user.firstName} ${post.user.lastName}`;
@@ -304,6 +270,9 @@ export const PostCard = ({
                     <styled.img
                       src={comment.user.image ?? "/blank-driver-right.jpg"}
                       alt={`${comment.user.firstName} ${comment.user.lastName}`}
+                      w="full"
+                      h="full"
+                      objectFit="cover"
                     />
                   </LinkOverlay>
                 </Box>
@@ -379,6 +348,9 @@ export const PostCard = ({
                           <styled.img
                             src={reply.user.image ?? "/blank-driver-right.jpg"}
                             alt={`${reply.user.firstName} ${reply.user.lastName}`}
+                            w="full"
+                            h="full"
+                            objectFit="cover"
                           />
                         </LinkOverlay>
                       </Box>
@@ -435,99 +407,6 @@ export const PostCard = ({
               )}
             </Flex>
           ))}
-
-          {allowComment && user && (
-            <form
-              onSubmit={formik.handleSubmit}
-              id="comment"
-              style={{
-                // @ts-ignore
-                "--order": replyCommentIndex !== null ? replyCommentIndex : -1,
-              }}
-              className={css({
-                order: "var(--order)",
-              })}
-            >
-              <Flex
-                borderBottomWidth={1}
-                borderColor="gray.800"
-                px={4}
-                pb={2}
-                gap={2}
-                mb={2}
-              >
-                <Box
-                  w={10}
-                  h={10}
-                  rounded="full"
-                  overflow="hidden"
-                  borderWidth={1}
-                  borderColor="gray.700"
-                >
-                  <styled.img
-                    w="full"
-                    h="full"
-                    src={user?.image ?? "/blank-driver-right.jpg"}
-                    objectFit="cover"
-                  />
-                </Box>
-                <Box
-                  flex={1}
-                  bgColor="gray.800"
-                  rounded="xl"
-                  borderWidth={1}
-                  borderColor="gray.700"
-                >
-                  {replyComment && (
-                    <Flex
-                      pl={4}
-                      pr={1}
-                      py={0.5}
-                      bgColor="gray.900"
-                      borderTopRadius="xl"
-                      alignItems="center"
-                    >
-                      <styled.p color="gray.500" fontSize="sm">
-                        Replying to {replyComment.user.firstName}{" "}
-                        {replyComment.user.lastName}
-                      </styled.p>
-                      <Spacer />
-                      <Link
-                        to={`/posts/${post.id}#comment`}
-                        className={css({
-                          p: 1,
-                        })}
-                      >
-                        <RiCloseLine />
-                      </Link>
-                    </Flex>
-                  )}
-                  <UserTaggingInput
-                    placeholder="Add a comment..."
-                    autoFocus
-                    name="comment"
-                    value={formik.values.comment}
-                    onChange={(value) => formik.setFieldValue("comment", value)}
-                    rounded="xl"
-                  />
-                  <Flex p={2}>
-                    <Spacer />
-                    <Button
-                      px={0}
-                      py={0}
-                      w={8}
-                      h={8}
-                      type="submit"
-                      disabled={createComment.isPending}
-                      isLoading={createComment.isPending}
-                    >
-                      <RiSendPlaneFill size={16} />
-                    </Button>
-                  </Flex>
-                </Box>
-              </Flex>
-            </form>
-          )}
         </Flex>
       )}
     </Box>
