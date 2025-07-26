@@ -43,6 +43,7 @@ import {
   RiFullscreenFill,
   RiOpenArmLine,
   RiRemoteControlLine,
+  RiShareForwardFill,
   RiShuffleLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
@@ -336,6 +337,17 @@ const TournamentPage = () => {
                 {sentenceCase(tournament.format)}
               </styled.span>
               <Spacer />
+              <Button
+                px={2}
+                variant="ghost"
+                onClick={() => {
+                  navigator.share({
+                    url: `https://rcdriftuk.com/tournaments/${tournament.id}`,
+                  });
+                }}
+              >
+                <RiShareForwardFill />
+              </Button>
               <LinkButton
                 to={location.pathname + "?embed=true"}
                 px={2}

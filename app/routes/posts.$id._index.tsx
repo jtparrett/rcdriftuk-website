@@ -57,7 +57,7 @@ const PostPage = () => {
           bottom={0}
           bgColor="rgba(12, 12, 12, 0.75)"
           backdropFilter="blur(10px)"
-          zIndex={100}
+          zIndex={1}
           borderTopWidth={1}
           borderColor="gray.900"
           pb="env(safe-area-inset-bottom)"

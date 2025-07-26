@@ -112,6 +112,7 @@ export const PostCommentForm = ({
             value={formik.values.comment}
             onChange={(value) => formik.setFieldValue("comment", value)}
             rounded="xl"
+            placement="top"
           />
         </Box>
 

@@ -3,7 +3,7 @@ import { styled } from "~/styled-system/jsx";
 export const Dropdown = styled("div", {
   base: {
     pos: "absolute",
-    top: "full",
+    top: "100%",
     left: 0,
     w: "full",
     zIndex: 1000,

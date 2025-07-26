@@ -79,10 +79,12 @@ const useUserSearch = (query: string) => {
 export const UserTaggingInput = ({
   value,
   onChange,
+  placement = "bottom",
   ...props
 }: {
   value: string;
   onChange: (value: string) => void;
+  placement?: "top" | "bottom";
 } & Omit<React.ComponentProps<typeof Textarea>, "onChange" | "value">) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [cursorPosition, setCursorPosition] = useState(0);
@@ -183,7 +185,13 @@ export const UserTaggingInput = ({
       />
 
       {showDropdown && currentMention && (
-        <Dropdown role="listbox" style={{ top: "100%" }}>
+        <Dropdown
+          role="listbox"
+          top={placement === "top" ? "unset" : "100%"}
+          bottom={placement === "top" ? "100%" : "unset"}
+          mt={placement === "top" ? 0 : 1}
+          mb={placement === "top" ? 1 : 0}
+        >
           {isLoading && (
             <Box px={2} py={1} color="gray.500">
               Searching...
