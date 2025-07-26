@@ -410,6 +410,15 @@ export const PostCard = ({
                             })}
                           </styled.p>
 
+                          {user && (
+                            <StyledLink
+                              to={`/posts/${post.id}?reply=${comment.id}&comment=@${reply.user.driverId}(${reply.user.firstName} ${reply.user.lastName})#comment`}
+                              fontSize="sm"
+                            >
+                              Reply
+                            </StyledLink>
+                          )}
+
                           {user?.id === reply.user.id && (
                             <StyledLink
                               to={`/comments/${reply.id}/delete`}
