@@ -6,6 +6,7 @@ import {
   RiCloseLine,
   RiDeleteBinFill,
   RiSendPlaneFill,
+  RiShareForwardFill,
   RiThumbUpFill,
   RiThumbUpLine,
 } from "react-icons/ri";
@@ -152,6 +153,21 @@ export const PostCard = ({
               <RiDeleteBinFill size={14} />
             </LinkButton>
           )}
+
+          <Button
+            variant="ghost"
+            size="sm"
+            px={2}
+            color="gray.400"
+            aria-label="Share post"
+            onClick={() => {
+              navigator.share({
+                url: `https://rcdrift.uk/posts/${post.id}`,
+              });
+            }}
+          >
+            <RiShareForwardFill size={14} />
+          </Button>
         </Flex>
 
         <Box py={3}>
