@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /private/
 
-Sitemap: https://rcdriftuk.com/sitemap.xml
+Sitemap: https://rcdrift.uk/sitemap.xml

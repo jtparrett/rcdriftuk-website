@@ -342,7 +342,7 @@ const TournamentPage = () => {
                 variant="ghost"
                 onClick={() => {
                   navigator.share({
-                    url: `https://rcdriftuk.com/tournaments/${tournament.id}`,
+                    url: `https://rcdrift.uk/tournaments/${tournament.id}`,
                   });
                 }}
               >
