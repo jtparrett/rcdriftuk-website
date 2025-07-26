@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import React, { useState } from "react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { Box, Flex, styled } from "~/styled-system/jsx";
-import { motion, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import { css } from "~/styled-system/css";
 
 interface Props {
@@ -63,6 +63,7 @@ export const Carousel = ({ children }: Props) => {
           })}
           onDragEnd={handleDragEnd}
           drag={arrayChildren.length > 1 ? "x" : false}
+          dragElastic={0}
           animate={{ x: (-100 / arrayChildren.length) * currentIndex + "%" }}
           style={{
             width: `${arrayChildren.length * 100}%`,

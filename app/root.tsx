@@ -31,6 +31,7 @@ import { AppHeader } from "./components/AppHeader";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
+import { useEffect } from "react";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -141,6 +142,40 @@ function App({
   const { user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
+
+  useEffect(() => {
+    if (isApp) {
+      let focusTimestamp = 0;
+
+      const handleFocusIn = (e: Event) => {
+        if (
+          e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement
+        ) {
+          focusTimestamp = Date.now();
+        }
+      };
+
+      const handleScroll = () => {
+        const activeElement = document.activeElement;
+        if (
+          (activeElement instanceof HTMLInputElement ||
+            activeElement instanceof HTMLTextAreaElement) &&
+          Date.now() - focusTimestamp > 1500
+        ) {
+          activeElement.blur();
+        }
+      };
+
+      document.addEventListener("focusin", handleFocusIn);
+      window.addEventListener("scroll", handleScroll);
+
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+        document.removeEventListener("focusin", handleFocusIn);
+      };
+    }
+  }, [isApp]);
 
   return (
     <ClerkProvider

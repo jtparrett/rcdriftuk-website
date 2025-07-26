@@ -159,7 +159,7 @@ export const UserTaggingInput = ({
     <Box pos="relative">
       <Textarea
         ref={textareaRef}
-        enterKeyHint="send"
+        enterKeyHint="enter"
         value={value}
         onChange={(e) => handleTextareaChange(e.target.value)}
         onKeyDown={handleKeyDown}
