@@ -18,7 +18,7 @@ import { Header } from "./components/Header";
 import { rootAuthLoader } from "@clerk/react-router/ssr.server";
 import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
-import { LinkButton } from "./components/Button";
+import { Button, LinkButton } from "./components/Button";
 import { RiHome2Line } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
@@ -128,6 +128,7 @@ export function ErrorBoundary() {
         <LinkButton to="/app">
           Go Home <RiHome2Line />
         </LinkButton>
+        <Button onClick={() => window.location.reload()}>Refresh</Button>
       </Box>
     </Center>
   );
