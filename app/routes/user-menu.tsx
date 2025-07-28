@@ -92,7 +92,7 @@ const UserMenuPage = () => {
 
       <UserMenu />
 
-      <MenuLink to="/vtrack" reloadDocument>
+      <MenuLink to="/vtrack">
         <MenuIcon>
           <RiGamepadLine />
         </MenuIcon>
