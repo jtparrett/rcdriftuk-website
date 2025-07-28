@@ -1,4 +1,9 @@
-import { RiCameraLensLine, RiRocketLine, RiTrophyLine } from "react-icons/ri";
+import {
+  RiCameraLensLine,
+  RiGamepadLine,
+  RiRocketLine,
+  RiTrophyLine,
+} from "react-icons/ri";
 import {
   Link,
   redirect,
@@ -86,6 +91,13 @@ const UserMenuPage = () => {
       </MenuLink>
 
       <UserMenu />
+
+      <MenuLink to="/vtrack" reloadDocument>
+        <MenuIcon>
+          <RiGamepadLine />
+        </MenuIcon>
+        Let's Skid!
+      </MenuLink>
     </Box>
   );
 };
