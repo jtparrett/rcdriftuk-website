@@ -6,6 +6,9 @@ import {
   RiArrowDropUpLine,
   RiSettings3Line,
   RiCloseLine,
+  RiRecordCircleLine,
+  RiPlayLine,
+  RiStopLine,
 } from "react-icons/ri";
 import { Button } from "~/components/Button";
 import { Box, Center, Flex, Spacer, styled } from "~/styled-system/jsx";
@@ -212,9 +215,28 @@ const SETTINGS_CONFIG = {
   },
 };
 
+// Recording data type
+type RecordingFrame = {
+  timestamp: number;
+  x: number;
+  y: number;
+  theta: number;
+  vx: number;
+  vy: number;
+  r: number;
+  steeringAngle: number;
+  leftWheelAngle: number;
+  rightWheelAngle: number;
+};
+
+type RecordingMode = "idle" | "recording" | "playing";
+
 const VTrackPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [recordingMode, setRecordingMode] = useState<RecordingMode>("idle");
+  const [recording, setRecording] = useState<RecordingFrame[]>([]);
+  const [playbackIndex, setPlaybackIndex] = useState(0);
   const [settings, setSettings] = useState<Settings>(() => {
     // Load settings from localStorage or use defaults
     if (typeof window !== "undefined") {
@@ -282,6 +304,25 @@ const VTrackPage = () => {
     };
     setSettings(defaultSettings);
   };
+
+  // Recording and playback handlers
+  const startRecording = () => {
+    setRecording([]);
+    setRecordingMode("recording");
+  };
+
+  const stopRecording = () => {
+    // Auto-play the recording immediately if there's content
+    if (recording.length > 0) {
+      setPlaybackIndex(0);
+      setRecordingMode("playing");
+    } else {
+      setRecordingMode("idle");
+    }
+  };
+
+  // Store game instance reference
+  const gameRef = useRef<any>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -970,6 +1011,54 @@ const VTrackPage = () => {
         }
       }
 
+      // Save current car state for recording
+      saveState(timestamp: number): RecordingFrame {
+        return {
+          timestamp,
+          x: this.x,
+          y: this.y,
+          theta: this.theta,
+          vx: this.vx,
+          vy: this.vy,
+          r: this.r,
+          steeringAngle: this.steeringAngle,
+          leftWheelAngle: this.leftWheelAngle,
+          rightWheelAngle: this.rightWheelAngle,
+        };
+      }
+
+      // Restore car state from recording frame
+      restoreState(frame: RecordingFrame) {
+        this.x = frame.x;
+        this.y = frame.y;
+        this.theta = frame.theta;
+        this.vx = frame.vx;
+        this.vy = frame.vy;
+        this.r = frame.r;
+        this.steeringAngle = frame.steeringAngle;
+        this.leftWheelAngle = frame.leftWheelAngle;
+        this.rightWheelAngle = frame.rightWheelAngle;
+        // Don't restore trail marks - let them accumulate during playback
+      }
+
+      // Reset car to starting position
+      resetToStart() {
+        this.x = getEffectiveBackgroundWidth() / 2;
+        this.y = getEffectiveBackgroundHeight() / 2;
+        this.theta = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.r = 0;
+        this.steeringInput = 0;
+        this.steeringAngle = 0;
+        this.leftWheelAngle = 0;
+        this.rightWheelAngle = 0;
+        this.tractionForce = 0;
+        this.brakeForce = 0;
+        this.wheelSpeed = 0;
+        this.trailMarks = []; // Clear skid marks
+      }
+
       render(ctx: CanvasRenderingContext2D, cameraX: number, cameraY: number) {
         const screenX = this.x - cameraX;
         const screenY = this.y - cameraY;
@@ -1101,19 +1190,207 @@ const VTrackPage = () => {
       }
     }
 
+    class GhostCar extends Car {
+      isVisible: boolean = false;
+
+      constructor() {
+        super();
+        this.isVisible = false;
+      }
+
+      // Override render method to draw ghost car with transparency
+      render(ctx: CanvasRenderingContext2D, cameraX: number, cameraY: number) {
+        if (!this.isVisible) return;
+
+        const screenX = this.x - cameraX;
+        const screenY = this.y - cameraY;
+
+        // Car dimensions (scaled down 50% from original)
+        const carWidth = CONFIG.car.dimensions.width * 50; // 90px
+        const carLength = CONFIG.car.dimensions.length * 50; // 210px
+
+        // Draw trail marks first (bottom layer) - more transparent
+        this.trailMarks.forEach((mark) => {
+          const markX = mark.x - cameraX;
+          const markY = mark.y - cameraY;
+          const age = (Date.now() - mark.time) / 4000;
+          const alpha =
+            (1 - age) * mark.intensity * CONFIG.car.skidmarkAlpha * 0.3; // More transparent
+
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = "#444"; // Lighter color for ghost trails
+          ctx.beginPath();
+          ctx.arc(markX, markY, 2, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        // TIRE POSITIONING - Keep wheels attached to car
+        // All tire positions are calculated relative to car center, then transformed to world coordinates
+
+        // Tire dimensions
+        const tireWidth = 8;
+        const tireLength = 16;
+
+        // Tire offsets in car's local coordinate system (car faces up when theta=0)
+        const frontOffset = carLength * 0.3; // Front tires position
+        const rearOffset = -carLength * 0.3; // Rear tires position
+
+        // Different track widths for front and rear
+        const frontLeftOffset = -carWidth * 0.466; // Front left offset
+        const frontRightOffset = carWidth * 0.466; // Front right offset
+        const rearLeftOffset = -carWidth * 0.44; // Rear left offset - slightly narrower
+        const rearRightOffset = carWidth * 0.44; // Rear right offset - slightly narrower
+
+        // Calculate tire positions in world coordinates
+        // Calculate tire positions using same coordinate system as movement
+        // Front tires
+        const frontLeftX =
+          screenX +
+          (frontOffset * Math.sin(this.theta) +
+            frontLeftOffset * Math.cos(this.theta));
+        const frontLeftY =
+          screenY +
+          (frontOffset * -Math.cos(this.theta) +
+            frontLeftOffset * Math.sin(this.theta));
+
+        const frontRightX =
+          screenX +
+          (frontOffset * Math.sin(this.theta) +
+            frontRightOffset * Math.cos(this.theta));
+        const frontRightY =
+          screenY +
+          (frontOffset * -Math.cos(this.theta) +
+            frontRightOffset * Math.sin(this.theta));
+
+        // Rear tires (fixed, no steering)
+        const rearLeftX =
+          screenX +
+          (rearOffset * Math.sin(this.theta) +
+            rearLeftOffset * Math.cos(this.theta));
+        const rearLeftY =
+          screenY +
+          (rearOffset * -Math.cos(this.theta) +
+            rearLeftOffset * Math.sin(this.theta));
+
+        const rearRightX =
+          screenX +
+          (rearOffset * Math.sin(this.theta) +
+            rearRightOffset * Math.cos(this.theta));
+        const rearRightY =
+          screenY +
+          (rearOffset * -Math.cos(this.theta) +
+            rearRightOffset * Math.sin(this.theta));
+
+        // Set global transparency for all ghost car elements
+        ctx.save();
+        ctx.globalAlpha = 0.5; // Make ghost car semi-transparent
+
+        // Draw tires second (middle layer)
+        // Draw front left tire (steered)
+        ctx.save();
+        ctx.translate(frontLeftX, frontLeftY);
+        ctx.rotate(this.theta + this.leftWheelAngle);
+        ctx.fillStyle = "#555"; // Lighter color for ghost tires
+        ctx.fillRect(-tireWidth / 2, -tireLength / 2, tireWidth, tireLength);
+        ctx.restore();
+
+        // Draw front right tire (steered)
+        ctx.save();
+        ctx.translate(frontRightX, frontRightY);
+        ctx.rotate(this.theta + this.rightWheelAngle);
+        ctx.fillStyle = "#555";
+        ctx.fillRect(-tireWidth / 2, -tireLength / 2, tireWidth, tireLength);
+        ctx.restore();
+
+        // Draw rear left tire (not steered)
+        ctx.save();
+        ctx.translate(rearLeftX, rearLeftY);
+        ctx.rotate(this.theta);
+        ctx.fillStyle = "#666";
+        ctx.fillRect(-tireWidth / 2, -tireLength / 2, tireWidth, tireLength);
+        ctx.restore();
+
+        // Draw rear right tire (not steered)
+        ctx.save();
+        ctx.translate(rearRightX, rearRightY);
+        ctx.rotate(this.theta);
+        ctx.fillStyle = "#666";
+        ctx.fillRect(-tireWidth / 2, -tireLength / 2, tireWidth, tireLength);
+        ctx.restore();
+
+        // Draw car image last (top layer) with tint for ghost effect
+        if (this.carImage.complete) {
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(this.theta);
+
+          // Add a slight blue tint to distinguish ghost car
+          ctx.filter = "sepia(100%) hue-rotate(200deg) saturate(50%)";
+
+          ctx.drawImage(
+            this.carImage,
+            -carWidth / 2,
+            -carLength / 2,
+            carWidth,
+            carLength,
+          );
+          ctx.restore();
+        }
+
+        ctx.restore(); // Restore original globalAlpha
+      }
+
+      show() {
+        this.isVisible = true;
+      }
+
+      hide() {
+        this.isVisible = false;
+      }
+    }
+
     class Game {
       $canvas: HTMLCanvasElement;
       ctx: CanvasRenderingContext2D;
       backgroundImage: HTMLImageElement;
       inputHandler: InputHandler;
       car: Car;
+      ghostCar: GhostCar;
       cameraX: number;
       cameraY: number;
       lastTime: number | null;
       animationId: number | null = null;
 
-      constructor(canvas: HTMLCanvasElement) {
+      // Recording/playback properties
+      recordingMode: RecordingMode;
+      recording: RecordingFrame[];
+      playbackIndex: number;
+      setRecording: (frames: RecordingFrame[]) => void;
+      setPlaybackIndex: (index: number) => void;
+      setRecordingMode: (mode: RecordingMode) => void;
+
+      constructor(
+        canvas: HTMLCanvasElement,
+        recordingState: {
+          recordingMode: RecordingMode;
+          recording: RecordingFrame[];
+          playbackIndex: number;
+          setRecording: (frames: RecordingFrame[]) => void;
+          setPlaybackIndex: (index: number) => void;
+          setRecordingMode: (mode: RecordingMode) => void;
+        },
+      ) {
         this.$canvas = canvas;
+
+        // Initialize recording state
+        this.recordingMode = recordingState.recordingMode;
+        this.recording = recordingState.recording;
+        this.playbackIndex = recordingState.playbackIndex;
+        this.setRecording = recordingState.setRecording;
+        this.setPlaybackIndex = recordingState.setPlaybackIndex;
+        this.setRecordingMode = recordingState.setRecordingMode;
 
         // Make canvas a perfect square based on the smaller dimension for mobile
         const size = Math.min(window.innerWidth, window.innerHeight);
@@ -1128,6 +1405,7 @@ const VTrackPage = () => {
 
         this.inputHandler = new InputHandler();
         this.car = new Car();
+        this.ghostCar = new GhostCar();
 
         // Initialize camera to center on car
         this.cameraX = clamp(
@@ -1163,8 +1441,44 @@ const VTrackPage = () => {
           return;
         }
 
+        // Always update the main car with user controls
         const controls = this.inputHandler.getControls();
         this.car.update(dt, controls);
+
+        if (this.recordingMode === "recording") {
+          // Record current frame while user drives
+          const frame = this.car.saveState(timestamp);
+          const newRecording = [...this.recording, frame];
+          this.setRecording(newRecording);
+          this.recording = newRecording; // Update local copy
+        } else if (
+          this.recordingMode === "playing" &&
+          this.recording.length > 0
+        ) {
+          // Show ghost car during playback
+          this.ghostCar.show();
+
+          // Update ghost car position from recording
+          const currentFrame = this.recording[this.playbackIndex];
+          if (currentFrame) {
+            this.ghostCar.restoreState(currentFrame);
+          }
+
+          // Advance playback index
+          const nextIndex = this.playbackIndex + 1;
+          if (nextIndex >= this.recording.length) {
+            // Loop back to beginning
+            this.setPlaybackIndex(0);
+            this.playbackIndex = 0;
+          } else {
+            this.setPlaybackIndex(nextIndex);
+            this.playbackIndex = nextIndex;
+          }
+        } else {
+          // Hide ghost car when not playing
+          this.ghostCar.hide();
+        }
+
         this.updateCamera();
         this.draw();
 
@@ -1233,10 +1547,41 @@ const VTrackPage = () => {
           );
         }
 
-        // Render car with normal camera coordinates
+        // Render ghost car first (behind main car)
+        this.ghostCar.render(this.ctx, this.cameraX, this.cameraY);
+
+        // Render main car on top
         this.car.render(this.ctx, this.cameraX, this.cameraY);
 
         this.ctx.restore();
+      }
+
+      // Update recording state from React components
+      updateRecordingState(newState: {
+        recordingMode: RecordingMode;
+        recording: RecordingFrame[];
+        playbackIndex: number;
+      }) {
+        const oldMode = this.recordingMode;
+        this.recordingMode = newState.recordingMode;
+        this.recording = newState.recording;
+        this.playbackIndex = newState.playbackIndex;
+
+        // Handle ghost car when starting playback
+        if (oldMode !== "playing" && newState.recordingMode === "playing") {
+          if (newState.recording.length > 0) {
+            this.ghostCar.restoreState(newState.recording[0]);
+            this.ghostCar.trailMarks = []; // Clear ghost trail marks for clean playback
+            this.ghostCar.show();
+          }
+        }
+
+        // Hide ghost car when not playing
+        if (newState.recordingMode !== "playing") {
+          this.ghostCar.hide();
+        }
+
+        // Don't reset main car when starting recording - start from current position
       }
 
       cleanup() {
@@ -1250,13 +1595,35 @@ const VTrackPage = () => {
     }
 
     // Initialize the game
-    const game = new Game(canvasRef.current);
+    const game = new Game(canvasRef.current, {
+      recordingMode,
+      recording,
+      playbackIndex,
+      setRecording,
+      setPlaybackIndex,
+      setRecordingMode,
+    });
+
+    // Store game reference
+    gameRef.current = game;
 
     // Cleanup function
     return () => {
       game.cleanup();
+      gameRef.current = null;
     };
-  }, [settings]); // Add settings as dependency to recreate game when settings change
+  }, [settings]); // Only recreate game when settings change
+
+  // Sync recording state with game instance
+  useEffect(() => {
+    if (gameRef.current) {
+      gameRef.current.updateRecordingState({
+        recordingMode,
+        recording,
+        playbackIndex,
+      });
+    }
+  }, [recordingMode, recording, playbackIndex]);
 
   return (
     <Flex
@@ -1269,26 +1636,56 @@ const VTrackPage = () => {
       pos="relative"
       zIndex={1}
     >
-      {/* Settings Button */}
-      <Button
-        pos="absolute"
-        top="4"
-        right="4"
-        zIndex={200}
-        onClick={() => setShowSettings(true)}
-        px={2}
-      >
-        <RiSettings3Line size={20} />
-      </Button>
+      {/* Recording Status */}
+      {recordingMode !== "idle" && (
+        <Box
+          pos="absolute"
+          top="4"
+          left="4"
+          zIndex={200}
+          px={3}
+          py={1}
+          bgColor={recordingMode === "recording" ? "red.600" : "green.600"}
+          color="white"
+          fontSize="sm"
+          fontWeight="bold"
+          rounded="md"
+          display="flex"
+          alignItems="center"
+          gap={2}
+        >
+          {recordingMode === "recording" ? (
+            <>
+              <RiRecordCircleLine size={16} />
+              RECORDING
+            </>
+          ) : (
+            <>
+              <RiPlayLine size={16} />
+              REPLAYING
+            </>
+          )}
+        </Box>
+      )}
+
+      {/* Control Buttons */}
+      <Flex pos="absolute" top="4" right="4" zIndex={200} gap={2}>
+        {/* Settings Button */}
+        <Button onClick={() => setShowSettings(true)} px={2}>
+          <RiSettings3Line size={20} />
+        </Button>
+      </Flex>
 
       {/* Settings Modal */}
       {showSettings && (
         <Box
           pos="fixed"
-          top={8}
+          top="0"
+          pt="120px"
+          pb={12}
           left="0"
           w="100vw"
-          h="calc(100vh - 32px)"
+          h="100vh"
           bgColor="rgba(0, 0, 0, 0.8)"
           zIndex={300}
           display="flex"
@@ -1441,7 +1838,32 @@ const VTrackPage = () => {
           borderWidth={1}
           borderColor="black"
           shadow="inset 0 4px 6px rgba(0, 0, 0, 0.8)"
+          pos="relative"
         >
+          <Box
+            pos="absolute"
+            top="0"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            rounded="full"
+            p="2vw"
+            bgColor="gray.900"
+          >
+            {/* Record Button */}
+            {(recordingMode === "idle" || recordingMode === "playing") && (
+              <Button onClick={startRecording} px={2} transform="rotate(20deg)">
+                <RiRecordCircleLine size={20} />
+              </Button>
+            )}
+
+            {/* Stop Recording Button */}
+            {recordingMode === "recording" && (
+              <Button onClick={stopRecording} px={2} transform="rotate(20deg)">
+                <RiStopLine size={20} />
+              </Button>
+            )}
+          </Box>
+
           <Button
             id="car-stop"
             p={0}
