@@ -97,6 +97,7 @@ type Settings = {
   casterStiffness: number;
   steerRate: number;
   cameraScale: number;
+  flipControls: number; // 0 = normal, 1 = flipped
 };
 
 // Settings configuration with ranges and labels
@@ -213,6 +214,13 @@ const SETTINGS_CONFIG = {
     label: "Camera Zoom Scale",
     unit: "",
   },
+  flipControls: {
+    min: 0,
+    max: 1,
+    step: 1,
+    label: "Flip Controls",
+    unit: "",
+  },
 };
 
 // Recording data type
@@ -268,6 +276,7 @@ const VTrackPage = () => {
       casterStiffness: DEFAULT_CONFIG.car.casterStiffness,
       steerRate: DEFAULT_CONFIG.car.steerRate,
       cameraScale: DEFAULT_CONFIG.camera.scale,
+      flipControls: 0, // Default to normal controls
     };
   });
 
@@ -301,6 +310,7 @@ const VTrackPage = () => {
       casterStiffness: DEFAULT_CONFIG.car.casterStiffness,
       steerRate: DEFAULT_CONFIG.car.steerRate,
       cameraScale: DEFAULT_CONFIG.camera.scale,
+      flipControls: 0, // Reset flip controls to normal
     };
     setSettings(defaultSettings);
   };
@@ -1795,7 +1805,13 @@ const VTrackPage = () => {
       >
         <styled.canvas ref={canvasRef} w="100%" />
       </Box>
-      <Center flexGrow={1} gap="4vw" px="4vw" pos="relative">
+      <Center
+        flexGrow={1}
+        gap="4vw"
+        px="4vw"
+        pos="relative"
+        flexDir={settings.flipControls ? "row-reverse" : "row"}
+      >
         <Box
           pos="absolute"
           top="4vw"
