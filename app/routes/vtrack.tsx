@@ -52,22 +52,24 @@ const VTrackPage = () => {
         wheelRadius: 0.32, // meters
 
         // Steering system - reduced sensitivity for better control
-        maxSteeringAngle: 1.57, // radians (90 degrees) - increased steering angle
-        maxInnerWheelAngle: Math.PI / 2, // 90 degrees maximum for inside wheel
+        maxSteeringAngle: (82 * Math.PI) / 180, // radians (82 degrees)
+        maxInnerWheelAngle: (88 * Math.PI) / 180, // 88 degrees maximum for inside wheel
         steeringRatio: 16, // steering wheel to road wheel ratio
-        ackermannRatio: 0.3, // Ackermann factor (0-1) - reduced for less geometry correction
+        ackermannRatio: 0.7, // Ackermann factor (0-1) - reduced for less geometry correction
         casterStiffness: 0.9, // kcaster - stronger for better high-speed stability
+        steerRate: 1.7, // rad/s - reduced for less sensitive steering
 
         // Physics integration
         timeStep: 1 / 60, // 60 Hz physics update - more reasonable for frame drops
 
         // Visual effects
         skidmarkThreshold: 3, // slip angle threshold for skidmarks (degrees)
-        skidmarkAlpha: 0.5,
+        skidmarkAlpha: 0.6,
       },
 
       camera: {
         edgeBufferRatio: 0.4,
+        scale: 0.8, // Camera zoom scale - 1.0 is normal, >1.0 zooms in, <1.0 zooms out
       },
 
       input: {
@@ -107,9 +109,11 @@ const VTrackPage = () => {
       constructor() {
         // Keyboard event listeners
         const handleKeyDown = (e: KeyboardEvent) => {
+          e.preventDefault();
           this.keys[e.code] = true;
         };
         const handleKeyUp = (e: KeyboardEvent) => {
+          e.preventDefault();
           this.keys[e.code] = false;
         };
 
@@ -339,11 +343,10 @@ const VTrackPage = () => {
         const targetSteeringAngle = steerInput * config.maxSteeringAngle;
 
         // Apply steering rate limiting for realism - controlled response
-        const steerRate = 3.2; // rad/s - reduced for less sensitive steering
         const deltaError = targetSteeringAngle - this.steeringAngle;
         this.steeringAngle +=
           Math.sign(deltaError) *
-          Math.min(Math.abs(deltaError), steerRate * dt);
+          Math.min(Math.abs(deltaError), config.steerRate * dt);
 
         // Clamp to maximum steering angle
         this.steeringAngle = clamp(
@@ -511,10 +514,10 @@ const VTrackPage = () => {
 
         // === LONGITUDINAL FORCES ===
         // Front longitudinal force (braking only)
-        this.Fx_f = -this.brakeForce * 0.6; // 60% brake bias to front
+        // this.Fx_f = -this.brakeForce * 0.6; // 60% brake bias to front
 
         // Rear longitudinal force - normal traction/braking only
-        this.Fx_r = this.tractionForce - this.brakeForce * 0.4; // 40% brake bias to rear
+        this.Fx_r = this.tractionForce - this.brakeForce * 1; // 100% brake bias to rear
 
         // ✅ 2. Limit force magnitude using friction circle (from specification)
         // Fy = clamp(Fy, -mu * Fz, mu * Fz)
@@ -967,7 +970,19 @@ const VTrackPage = () => {
       draw() {
         this.ctx.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
 
-        // Draw background (track image) with scaling
+        // Apply centered camera scale transformation
+        this.ctx.save();
+
+        // Translate to center of canvas
+        this.ctx.translate(this.$canvas.width / 2, this.$canvas.height / 2);
+
+        // Apply scale (higher number = zoom in, lower number = zoom out)
+        this.ctx.scale(CONFIG.camera.scale, CONFIG.camera.scale);
+
+        // Translate back from center
+        this.ctx.translate(-this.$canvas.width / 2, -this.$canvas.height / 2);
+
+        // Draw background (track image) with normal camera coordinates
         if (this.backgroundImage.complete) {
           this.ctx.drawImage(
             this.backgroundImage,
@@ -978,8 +993,10 @@ const VTrackPage = () => {
           );
         }
 
-        // Render car
+        // Render car with normal camera coordinates
         this.car.render(this.ctx, this.cameraX, this.cameraY);
+
+        this.ctx.restore();
       }
 
       cleanup() {
@@ -1002,26 +1019,89 @@ const VTrackPage = () => {
   }, []);
 
   return (
-    <Flex h="calc(100dvh - 100px)" flexDir="column">
-      <Box w="1024px" maxW="100%" mx="auto">
+    <Flex
+      h="calc(100dvh - 180px)"
+      flexDir="column"
+      bgColor="gray.800"
+      w="1024px"
+      maxW="100%"
+      mx="auto"
+    >
+      <Box
+        overflow="hidden"
+        rounded="4xl"
+        m="4vw"
+        borderWidth="1vw"
+        borderColor="black"
+      >
         <styled.canvas ref={canvasRef} w="100%" />
       </Box>
-      <Center flex={1} gap={6} px="6vw">
-        <Button id="car-left" p={0} w={16} h={16} fontSize="3xl">
-          <RiArrowDropLeftLine />
-        </Button>
-        <Button id="car-right" p={0} w={16} h={16} fontSize="3xl">
-          <RiArrowDropRightLine />
-        </Button>
+      <Center flexGrow={1} gap="4vw" px="4vw" pos="relative">
+        <Box
+          pos="absolute"
+          top="4vw"
+          h="3vw"
+          left="50%"
+          w="11vw"
+          rounded="full"
+          transform="translate(-50%, -50%)"
+          bgColor="green.500"
+          zIndex={100}
+          borderWidth={2}
+          borderColor="black"
+        />
+
+        <Flex
+          gap="6vw"
+          p="2vw"
+          bgColor="gray.900"
+          rounded="full"
+          borderWidth={2}
+          borderColor="black"
+          shadow="inset 0 4px 6px rgba(0, 0, 0, 0.8)"
+        >
+          <Button id="car-left" p={0} w="16vw" h="16vw" fontSize="3xl">
+            <RiArrowDropLeftLine />
+          </Button>
+          <Button id="car-right" p={0} w="16vw" h="16vw" fontSize="3xl">
+            <RiArrowDropRightLine />
+          </Button>
+        </Flex>
 
         <Spacer />
 
-        <Button id="car-go" p={0} w={16} h={16} fontSize="3xl" mt={-6}>
-          <RiArrowDropUpLine />
-        </Button>
-        <Button id="car-stop" p={0} w={16} h={16} fontSize="3xl" mt={6}>
-          <RiArrowDropDownLine />
-        </Button>
+        <Flex
+          gap="6vw"
+          p="2vw"
+          bgColor="gray.900"
+          rounded="full"
+          transform="rotate(-20deg)"
+          borderWidth={1}
+          borderColor="black"
+          shadow="inset 0 4px 6px rgba(0, 0, 0, 0.8)"
+        >
+          <Button
+            id="car-stop"
+            p={0}
+            w="16vw"
+            h="16vw"
+            fontSize="3xl"
+            transform="rotate(20deg)"
+          >
+            <RiArrowDropDownLine />
+          </Button>
+
+          <Button
+            id="car-go"
+            p={0}
+            w="16vw"
+            h="16vw"
+            fontSize="3xl"
+            transform="rotate(20deg)"
+          >
+            <RiArrowDropUpLine />
+          </Button>
+        </Flex>
       </Center>
     </Flex>
   );
