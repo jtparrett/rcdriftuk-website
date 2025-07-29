@@ -1,87 +1,317 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   RiArrowDropDownLine,
   RiArrowDropLeftLine,
   RiArrowDropRightLine,
   RiArrowDropUpLine,
+  RiSettings3Line,
+  RiCloseLine,
 } from "react-icons/ri";
 import { Button } from "~/components/Button";
 import { Box, Center, Flex, Spacer, styled } from "~/styled-system/jsx";
 
+// Default configuration values for realistic drift physics
+const DEFAULT_CONFIG = {
+  background: {
+    imageSrc: "track-2.png",
+    width: 2048,
+    height: 2048,
+    scale: 1.33, // Scale factor for background size
+  },
+
+  // Boundary box to contain the car (in pixels, relative to unscaled background)
+  boundary: {
+    x: 80, // Left edge
+    y: 650, // Top edge
+    width: 1850, // Width of boundary box
+    height: 900, // Height of boundary box
+  },
+  car: {
+    // Vehicle dimensions and properties
+    dimensions: { width: 1, length: 2 }, // meters
+
+    // Rigid body vehicle parameters - balanced speed-dependent rotation
+    mass: 300, // kg - lighter for maximum low-speed response
+    inertiaZ: 180, // kg⋅m² - slightly higher for controlled low-speed rotation
+    wheelbase: 1.25, // L - ultra-short for maximum agility
+    a: 0.5, // distance from CoM to front axle (meters) - extremely rear-biased
+    b: 1.0, // distance from CoM to rear axle (meters) - maximum tail-happy behavior
+    trackWidth: 1.5, // w - distance between left/right wheels (meters)
+
+    // Tire properties - reduced front grip for high-speed handling
+    corneringStiffnessFront: 38000, // Cα front - further reduced for less high-speed front grip
+    corneringStiffnessRear: 18000, // Cα rear - unchanged for oversteer capability
+    mu: 0.8, // μ - friction coefficient - reasonable but limited
+
+    // Engine and drivetrain - massive power for guaranteed power oversteer
+    maxEngineTorque: 2000, // Nm - increased for a bit more power
+    wheelRadius: 0.32, // meters
+
+    // Steering system - reduced sensitivity for better control
+    maxSteeringAngle: (82 * Math.PI) / 180, // radians (82 degrees)
+    maxInnerWheelAngle: (88 * Math.PI) / 180, // 88 degrees maximum for inside wheel
+    steeringRatio: 16, // steering wheel to road wheel ratio
+    ackermannRatio: 0.7, // Ackermann factor (0-1) - reduced for less geometry correction
+    casterStiffness: 0.9, // kcaster - stronger for better high-speed stability
+    steerRate: 1.7, // rad/s - reduced for less sensitive steering
+
+    // Physics integration
+    timeStep: 1 / 60, // 60 Hz physics update - more reasonable for frame drops
+
+    // Visual effects
+    skidmarkThreshold: 3, // slip angle threshold for skidmarks (degrees)
+    skidmarkAlpha: 0.6,
+  },
+
+  camera: {
+    edgeBufferRatio: 0.4,
+    scale: 0.8, // Camera zoom scale - 1.0 is normal, >1.0 zooms in, <1.0 zooms out
+  },
+
+  input: {
+    throttleKey: "ArrowUp",
+    brakeKey: "ArrowDown",
+    steerLeftKey: "ArrowLeft",
+    steerRightKey: "ArrowRight",
+  },
+};
+
+// Settings type definition
+type Settings = {
+  mass: number;
+  inertiaZ: number;
+  wheelbase: number;
+  trackWidth: number;
+  corneringStiffnessFront: number;
+  corneringStiffnessRear: number;
+  mu: number;
+  maxEngineTorque: number;
+  wheelRadius: number;
+  maxSteeringAngle: number;
+  maxInnerWheelAngle: number;
+  steeringRatio: number;
+  ackermannRatio: number;
+  casterStiffness: number;
+  steerRate: number;
+  cameraScale: number;
+};
+
+// Settings configuration with ranges and labels
+const SETTINGS_CONFIG = {
+  mass: {
+    min: 200,
+    max: 600,
+    step: 10,
+    label: "Vehicle Mass (kg)",
+    unit: "kg",
+  },
+  inertiaZ: {
+    min: 100,
+    max: 400,
+    step: 10,
+    label: "Rotational Inertia (kg⋅m²)",
+    unit: "kg⋅m²",
+  },
+  wheelbase: {
+    min: 0.8,
+    max: 2.0,
+    step: 0.05,
+    label: "Wheelbase Length (m)",
+    unit: "m",
+  },
+  trackWidth: {
+    min: 1.0,
+    max: 2.5,
+    step: 0.1,
+    label: "Track Width (m)",
+    unit: "m",
+  },
+  corneringStiffnessFront: {
+    min: 20000,
+    max: 60000,
+    step: 1000,
+    label: "Front Cornering Stiffness (N/rad)",
+    unit: "N/rad",
+  },
+  corneringStiffnessRear: {
+    min: 10000,
+    max: 30000,
+    step: 1000,
+    label: "Rear Cornering Stiffness (N/rad)",
+    unit: "N/rad",
+  },
+  mu: {
+    min: 0.3,
+    max: 1.2,
+    step: 0.05,
+    label: "Friction Coefficient",
+    unit: "",
+  },
+  maxEngineTorque: {
+    min: 500,
+    max: 4000,
+    step: 100,
+    label: "Max Engine Torque (Nm)",
+    unit: "Nm",
+  },
+  wheelRadius: {
+    min: 0.2,
+    max: 0.5,
+    step: 0.01,
+    label: "Wheel Radius (m)",
+    unit: "m",
+  },
+  maxSteeringAngle: {
+    min: 30,
+    max: 120,
+    step: 5,
+    label: "Max Steering Angle (degrees)",
+    unit: "°",
+  },
+  maxInnerWheelAngle: {
+    min: 45,
+    max: 120,
+    step: 5,
+    label: "Max Inner Wheel Angle (degrees)",
+    unit: "°",
+  },
+  steeringRatio: {
+    min: 8,
+    max: 25,
+    step: 1,
+    label: "Steering Ratio",
+    unit: ":1",
+  },
+  ackermannRatio: {
+    min: 0.0,
+    max: 1.0,
+    step: 0.1,
+    label: "Ackermann Factor",
+    unit: "",
+  },
+  casterStiffness: {
+    min: 0.0,
+    max: 2.0,
+    step: 0.1,
+    label: "Caster Stiffness",
+    unit: "",
+  },
+  steerRate: {
+    min: 0.5,
+    max: 5.0,
+    step: 0.1,
+    label: "Steering Rate (rad/s)",
+    unit: "rad/s",
+  },
+  cameraScale: {
+    min: 0.3,
+    max: 2.0,
+    step: 0.1,
+    label: "Camera Zoom Scale",
+    unit: "",
+  },
+};
+
 const VTrackPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<Settings>(() => {
+    // Load settings from localStorage or use defaults
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("vtrack-settings");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.warn("Failed to parse saved settings:", e);
+        }
+      }
+    }
+
+    return {
+      mass: DEFAULT_CONFIG.car.mass,
+      inertiaZ: DEFAULT_CONFIG.car.inertiaZ,
+      wheelbase: DEFAULT_CONFIG.car.wheelbase,
+      trackWidth: DEFAULT_CONFIG.car.trackWidth,
+      corneringStiffnessFront: DEFAULT_CONFIG.car.corneringStiffnessFront,
+      corneringStiffnessRear: DEFAULT_CONFIG.car.corneringStiffnessRear,
+      mu: DEFAULT_CONFIG.car.mu,
+      maxEngineTorque: DEFAULT_CONFIG.car.maxEngineTorque,
+      wheelRadius: DEFAULT_CONFIG.car.wheelRadius,
+      maxSteeringAngle: (DEFAULT_CONFIG.car.maxSteeringAngle * 180) / Math.PI,
+      maxInnerWheelAngle:
+        (DEFAULT_CONFIG.car.maxInnerWheelAngle * 180) / Math.PI,
+      steeringRatio: DEFAULT_CONFIG.car.steeringRatio,
+      ackermannRatio: DEFAULT_CONFIG.car.ackermannRatio,
+      casterStiffness: DEFAULT_CONFIG.car.casterStiffness,
+      steerRate: DEFAULT_CONFIG.car.steerRate,
+      cameraScale: DEFAULT_CONFIG.camera.scale,
+    };
+  });
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("vtrack-settings", JSON.stringify(settings));
+    }
+  }, [settings]);
+
+  const handleSettingChange = (key: keyof Settings, value: number) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const resetSettings = () => {
+    const defaultSettings: Settings = {
+      mass: DEFAULT_CONFIG.car.mass,
+      inertiaZ: DEFAULT_CONFIG.car.inertiaZ,
+      wheelbase: DEFAULT_CONFIG.car.wheelbase,
+      trackWidth: DEFAULT_CONFIG.car.trackWidth,
+      corneringStiffnessFront: DEFAULT_CONFIG.car.corneringStiffnessFront,
+      corneringStiffnessRear: DEFAULT_CONFIG.car.corneringStiffnessRear,
+      mu: DEFAULT_CONFIG.car.mu,
+      maxEngineTorque: DEFAULT_CONFIG.car.maxEngineTorque,
+      wheelRadius: DEFAULT_CONFIG.car.wheelRadius,
+      maxSteeringAngle: (DEFAULT_CONFIG.car.maxSteeringAngle * 180) / Math.PI,
+      maxInnerWheelAngle:
+        (DEFAULT_CONFIG.car.maxInnerWheelAngle * 180) / Math.PI,
+      steeringRatio: DEFAULT_CONFIG.car.steeringRatio,
+      ackermannRatio: DEFAULT_CONFIG.car.ackermannRatio,
+      casterStiffness: DEFAULT_CONFIG.car.casterStiffness,
+      steerRate: DEFAULT_CONFIG.car.steerRate,
+      cameraScale: DEFAULT_CONFIG.camera.scale,
+    };
+    setSettings(defaultSettings);
+  };
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Default configuration values for realistic drift physics
-    const DEFAULT_CONFIG = {
-      background: {
-        imageSrc: "track-2.png",
-        width: 2048,
-        height: 2048,
-        scale: 1.05, // Scale factor for background size
-      },
-
-      // Boundary box to contain the car (in pixels, relative to scaled background)
-      boundary: {
-        x: 100, // Left edge
-        y: 650, // Top edge
-        width: 1950, // Width of boundary box
-        height: 900, // Height of boundary box
-      },
+    // Create CONFIG with current settings
+    const CONFIG = {
+      ...DEFAULT_CONFIG,
       car: {
-        // Vehicle dimensions and properties
-        dimensions: { width: 1, length: 2 }, // meters
-
-        // Rigid body vehicle parameters - balanced speed-dependent rotation
-        mass: 300, // kg - lighter for maximum low-speed response
-        inertiaZ: 180, // kg⋅m² - slightly higher for controlled low-speed rotation
-        wheelbase: 1.25, // L - ultra-short for maximum agility
-        a: 0.5, // distance from CoM to front axle (meters) - extremely rear-biased
-        b: 1.0, // distance from CoM to rear axle (meters) - maximum tail-happy behavior
-        trackWidth: 1.5, // w - distance between left/right wheels (meters)
-
-        // Tire properties - reduced front grip for high-speed handling
-        corneringStiffnessFront: 38000, // Cα front - further reduced for less high-speed front grip
-        corneringStiffnessRear: 18000, // Cα rear - unchanged for oversteer capability
-        mu: 0.8, // μ - friction coefficient - reasonable but limited
-
-        // Engine and drivetrain - massive power for guaranteed power oversteer
-        maxEngineTorque: 2000, // Nm - increased for a bit more power
-        wheelRadius: 0.32, // meters
-
-        // Steering system - reduced sensitivity for better control
-        maxSteeringAngle: (82 * Math.PI) / 180, // radians (82 degrees)
-        maxInnerWheelAngle: (88 * Math.PI) / 180, // 88 degrees maximum for inside wheel
-        steeringRatio: 16, // steering wheel to road wheel ratio
-        ackermannRatio: 0.7, // Ackermann factor (0-1) - reduced for less geometry correction
-        casterStiffness: 0.9, // kcaster - stronger for better high-speed stability
-        steerRate: 1.7, // rad/s - reduced for less sensitive steering
-
-        // Physics integration
-        timeStep: 1 / 60, // 60 Hz physics update - more reasonable for frame drops
-
-        // Visual effects
-        skidmarkThreshold: 3, // slip angle threshold for skidmarks (degrees)
-        skidmarkAlpha: 0.6,
+        ...DEFAULT_CONFIG.car,
+        mass: settings.mass,
+        inertiaZ: settings.inertiaZ,
+        wheelbase: settings.wheelbase,
+        trackWidth: settings.trackWidth,
+        corneringStiffnessFront: settings.corneringStiffnessFront,
+        corneringStiffnessRear: settings.corneringStiffnessRear,
+        mu: settings.mu,
+        maxEngineTorque: settings.maxEngineTorque,
+        wheelRadius: settings.wheelRadius,
+        maxSteeringAngle: (settings.maxSteeringAngle * Math.PI) / 180,
+        maxInnerWheelAngle: (settings.maxInnerWheelAngle * Math.PI) / 180,
+        steeringRatio: settings.steeringRatio,
+        ackermannRatio: settings.ackermannRatio,
+        casterStiffness: settings.casterStiffness,
+        steerRate: settings.steerRate,
       },
-
       camera: {
-        edgeBufferRatio: 0.4,
-        scale: 0.8, // Camera zoom scale - 1.0 is normal, >1.0 zooms in, <1.0 zooms out
-      },
-
-      input: {
-        throttleKey: "ArrowUp",
-        brakeKey: "ArrowDown",
-        steerLeftKey: "ArrowLeft",
-        steerRightKey: "ArrowRight",
+        ...DEFAULT_CONFIG.camera,
+        scale: settings.cameraScale,
       },
     };
-
-    // Initialize CONFIG with default values
-    const CONFIG = DEFAULT_CONFIG;
 
     // Utility functions to get effective background dimensions
     function getEffectiveBackgroundWidth() {
@@ -90,6 +320,16 @@ const VTrackPage = () => {
 
     function getEffectiveBackgroundHeight() {
       return CONFIG.background.height * CONFIG.background.scale;
+    }
+
+    // Utility functions to get effective boundary dimensions (scaled with background)
+    function getEffectiveBoundary() {
+      return {
+        x: CONFIG.boundary.x * CONFIG.background.scale,
+        y: CONFIG.boundary.y * CONFIG.background.scale,
+        width: CONFIG.boundary.width * CONFIG.background.scale,
+        height: CONFIG.boundary.height * CONFIG.background.scale,
+      };
     }
 
     // Utility functions
@@ -635,7 +875,7 @@ const VTrackPage = () => {
         while (this.theta < -Math.PI) this.theta += 2 * Math.PI;
 
         // Boundary collision handling - keep car within boundary box
-        const boundary = CONFIG.boundary;
+        const boundary = getEffectiveBoundary();
         const carRadius = 50; // Approximate car radius for collision
 
         // Left boundary
@@ -1016,7 +1256,7 @@ const VTrackPage = () => {
     return () => {
       game.cleanup();
     };
-  }, []);
+  }, [settings]); // Add settings as dependency to recreate game when settings change
 
   return (
     <Flex
@@ -1026,7 +1266,129 @@ const VTrackPage = () => {
       w="1024px"
       maxW="100%"
       mx="auto"
+      pos="relative"
+      zIndex={1}
     >
+      {/* Settings Button */}
+      <Button
+        pos="absolute"
+        top="4"
+        right="4"
+        zIndex={200}
+        onClick={() => setShowSettings(true)}
+        px={2}
+      >
+        <RiSettings3Line size={20} />
+      </Button>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <Box
+          pos="fixed"
+          top={8}
+          left="0"
+          w="100vw"
+          h="calc(100vh - 32px)"
+          bgColor="rgba(0, 0, 0, 0.8)"
+          zIndex={300}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowSettings(false);
+            }
+          }}
+        >
+          <Box pos="relative">
+            <Button
+              onClick={() => setShowSettings(false)}
+              px={2}
+              bgColor="transparent"
+              pos="absolute"
+              top={0}
+              right={0}
+              transform="translate(25%, -25%)"
+            >
+              <RiCloseLine size={20} />
+            </Button>
+
+            <Box
+              w="90vw"
+              maxW="600px"
+              maxH="80vh"
+              bgColor="gray.900"
+              borderWidth={1}
+              borderColor="gray.700"
+              rounded="2xl"
+              p={6}
+              overflow="auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <styled.h2 fontSize="xl" fontWeight="bold" color="white" mb={4}>
+                Settings
+              </styled.h2>
+
+              <Box display="grid" gap="4">
+                {Object.entries(SETTINGS_CONFIG).map(([key, config]) => (
+                  <Box key={key}>
+                    <Flex justify="space-between" align="center" mb="2">
+                      <styled.label fontSize="sm" color="gray.300">
+                        {config.label}
+                      </styled.label>
+                      <styled.span fontSize="sm" color="gray.400">
+                        {settings[key as keyof typeof settings]}
+                        {config.unit}
+                      </styled.span>
+                    </Flex>
+                    <styled.input
+                      type="range"
+                      min={config.min}
+                      max={config.max}
+                      step={config.step}
+                      value={settings[key as keyof typeof settings]}
+                      onChange={(e) =>
+                        handleSettingChange(
+                          key as keyof Settings,
+                          parseFloat(e.target.value),
+                        )
+                      }
+                      w="full"
+                      h="2"
+                      bgColor="gray.600"
+                      rounded="lg"
+                      appearance="none"
+                      css={{
+                        "&::-webkit-slider-thumb": {
+                          appearance: "none",
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          backgroundColor: "#3B82F6",
+                          cursor: "pointer",
+                        },
+                        "&::-moz-range-thumb": {
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          backgroundColor: "#3B82F6",
+                          cursor: "pointer",
+                          border: "none",
+                        },
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+
+              <Button onClick={resetSettings} w="full" mt={6}>
+                Reset to Defaults
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
+
       <Box
         overflow="hidden"
         rounded="4xl"
