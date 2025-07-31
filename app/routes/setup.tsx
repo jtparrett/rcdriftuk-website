@@ -19,6 +19,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import z from "zod";
 import { Button } from "~/components/Button";
 import { CarSetupSummary } from "~/components/CarSetupSummary";
+import { Input } from "~/components/Input";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `RC Drift UK | Setup Changes` }];
@@ -47,13 +48,14 @@ export const action = async (args: ActionFunctionArgs) => {
   const data = formSchema.parse({
     type: formData.get("type"),
     value: formData.get("value"),
+    chassis: formData.get("chassis"),
   });
 
   await prisma.carSetupChanges.create({
     data: {
       userId,
       type: data.type,
-      value: data.value,
+      value: data.chassis ? data.chassis : data.value,
     },
   });
 
@@ -63,6 +65,7 @@ export const action = async (args: ActionFunctionArgs) => {
 const formSchema = z.object({
   type: z.nativeEnum(CAR_SETUP_CHANGE_TYPES),
   value: z.string(),
+  chassis: z.string().optional().nullable(),
 });
 
 const validationSchema = toFormikValidationSchema(formSchema);
@@ -77,16 +80,20 @@ const SetupPage = () => {
     initialValues: {
       type: null,
       value: null,
+      chassis: null,
     },
     async onSubmit(values) {
       const formData = new FormData();
 
       formData.append("type", values.type ?? "");
       formData.append("value", values.value ?? "");
+      formData.append("chassis", values.chassis ?? "");
 
       await submit(formData, {
         method: "POST",
       });
+
+      formik.resetForm();
     },
   });
 
@@ -145,6 +152,17 @@ const SetupPage = () => {
                 )}
               </Select>
             )}
+
+            {formik.values.type === CAR_SETUP_CHANGE_TYPES.CHASSIS &&
+              formik.values.value === "Other" && (
+                <Input
+                  name="chassis"
+                  value={formik.values.chassis ?? ""}
+                  onChange={formik.handleChange}
+                  mt={2}
+                  placeholder="Enter your chassis..."
+                />
+              )}
 
             {formik.isValid && (
               <Button
