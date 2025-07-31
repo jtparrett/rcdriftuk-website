@@ -58,7 +58,7 @@ export type CarSetupChangeTypes = Values<typeof CAR_SETUP_CHANGE_TYPES>;
 
 const CAR_SETUP_CHANGE_VALUES = {
   [CAR_SETUP_CHANGE_TYPES.CHASSIS]: {
-    rdx: "Rêve'd RDX",
+    rdx: "Rêve D RDX",
     rd2: "Yokomo RD2.0",
     rd1: "Yokomo RD1.0",
     sd1: "Yokomo SD1.0",
