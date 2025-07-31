@@ -32,6 +32,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import { PostCard } from "~/components/PostCard";
 import { getUser, type GetUser } from "~/utils/getUser.server";
 import { TabsBar } from "~/components/TabsBar";
+import { CarSetupSummary } from "~/components/CarSetupSummary";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -62,6 +63,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
       elo_LATAM: true,
       elo_MEA: true,
       totalBattles: true,
+      carSetupChanges: {
+        orderBy: {
+          id: "desc",
+        },
+      },
       Posts: {
         orderBy: {
           createdAt: "desc",
@@ -238,6 +244,7 @@ const TABS = {
   ratingHistory: "Rating History",
   regionalRatings: "Regional Ratings",
   posts: "Posts",
+  carSetup: "Car Setup",
 };
 
 const Page = () => {
@@ -405,6 +412,12 @@ const Page = () => {
               onClick={() => setTab(TABS.regionalRatings)}
             >
               Regional Ratings
+            </TabButton>
+            <TabButton
+              isActive={tab === TABS.carSetup}
+              onClick={() => setTab(TABS.carSetup)}
+            >
+              Car Setup
             </TabButton>
             <TabButton
               isActive={tab === TABS.posts}
@@ -828,6 +841,10 @@ const Page = () => {
                 <PostCard key={post.id} post={post} user={user} />
               ))}
             </Flex>
+          )}
+
+          {tab === TABS.carSetup && (
+            <CarSetupSummary history={driver.carSetupChanges} />
           )}
         </Container>
       </Box>

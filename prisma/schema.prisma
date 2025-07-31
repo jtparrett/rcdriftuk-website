@@ -245,6 +245,71 @@ model Users {
   PostComments      PostComments[]
   Posts             Posts[]
   archived          Boolean             @default(false)
+  carSetupChanges   CarSetupChanges[]
+}
+
+model CarSetupChanges {
+  id        Int                @id @default(autoincrement())
+  type      CarSetupChangeType
+  value     String
+  userId    String
+  user      Users              @relation(fields: [userId], references: [id])
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
+}
+
+enum CarSetupChangeType {
+  CHASSIS
+
+  FRONT_CAMBER // DEGREES
+  REAR_CAMBER // DEGREES
+  FRONT_CASTER // DEGREES
+  REAR_CASTER // DEGREES
+  DIFF_TYPE // OPEN | GEARED | BALL | SPOOL | CLSD
+  DIFF_OIL // THICK | MEDIUM | THIN
+  FRONT_TOE // DEGREES
+  REAR_TOE // DEGREES
+  ACKERMAN // LOW | MEDIUM | HIGH
+  SPRING_STIFFNESS_FRONT // SOFT | MEDIUM | HARD
+  SPRING_STIFFNESS_REAR // SOFT | MEDIUM | HARD
+  OIL_THICKNESS_FRONT // THICK | MEDIUM | THIN
+  OIL_THICKNESS_REAR // THICK | MEDIUM | THIN
+  REAR_SHOCK_ANGLE // DEGREES (optional numeric)
+  FRONT_SHOCK_ANGLE // DEGREES (optional numeric)
+  REAR_SHOCK_REBOUND // NONE | LOW | MEDIUM | HIGH
+  FRONT_SHOCK_REBOUND // NONE | LOW | MEDIUM | HIGH
+
+  RIDE_HEIGHT_FRONT // MM
+  RIDE_HEIGHT_REAR // MM
+  DROOP_FRONT // MM
+  DROOP_REAR // MM
+  SHOCK_MOUNT_FRONT // INNER | MIDDLE | OUTER
+  SHOCK_MOUNT_REAR // INNER | MIDDLE | OUTER
+  UPPER_ARM_LENGTH // SHORT | MEDIUM | LONG
+  LOWER_ARM_LENGTH_FRONT // MM
+  LOWER_ARM_LENGTH_REAR // MM
+  KPI_ANGLE // DEGREES
+
+  GYRO_GAIN // PERCENT (0–100)
+  GYRO_ORIENTATION // HORIZONTAL | VERTICAL | INVERTED
+  SERVO_SPEED // SEC_60 (e.g. 0.06s)
+  SERVO_TORQUE // KG_CM (e.g. 12kg·cm)
+  SERVO_HORN_LENGTH // MM
+  BUMP_STEER_SETTING // NONE | LOW | MEDIUM | HIGH
+  STEERING_RATE // PERCENT (0–100)
+
+  MOTOR_POSITION // LOW | MID | HIGH | REARWARD | FORWARD
+  SPUR_GEAR // TOOTH COUNT (e.g. 90T)
+  PINION_GEAR // TOOTH COUNT (e.g. 21T)
+  FDR // NUMERIC (e.g. 4.5, 5.8)
+  BELT_TENSION // LOOSE | MEDIUM | TIGHT
+
+  FRONT_WHEEL_OFFSET // +3 | +5 | +7 | +10
+  REAR_WHEEL_OFFSET // +3 | +5 | +7 | +10
+
+  ESC_BOOST // DEGREES (e.g. 10)
+  ESC_TURBO // DEGREES (e.g. 10)
+  BATTERY_TYPE // SHORTY | FULL_SIZE | LCG
 }
 
 model Products {

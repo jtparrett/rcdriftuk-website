@@ -194,19 +194,9 @@ const UserProfilePage = () => {
           </form>
         </Box>
 
-        <styled.h2 mt={6}>Danger Zone</styled.h2>
-
-        <Box
-          bgColor="brand.900"
-          p={6}
-          rounded="2xl"
-          mt={2}
-          borderWidth={1}
-          borderColor="brand.800"
-          borderStyle="dashed"
-        >
-          <LinkButton to="/user/delete">Delete My Account</LinkButton>
-        </Box>
+        <LinkButton to="/user/delete" variant="outline" w="full" mt={6}>
+          Delete My Account
+        </LinkButton>
       </Box>
     </Container>
   );

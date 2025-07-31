@@ -3,6 +3,7 @@ import {
   RiBook2Line,
   RiCalendarLine,
   RiCameraLensLine,
+  RiDashboard2Line,
   RiFlagLine,
   RiHomeLine,
   RiListOrdered2,
@@ -218,6 +219,13 @@ export const UserMenu = () => {
           <RiUserLine />
         </MenuIcon>
         My Driver Profile
+      </MenuLink>
+
+      <MenuLink to="/setup">
+        <MenuIcon>
+          <RiDashboard2Line />
+        </MenuIcon>
+        My Car Setup
       </MenuLink>
 
       <MenuLink

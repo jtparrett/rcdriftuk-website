@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Select } from "~/components/Select";
 import { Box, Container, styled } from "~/styled-system/jsx";
 import type { Route } from "./+types/fdr";
+
 const CHASSIS_RATIOS = {
   "Yokomo YD-2": 2.6,
   "Yokomo MD1.0": 2.6,
