@@ -269,7 +269,7 @@ export default function RulesPage() {
                 <Highlight>
                   must have a visible marking on the outer face
                 </Highlight>{" "}
-                to indicate orientation."
+                to indicate orientation.
               </styled.li>
               <styled.li>
                 Tires must be the <Highlight>specified control tire</Highlight>{" "}
