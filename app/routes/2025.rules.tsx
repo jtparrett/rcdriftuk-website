@@ -264,6 +264,14 @@ export default function RulesPage() {
                 viewed from above
               </styled.li>
               <styled.li>
+                Wheels without visible spokes (e.g. turbofans or solid-face
+                designs){" "}
+                <Highlight>
+                  must have a visible marking on the outer face
+                </Highlight>{" "}
+                to indicate orientation."
+              </styled.li>
+              <styled.li>
                 Tires must be the <Highlight>specified control tire</Highlight>{" "}
                 for the event/venue in compliance with venue rules
               </styled.li>
