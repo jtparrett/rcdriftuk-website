@@ -5,12 +5,6 @@ import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getEventDate } from "~/utils/getEventDate";
 import { prisma } from "~/utils/prisma.server";
 
-export function headers() {
-  return {
-    "Cache-Control": "s-maxage=60, stale-while-revalidate=120",
-  };
-}
-
 export const loader = async () => {
   const events = await prisma.events.findMany({
     where: {

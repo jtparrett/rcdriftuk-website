@@ -9,12 +9,6 @@ import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
 import { format, isAfter, isBefore } from "date-fns";
 
-export function headers() {
-  return {
-    "Cache-Control": "s-maxage=60, stale-while-revalidate=120",
-  };
-}
-
 export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | 2025 Schedule" },
@@ -53,6 +47,7 @@ export const loader = async () => {
           "9c7a9c38-0ca5-444d-8596-cfb37b7c900d",
           "7d468d79-950c-4f5d-9f47-379126430364",
           "71f7f4a7-0e62-4f3d-8d32-d19b77eefa49",
+          "73b48b6c-8839-486c-a6f9-cc627b927731",
           "e52f8cc0-0e32-4491-91e1-fdd31065592a", // Test
         ],
       },
