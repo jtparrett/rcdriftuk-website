@@ -62,9 +62,7 @@ export const loader = async () => {
       );
     });
 
-  // This is awkard, we should've sliced the ratings before the logic above
-  // But we can't change it until after 2025 season is over
-  return drivers.slice(0, 64);
+  return drivers;
 };
 
 const StandingsPage = () => {
@@ -93,7 +91,13 @@ const StandingsPage = () => {
           <styled.table w="full">
             <tbody>
               {drivers.map((driver, i) => (
-                <tr key={driver.id}>
+                <tr
+                  key={driver.id}
+                  style={{
+                    opacity: i >= 64 ? 0.5 : 1,
+                    borderTop: i === 64 ? "1px solid red" : undefined,
+                  }}
+                >
                   <styled.td textAlign="center" fontFamily="mono">
                     {i + 1}
                   </styled.td>
