@@ -6,7 +6,7 @@ import {
   RANKS,
   RANKS_RULES,
 } from "~/utils/getDriverRank";
-import { getDriverRatings } from "~/utils/getDriverRatings";
+import { getDriverRatings } from "~/utils/getDriverRatings.server";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
