@@ -32,6 +32,8 @@ const StyledLink = styled(Link, {
   },
 });
 
+type PostUser = Omit<NonNullable<GetUser>, "Tracks"> | null;
+
 export const PostCard = ({
   post,
   allowComment = false,
@@ -39,7 +41,7 @@ export const PostCard = ({
 }: {
   post: GetPostById;
   allowComment?: boolean;
-  user: Omit<NonNullable<GetUser>, "Tracks"> | null;
+  user: PostUser;
 }) => {
   const {
     data: { totalPostLikes, userLiked },

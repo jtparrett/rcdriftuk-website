@@ -1,6 +1,7 @@
 import clc from "cli-color";
 import { calculateElos } from "~/utils/calculateElos";
 import { Regions } from "~/utils/enums";
+import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
 import { prisma } from "~/utils/prisma.server";
 
 const computeRatingsForRegion = async (region: Regions) => {
@@ -60,6 +61,7 @@ const computeRatingsForRegion = async (region: Regions) => {
   console.log(clc.blue(`Found ${battles.length} battles to process`));
 
   const driverElos: Record<number, number> = {};
+  const driverLastBattleDate: Record<number, Date> = {};
 
   // Process each battle in chronological order
   for (const [index, battle] of battles.entries()) {
@@ -97,12 +99,37 @@ const computeRatingsForRegion = async (region: Regions) => {
     const loserId = loser.driverId;
 
     // Initialize ELOs if not already set
-    const winnerStartingElo = (driverElos[winnerId] =
+    const winnerBaseElo = (driverElos[winnerId] =
       driverElos?.[winnerId] ?? 1000);
 
     // 0 = BYE driver
-    const loserStartingElo = (driverElos[loserId] =
+    const loserBaseElo = (driverElos[loserId] =
       loserId === 0 ? 1000 : driverElos?.[loserId] ?? 1000);
+
+    // Calculate inactivity penalties
+    let winnerInactivityPenalty = 0;
+    let loserInactivityPenalty = 0;
+
+    if (driverLastBattleDate[winnerId]) {
+      winnerInactivityPenalty = calculateInactivityPenaltyOverPeriod(
+        driverLastBattleDate[winnerId],
+        battle.createdAt,
+      );
+    }
+
+    if (loserId !== 0 && driverLastBattleDate[loserId]) {
+      loserInactivityPenalty = calculateInactivityPenaltyOverPeriod(
+        driverLastBattleDate[loserId],
+        battle.createdAt,
+      );
+    }
+
+    // Apply penalties to starting ELOs
+    const winnerStartingElo = Math.max(
+      0,
+      winnerBaseElo + winnerInactivityPenalty,
+    );
+    const loserStartingElo = Math.max(0, loserBaseElo + loserInactivityPenalty);
 
     // Count previous battles for K-factor calculation
     const winnerTotalBattles = [...battles].slice(0, index).filter((b) => {
@@ -129,9 +156,15 @@ const computeRatingsForRegion = async (region: Regions) => {
       losersK,
     );
 
-    // Update driver ELOs
+    // Update driver ELOs (store the new ELO without penalty for next battle's base)
     driverElos[winnerId] = winnerElo;
     driverElos[loserId] = loserElo;
+
+    // Update last battle dates
+    driverLastBattleDate[winnerId] = battle.createdAt;
+    if (loserId !== 0) {
+      driverLastBattleDate[loserId] = battle.createdAt;
+    }
 
     // Update battle with points
     if (region == Regions.ALL) {
@@ -142,6 +175,8 @@ const computeRatingsForRegion = async (region: Regions) => {
           loserElo,
           winnerStartingElo,
           loserStartingElo,
+          winnerInactivityPenalty,
+          loserInactivityPenalty,
         },
       });
     } else {
@@ -152,6 +187,8 @@ const computeRatingsForRegion = async (region: Regions) => {
           loserRegionalElo: loserElo,
           winnerRegionalStartingElo: winnerStartingElo,
           loserRegionalStartingElo: loserStartingElo,
+          winnerInactivityPenalty,
+          loserInactivityPenalty,
         },
       });
     }
@@ -164,11 +201,28 @@ const computeRatingsForRegion = async (region: Regions) => {
         `Battle ${battle.id}, ${battle.tournament.name} (totalwins: ${winnerTotalBattles}) (${battle.round}):`,
       ),
     );
+
+    if (winnerInactivityPenalty !== 0) {
+      console.log(
+        clc.cyan(
+          `   ${winner.user.firstName} ${winner.user.lastName} inactivity penalty: ${winnerInactivityPenalty}`,
+        ),
+      );
+    }
+
     console.log(
       clc.green(
         `   ${winner.user.firstName} ${winner.user.lastName} won ${winnerPoints} points (Total: ${winnerElo.toFixed(3)})`,
       ),
     );
+
+    if (loserInactivityPenalty !== 0) {
+      console.log(
+        clc.cyan(
+          `   ${loser.user.firstName} ${loser.user.lastName} inactivity penalty: ${loserInactivityPenalty}`,
+        ),
+      );
+    }
 
     console.log(
       clc.red(
@@ -195,6 +249,7 @@ const computeRatingsForRegion = async (region: Regions) => {
       data: {
         [eloField]: elo,
         totalBattles,
+        lastBattleDate: driverLastBattleDate[parseInt(driverId)],
       },
     });
     console.log(

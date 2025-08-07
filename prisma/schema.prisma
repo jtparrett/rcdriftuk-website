@@ -156,6 +156,9 @@ model TournamentBattles {
   loserRegionalStartingElo Float?
   loserRegionalElo         Float?
 
+  winnerInactivityPenalty Float @default(0)
+  loserInactivityPenalty  Float @default(0)
+
   tournament     Tournaments             @relation(fields: [tournamentId], references: [id])
   driverLeft     TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
   driverRight    TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
@@ -246,6 +249,7 @@ model Users {
   Posts             Posts[]
   archived          Boolean             @default(false)
   carSetupChanges   CarSetupChanges[]
+  lastBattleDate    DateTime?
 }
 
 model CarSetupChanges {

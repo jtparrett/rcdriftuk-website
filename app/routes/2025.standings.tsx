@@ -5,7 +5,7 @@ import { startOfYear } from "date-fns";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Container, styled, Flex, Box } from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
-import { getDriverRatings } from "~/utils/getDriverRatings";
+import { getDriverRatings } from "~/utils/getDriverRatings.server";
 import { prisma } from "~/utils/prisma.server";
 
 export const meta: Route.MetaFunction = () => {

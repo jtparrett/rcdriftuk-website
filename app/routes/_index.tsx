@@ -17,10 +17,9 @@ import {
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { Glow } from "~/components/Glow";
-import { ImageContainer } from "~/components/ImageContainer";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
-import { getDriverRatings } from "~/utils/getDriverRatings";
+import { getDriverRatings } from "~/utils/getDriverRatings.server";
 import { prisma } from "~/utils/prisma.server";
 import { motion } from "motion/react";
 import { css } from "~/styled-system/css";

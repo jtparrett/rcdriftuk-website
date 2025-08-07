@@ -33,6 +33,8 @@ import { PostCard } from "~/components/PostCard";
 import { getUser, type GetUser } from "~/utils/getUser.server";
 import { TabsBar } from "~/components/TabsBar";
 import { CarSetupSummary } from "~/components/CarSetupSummary";
+import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
+import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -50,6 +52,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       driverId,
     },
     select: {
+      lastBattleDate: true,
       driverId: true,
       firstName: true,
       lastName: true,
@@ -133,6 +136,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
             select: {
               id: true,
               createdAt: true,
+              winnerInactivityPenalty: true,
+              loserInactivityPenalty: true,
               driverLeft: {
                 select: {
                   id: true,
@@ -179,6 +184,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
             select: {
               id: true,
               createdAt: true,
+              winnerInactivityPenalty: true,
+              loserInactivityPenalty: true,
               driverLeft: {
                 select: {
                   id: true,
@@ -226,7 +233,23 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return { driver, user };
+  return {
+    driver: {
+      ...driver,
+      elo: adjustDriverElo(driver.elo, driver.lastBattleDate),
+      elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
+      elo_EU: adjustDriverElo(driver.elo_EU, driver.lastBattleDate),
+      elo_NA: adjustDriverElo(driver.elo_NA, driver.lastBattleDate),
+      elo_APAC: adjustDriverElo(driver.elo_APAC, driver.lastBattleDate),
+      elo_LATAM: adjustDriverElo(driver.elo_LATAM, driver.lastBattleDate),
+      elo_MEA: adjustDriverElo(driver.elo_MEA, driver.lastBattleDate),
+      inactivityPenalty: calculateInactivityPenaltyOverPeriod(
+        driver.lastBattleDate,
+        new Date(),
+      ),
+    },
+    user,
+  };
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -272,6 +295,8 @@ const Page = () => {
         : [...prev, battleId],
     );
   };
+
+  const isInactive = driver.inactivityPenalty !== 0;
 
   return (
     <Box
@@ -354,19 +379,36 @@ const Page = () => {
             </Box>
           </Box>
 
-          <styled.span
-            borderWidth={1}
-            borderColor="gray.800"
-            px={2}
-            py={1}
-            rounded="full"
-            fontSize="xs"
-            color="gray.400"
-            bgColor="black"
-            mb={1}
-          >
-            #{driver.driverId}
-          </styled.span>
+          <Flex gap={1} alignItems="center" mb={1}>
+            <styled.span
+              borderWidth={1}
+              borderColor="gray.800"
+              px={2}
+              rounded="full"
+              fontSize="sm"
+              color="gray.400"
+              bgColor="black"
+            >
+              #{driver.driverId}
+            </styled.span>
+
+            {(driver.inactivityPenalty !== 0 ||
+              driver.lastBattleDate !== null) && (
+              <styled.span
+                borderWidth={1}
+                borderColor={isInactive ? "red.800" : "green.800"}
+                px={2}
+                rounded="full"
+                fontSize="sm"
+                color={isInactive ? "red.400" : "green.400"}
+                bgColor="black"
+              >
+                {isInactive
+                  ? `Inactivity Penalty: ${driver.inactivityPenalty}`
+                  : "Active"}
+              </styled.span>
+            )}
+          </Flex>
 
           <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1} mb={3}>
             {driver.firstName} {driver.lastName}
@@ -524,6 +566,14 @@ const Page = () => {
                   ? battle?.winnerElo ?? 1000
                   : battle?.loserElo ?? 1000;
                 const pointsChange = endingElo - startingElo;
+
+                const inactivityPenalty = isWinner
+                  ? battle?.winnerInactivityPenalty ?? 0
+                  : battle?.loserInactivityPenalty ?? 0;
+
+                const opponentInactivityPenalty = isWinner
+                  ? battle?.loserInactivityPenalty ?? 0
+                  : battle?.winnerInactivityPenalty ?? 0;
 
                 const opponentStartingElo = isWinner
                   ? battle?.loserStartingElo ?? 1000
@@ -741,6 +791,12 @@ const Page = () => {
                                     " " +
                                     battle.driverRight?.user.lastName}
                               </styled.h4>
+                              {inactivityPenalty !== 0 && (
+                                <styled.div fontSize="sm" color="red.300">
+                                  Inactivity Penalty:{" "}
+                                  {inactivityPenalty.toFixed(3)}
+                                </styled.div>
+                              )}
                               <styled.div fontSize="sm" color="gray.300">
                                 Starting: {startingElo.toFixed(3)}
                               </styled.div>
@@ -775,6 +831,12 @@ const Page = () => {
                                     " " +
                                     battle.driverLeft?.user.lastName}
                               </styled.h4>
+                              {opponentInactivityPenalty !== 0 && (
+                                <styled.div fontSize="sm" color="red.300">
+                                  Inactivity Penalty:{" "}
+                                  {opponentInactivityPenalty.toFixed(3)}
+                                </styled.div>
+                              )}
                               <styled.div fontSize="sm" color="gray.300">
                                 Starting: {opponentStartingElo.toFixed(3)}
                               </styled.div>
