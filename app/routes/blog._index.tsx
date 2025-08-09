@@ -53,7 +53,7 @@ const BlogListingPage = () => {
             <Box borderTopWidth={1} borderColor="gray.800" p={8}>
               <Markdown>{article.content.split("\n")[0] + "..."}</Markdown>
 
-              <Flex gap={3} flexDir={{ base: "column", md: "row" }}>
+              <Flex gap={3} flexDir={{ base: "column", md: "row" }} mt={4}>
                 <LinkButton to={`/blog/${article.slug}`}>
                   Read the full article <RiArrowRightLine />
                 </LinkButton>
