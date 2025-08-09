@@ -11,7 +11,7 @@ import {
   useRouteError,
 } from "react-router";
 import { ClerkProvider } from "@clerk/react-router";
-import { Box, Center, styled } from "~/styled-system/jsx";
+import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 
 import "./index.css";
 import { Header } from "./components/Header";
@@ -19,7 +19,7 @@ import { rootAuthLoader } from "@clerk/react-router/ssr.server";
 import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { Button, LinkButton } from "./components/Button";
-import { RiHome2Line } from "react-icons/ri";
+import { RiHome2Line, RiRefreshLine } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
 import { AnnouncementBanner } from "./components/AnnouncementBanner";
@@ -108,11 +108,12 @@ export function ErrorBoundary() {
       bgPosition="center"
       borderBottomWidth={1}
       borderColor="gray.800"
+      minH="100dvh"
     >
       <Box
         p={8}
         bg="gray.900"
-        borderRadius="lg"
+        borderRadius="2xl"
         borderWidth={1}
         borderColor="gray.800"
         shadow="lg"
@@ -120,15 +121,19 @@ export function ErrorBoundary() {
       >
         <styled.h1 fontWeight="extrabold" mb={4} fontSize="3xl">
           {isRouteErrorResponse(error)
-            ? `${error.status} ${error.statusText}`
+            ? `${error.statusText}`
             : error instanceof Error
               ? error.message
               : "Unknown Error"}
         </styled.h1>
-        <LinkButton to="/app">
-          Go Home <RiHome2Line />
-        </LinkButton>
-        <Button onClick={() => window.location.reload()}>Refresh</Button>
+        <Flex gap={2}>
+          <LinkButton to="/app">
+            Go Home <RiHome2Line />
+          </LinkButton>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Reload <RiRefreshLine />
+          </Button>
+        </Flex>
       </Box>
     </Center>
   );

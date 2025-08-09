@@ -8,7 +8,7 @@ import { getBracketName } from "~/utils/getBracketName";
 import { prisma } from "~/utils/prisma.server";
 import { Glow } from "~/components/Glow";
 import { sentenceCase } from "change-case";
-import { HiddenEmbed } from "~/utils/EmbedContext";
+import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -142,6 +142,7 @@ const Driver = ({
 
 const TournamentBattlesPage = () => {
   const { tournament, bracket } = useLoaderData<typeof loader>();
+  const isEmbed = useIsEmbed();
 
   const battlesByRound = tournament.battles.reduce<Record<string, Battle[]>>(
     (agg, battle) => {
@@ -199,21 +200,21 @@ const TournamentBattlesPage = () => {
       </HiddenEmbed>
 
       <Box
-        p={1}
+        p={isEmbed ? 0 : 1}
         rounded="3xl"
         bg="gray.900"
-        borderWidth={1}
+        borderWidth={isEmbed ? 0 : 1}
         borderColor="gray.800"
       >
         <Flex
           overflow="auto"
           scrollbar="hidden"
           py={8}
-          borderWidth={1}
+          borderWidth={isEmbed ? 0 : 1}
           borderColor="gray.800"
           rounded="2xl"
           bg="black"
-          bgImage="url(/dot-bg.svg)"
+          bgImage={isEmbed ? undefined : "url(/dot-bg.svg)"}
           bgRepeat="repeat"
           bgSize="16px"
           bgPosition="center"
