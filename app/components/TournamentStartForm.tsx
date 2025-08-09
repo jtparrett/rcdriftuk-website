@@ -7,10 +7,11 @@ import { Regions, TournamentsFormat } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
-import { RiDeleteBinFill } from "react-icons/ri";
+import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { StepDot } from "./StepDot";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
+import { Reorder } from "motion/react";
 
 interface Props {
   tournament: GetTournament;
@@ -54,41 +55,76 @@ const PeopleForm = ({
           borderWidth={1}
           borderColor="gray.800"
         >
-          <Box mb="-1px">
+          <Reorder.Group
+            axis="y"
+            values={value}
+            onReorder={onChange}
+            style={{
+              margin: 0,
+              padding: 0,
+              listStyle: "none",
+              marginBottom: "-1px",
+            }}
+          >
             {value.map((userId, i) => {
               const user = users.find((user) =>
                 typeof userId === "string" ? false : user.driverId === userId,
               );
 
               return (
-                <Flex
+                <Reorder.Item
                   key={userId}
-                  gap={1}
-                  borderBottomWidth={1}
-                  borderBottomColor="gray.800"
+                  value={userId}
+                  style={{ listStyle: "none" }}
+                  whileDrag={{
+                    zIndex: 1000,
+                  }}
+                  dragElastic={0.1}
                 >
-                  <input type="hidden" name={name} value={userId} />
-                  <styled.p py={1} px={4} flex={1}>
-                    {user ? `${user.firstName} ${user.lastName}` : userId}
-                  </styled.p>
+                  <Flex
+                    gap={2}
+                    borderBottomWidth={1}
+                    borderBottomColor="gray.800"
+                    cursor="grab"
+                    _active={{ cursor: "grabbing" }}
+                    transition="all 0.2s ease"
+                    _hover={{ bgColor: "gray.800" }}
+                    alignItems="center"
+                    pl={2}
+                  >
+                    <input type="hidden" name={name} value={userId} />
 
-                  <Box p={1}>
-                    <Button
-                      px={1}
-                      size="xs"
-                      type="button"
-                      variant="ghost"
-                      onClick={() => {
-                        onChange(value.filter((_id, index) => index !== i));
-                      }}
+                    <RiDraggable size={16} />
+
+                    <styled.p
+                      flex={1}
+                      userSelect="none"
+                      whiteSpace="nowrap"
+                      textOverflow="ellipsis"
+                      overflow="hidden"
+                      py={1}
                     >
-                      <RiDeleteBinFill />
-                    </Button>
-                  </Box>
-                </Flex>
+                      {user ? `${user.firstName} ${user.lastName}` : userId}
+                    </styled.p>
+
+                    <Box p={1}>
+                      <Button
+                        px={1}
+                        size="xs"
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          onChange(value.filter((_id, index) => index !== i));
+                        }}
+                      >
+                        <RiDeleteBinFill />
+                      </Button>
+                    </Box>
+                  </Flex>
+                </Reorder.Item>
               );
             })}
-          </Box>
+          </Reorder.Group>
         </Box>
       )}
 
