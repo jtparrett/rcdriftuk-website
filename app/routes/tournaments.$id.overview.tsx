@@ -215,8 +215,8 @@ const TournamentsOverviewPage = () => {
 
   return (
     <Flex
-      p={1}
-      borderWidth={1}
+      p={isEmbed ? 0 : 1}
+      borderWidth={isEmbed ? 0 : 1}
       rounded="3xl"
       bgColor="gray.900"
       borderColor="gray.800"
@@ -227,11 +227,11 @@ const TournamentsOverviewPage = () => {
         flexGrow={1}
         w="full"
         bgColor="black"
-        bgImage="url(/dot-bg.svg)"
+        bgImage={isEmbed ? undefined : "url(/dot-bg.svg)"}
         bgRepeat="repeat"
         bgSize="16px"
         bgPosition="center"
-        borderWidth={1}
+        borderWidth={isEmbed ? 0 : 1}
         rounded="2xl"
         borderColor="gray.800"
         className="bg"
