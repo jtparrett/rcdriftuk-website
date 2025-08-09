@@ -14,7 +14,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.coerce.number().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const comment = await prisma.postComments.findUnique({
     where: {
@@ -23,7 +23,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(comment);
+  notFoundInvariant(comment, "Comment not found");
 
   return comment;
 };
@@ -32,7 +32,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const id = z.coerce.number().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const comment = await prisma.postComments.findUnique({
     where: {
@@ -41,7 +41,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(comment);
+  notFoundInvariant(comment, "Comment not found");
 
   await prisma.postComments.delete({
     where: {

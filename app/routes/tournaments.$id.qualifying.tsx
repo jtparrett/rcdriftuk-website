@@ -2,7 +2,7 @@ import { styled, Box, Center, Flex } from "~/styled-system/jsx";
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { Fragment } from "react";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { pow2Floor } from "~/utils/powFns";
 import { prisma } from "~/utils/prisma.server";
@@ -73,7 +73,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  invariant(tournament);
+  invariant(tournament, "Tournament not found");
 
   return {
     id: tournament.id,

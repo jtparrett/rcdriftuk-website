@@ -20,7 +20,7 @@ import pluralize from "pluralize";
 import { Button, LinkButton } from "~/components/Button";
 import { styled, Box, Container, Flex, Divider } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { SignedIn, SignedOut, useClerk } from "@clerk/react-router";
 import { getEventDate } from "~/utils/getEventDate";
 import { getAuth } from "~/utils/getAuth.server";

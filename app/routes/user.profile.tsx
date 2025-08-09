@@ -14,7 +14,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/user.profile";
 import { z } from "zod";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import { ImageInput } from "~/components/ImageInput";

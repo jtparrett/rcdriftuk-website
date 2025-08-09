@@ -1,7 +1,7 @@
 import { getAuth } from "~/utils/getAuth.server";
 import type { ActionFunctionArgs } from "react-router";
 import { Form, redirect, useFetcher } from "react-router";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Glow } from "~/components/Glow";
@@ -16,7 +16,7 @@ import { FormControl } from "~/components/FormControl";
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  invariant(userId);
+  invariant(userId, "User not found");
 
   const formData = await args.request.formData();
   const name = z.string().min(1).parse(formData.get("name"));

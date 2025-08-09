@@ -8,7 +8,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const id = z.coerce.number().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const protest = await prisma.battleProtests.findUnique({
     where: {
@@ -28,7 +28,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(protest);
+  notFoundInvariant(protest, "Protest not found");
 
   await prisma.battleProtests.update({
     where: { id },

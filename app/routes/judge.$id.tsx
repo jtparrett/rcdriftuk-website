@@ -9,7 +9,7 @@ import {
 } from "react-router";
 import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Glow } from "~/components/Glow";
@@ -108,8 +108,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  invariant(tournament);
-  invariant(tournament.judges.length > 0, "No judges found");
+  invariant(tournament, "Tournament not found");
+  invariant(tournament.judges.length > 0, "No judges found for tournament");
 
   return {
     tournament,

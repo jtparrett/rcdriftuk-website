@@ -1,5 +1,5 @@
 import Ably from "ably";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 
 export const createAbly = () => {
   invariant(process.env.ABLY_API_KEY, "ABLY_API_KEY is not set");

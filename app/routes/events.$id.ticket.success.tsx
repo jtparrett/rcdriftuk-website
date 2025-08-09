@@ -1,7 +1,7 @@
 import { TicketStatus } from "~/utils/enums";
 import { useLoaderData } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";

@@ -15,7 +15,7 @@ import {
   useNavigation,
 } from "react-router";
 import { AblyProvider, ChannelProvider } from "ably/react";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
 import { TournamentStartForm } from "~/components/TournamentStartForm";

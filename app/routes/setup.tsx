@@ -28,7 +28,7 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const data = await prisma.carSetupChanges.findMany({
     where: { userId },
@@ -41,7 +41,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const formData = await args.request.formData();
 

@@ -1,6 +1,6 @@
 import { TicketStatus } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { getEventDate } from "~/utils/getEventDate";
 import { prisma } from "~/utils/prisma.server";
 import { sendEmail } from "~/utils/resend.server";

@@ -6,7 +6,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import z from "zod";
 import { Button } from "~/components/Button";
 import { Dropdown, Option } from "~/components/Dropdown";

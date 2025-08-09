@@ -27,7 +27,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const user = await getUser(userId);
 
-  notFoundInvariant(user);
+  notFoundInvariant(user, "User not found");
 
   return { user };
 };

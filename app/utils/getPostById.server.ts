@@ -50,7 +50,7 @@ export const getPostById = async (id: number, userId?: string | null) => {
     },
   });
 
-  notFoundInvariant(post);
+  notFoundInvariant(post, "Post not found");
 
   return post;
 };

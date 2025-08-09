@@ -1,5 +1,5 @@
 import { Stripe } from "stripe";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 
 invariant(process.env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY is not set");
 

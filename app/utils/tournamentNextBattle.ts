@@ -1,5 +1,5 @@
 import { TournamentsFormat, TournamentsState } from "~/utils/enums";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import {
   advanceDoubleEliminationBattleWinner,
   advanceSingleEliminationBattleWinner,
@@ -66,7 +66,7 @@ export const tournamentNextBattle = async (id: string) => {
     },
   });
 
-  invariant(tournament);
+  invariant(tournament, "Tournament not found");
 
   if (!tournament.nextBattleId || !tournament.nextBattle) {
     // End the comp!

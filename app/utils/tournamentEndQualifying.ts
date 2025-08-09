@@ -4,7 +4,7 @@ import {
   TournamentsFormat,
   TournamentsState,
 } from "~/utils/enums";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";

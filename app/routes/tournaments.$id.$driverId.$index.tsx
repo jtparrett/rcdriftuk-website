@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, useLoaderData, useParams } from "react-router";
 import { styled, Box, VStack } from "~/styled-system/jsx";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { TournamentsState } from "~/utils/enums";
@@ -52,14 +52,20 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(tournament);
-  notFoundInvariant(tournament.state === TournamentsState.QUALIFYING);
-  notFoundInvariant(tournament.drivers.length > 0);
+  notFoundInvariant(tournament, "Tournament not found");
+  notFoundInvariant(
+    tournament.state === TournamentsState.QUALIFYING,
+    "Tournament is not in qualifying",
+  );
+  notFoundInvariant(
+    tournament.drivers.length > 0,
+    "No drivers found for tournament",
+  );
 
   const driver = tournament.drivers[0];
   const lap = driver.laps[Number(index)];
 
-  notFoundInvariant(lap);
+  notFoundInvariant(lap, "Lap not found");
 
   return {
     tournament,

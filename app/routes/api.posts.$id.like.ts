@@ -7,7 +7,7 @@ import { prisma } from "~/utils/prisma.server";
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const id = z.coerce.number().parse(args.params.id);
 

@@ -22,7 +22,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(tournament);
+  notFoundInvariant(tournament, "Tournament not found");
 
   return null;
 };

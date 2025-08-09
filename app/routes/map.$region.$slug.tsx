@@ -35,7 +35,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(track);
+  notFoundInvariant(track, "Track not found");
 
   return track;
 };

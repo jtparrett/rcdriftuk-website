@@ -11,7 +11,7 @@ import {
   sub,
 } from "date-fns";
 import { useState } from "react";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { DatePicker } from "~/components/DatePicker";
@@ -58,7 +58,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const body = await request.formData();
   const slug = z.string().parse(params.slug);
 
-  invariant(userId);
+  invariant(userId, "User not found");
 
   const name = body.get("name");
   const startDate = body.get("startDate");

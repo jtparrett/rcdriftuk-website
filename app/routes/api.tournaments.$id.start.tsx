@@ -1,7 +1,7 @@
 import { Regions, TournamentsFormat, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
@@ -10,7 +10,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
   const id = z.string().parse(args.params.id);
 
-  invariant(userId);
+  invariant(userId, "User not found");
 
   const tournament = await prisma.tournaments.findFirst({
     where: {
@@ -18,7 +18,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  invariant(tournament);
+  invariant(tournament, "Tournament not found");
 
   const formData = await args.request.formData();
 

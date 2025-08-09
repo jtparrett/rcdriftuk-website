@@ -47,11 +47,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const user = await getUser(userId);
 
-  notFoundInvariant(user);
+  notFoundInvariant(user, "User not found");
 
   const canPost = userIsVerified(user);
 
-  notFoundInvariant(canPost);
+  notFoundInvariant(canPost, "User is not verified");
 
   const userTracks = await prisma.tracks.findMany({
     where: {
@@ -70,15 +70,15 @@ export const action = async (args: ActionFunctionArgs) => {
   const { request } = args;
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const user = await getUser(userId);
 
-  notFoundInvariant(user);
+  notFoundInvariant(user, "GetUser not found");
 
   const canPost = userIsVerified(user);
 
-  notFoundInvariant(canPost);
+  notFoundInvariant(canPost, "User is not verified");
 
   const formData = await request.json();
   const data = postSchema.parse(formData);

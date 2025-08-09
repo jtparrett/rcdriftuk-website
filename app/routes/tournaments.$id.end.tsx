@@ -21,7 +21,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     })
     .parse(args.params);
 
-  notFoundInvariant(userId);
+  notFoundInvariant(userId, "User not found");
 
   const tournament = await prisma.tournaments.findFirst({
     where: {
@@ -30,7 +30,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(tournament);
+  notFoundInvariant(tournament, "Tournament not found");
 
   return tournament;
 };
@@ -50,7 +50,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(tournament);
+  notFoundInvariant(tournament, "Tournament not found");
 
   await tournamentNextBattle(tournament.id);
 

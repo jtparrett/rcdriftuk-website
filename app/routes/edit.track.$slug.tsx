@@ -2,7 +2,7 @@ import { TournamentsState, TrackTypes } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { useLoaderData } from "react-router";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { TrackForm } from "~/components/TrackForm";
 import { Box, Container, styled } from "~/styled-system/jsx";

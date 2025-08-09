@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import invariant from "tiny-invariant";
+import invariant from "~/utils/invariant";
 
 invariant(process.env.RESEND_API_KEY, "RESEND_API_KEY is not set");
 
