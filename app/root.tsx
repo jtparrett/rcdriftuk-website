@@ -151,25 +151,27 @@ function App({
 
   useEffect(() => {
     if (isApp) {
-      let focusTimestamp = 0;
+      let scrollStartY = 0;
 
       const handleFocusIn = (e: Event) => {
         if (
           e.target instanceof HTMLInputElement ||
           e.target instanceof HTMLTextAreaElement
         ) {
-          focusTimestamp = Date.now();
+          scrollStartY = window.scrollY;
         }
       };
 
       const handleScroll = () => {
         const activeElement = document.activeElement;
         if (
-          (activeElement instanceof HTMLInputElement ||
-            activeElement instanceof HTMLTextAreaElement) &&
-          Date.now() - focusTimestamp > 1500
+          activeElement instanceof HTMLInputElement ||
+          activeElement instanceof HTMLTextAreaElement
         ) {
-          activeElement.blur();
+          const scrollDistance = Math.abs(window.scrollY - scrollStartY);
+          if (scrollDistance > 30) {
+            activeElement.blur();
+          }
         }
       };
 
