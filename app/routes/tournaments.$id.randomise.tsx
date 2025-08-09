@@ -93,9 +93,9 @@ export const action = async (args: ActionFunctionArgs) => {
 const RandomiseQualifyingPage = () => {
   return (
     <ConfirmationForm
-      title="Are you sure you want to randomise qualifying?"
+      title="Are you sure you want to randomise the qualifying results?"
       confirmText="Yes, Randomise"
-      disclaimer="This will randomise the qualifying results for all drivers and allow for random battle pairings to be generated."
+      disclaimer="This will randomise the qualifying results for all drivers and allow for random battle pairings to be generated. This will not randomise the order of the drivers in the tournament."
     />
   );
 };

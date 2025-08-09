@@ -9,6 +9,7 @@ import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { pow2Floor } from "~/utils/tournament.server";
+import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
 
 const addByeDriverToTournament = async (tournament: Tournaments) => {
   const byeDriver = await prisma.users.findFirstOrThrow({
@@ -271,4 +272,7 @@ export const tournamentEndQualifying = async (id: string) => {
       nextBattleId: nextBattle?.id,
     },
   });
+
+  // After setting up battles, check if the first battle is a bye run and auto-advance if needed
+  await autoAdvanceByeRuns(id);
 };

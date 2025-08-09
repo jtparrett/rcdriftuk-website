@@ -5,6 +5,7 @@ import {
   advanceSingleEliminationBattleWinner,
 } from "~/utils/tournament.server";
 import { prisma } from "~/utils/prisma.server";
+import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
 
 const advanceToNextBattle = async (tournamentId: string) => {
   const nextBattle = await prisma.tournamentBattles.findFirst({
@@ -71,6 +72,8 @@ export const tournamentNextBattle = async (id: string) => {
   if (!tournament.nextBattleId || !tournament.nextBattle) {
     // End the comp!
     await advanceToNextBattle(id);
+    // After setting next battle, check if it's a bye run that needs auto-advancement
+    await autoAdvanceByeRuns(id);
     return null;
   }
 
@@ -141,6 +144,9 @@ export const tournamentNextBattle = async (id: string) => {
 
     await advanceToNextBattle(id);
 
+    // After advancing, check if the next battle is a bye run that needs auto-advancement
+    await autoAdvanceByeRuns(id);
+
     return null;
   }
 
@@ -152,6 +158,9 @@ export const tournamentNextBattle = async (id: string) => {
     });
 
     await advanceToNextBattle(id);
+
+    // After advancing, check if the next battle is a bye run that needs auto-advancement
+    await autoAdvanceByeRuns(id);
 
     return null;
   }
@@ -167,6 +176,9 @@ export const tournamentNextBattle = async (id: string) => {
     });
 
     await advanceToNextBattle(id);
+
+    // After advancing, check if the next battle is a bye run that needs auto-advancement
+    await autoAdvanceByeRuns(id);
 
     return null;
   }
