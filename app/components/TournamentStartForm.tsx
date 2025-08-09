@@ -131,17 +131,22 @@ const PeopleForm = ({
               );
             })}
 
-            {allowNewDrivers && (
-              <Option
-                type="button"
-                onClick={() => {
-                  onChange([...value, search]);
-                  setSearch("");
-                }}
-              >
-                Create "{search}" as a new driver
-              </Option>
-            )}
+            {allowNewDrivers &&
+              search.trim().split(" ").length >= 2 &&
+              search
+                .trim()
+                .split(" ")
+                .every((part) => part.length > 0) && (
+                <Option
+                  type="button"
+                  onClick={() => {
+                    onChange([...value, search.trim()]);
+                    setSearch("");
+                  }}
+                >
+                  Create "{search.trim()}" as a new driver
+                </Option>
+              )}
           </Dropdown>
         )}
       </Box>
@@ -199,6 +204,7 @@ export const TournamentStartForm = ({
                 maxW={100}
                 type="number"
                 name="qualifyingLaps"
+                min={1}
                 defaultValue={tournament?.qualifyingLaps}
               />
             </Box>

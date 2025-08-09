@@ -25,10 +25,10 @@ export const action = async (args: ActionFunctionArgs) => {
   const judges = z.array(z.string()).parse(formData.getAll("judges"));
   const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
 
-  const qualifyingLaps = Math.max(
-    z.coerce.number().parse(formData.get("qualifyingLaps") || 1),
-    1,
-  );
+  const qualifyingLaps = z.coerce
+    .number()
+    .min(1, "Qualifying laps must be at least 1")
+    .parse(formData.get("qualifyingLaps") || 1);
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
   const fullInclusion =
     z.string().parse(formData.get("fullInclusion") || "false") === "true";
@@ -68,9 +68,15 @@ export const action = async (args: ActionFunctionArgs) => {
       data: newDrivers.map((driverId) => {
         const [firstName, lastName] = driverId.split(" ");
 
+        if (!firstName?.trim() || !lastName?.trim()) {
+          throw new Error(
+            `Invalid driver name: "${driverId}". Please provide both first and last name.`,
+          );
+        }
+
         return {
-          firstName,
-          lastName,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
         };
       }),
       select: {

@@ -43,8 +43,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 const formSchema = z.object({
   avatar: z.union([z.instanceof(File), z.string()]).optional(),
-  firstName: z.string(),
-  lastName: z.string(),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   team: z.string().optional().nullable(),
 });
 

@@ -67,10 +67,17 @@ export const action = async (args: ActionFunctionArgs) => {
 
   if (!/^\d+$/.test(driverLeftId)) {
     const [firstName, lastName] = driverLeftId.split(" ");
+
+    if (!firstName?.trim() || !lastName?.trim()) {
+      throw new Error(
+        `Invalid left driver name: "${driverLeftId}". Please provide both first and last name.`,
+      );
+    }
+
     const user = await prisma.users.create({
       data: {
-        firstName,
-        lastName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
       },
     });
 
@@ -79,10 +86,17 @@ export const action = async (args: ActionFunctionArgs) => {
 
   if (!/^\d+$/.test(driverRightId)) {
     const [firstName, lastName] = driverRightId.split(" ");
+
+    if (!firstName?.trim() || !lastName?.trim()) {
+      throw new Error(
+        `Invalid right driver name: "${driverRightId}". Please provide both first and last name.`,
+      );
+    }
+
     const user = await prisma.users.create({
       data: {
-        firstName,
-        lastName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
       },
     });
 
