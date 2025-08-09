@@ -153,14 +153,24 @@ function App({
     if (isApp) {
       let scrollStartY = 0;
       let focusStartTime = 0;
+      let scrollStartTimeout: NodeJS.Timeout | null = null;
 
       const handleFocusIn = (e: Event) => {
         if (
           e.target instanceof HTMLInputElement ||
           e.target instanceof HTMLTextAreaElement
         ) {
-          scrollStartY = window.scrollY;
           focusStartTime = Date.now();
+
+          // Clear any existing timeout
+          if (scrollStartTimeout) {
+            clearTimeout(scrollStartTimeout);
+          }
+
+          // Set scrollStartY after 1 second delay
+          scrollStartTimeout = setTimeout(() => {
+            scrollStartY = window.scrollY;
+          }, 1000);
         }
       };
 
@@ -186,6 +196,9 @@ function App({
       return () => {
         window.removeEventListener("scroll", handleScroll);
         document.removeEventListener("focusin", handleFocusIn);
+        if (scrollStartTimeout) {
+          clearTimeout(scrollStartTimeout);
+        }
       };
     }
   }, [isApp]);
