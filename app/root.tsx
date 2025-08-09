@@ -152,6 +152,7 @@ function App({
   useEffect(() => {
     if (isApp) {
       let scrollStartY = 0;
+      let focusStartTime = 0;
 
       const handleFocusIn = (e: Event) => {
         if (
@@ -159,6 +160,7 @@ function App({
           e.target instanceof HTMLTextAreaElement
         ) {
           scrollStartY = window.scrollY;
+          focusStartTime = Date.now();
         }
       };
 
@@ -168,6 +170,9 @@ function App({
           activeElement instanceof HTMLInputElement ||
           activeElement instanceof HTMLTextAreaElement
         ) {
+          // Only enable blur after 1 second has passed since focus
+          if (Date.now() - focusStartTime < 1000) return;
+
           const scrollDistance = Math.abs(window.scrollY - scrollStartY);
           if (scrollDistance > 30) {
             activeElement.blur();
