@@ -174,7 +174,7 @@ function App({
           if (Date.now() - focusStartTime < 1000) return;
 
           const scrollDistance = Math.abs(window.scrollY - scrollStartY);
-          if (scrollDistance > 30) {
+          if (scrollDistance > 80) {
             activeElement.blur();
           }
         }
