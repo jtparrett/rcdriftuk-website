@@ -44,7 +44,7 @@ const BlogListingPage = () => {
       <styled.h1 fontSize={40} fontWeight={700} mb={4}>
         Insights Blog
       </styled.h1>
-      <ul>
+      <Flex flexDir="column" gap={4}>
         {articles.map((article) => (
           <Card key={article.id}>
             <styled.h2 srOnly>{article.title}</styled.h2>
@@ -53,12 +53,10 @@ const BlogListingPage = () => {
             <Box borderTopWidth={1} borderColor="gray.800" p={8}>
               <Markdown>{article.content.split("\n")[0] + "..."}</Markdown>
 
-              <Flex
-                gap={3}
-                alignItems={{ base: "flex-start", md: "center" }}
-                flexDir={{ base: "column", md: "row" }}
-              >
-                <Spacer />
+              <Flex gap={3} flexDir={{ base: "column", md: "row" }}>
+                <LinkButton to={`/blog/${article.slug}`}>
+                  Read the full article <RiArrowRightLine />
+                </LinkButton>
                 <styled.p
                   fontSize="sm"
                   color="gray.500"
@@ -74,14 +72,11 @@ const BlogListingPage = () => {
                   {format(article.createdAt, "do MMMM yyyy")}
                   <RiCalendarLine />
                 </styled.p>
-                <LinkButton to={`/blog/${article.slug}`}>
-                  Read the full article <RiArrowRightLine />
-                </LinkButton>
               </Flex>
             </Box>
           </Card>
         ))}
-      </ul>
+      </Flex>
     </Container>
   );
 };

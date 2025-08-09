@@ -33,6 +33,7 @@ export const Markdown = ({ children }: Props) => {
           "h2",
           "h3",
           "ul",
+          "ol",
           "li",
           "blockquote",
           "hr",
