@@ -38,6 +38,8 @@ export const Markdown = ({ children }: Props) => {
           "blockquote",
           "hr",
           "em",
+          "code",
+          "pre",
         ]}
         components={{
           p({ children }) {
@@ -131,6 +133,45 @@ export const Markdown = ({ children }: Props) => {
               >
                 {children}
               </styled.blockquote>
+            );
+          },
+          em({ children }) {
+            return (
+              <styled.em color="gray.300" fontStyle="italic">
+                {children}
+              </styled.em>
+            );
+          },
+          code({ children }) {
+            return (
+              <styled.code
+                color="brand.400"
+                bg="gray.900"
+                px={1}
+                py={0.5}
+                borderRadius="sm"
+                fontSize="sm"
+                fontFamily="mono"
+              >
+                {children}
+              </styled.code>
+            );
+          },
+          pre({ children }) {
+            return (
+              <styled.pre
+                bg="gray.900"
+                p={4}
+                borderRadius="md"
+                overflow="auto"
+                fontSize="sm"
+                fontFamily="mono"
+                border="1px solid"
+                borderColor="gray.800"
+                my={4}
+              >
+                {children}
+              </styled.pre>
             );
           },
         }}
