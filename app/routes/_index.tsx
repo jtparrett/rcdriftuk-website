@@ -175,8 +175,8 @@ const Page = () => {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5 }}
               >
-                Your online home
-                <br /> for RC Drifting
+                Driving the Future
+                <br /> of RC Drifting
               </motion.h1>
               <motion.p
                 className={css({
