@@ -8,9 +8,11 @@ import { pow2Floor } from "~/utils/powFns";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
+import { getAuth } from "~/utils/getAuth.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
 
   const tournament = await prisma.tournaments.findFirst({
     where: {
@@ -26,6 +28,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       fullInclusion: true,
       state: true,
       qualifyingLaps: true,
+      userId: true,
       nextQualifyingLap: {
         select: {
           driver: {
@@ -75,7 +78,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   invariant(tournament, "Tournament not found");
 
+  const isOwner = tournament?.userId === userId;
+
   return {
+    isOwner,
     id: tournament.id,
     fullInclusion: tournament.fullInclusion,
     totalJudges: tournament._count.judges,
@@ -111,12 +117,14 @@ interface TableProps {
   drivers: Awaited<ReturnType<typeof loader>>["drivers"];
   qualifyingCutOff: number;
   startPosition?: number;
+  isOwner: boolean;
 }
 
 const Table = ({
   drivers,
   qualifyingCutOff,
   startPosition = 0,
+  isOwner,
 }: TableProps) => {
   const tournament = useLoaderData<typeof loader>();
 
@@ -186,11 +194,15 @@ const Table = ({
 
                   {driver.lapScores.map((lapScore, i) => (
                     <styled.td key={i} color="gray.500" textAlign="center">
-                      <Link
-                        to={`/tournaments/${tournament.id}/${driver.id}/${i}`}
-                      >
-                        {lapScore}
-                      </Link>
+                      {isOwner ? (
+                        <Link
+                          to={`/tournaments/${tournament.id}/${driver.id}/${i}`}
+                        >
+                          {lapScore}
+                        </Link>
+                      ) : (
+                        lapScore
+                      )}
                     </styled.td>
                   ))}
                 </styled.tr>
@@ -234,6 +246,7 @@ const QualifyingPage = () => {
         <Table
           drivers={driversWithoutBuys.slice(0, half)}
           qualifyingCutOff={qualifyingCutOff}
+          isOwner={tournament.isOwner}
         />
 
         <Box
@@ -247,6 +260,7 @@ const QualifyingPage = () => {
           drivers={driversWithoutBuys.slice(half)}
           qualifyingCutOff={qualifyingCutOff}
           startPosition={half}
+          isOwner={tournament.isOwner}
         />
       </Flex>
     </Box>
