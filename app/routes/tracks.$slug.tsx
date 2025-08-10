@@ -1,6 +1,6 @@
 import { TrackTypes } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
-import { Outlet, useLoaderData, useLocation } from "react-router";
+import { Link, Outlet, useLoaderData, useLocation } from "react-router";
 import {
   RiAddCircleFill,
   RiEditCircleFill,
@@ -11,12 +11,14 @@ import {
 import { z } from "zod";
 import { LinkButton } from "~/components/Button";
 import { Tab } from "~/components/Tab";
-import { Box, Flex, Container } from "~/styled-system/jsx";
+import { Box, Flex, Container, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/tracks.$slug";
 import { TrackSnippet } from "~/components/TrackSnippet";
 import notFoundInvariant from "~/utils/notFoundInvariant";
+import { Label } from "~/components/Label";
+import { css } from "~/styled-system/css";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -29,38 +31,41 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
     include: {
       Owners: {
-        ...(userId
-          ? {
-              where: {
-                userId,
-              },
-            }
-          : {
-              take: 0,
-            }),
+        select: {
+          userId: true,
+          user: {
+            select: {
+              driverId: true,
+              image: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
       },
     },
   });
 
   notFoundInvariant(track, "Track not found");
 
-  return track;
+  const isOwner = track.Owners.some((owner) => owner.userId === userId);
+
+  return { track, isOwner };
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
-    { title: `RC Drift UK | Tracks | ${data?.name}` },
-    { name: "description", content: data?.description },
+    { title: `RC Drift UK | Tracks | ${data?.track.name}` },
+    { name: "description", content: data?.track.description },
     {
       property: "og:image",
-      content: `https://rcdrift.uk/${data?.image}`,
+      content: `https://rcdrift.uk/${data?.track.image}`,
     },
   ];
 };
 
 const TrackPage = () => {
-  const track = useLoaderData<typeof loader>();
-  const isOwner = (track?.Owners.length ?? 0) > 0;
+  const { track, isOwner } = useLoaderData<typeof loader>();
   const location = useLocation();
   const tab = location.pathname.split("/").pop();
 
@@ -87,6 +92,35 @@ const TrackPage = () => {
             <TrackSnippet track={track} />
 
             <Box p={4}>
+              {track.Owners.length > 0 && (
+                <Box mb={4}>
+                  <Label>Owners</Label>
+                  <Flex>
+                    {track.Owners.map((owner) => (
+                      <Link
+                        key={owner.userId}
+                        to={`/drivers/${owner.user.driverId}`}
+                        className={css({
+                          w: 10,
+                          h: 10,
+                          rounded: "full",
+                          mr: -2,
+                          overflow: "hidden",
+                        })}
+                      >
+                        <styled.img
+                          src={owner.user.image ?? "/blank-driver-right.jpg"}
+                          alt={owner.user.firstName ?? ""}
+                          w="full"
+                          h="full"
+                          objectFit="cover"
+                        />
+                      </Link>
+                    ))}
+                  </Flex>
+                </Box>
+              )}
+
               <LinkButton
                 w="full"
                 to={track?.url}
