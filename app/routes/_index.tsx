@@ -358,51 +358,67 @@ const Page = () => {
           </Container>
         </styled.section>
 
-        <styled.section
-          borderTopWidth={1}
-          borderBottomWidth={1}
-          borderColor="gray.800"
-          mt={8}
-          mb={12}
-          bgImage="url(/main-event-bg.jpg)"
-          bgSize="cover"
-          bgPosition="center"
-          bgRepeat="no-repeat"
-        >
-          <Box
-            bgColor={{ base: "rgba(0, 0, 0, 0.8)", md: "rgba(0, 0, 0, 0.7)" }}
-          >
-            <Container px={2} maxW={1100}>
-              <Flex flexDir={{ base: "column", md: "row" }}>
-                <Spacer />
-                <Box textAlign="center" flex={1} py={32}>
-                  <Center
-                    w={14}
-                    h={14}
-                    rounded="full"
-                    bgColor="black"
-                    mx="auto"
-                    mb={4}
+        <styled.section mt={8} mb={12} overflow="hidden" w="full">
+          <Box mx="-1px">
+            <Container
+              px={0}
+              py={{ base: 0, md: 12 }}
+              maxW={1084}
+              borderLeftWidth={1}
+              borderRightWidth={1}
+              borderColor="gray.800"
+            >
+              <Box
+                bgImage="url(/main-event-bg.jpg)"
+                bgSize="cover"
+                bgPosition="center"
+                bgRepeat="no-repeat"
+              >
+                <Box
+                  borderTopWidth={1}
+                  borderBottomWidth={1}
+                  borderColor="gray.800"
+                  mx={-12}
+                  px={12}
+                >
+                  <Flex
+                    flexDir={{ base: "column", md: "row" }}
+                    bgColor={{
+                      base: "rgba(0, 0, 0, 0.8)",
+                      md: "rgba(0, 0, 0, 0.6)",
+                    }}
                   >
-                    <RiTrophyLine size={24} />
-                  </Center>
-                  <styled.h1
-                    fontWeight="extrabold"
-                    fontSize={{ base: "4xl", md: "5xl" }}
-                    letterSpacing="tight"
-                    lineHeight={1.1}
-                  >
-                    RC Drift UK 2025
-                  </styled.h1>
-                  <styled.p textWrap="balance" mb={4}>
-                    The UK's professional RC Drifting Series.
-                  </styled.p>
-                  <LinkButton to="/2025" variant="secondary" mb={4}>
-                    Learn More
-                    <RiArrowRightLine />
-                  </LinkButton>
+                    <Spacer />
+                    <Box textAlign="center" flex={1} py={32}>
+                      <Center
+                        w={14}
+                        h={14}
+                        rounded="full"
+                        bgColor="black"
+                        mx="auto"
+                        mb={4}
+                      >
+                        <RiTrophyLine size={24} />
+                      </Center>
+                      <styled.h1
+                        fontWeight="extrabold"
+                        fontSize={{ base: "4xl", md: "5xl" }}
+                        letterSpacing="tight"
+                        lineHeight={1.1}
+                      >
+                        RC Drift UK 2025
+                      </styled.h1>
+                      <styled.p textWrap="balance" mb={4}>
+                        The UK's professional RC Drifting Series.
+                      </styled.p>
+                      <LinkButton to="/2025" variant="secondary" mb={4}>
+                        Learn More
+                        <RiArrowRightLine />
+                      </LinkButton>
+                    </Box>
+                  </Flex>
                 </Box>
-              </Flex>
+              </Box>
             </Container>
           </Box>
         </styled.section>
