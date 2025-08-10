@@ -126,7 +126,7 @@ const Page = () => {
             maxW={1100}
             py={12}
             minH="75dvh"
-            px={6}
+            px={2}
             display="flex"
             alignItems="center"
           >
