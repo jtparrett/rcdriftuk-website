@@ -442,7 +442,7 @@ const Page = () => {
                       )}.csv`}
                       target="_blank"
                     >
-                      Download CSV <RiDownloadLine />
+                      Download Attendees <RiDownloadLine />
                     </LinkButton>
 
                     <LinkButton
