@@ -42,17 +42,17 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
         ROUND(
           (
             (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-            POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.8)
+            POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.2)
           ) * (
             0.7 + 0.6 * (
               -- Use post id and seed to create deterministic randomness
               (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
             )
           ) + 
-          -- Add fresh post boost: 1000 points if created within last 3 hours (10800 seconds)
+          -- Add fresh post boost: 500 points if created within last 12 hours (43200 seconds)
           CASE 
-            WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 10800 
-            THEN 1000 
+            WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 43200 
+            THEN 500 
             ELSE 0 
           END, 4
         ) as score
@@ -73,7 +73,7 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
           ROUND(
             (
               (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.8)
+              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.2)
             ) * (
               0.7 + 0.6 * (
                 (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
@@ -81,8 +81,8 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
             ) + 
             -- Add fresh post boost in WHERE clause too
             CASE 
-              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 10800 
-              THEN 1000 
+              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 43200 
+              THEN 500 
               ELSE 0 
             END, 4
           ) < ${cursorScore}
@@ -90,7 +90,7 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
           ROUND(
             (
               (COALESCE(l.likes_count, 0) + COALESCE(c.comments_count, 0) * 2) / 
-              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.8)
+              POWER(GREATEST(EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") / 3600, 1), 1.2)
             ) * (
               0.7 + 0.6 * (
                 (((p.id * 1299827) + ${seed}) % 1000) / 1000.0
@@ -98,8 +98,8 @@ export async function getFeedPosts(options: GetFeedPostsOptions = {}) {
             ) + 
             -- Add fresh post boost in WHERE clause too
             CASE 
-              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 10800 
-              THEN 1000 
+              WHEN EXTRACT(EPOCH FROM ${scoreTimestamp}::timestamp - p."createdAt") <= 43200 
+              THEN 500 
               ELSE 0 
             END, 4
           ) = ${cursorScore}::decimal AND p.id < ${cursorId || 0}
