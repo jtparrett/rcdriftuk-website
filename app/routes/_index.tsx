@@ -192,8 +192,9 @@ const Page = () => {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                We're empowering the RC Drift community with powerful tools,
-                major events, beginner guides, and innovative driver analytics.
+                We're empowering the Radio-Controlled Drifting community with
+                powerful tools, major events, beginner guides, and innovative
+                driver analytics.
               </motion.p>
 
               <Flex
