@@ -17,7 +17,14 @@ import {
 import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { Glow } from "~/components/Glow";
-import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Spacer,
+  styled,
+} from "~/styled-system/jsx";
 import { getDriverRank } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings.server";
 import { prisma } from "~/utils/prisma.server";
@@ -357,65 +364,47 @@ const Page = () => {
           borderColor="gray.800"
           mt={8}
           mb={12}
+          bgImage="url(/main-event-bg.jpg)"
+          bgSize="cover"
+          bgPosition="center"
+          bgRepeat="no-repeat"
         >
-          <Container px={2} maxW={1100}>
-            <styled.section
-              pos="relative"
-              bgColor="#090909"
-              py={12}
-              mb={8}
-              transform="translate3d(0, 0, 0)"
-            >
-              <styled.video
-                src="/2025-spinner.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                w={{ base: "240px", md: "380px" }}
-                mx="auto"
-              />
-
-              <Box textAlign="center" mt={8} pos="relative" zIndex={3}>
-                <styled.h1 fontWeight="bold" fontSize="4xl">
-                  RC Drift UK 2025
-                </styled.h1>
-                <styled.p color="gray.400" textWrap="balance" mb={4}>
-                  The UK's professional RC Drifting Series.
-                </styled.p>
-                <LinkButton to="/2025" variant="secondary">
-                  Learn More
-                  <RiArrowRightLine />
-                </LinkButton>
-              </Box>
-
-              <Box
-                bgImage="url(/dot-bg.svg)"
-                bgRepeat="repeat"
-                bgSize="16px"
-                bgPosition="center"
-                pos="absolute"
-                top={0}
-                left={0}
-                w="full"
-                h="full"
-                zIndex={1}
-                mixBlendMode="lighten"
-              />
-              <Box
-                pos="absolute"
-                top={0}
-                left={0}
-                w="full"
-                h="full"
-                zIndex={1}
-                className={css({
-                  backgroundImage:
-                    "radial-gradient(circle, transparent, #0c0c0c)",
-                })}
-              />
-            </styled.section>
-          </Container>
+          <Box
+            bgColor={{ base: "rgba(0, 0, 0, 0.8)", md: "rgba(0, 0, 0, 0.7)" }}
+          >
+            <Container px={2} maxW={1100}>
+              <Flex flexDir={{ base: "column", md: "row" }}>
+                <Spacer />
+                <Box textAlign="center" flex={1} py={32}>
+                  <Center
+                    w={14}
+                    h={14}
+                    rounded="full"
+                    bgColor="black"
+                    mx="auto"
+                    mb={4}
+                  >
+                    <RiTrophyLine size={24} />
+                  </Center>
+                  <styled.h1
+                    fontWeight="extrabold"
+                    fontSize={{ base: "4xl", md: "5xl" }}
+                    letterSpacing="tight"
+                    lineHeight={1.1}
+                  >
+                    RC Drift UK 2025
+                  </styled.h1>
+                  <styled.p textWrap="balance" mb={4}>
+                    The UK's professional RC Drifting Series.
+                  </styled.p>
+                  <LinkButton to="/2025" variant="secondary" mb={4}>
+                    Learn More
+                    <RiArrowRightLine />
+                  </LinkButton>
+                </Box>
+              </Flex>
+            </Container>
+          </Box>
         </styled.section>
       </HiddenApp>
 
