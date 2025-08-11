@@ -1,7 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, useLoaderData, useParams } from "react-router";
 import { styled, Box, VStack } from "~/styled-system/jsx";
-import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { TournamentsState } from "~/utils/enums";
@@ -13,7 +12,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { id, driverId, index } = params;
   const { userId } = await getAuth(args);
 
-  invariant(userId, "Missing user id");
+  notFoundInvariant(userId, "Missing user id");
 
   const tournament = await prisma.tournaments.findFirst({
     where: {
@@ -81,9 +80,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   const score = formData.get("score");
   const lapId = formData.get("lapId");
 
-  invariant(judgeId, "Missing judge id");
-  invariant(score, "Missing score");
-  invariant(lapId, "Missing lap id");
+  notFoundInvariant(judgeId, "Missing judge id");
+  notFoundInvariant(score, "Missing score");
+  notFoundInvariant(lapId, "Missing lap id");
 
   await prisma.lapScores.update({
     where: {
