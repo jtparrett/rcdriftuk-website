@@ -75,7 +75,7 @@ const CalendarPage = () => {
         </Tab>
       </TabsBar>
 
-      <Container px={2} pb={100} maxW={1100} pt={2}>
+      <Container px={2} maxW={1100} py={2}>
         <Outlet />
       </Container>
     </>

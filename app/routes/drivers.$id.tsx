@@ -263,11 +263,10 @@ export const meta: Route.MetaFunction = ({ data }) => {
 };
 
 const TABS = {
-  battleHistory: "Battle History",
-  ratingHistory: "Rating History",
-  regionalRatings: "Regional Ratings",
-  posts: "Posts",
+  history: "History",
+  ratings: "Ratings",
   carSetup: "Car Setup",
+  posts: "Posts",
 };
 
 const Page = () => {
@@ -284,7 +283,7 @@ const Page = () => {
     ? getDriverRank(driver.elo, driver.totalBattles)
     : RANKS.UNRANKED;
 
-  const [tab, setTab] = useState<Values<typeof TABS>>(TABS.battleHistory);
+  const [tab, setTab] = useState<Values<typeof TABS>>(TABS.history);
 
   const [expandedBattles, setExpandedBattles] = useState<string[]>([]);
 
@@ -437,117 +436,16 @@ const Page = () => {
       <Box bgColor="gray.950" borderTopWidth={1} borderColor="gray.900">
         <TabsBar>
           <Flex gap={0.5} alignItems="center" w={784} mx="auto">
-            <TabButton
-              isActive={tab === TABS.battleHistory}
-              onClick={() => setTab(TABS.battleHistory)}
-            >
-              Battle History
-            </TabButton>
-            <TabButton
-              isActive={tab === TABS.ratingHistory}
-              onClick={() => setTab(TABS.ratingHistory)}
-            >
-              Rating History
-            </TabButton>
-            <TabButton
-              isActive={tab === TABS.regionalRatings}
-              onClick={() => setTab(TABS.regionalRatings)}
-            >
-              Regional Ratings
-            </TabButton>
-            <TabButton
-              isActive={tab === TABS.carSetup}
-              onClick={() => setTab(TABS.carSetup)}
-            >
-              Car Setup
-            </TabButton>
-            <TabButton
-              isActive={tab === TABS.posts}
-              onClick={() => setTab(TABS.posts)}
-            >
-              Posts
-            </TabButton>
+            {Object.values(TABS).map((i) => (
+              <TabButton isActive={tab === i} onClick={() => setTab(i)}>
+                {i}
+              </TabButton>
+            ))}
           </Flex>
         </TabsBar>
 
         <Container maxW={800} px={2} py={6}>
-          {tab === TABS.ratingHistory &&
-            driver &&
-            driver.TournamentDrivers.length > 0 && (
-              <Box
-                px={6}
-                pt={10}
-                borderRadius="xl"
-                borderWidth={1}
-                borderColor="gray.800"
-                bgGradient="to-b"
-                gradientFrom="gray.900"
-                gradientTo="black"
-              >
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart
-                    data={[
-                      { elo: 1000 },
-                      ...battles.map((battle) => {
-                        const isLeftDriver =
-                          battle.driverLeft?.driverId === driver.driverId;
-                        const isWinner = isLeftDriver
-                          ? battle.winnerId === battle.driverLeft?.id
-                          : battle.winnerId === battle.driverRight?.id;
-
-                        return {
-                          date: format(battle.tournament.createdAt, "MMM, yy"),
-                          elo: isWinner ? battle.winnerElo : battle.loserElo,
-                          startingElo: isWinner
-                            ? battle.winnerStartingElo
-                            : battle.loserStartingElo,
-                        };
-                      }),
-                    ]}
-                    margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
-                  >
-                    <defs>
-                      <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
-                        <stop
-                          offset="5%"
-                          stopColor="rgba(236, 26, 85, 0.3)"
-                          stopOpacity={1}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="rgba(236, 26, 85, 0)"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="date"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      interval="preserveStartEnd"
-                      tick={{ fontSize: 10 }}
-                    />
-                    <YAxis
-                      domain={[
-                        (dataMin: number) =>
-                          Math.min(1000, Math.floor(dataMin * 0.9)),
-                        (dataMax: number) => Math.ceil(dataMax),
-                      ]}
-                    />
-                    <Tooltip />
-                    <Area
-                      type="monotone"
-                      dataKey="elo"
-                      stroke="#ec1a55"
-                      fill="url(#colorElo)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Box>
-            )}
-
-          {tab === TABS.battleHistory && battles.length > 0 && (
+          {tab === TABS.history && battles.length > 0 && (
             <VStack gap={4}>
               {battles.reverse().map((battle, i) => {
                 const isLeftDriver =
@@ -865,40 +763,115 @@ const Page = () => {
             </VStack>
           )}
 
-          {tab === TABS.regionalRatings && (
-            <Grid gridTemplateColumns="1fr 1fr" gap={4}>
-              {Object.values(Regions).map((region) => {
-                if (region === Regions.ALL) return null;
+          {tab === TABS.ratings && (
+            <Box>
+              <Grid gridTemplateColumns="1fr 1fr" gap={4}>
+                {Object.values(Regions).map((region) => {
+                  if (region === Regions.ALL) return null;
 
-                const elo = driver[`elo_${region}`];
+                  const elo = driver[`elo_${region}`];
 
-                return (
-                  <Flex
-                    key={region}
-                    bgGradient="to-b"
-                    gradientFrom="gray.900"
-                    gradientTo="black"
-                    rounded="xl"
-                    p={4}
-                    borderWidth={1}
-                    borderColor="gray.800"
-                    alignItems="center"
+                  return (
+                    <Flex
+                      key={region}
+                      bgGradient="to-b"
+                      gradientFrom="gray.900"
+                      gradientTo="black"
+                      rounded="xl"
+                      p={4}
+                      borderWidth={1}
+                      borderColor="gray.800"
+                      alignItems="center"
+                    >
+                      <styled.span fontWeight="semibold">{region}</styled.span>
+                      <Spacer />
+                      <styled.span>{elo.toFixed(3)}</styled.span>
+                      <styled.img
+                        src={`/badges/${getDriverRank(1000, 0)}.png`}
+                        w={10}
+                      />
+                    </Flex>
+                  );
+                })}
+              </Grid>
+
+              <Box
+                px={6}
+                pt={10}
+                borderRadius="xl"
+                borderWidth={1}
+                borderColor="gray.800"
+                bgGradient="to-b"
+                gradientFrom="gray.900"
+                gradientTo="black"
+                mt={4}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart
+                    data={[
+                      { elo: 1000 },
+                      ...battles.map((battle) => {
+                        const isLeftDriver =
+                          battle.driverLeft?.driverId === driver.driverId;
+                        const isWinner = isLeftDriver
+                          ? battle.winnerId === battle.driverLeft?.id
+                          : battle.winnerId === battle.driverRight?.id;
+
+                        return {
+                          date: format(battle.tournament.createdAt, "MMM, yy"),
+                          elo: isWinner ? battle.winnerElo : battle.loserElo,
+                          startingElo: isWinner
+                            ? battle.winnerStartingElo
+                            : battle.loserStartingElo,
+                        };
+                      }),
+                    ]}
+                    margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
                   >
-                    <styled.span fontWeight="semibold">{region}</styled.span>
-                    <Spacer />
-                    <styled.span>{elo.toFixed(3)}</styled.span>
-                    <styled.img
-                      src={`/badges/${getDriverRank(1000, 0)}.png`}
-                      w={10}
+                    <defs>
+                      <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
+                        <stop
+                          offset="5%"
+                          stopColor="rgba(236, 26, 85, 0.3)"
+                          stopOpacity={1}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="rgba(236, 26, 85, 0)"
+                          stopOpacity={1}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <XAxis
+                      dataKey="date"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                      interval="preserveStartEnd"
+                      tick={{ fontSize: 10 }}
                     />
-                  </Flex>
-                );
-              })}
-            </Grid>
+                    <YAxis
+                      domain={[
+                        (dataMin: number) =>
+                          Math.min(1000, Math.floor(dataMin * 0.9)),
+                        (dataMax: number) => Math.ceil(dataMax),
+                      ]}
+                    />
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="elo"
+                      stroke="#ec1a55"
+                      fill="url(#colorElo)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Box>
+            </Box>
           )}
 
           {tab === TABS.posts && driver.Posts.length > 0 && (
-            <Flex gap={4} mt={2} flexDir="column">
+            <Flex gap={4} flexDir="column">
               {driver.Posts.map((post) => (
                 <PostCard key={post.id} post={post} user={user} />
               ))}
