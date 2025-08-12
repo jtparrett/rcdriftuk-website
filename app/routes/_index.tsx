@@ -6,9 +6,9 @@ import {
   RiAddCircleFill,
   RiArrowRightLine,
   RiCalendarLine,
-  RiCodeFill,
+  RiCodeLine,
   RiListOrdered2,
-  RiMapPin2Fill,
+  RiMapPin2Line,
   RiRocketLine,
   RiStockLine,
   RiTrophyLine,
@@ -41,8 +41,6 @@ const Card = styled("article", {
     borderColor: "gray.800",
     p: 4,
     bgColor: "gray.950",
-    shadow:
-      "0 6px 16px rgba(0, 0, 0, 0.2), inset 0 0 24px rgba(255, 255, 255, 0.05)",
     bgGradient: "to-b",
     gradientFrom: "gray.900",
     gradientTo: "black",
@@ -214,7 +212,7 @@ const Page = () => {
                   </LinkButton>
                 </SignedIn>
                 <LinkButton to="/map/all" variant="secondary">
-                  <RiMapPin2Fill /> Find My Local Track
+                  <RiMapPin2Line /> Find My Local Track
                 </LinkButton>
               </Flex>
             </Box>
@@ -224,49 +222,39 @@ const Page = () => {
         <styled.section
           bgGradient="to-b"
           gradientFrom="black"
-          gradientVia="gray.900"
+          gradientVia="rgba(255, 255, 255, 0.03)"
           gradientTo="black"
           pb={4}
         >
           <Container maxW={1100} px={2}>
             <Flex gap={4} flexDir={{ base: "column", md: "row" }} mb={4}>
-              <Box pos="relative" flex={1}>
-                <Card p={0} overflow="hidden">
-                  <styled.img
-                    src="/shine.png"
-                    pos="absolute"
-                    top={0}
-                    w="full"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                  />
-                  <Flex
-                    align="center"
-                    px={{ base: 8, md: 12 }}
-                    gap={{ base: 4, md: 12 }}
-                    flexDir={{ base: "column-reverse", md: "row" }}
-                  >
-                    <MockPhone src="/home/driver-profile.jpg" />
+              <Card p={0} flex={1}>
+                <Flex
+                  align="center"
+                  px={{ base: 8, md: 12 }}
+                  gap={{ base: 4, md: 12 }}
+                  flexDir={{ base: "column-reverse", md: "row" }}
+                >
+                  <MockPhone src="/home/driver-profile.jpg" />
 
-                    <Box flex={1} py={8}>
-                      <IconBox mb={2}>
-                        <RiStockLine size={16} />
-                      </IconBox>
-                      <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
-                        Driver Analytics
-                      </styled.h1>
-                      <styled.p color="gray.400" textWrap="balance">
-                        Track your rank with real-time driver ratings. From
-                        grassroots events to pro-level tournaments.
-                      </styled.p>
-                      <LinkButton to="/ratings/all" variant="outline" mt={4}>
-                        See All Driver Ratings
-                        <RiArrowRightLine />
-                      </LinkButton>
-                    </Box>
-                  </Flex>
-                </Card>
-              </Box>
+                  <Box flex={1} py={8}>
+                    <IconBox mb={2}>
+                      <RiStockLine size={16} />
+                    </IconBox>
+                    <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
+                      Driver Analytics
+                    </styled.h1>
+                    <styled.p color="gray.400" textWrap="balance">
+                      Track your rank with real-time driver ratings. From
+                      grassroots events to pro-level tournaments.
+                    </styled.p>
+                    <LinkButton to="/ratings/all" variant="outline" mt={4}>
+                      See All Driver Ratings
+                      <RiArrowRightLine />
+                    </LinkButton>
+                  </Box>
+                </Flex>
+              </Card>
 
               <Card
                 bgColor="gray.900"
@@ -281,7 +269,7 @@ const Page = () => {
               >
                 <Box textAlign="center">
                   <IconBox mb={2} mx="auto">
-                    <RiMapPin2Fill size={16} />
+                    <RiMapPin2Line size={16} />
                   </IconBox>
                   <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
                     200+ Tracks
@@ -338,7 +326,7 @@ const Page = () => {
 
                     <Box flex={1} py={8}>
                       <IconBox mb={2}>
-                        <RiCodeFill size={16} />
+                        <RiCodeLine size={16} />
                       </IconBox>
                       <styled.h1 fontWeight="semibold" fontSize="3xl" mb={1}>
                         Beskpoke Software
@@ -370,17 +358,29 @@ const Page = () => {
               borderColor="gray.800"
             >
               <Box
-                bgImage="url(/main-event-bg.jpg)"
-                bgSize="cover"
-                bgPosition="center"
-                bgRepeat="no-repeat"
+                borderTopWidth={1}
+                borderBottomWidth={1}
+                borderColor="gray.800"
+                mx={-12}
+                px={12}
               >
                 <Box
-                  borderTopWidth={1}
-                  borderBottomWidth={1}
-                  borderColor="gray.800"
-                  mx={-12}
-                  px={12}
+                  bgImage="url(/main-event-bg.jpg)"
+                  bgSize="cover"
+                  bgPosition="center"
+                  bgRepeat="no-repeat"
+                  rounded="xl"
+                  overflow="hidden"
+                  pos="relative"
+                  m={1}
+                  _after={{
+                    content: '""',
+                    pos: "absolute",
+                    inset: 0,
+                    pointerEvents: "none",
+                    shadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.1)",
+                    rounded: "inherit",
+                  }}
                 >
                   <Flex
                     flexDir={{ base: "column", md: "row" }}
@@ -395,11 +395,11 @@ const Page = () => {
                         w={14}
                         h={14}
                         rounded="full"
-                        bgColor="black"
+                        bgColor="brand.500"
                         mx="auto"
                         mb={4}
                       >
-                        <RiTrophyLine size={24} />
+                        <RiTrophyLine size={26} />
                       </Center>
                       <styled.h1
                         fontWeight="extrabold"
