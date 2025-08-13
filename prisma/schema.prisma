@@ -27,6 +27,12 @@ model Events {
   ticketReleaseDate DateTime?
   earlyAccessCode   String?
   ticketPrice       Float?
+
+  @@index([startDate])
+  @@index([endDate])
+  @@index([trackId])
+  @@index([startDate, endDate])
+  @@index([enableTicketing, startDate])
 }
 
 model EventTickets {
@@ -41,6 +47,10 @@ model EventTickets {
   sessionId String?
 
   @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([status])
+  @@index([sessionId])
 }
 
 model EventResponses {
@@ -76,6 +86,15 @@ model Tournaments {
   region              Regions?
   rated               Boolean             @default(false)
   tracks              TrackTournaments[]
+
+  @@index([state])
+  @@index([archived])
+  @@index([createdAt])
+  @@index([userId])
+  @@index([region])
+  @@index([rated])
+  @@index([state, archived])
+  @@index([region, rated])
 }
 
 model TournamentDrivers {
@@ -90,6 +109,12 @@ model TournamentDrivers {
   leftBattles        TournamentBattles[] @relation("battleDriverLeft")
   rightBattles       TournamentBattles[] @relation("battleDriverRight")
   isBye              Boolean             @default(false)
+
+  @@index([tournamentId])
+  @@index([driverId])
+  @@index([qualifyingPosition])
+  @@index([tournamentId, driverId])
+  @@index([tournamentId, qualifyingPosition])
 }
 
 model TournamentJudges {
@@ -166,6 +191,10 @@ model TournamentBattles {
   bracket        BattlesBracket          @default(UPPER)
   BattleVotes    TournamentBattleVotes[]
   BattleProtests BattleProtests[]
+
+  @@index([tournamentId])
+  @@index([tournamentId, round])
+  @@index([tournamentId, bracket])
 }
 
 model TournamentBattleVotes {
@@ -201,6 +230,11 @@ model Tracks {
   address     String?
   tournaments TrackTournaments[]
   posts       Posts[]
+
+  @@index([status])
+  @@index([types])
+  @@index([lat, lng])
+  @@index([createdAt])
 }
 
 model TrackOwners {
@@ -250,6 +284,12 @@ model Users {
   archived          Boolean             @default(false)
   carSetupChanges   CarSetupChanges[]
   lastBattleDate    DateTime?
+
+  @@index([elo])
+  @@index([totalBattles])
+  @@index([archived])
+  @@index([lastBattleDate])
+  @@index([team])
 }
 
 model CarSetupChanges {
@@ -260,6 +300,11 @@ model CarSetupChanges {
   user      Users              @relation(fields: [userId], references: [id])
   createdAt DateTime           @default(now())
   updatedAt DateTime           @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([userId, type])
 }
 
 enum CarSetupChangeType {
@@ -327,6 +372,10 @@ model Products {
   Tracks      Tracks?       @relation(fields: [trackId], references: [id])
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
+
+  @@index([trackId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Articles {
@@ -350,6 +399,11 @@ model Posts {
   trackId   String?        @db.Uuid
   user      Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
   track     Tracks?        @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([trackId])
+  @@index([createdAt])
+  @@index([trackId, createdAt])
 }
 
 model PostLikes {
@@ -361,6 +415,8 @@ model PostLikes {
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
 }
 
 model PostComments {
@@ -374,6 +430,12 @@ model PostComments {
   replies   PostComments[] @relation("parentComment")
   userId    String
   user      Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@index([postId, createdAt])
 }
 
 enum TrackTypes {
