@@ -1,6 +1,5 @@
 import { redirect } from "react-router";
 import { useLoaderData } from "react-router";
-import { useEffect, useRef } from "react";
 import {
   add,
   endOfWeek,
@@ -68,36 +67,29 @@ const CalendarWeeksPage = () => {
   const startWeekDate = startOfWeek(date, {
     weekStartsOn: 1,
   });
-  const endWeekDate = endOfWeek(date, {
-    weekStartsOn: 1,
-  });
 
   return (
     <Box>
       <Flex gap={1}>
-        <styled.h1 fontWeight="medium" alignSelf="center" fontSize="sm">
-          {format(startWeekDate, "do")}-{format(endWeekDate, "do MMMM, yyyy")}
-        </styled.h1>
-
         <Spacer />
 
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`/calendar/week/${format(sub(date, { weeks: 1 }), "dd-MM-yy")}`}
         >
           <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`/calendar/week/${format(new Date(), "dd-MM-yy")}`}
         >
           Today
         </LinkButton>
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`/calendar/week/${format(add(date, { weeks: 1 }), "dd-MM-yy")}`}
         >
           <RiArrowRightSLine />

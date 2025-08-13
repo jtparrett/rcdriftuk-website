@@ -1,9 +1,9 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
+import { redirect, useLoaderData } from "react-router";
 import { Outlet, useLocation, useParams } from "react-router";
-import { format, isThisWeek, parse } from "date-fns";
+import { endOfWeek, format, isThisWeek, parse, startOfWeek } from "date-fns";
 import { Tab } from "~/components/Tab";
-import { Container } from "~/styled-system/jsx";
+import { Container, Spacer, styled } from "~/styled-system/jsx";
 import type { Route } from "./+types/calendar";
 import { TabsBar } from "~/components/TabsBar";
 
@@ -35,23 +35,58 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { request } = args;
   const url = new URL(request.url);
 
-  if (url.pathname === "/calendar" || url.pathname === "/calendar/") {
+  if (
+    url.pathname === "/calendar" ||
+    url.pathname === "/calendar/" ||
+    !args.params.date
+  ) {
     const today = format(new Date(), "dd-MM-yy");
     throw redirect(`/calendar/week/${today}`);
   }
 
-  return null;
+  const date = parse(args.params.date, "dd-MM-yy", new Date());
+
+  return { date };
 };
 
 const CalendarPage = () => {
+  const { date } = useLoaderData<typeof loader>();
   const location = useLocation();
   const params = useParams();
   const today = format(new Date(), "dd-MM-yy");
   const dateParam = params.date ?? today;
+  const increment = location.pathname.includes("/day")
+    ? "day"
+    : location.pathname.includes("/week")
+      ? "week"
+      : "month";
+
+  const startWeekDate = startOfWeek(date, {
+    weekStartsOn: 1,
+  });
+  const endWeekDate = endOfWeek(date, {
+    weekStartsOn: 1,
+  });
+
+  const getDate = () => {
+    if (increment === "day") {
+      return format(date, "EEEE do MMMM, yyyy");
+    }
+
+    if (increment === "week") {
+      return `${format(startWeekDate, "do")}-${format(endWeekDate, "do MMMM, yyyy")}`;
+    }
+
+    if (increment === "month") {
+      return format(date, "MMMM, yyyy");
+    }
+  };
 
   return (
     <>
       <TabsBar>
+        <styled.span>{getDate()}</styled.span>
+        <Spacer />
         <Tab
           isActive={location.pathname.includes("/calendar/day")}
           to={`/calendar/day/${dateParam}`}

@@ -54,27 +54,24 @@ const CalendarDaysPage = () => {
   return (
     <>
       <Flex gap={1}>
-        <styled.h1 fontWeight="medium" alignSelf="center" fontSize="sm">
-          {format(date, "EEEE do MMMM, yyyy")}
-        </styled.h1>
         <Spacer />
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`/calendar/day/${format(sub(date, { days: 1 }), "dd-MM-yy")}`}
         >
           <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`/calendar/day/${format(new Date(), "dd-MM-yy")}`}
         >
           Today
         </LinkButton>
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`/calendar/day/${format(add(date, { days: 1 }), "dd-MM-yy")}`}
         >
           <RiArrowRightSLine />

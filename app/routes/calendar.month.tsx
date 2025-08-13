@@ -8,7 +8,7 @@ import {
 } from "react-icons/ri";
 import invariant from "~/utils/invariant";
 import { LinkButton } from "~/components/Button";
-import { styled, Flex, Spacer } from "~/styled-system/jsx";
+import { Flex, Spacer } from "~/styled-system/jsx";
 
 const CalendarMonthsPage = () => {
   const params = useParams();
@@ -23,16 +23,12 @@ const CalendarMonthsPage = () => {
   return (
     <>
       <Flex gap={1}>
-        <styled.h1 fontWeight="medium" alignSelf="center" fontSize="sm">
-          {format(date, "MMMM, yyyy")}
-        </styled.h1>
-
         <Spacer />
 
         <LinkButton
           to={`/calendar/month/${format(date, "dd-MM-yy")}`}
           size="sm"
-          variant={isListView ? "secondary" : "primary"}
+          variant={isListView ? "outline" : "primary"}
         >
           <RiCalendarFill />
         </LinkButton>
@@ -40,28 +36,28 @@ const CalendarMonthsPage = () => {
         <LinkButton
           to={`/calendar/month/list/${format(date, "dd-MM-yy")}`}
           size="sm"
-          variant={isListView ? "primary" : "secondary"}
+          variant={isListView ? "primary" : "outline"}
         >
           <RiListUnordered />
         </LinkButton>
 
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`${basePath}/${format(sub(date, { months: 1 }), "dd-MM-yy")}`}
         >
           <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`${basePath}/${format(new Date(), "dd-MM-yy")}`}
         >
           Today
         </LinkButton>
         <LinkButton
           size="sm"
-          variant="secondary"
+          variant="outline"
           to={`${basePath}/${format(add(date, { months: 1 }), "dd-MM-yy")}`}
         >
           <RiArrowRightSLine />
