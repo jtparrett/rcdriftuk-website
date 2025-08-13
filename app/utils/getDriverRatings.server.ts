@@ -38,8 +38,9 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
   });
 
   return users
-    .map((user) => ({
+    .map((user, rank) => ({
       ...user,
+      rank: rank + 1,
       elo: adjustDriverElo(user.elo, user.lastBattleDate),
       elo_UK: adjustDriverElo(user.elo_UK, user.lastBattleDate),
       elo_EU: adjustDriverElo(user.elo_EU, user.lastBattleDate),

@@ -84,10 +84,8 @@ export const loader = async (params: LoaderFunctionArgs) => {
 const Page = () => {
   const products = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchValue, setSearchValue] = useState(
-    searchParams.get("query") ?? "",
-  );
   const query = searchParams.get("query") ?? "";
+  const [searchValue, setSearchValue] = useState(query);
   const page = Math.max(
     z.coerce.number().nullable().parse(searchParams.get("page")) ?? 1,
     1,

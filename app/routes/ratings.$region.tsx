@@ -1,5 +1,10 @@
-import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
-import { styled, Container, Box, Flex } from "~/styled-system/jsx";
+import {
+  redirect,
+  useLoaderData,
+  useSearchParams,
+  type LoaderFunctionArgs,
+} from "react-router";
+import { styled, Container, Box, Flex, Center } from "~/styled-system/jsx";
 import {
   getDriverRank,
   getRankColor,
@@ -7,7 +12,7 @@ import {
   RANKS_RULES,
 } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings.server";
-import { RiArrowDownSLine } from "react-icons/ri";
+import { RiArrowDownSLine, RiSearchLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Regions } from "~/utils/enums";
@@ -15,6 +20,7 @@ import type { Route } from "./+types/ratings.$region";
 import { Tab } from "~/components/Tab";
 import { z } from "zod";
 import { TabsBar } from "~/components/TabsBar";
+import { useCallback, useState } from "react";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -29,8 +35,10 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const region = z.nativeEnum(Regions).safeParse(params.region?.toUpperCase());
+  const url = new URL(request.url);
+  const query = url.searchParams.get("query");
 
   if (!region.success) {
     throw redirect("/ratings/all");
@@ -38,18 +46,38 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const drivers = await getDriverRatings(region.data);
 
-  return { drivers, region: region.data };
+  // Improved search: match first name, last name, full name, and driverId (as string)
+  const filteredDrivers = drivers.filter((driver) => {
+    if (driver.driverId === 0) return false;
+
+    if (!query) return true;
+
+    const q = query.trim().toLowerCase();
+    const first = driver.firstName?.toLowerCase() ?? "";
+    const last = driver.lastName?.toLowerCase() ?? "";
+    const full = `${first} ${last}`.trim();
+    const driverIdStr = String(driver.driverId ?? "");
+    return (
+      first.includes(q) ||
+      last.includes(q) ||
+      full.includes(q) ||
+      driverIdStr.includes(q)
+    );
+  });
+
+  return {
+    drivers: filteredDrivers,
+    region: region.data,
+  };
 };
 
 type LoaderData = typeof loader;
 
 const Row = ({
   driver,
-  rank,
   region,
 }: {
   driver: Awaited<ReturnType<LoaderData>>["drivers"][number];
-  rank: number;
   region: Regions;
 }) => {
   const rankTitle = driver
@@ -124,9 +152,9 @@ const Row = ({
       >
         <LinkOverlay to={`/drivers/${driver.driverId}`} viewTransition />
         <Flex gap={2} alignItems="center">
-          <styled.span fontFamily="mono" flex="none" w={7} textAlign="center">
-            {rank}
-          </styled.span>
+          <Box w={7} flex="none" textAlign="center">
+            <styled.span fontFamily="mono">{driver.rank}</styled.span>
+          </Box>
           <Box
             w={12}
             h={12}
@@ -152,6 +180,7 @@ const Row = ({
               fontWeight="semibold"
               w="full"
               fontSize={{ base: "sm", md: "md" }}
+              letterSpacing="tight"
             >
               {driver.firstName} {driver.lastName}
             </styled.p>
@@ -201,93 +230,117 @@ const RankSection = () => {
 
   return (
     <Box
-      p={1}
-      rounded="2xl"
       borderWidth={1}
-      borderColor="gray.900"
-      w="full"
-      bgColor="black"
+      borderColor="gray.800"
+      rounded="xl"
+      bgColor="gray.900"
+      overflow="hidden"
     >
-      <Box
-        borderWidth={1}
-        borderColor="gray.900"
-        rounded="xl"
-        bgColor="gray.900"
-        overflow="hidden"
+      <Flex
+        p={4}
+        alignItems="center"
+        justifyContent="space-between"
+        cursor="pointer"
+        onClick={keyDisclosure.toggle}
+        _hover={{
+          md: {
+            bgColor: "gray.800",
+          },
+        }}
       >
-        <Flex
-          p={4}
-          alignItems="center"
-          justifyContent="space-between"
-          cursor="pointer"
-          onClick={keyDisclosure.toggle}
-          _hover={{
-            md: {
-              bgColor: "gray.800",
-            },
-          }}
+        <styled.h2 fontSize="lg" fontWeight="semibold">
+          View Ranks
+        </styled.h2>
+        <Box
+          transform={keyDisclosure.isOpen ? "rotate(180deg)" : "none"}
+          transition="transform 0.2s"
+          color="gray.400"
         >
-          <styled.h2 fontSize="lg" fontWeight="semibold">
-            View Ranks
-          </styled.h2>
-          <Box
-            transform={keyDisclosure.isOpen ? "rotate(180deg)" : "none"}
-            transition="transform 0.2s"
-            color="gray.400"
-          >
-            <RiArrowDownSLine size={24} />
-          </Box>
-        </Flex>
+          <RiArrowDownSLine size={24} />
+        </Box>
+      </Flex>
 
-        {keyDisclosure.isOpen && (
-          <Box borderTopWidth={1} borderColor="gray.800" p={4}>
-            <Flex gap={4} flexWrap="wrap" justifyContent="space-between">
-              {Object.values(RANKS).map((rank, i) => {
-                const [bg] = getRankColor(rank);
+      {keyDisclosure.isOpen && (
+        <Box borderTopWidth={1} borderColor="gray.800" p={4}>
+          <Flex gap={4} flexWrap="wrap" justifyContent="space-between">
+            {Object.values(RANKS).map((rank, i) => {
+              const [bg] = getRankColor(rank);
 
-                return (
-                  <Flex
-                    key={i}
-                    gap={3}
-                    alignItems="center"
-                    minW="150px"
-                    flex={1}
-                    p={2}
-                    borderWidth={1}
-                    borderColor="gray.800"
-                    rounded="lg"
-                    bgColor="var(--rank-bg)"
-                    style={{
-                      // @ts-ignore
-                      "--rank-bg": bg,
-                    }}
-                  >
-                    <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
-                    <styled.p fontSize="sm" fontWeight="medium">
-                      {RANKS_RULES[rank]}
-                    </styled.p>
-                  </Flex>
-                );
-              })}
-            </Flex>
-          </Box>
-        )}
-      </Box>
+              return (
+                <Flex
+                  key={i}
+                  gap={3}
+                  alignItems="center"
+                  minW="150px"
+                  flex={1}
+                  p={2}
+                  borderWidth={1}
+                  borderColor="gray.800"
+                  rounded="lg"
+                  bgColor="var(--rank-bg)"
+                  style={{
+                    // @ts-ignore
+                    "--rank-bg": bg,
+                  }}
+                >
+                  <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
+                  <styled.p fontSize="sm" fontWeight="medium">
+                    {RANKS_RULES[rank]}
+                  </styled.p>
+                </Flex>
+              );
+            })}
+          </Flex>
+        </Box>
+      )}
     </Box>
   );
 };
 
 const RatingsPage = () => {
   const { drivers, region } = useLoaderData<LoaderData>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") ?? "";
+  const [searchValue, setSearchValue] = useState(query);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (value: string) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          const newSearchParams = new URLSearchParams(searchParams);
+          if (value.trim()) {
+            newSearchParams.set("query", value.trim());
+          } else {
+            newSearchParams.delete("query");
+          }
+          setSearchParams(newSearchParams);
+        }, 300); // 300ms debounce
+      };
+    })(),
+    [searchParams, setSearchParams],
+  );
+
+  // Handle input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    debouncedSearch(value);
+  };
 
   return (
     <>
+      <styled.h1 srOnly>Driver Ratings</styled.h1>
       <TabsBar>
         {Object.values(Regions).map((option) => {
           return (
             <Tab
               key={option}
-              to={`/ratings/${option.toLowerCase()}`}
+              to={`/ratings/${option.toLowerCase()}${
+                query ? `?query=${query}` : ""
+              }`}
               isActive={option === region}
               replace
             >
@@ -296,75 +349,50 @@ const RatingsPage = () => {
           );
         })}
       </TabsBar>
-      <Box
-        pos="relative"
-        zIndex={1}
-        _after={{
-          content: '""',
-          pos: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          h: "100dvh",
-          bgImage: "url(/dot-bg.svg)",
-          bgSize: "16px",
-          bgPosition: "center",
-          bgRepeat: "repeat",
-          zIndex: -2,
-        }}
-        _before={{
-          content: '""',
-          pos: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          h: "100dvh",
-          bgGradient: "to-t",
-          gradientFrom: "black",
-          gradientTo: "rgba(12, 12, 12, 0)",
-          zIndex: -1,
-        }}
-      >
-        <Container pb={12} px={2} pt={2} maxW={800}>
-          <Box textAlign="center" py={8} w="full">
-            <styled.h1
-              fontSize={{ base: "4xl", md: "5xl" }}
-              fontWeight="extrabold"
-            >
-              Driver Ratings
-            </styled.h1>
 
-            <styled.p
-              mb={4}
-              color="gray.500"
-              textWrap="balance"
-              maxW={300}
-              mx="auto"
-            >
-              Discover the top rated drivers from across the world.
-            </styled.p>
-          </Box>
-
-          <Flex
-            gap={4}
-            alignItems={{ md: "flex-start" }}
-            flexDirection="column"
+      <Box borderBottomWidth={1} borderColor="gray.900">
+        <Flex maxW={1100} mx="auto">
+          <styled.input
+            value={searchValue}
+            onChange={handleSearchChange}
+            bgColor="inherit"
+            px={4}
+            py={3}
             w="full"
-          >
+            placeholder={`Search ${region === Regions.ALL ? "" : `${region} `}driver ratings...`}
+            color="inherit"
+            outline="none"
+          />
+          <Center pr={4} color="gray.500">
+            <RiSearchLine />
+          </Center>
+        </Flex>
+      </Box>
+
+      <Container pb={12} px={2} pt={2} maxW={800}>
+        <Flex
+          gap={4}
+          alignItems={{ md: "flex-start" }}
+          flexDirection="column"
+          w="full"
+        >
+          <Flex flexDirection="column" gap={2} w="full">
             <RankSection />
 
-            <Flex flexDirection="column" gap={2} w="full">
-              {drivers
-                .filter((driver) => driver.driverId !== 0)
-                .map((driver, i) => {
-                  return (
-                    <Row key={i} driver={driver} rank={i + 1} region={region} />
-                  );
-                })}
-            </Flex>
+            {drivers.map((driver) => {
+              return (
+                <Row key={driver.driverId} driver={driver} region={region} />
+              );
+            })}
+
+            {drivers.length === 0 && (
+              <styled.p textAlign="center" color="gray.500" py={4}>
+                No drivers found.
+              </styled.p>
+            )}
           </Flex>
-        </Container>
-      </Box>
+        </Flex>
+      </Container>
     </>
   );
 };
