@@ -4,13 +4,21 @@ import { useLoaderData } from "react-router";
 import { capitalCase } from "change-case";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
-import { AspectRatio, Box, Center, Flex, styled } from "~/styled-system/jsx";
+import {
+  AspectRatio,
+  Box,
+  Center,
+  Flex,
+  Spacer,
+  styled,
+} from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
-import { RiTrophyFill } from "react-icons/ri";
+import { RiTrophyLine } from "react-icons/ri";
 import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { useIsEmbed } from "~/utils/EmbedContext";
+import { getRankColor, RANKS } from "~/utils/getDriverRank";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -140,57 +148,95 @@ const FinalResults = () => {
   const results = getTournamentStandings(tournament.battles).slice(0, 3);
 
   return (
-    <Flex w={700} maxW="full" alignItems="flex-end" p={4} gap={1}>
+    <Flex w={700} maxW="full" flexDir="column" gap={2} p={4} textAlign="left">
       {results.map((driver) => {
         const i = results.indexOf(driver);
+        const [bgColor] =
+          i === 0
+            ? getRankColor(RANKS.GOLD)
+            : i === 1
+              ? getRankColor(RANKS.SILVER)
+              : getRankColor(RANKS.BRONZE);
 
         return (
-          <Box
-            style={{
-              order: i === 0 ? 2 : i === 1 ? 1 : 3,
-              zIndex: 3 - i,
-              flex: 1 - i * 0.1,
-            }}
-            pos="relative"
-            key={i}
-            p={1}
-            bgColor="brand.500"
-            rounded="2xl"
+          <Flex
+            key={driver.id}
             overflow="hidden"
+            style={{
+              // @ts-ignore
+              "--bg": bgColor,
+              "--ml": i === 0 ? 0 : i === 1 ? "16px" : "32px",
+            }}
+            bgColor="var(--bg)"
+            ml="var(--ml)"
+            rounded="xl"
+            pos="relative"
+            zIndex={1}
+            _after={{
+              content: '""',
+              pos: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              bgGradient: "to-b",
+              gradientFrom: "rgba(0, 0, 0, 0)",
+              gradientTo: "rgba(0, 0, 0, 0.4)",
+              zIndex: -1,
+            }}
+            shadow="inset 0 1px 0 rgba(255, 255, 255, 0.3)"
           >
-            <styled.span
-              pos="absolute"
-              display="flex"
-              alignItems="center"
-              gap={2}
-              top={1}
-              left={1}
-              bgColor="inherit"
-              pl={2}
-              pr={3}
-              py={1}
-              borderBottomRightRadius="xl"
-              fontWeight="bold"
-              fontSize="sm"
-              zIndex={1}
-            >
-              <RiTrophyFill />
-              {i === 0 ? "First" : i === 1 ? "Second" : "Third"}
-            </styled.span>
-            <AspectRatio ratio={0.75} w="full" overflow="hidden" rounded="xl">
+            <AspectRatio ratio={1} w="78px" overflow="hidden" flex="none">
               <styled.img
                 src={driver?.image ?? "/blank-driver-right.jpg"}
                 alt={driver?.firstName ?? ""}
               />
             </AspectRatio>
+
             <styled.p
-              fontWeight="bold"
-              py={1}
-              fontSize={{ base: "xs", md: "md" }}
+              fontWeight="black"
+              fontSize="xl"
+              textTransform="uppercase"
+              fontStyle="italic"
+              alignSelf="center"
+              lineHeight={1.1}
+              p={{ base: 4, md: 6 }}
+              textShadow="1px 1px 2px rgba(0, 0, 0, 0.5)"
+              flex={1}
+              overflow="hidden"
             >
-              {driver?.firstName} {driver?.lastName}
+              <styled.span
+                display="block"
+                whiteSpace="nowrap"
+                textOverflow="ellipsis"
+                overflow="hidden"
+                maxW="100%"
+              >
+                {driver?.firstName}
+              </styled.span>{" "}
+              <styled.span
+                display="block"
+                whiteSpace="nowrap"
+                textOverflow="ellipsis"
+                overflow="hidden"
+                maxW="100%"
+              >
+                {driver?.lastName}
+              </styled.span>
             </styled.p>
-          </Box>
+
+            <Center
+              w={24}
+              bgColor="rgba(0, 0, 0, 0.4)"
+              flexDir="column"
+              shadow="inset 2px 0 6px rgba(0, 0, 0, 0.3)"
+              gap={0.5}
+              flex="none"
+            >
+              <RiTrophyLine size={24} />
+              <styled.span fontWeight="black">
+                {i === 0 ? "1ST" : i === 1 ? "2ND" : "3RD"}
+              </styled.span>
+            </Center>
+          </Flex>
         );
       })}
     </Flex>
