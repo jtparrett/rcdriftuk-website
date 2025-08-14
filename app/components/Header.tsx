@@ -1,13 +1,14 @@
 import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
 import { Link, useLocation, useNavigation } from "react-router";
 import { Button, LinkButton } from "./Button";
-import { RiMenuFill } from "react-icons/ri";
+import { RiMenuFill, RiNotificationLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
-import { SignedIn, SignedOut } from "@clerk/react-router";
+import { SignedOut } from "@clerk/react-router";
 import type { GetUser } from "~/utils/getUser.server";
 import { Menu, UserMenu } from "./Menu";
 import { UserTracks } from "./UserTracks";
+import { NotificationsBadge } from "./NotificationsBadge";
 
 export const HEADER_HEIGHT = 64;
 
@@ -52,16 +53,18 @@ const MenuDropdown = ({ user }: Props) => {
             <Menu />
           </Flex>
 
-          <SignedIn>
-            <Box w="1px" bgColor="gray.800" />
-            <Flex gap="1px" flexDir="column" flex={1} p={{ base: 2, md: 4 }}>
-              <UserMenu />
-            </Flex>
-          </SignedIn>
+          {user && (
+            <>
+              <Box w="1px" bgColor="gray.800" />
+              <Flex gap="1px" flexDir="column" flex={1} p={{ base: 2, md: 4 }}>
+                <UserMenu />
+              </Flex>
+            </>
+          )}
         </Flex>
       </Box>
 
-      <SignedIn>
+      {user && (
         <Box p={1} textAlign="center" borderBottomRadius="inherit">
           <styled.span
             fontWeight="semibold"
@@ -75,7 +78,7 @@ const MenuDropdown = ({ user }: Props) => {
             You're logged in as {user?.firstName ?? "..."} {user?.lastName}
           </styled.span>
         </Box>
-      </SignedIn>
+      )}
     </Box>
   );
 };
@@ -160,8 +163,22 @@ export const Header = ({ user }: Props) => {
             </Button>
           </Box>
 
-          <SignedIn>
-            {user && (
+          {user && (
+            <>
+              <LinkButton
+                to="/notifications"
+                pos="relative"
+                w={10}
+                h={10}
+                variant="outline"
+                px={0}
+                py={0}
+              >
+                <RiNotificationLine size={16} />
+                <styled.span srOnly>Notifications</styled.span>
+                <NotificationsBadge />
+              </LinkButton>
+
               <Link to={`/drivers/${user.driverId}`}>
                 <styled.div
                   w={10}
@@ -179,8 +196,8 @@ export const Header = ({ user }: Props) => {
                   />
                 </styled.div>
               </Link>
-            )}
-          </SignedIn>
+            </>
+          )}
 
           <SignedOut>
             <LinkButton variant="outline" size="md" to="/sign-in">

@@ -19,12 +19,30 @@ export const action = async (args: ActionFunctionArgs) => {
     })
     .parse(formData);
 
-  await prisma.postComments.create({
+  const comment = await prisma.postComments.create({
     data: {
       content: data.comment,
       postId: id,
       userId,
       parentId: data.replyId,
+    },
+    select: {
+      id: true,
+      Posts: {
+        select: {
+          userId: true,
+        },
+      },
+    },
+  });
+
+  // This should never happen, but just in case
+  notFoundInvariant(comment.Posts?.userId, "Post user not found");
+
+  await prisma.userNotifications.create({
+    data: {
+      userId: comment.Posts?.userId,
+      commentId: comment.id,
     },
   });
 

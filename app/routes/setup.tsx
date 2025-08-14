@@ -9,7 +9,6 @@ import {
 } from "react-router";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { Label } from "~/components/Label";
 import { capitalCase } from "change-case";
 import { formatDistanceToNow } from "date-fns";
 import { Select } from "~/components/Select";

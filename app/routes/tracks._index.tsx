@@ -45,7 +45,12 @@ const TracksPage = () => {
             gap={2}
           >
             <Box>
-              <styled.h1 fontSize="4xl" fontWeight="extrabold" lineHeight={1.2}>
+              <styled.h1
+                fontSize="4xl"
+                fontWeight="extrabold"
+                lineHeight={1.2}
+                letterSpacing="tight"
+              >
                 Tracks
               </styled.h1>
               <styled.p color="gray.400" maxW={400}>

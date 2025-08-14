@@ -256,34 +256,36 @@ model TrackTournaments {
 }
 
 model Users {
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @default(now()) @updatedAt
-  driverId          Int                 @id @default(autoincrement())
-  id                String?             @unique
-  firstName         String?
-  image             String?
-  lastName          String?
-  team              String?
-  elo               Float               @default(1000)
-  elo_UK            Float               @default(1000)
-  elo_EU            Float               @default(1000)
-  elo_NA            Float               @default(1000)
-  elo_APAC          Float               @default(1000)
-  elo_LATAM         Float               @default(1000)
-  elo_MEA           Float               @default(1000)
-  totalBattles      Int                 @default(0)
-  events            EventResponses[]
-  Tournaments       Tournaments[]
-  TournamentJudges  TournamentJudges[]
-  TournamentDrivers TournamentDrivers[]
-  EventTickets      EventTickets[]
-  Tracks            TrackOwners[]
-  PostLikes         PostLikes[]
-  PostComments      PostComments[]
-  Posts             Posts[]
-  archived          Boolean             @default(false)
-  carSetupChanges   CarSetupChanges[]
-  lastBattleDate    DateTime?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @default(now()) @updatedAt
+  driverId                Int                 @id @default(autoincrement())
+  id                      String?             @unique
+  firstName               String?
+  image                   String?
+  lastName                String?
+  team                    String?
+  elo                     Float               @default(1000)
+  elo_UK                  Float               @default(1000)
+  elo_EU                  Float               @default(1000)
+  elo_NA                  Float               @default(1000)
+  elo_APAC                Float               @default(1000)
+  elo_LATAM               Float               @default(1000)
+  elo_MEA                 Float               @default(1000)
+  totalBattles            Int                 @default(0)
+  events                  EventResponses[]
+  Tournaments             Tournaments[]
+  TournamentJudges        TournamentJudges[]
+  TournamentDrivers       TournamentDrivers[]
+  EventTickets            EventTickets[]
+  Tracks                  TrackOwners[]
+  PostLikes               PostLikes[]
+  PostComments            PostComments[]
+  Posts                   Posts[]
+  archived                Boolean             @default(false)
+  carSetupChanges         CarSetupChanges[]
+  lastBattleDate          DateTime?
+  notifications           UserNotifications[]
+  notificationsLastReadAt DateTime            @default(now())
 
   @@index([elo])
   @@index([totalBattles])
@@ -407,12 +409,13 @@ model Posts {
 }
 
 model PostLikes {
-  id        Int      @id @default(autoincrement())
-  postId    Int?
-  userId    String
-  createdAt DateTime @default(now())
-  Posts     Posts?   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int                 @id @default(autoincrement())
+  postId            Int?
+  userId            String
+  createdAt         DateTime            @default(now())
+  Posts             Posts?              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user              Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  UserNotifications UserNotifications[]
 
   @@unique([postId, userId])
   @@index([postId])
@@ -420,22 +423,37 @@ model PostLikes {
 }
 
 model PostComments {
-  id        Int            @id @default(autoincrement())
-  postId    Int
-  createdAt DateTime       @default(now())
-  content   String
-  Posts     Posts?         @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parentId  Int?
-  parent    PostComments?  @relation("parentComment", fields: [parentId], references: [id], onDelete: Cascade)
-  replies   PostComments[] @relation("parentComment")
-  userId    String
-  user      Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int                 @id @default(autoincrement())
+  postId            Int
+  createdAt         DateTime            @default(now())
+  content           String
+  Posts             Posts?              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId          Int?
+  parent            PostComments?       @relation("parentComment", fields: [parentId], references: [id], onDelete: Cascade)
+  replies           PostComments[]      @relation("parentComment")
+  userId            String
+  user              Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  UserNotifications UserNotifications[]
 
   @@index([postId])
   @@index([userId])
   @@index([parentId])
   @@index([createdAt])
   @@index([postId, createdAt])
+}
+
+model UserNotifications {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String
+  createdAt DateTime      @default(now())
+  user      Users         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId Int?
+  comment   PostComments? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  likeId    Int?
+  like      PostLikes?    @relation(fields: [likeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 enum TrackTypes {

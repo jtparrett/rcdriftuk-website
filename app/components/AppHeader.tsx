@@ -1,10 +1,11 @@
 import { Box, Center, Spacer, styled } from "~/styled-system/jsx";
 import { useDelayedLoader } from "./Header";
 import { Link, useLocation, useNavigate } from "react-router";
-import { RiArrowLeftSLine } from "react-icons/ri";
+import { RiArrowLeftSLine, RiNotificationLine } from "react-icons/ri";
 import { useScroll, motion, useTransform } from "motion/react";
 import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
+import { NotificationsBadge } from "./NotificationsBadge";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -18,6 +19,20 @@ export const APP_TAB_ROUTES = [
   "/sign-in",
   "/sign-up",
 ];
+
+const IconButton = styled(Link, {
+  base: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    w: 9,
+    h: 9,
+    borderRadius: "full",
+    bgColor: "gray.900",
+    borderWidth: 1,
+    borderColor: "gray.800",
+  },
+});
 
 export const AppHeader = () => {
   const isNavigating = useDelayedLoader();
@@ -52,6 +67,7 @@ export const AppHeader = () => {
             alignItems: "center",
             px: 4,
             pos: "relative",
+            gap: 2,
           })}
           style={{
             height,
@@ -62,7 +78,11 @@ export const AppHeader = () => {
               ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
               : location.pathname.toLowerCase() === route,
           ) && (
-            <styled.button onClick={() => navigate(-1)} type="button">
+            <styled.button
+              onClick={() => navigate(-1)}
+              type="button"
+              cursor="pointer"
+            >
               <RiArrowLeftSLine size={24} />
             </styled.button>
           )}
@@ -88,6 +108,17 @@ export const AppHeader = () => {
               />
             </Link>
           </Box>
+
+          <IconButton to="/notifications" pos="relative">
+            <RiNotificationLine size={16} />
+            <styled.span srOnly>Notifications</styled.span>
+            <NotificationsBadge />
+          </IconButton>
+
+          {/* <IconButton to="/inbox">
+            <RiChat3Line size={16} />
+            <styled.span srOnly>Inbox</styled.span>
+          </IconButton> */}
         </motion.div>
       </motion.div>
 
