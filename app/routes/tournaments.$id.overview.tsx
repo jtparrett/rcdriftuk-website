@@ -148,7 +148,7 @@ const FinalResults = () => {
   const results = getTournamentStandings(tournament.battles).slice(0, 3);
 
   return (
-    <Flex w={700} maxW="full" flexDir="column" gap={2} p={4} textAlign="left">
+    <Flex w={700} maxW="full" flexDir="column" gap={2} p={2} textAlign="left">
       {results.map((driver) => {
         const i = results.indexOf(driver);
         const [bgColor] =
@@ -165,7 +165,7 @@ const FinalResults = () => {
             style={{
               // @ts-ignore
               "--bg": bgColor,
-              "--ml": i === 0 ? 0 : i === 1 ? "16px" : "32px",
+              "--ml": i === 0 ? 0 : i === 1 ? "12px" : "24px",
             }}
             bgColor="var(--bg)"
             ml="var(--ml)"
@@ -192,8 +192,8 @@ const FinalResults = () => {
             </AspectRatio>
 
             <styled.p
-              fontWeight="black"
-              fontSize="xl"
+              fontWeight="extrabold"
+              fontSize={{ base: "lg", md: "xl" }}
               textTransform="uppercase"
               fontStyle="italic"
               alignSelf="center"
@@ -232,7 +232,7 @@ const FinalResults = () => {
               flex="none"
             >
               <RiTrophyLine size={24} />
-              <styled.span fontWeight="black">
+              <styled.span fontWeight="extrabold">
                 {i === 0 ? "1ST" : i === 1 ? "2ND" : "3RD"}
               </styled.span>
             </Center>
@@ -315,7 +315,7 @@ const TournamentsOverviewPage = () => {
               <styled.p fontWeight="semibold">
                 {capitalCase(
                   tournament.state === TournamentsState.END
-                    ? "Final Results"
+                    ? "Final Result"
                     : tournament.state,
                 )}
               </styled.p>
