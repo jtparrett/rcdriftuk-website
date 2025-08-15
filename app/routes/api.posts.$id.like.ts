@@ -40,15 +40,14 @@ export const action = async (args: ActionFunctionArgs) => {
       },
     });
 
-    // This should never happen, but just in case
-    notFoundInvariant(like.Posts?.userId, "Post user not found");
-
-    await prisma.userNotifications.create({
-      data: {
-        userId: like.Posts?.userId,
-        likeId: like.id,
-      },
-    });
+    if (like.Posts?.userId && like.Posts.userId !== userId) {
+      await prisma.userNotifications.create({
+        data: {
+          userId: like.Posts?.userId,
+          likeId: like.id,
+        },
+      });
+    }
   }
 
   const totalPostLikes = await prisma.postLikes.count({

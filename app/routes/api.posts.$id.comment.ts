@@ -4,6 +4,24 @@ import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 
+const extractTaggedUsers = (text: string): number[] => {
+  if (!text) return [];
+
+  // Extract @userid(firstname lastname) mentions and return unique user IDs
+  const userIdMatches = text.match(/@(\d+)\([^)]+\)/g);
+  if (!userIdMatches) return [];
+
+  const userIds = userIdMatches
+    .map((match) => {
+      const idMatch = match.match(/@(\d+)\(/);
+      return idMatch ? parseInt(idMatch[1], 10) : null;
+    })
+    .filter((id): id is number => id !== null);
+
+  // Return unique user IDs
+  return Array.from(new Set(userIds));
+};
+
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
@@ -18,6 +36,9 @@ export const action = async (args: ActionFunctionArgs) => {
       replyId: z.coerce.number().nullable(),
     })
     .parse(formData);
+
+  // Extract tagged users from the comment content
+  const taggedUserIds = extractTaggedUsers(data.comment);
 
   const comment = await prisma.postComments.create({
     data: {
@@ -36,15 +57,53 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  // This should never happen, but just in case
-  notFoundInvariant(comment.Posts?.userId, "Post user not found");
+  // Create notifications
+  const notificationsToCreate: { userId: string; commentId: number }[] = [];
 
-  await prisma.userNotifications.create({
-    data: {
-      userId: comment.Posts?.userId,
+  // Notification for the post author (if they're not the commenter)
+  if (comment.Posts?.userId && comment.Posts.userId !== userId) {
+    notificationsToCreate.push({
+      userId: comment.Posts.userId,
       commentId: comment.id,
-    },
-  });
+    });
+  }
+
+  // Notifications for tagged users (if they're not the commenter and not already included)
+  if (taggedUserIds.length > 0) {
+    // Get user IDs from driverIds (since taggedUserIds are driverIds, we need to convert them to user IDs)
+    const taggedUsers = await prisma.users.findMany({
+      where: {
+        driverId: {
+          in: taggedUserIds,
+        },
+      },
+      select: {
+        id: true,
+        driverId: true,
+      },
+    });
+
+    for (const taggedUser of taggedUsers) {
+      // Don't notify the commenter or the post author (already handled above)
+      if (
+        taggedUser.id &&
+        taggedUser.id !== userId &&
+        taggedUser.id !== comment.Posts?.userId
+      ) {
+        notificationsToCreate.push({
+          userId: taggedUser.id,
+          commentId: comment.id,
+        });
+      }
+    }
+  }
+
+  // Create all notifications at once
+  if (notificationsToCreate.length > 0) {
+    await prisma.userNotifications.createMany({
+      data: notificationsToCreate,
+    });
+  }
 
   return null;
 };

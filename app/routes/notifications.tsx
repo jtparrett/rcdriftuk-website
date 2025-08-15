@@ -34,6 +34,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
       comment: {
         select: {
           postId: true,
+          Posts: {
+            select: {
+              userId: true,
+            },
+          },
           user: {
             select: {
               id: true,
@@ -47,6 +52,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
       like: {
         select: {
           postId: true,
+          Posts: {
+            select: {
+              userId: true,
+            },
+          },
           user: {
             select: {
               id: true,
@@ -67,20 +77,29 @@ const getNotificationContent = (
   notification: Awaited<ReturnType<typeof loader>>[number],
 ) => {
   if (notification.comment) {
+    if (notification.comment.Posts?.userId !== notification.userId) {
+      return (
+        <>
+          {notification.comment?.user.firstName}{" "}
+          {notification.comment?.user.lastName} mentioned you in a comment
+        </>
+      );
+    }
+
     return (
-      <styled.p>
+      <>
         {notification.comment?.user.firstName}{" "}
         {notification.comment?.user.lastName} commented on your post
-      </styled.p>
+      </>
     );
   }
 
   if (notification.like) {
     return (
-      <styled.p>
+      <>
         {notification.like?.user.firstName} {notification.like?.user.lastName}{" "}
         liked your post
-      </styled.p>
+      </>
     );
   }
 
