@@ -37,6 +37,11 @@ export const action = async (args: ActionFunctionArgs) => {
         Posts: {
           select: {
             userId: true,
+            user: {
+              select: {
+                pushToken: true,
+              },
+            },
           },
         },
         user: {
@@ -44,7 +49,6 @@ export const action = async (args: ActionFunctionArgs) => {
             firstName: true,
             lastName: true,
             image: true,
-            pushToken: true,
           },
         },
       },
@@ -54,7 +58,7 @@ export const action = async (args: ActionFunctionArgs) => {
       await sendNotification({
         userId: like.Posts.userId,
         like,
-        pushToken: like.user.pushToken,
+        pushToken: like.Posts.user.pushToken,
       });
     }
   }

@@ -53,7 +53,9 @@ export const sendNotification = async ({
   });
 
   // Send push notification if token is available
+  console.log("pushToken", pushToken);
   if (pushToken && Expo.isExpoPushToken(pushToken)) {
+    console.log("pushToken is valid");
     try {
       if (comment || like) {
         const content = getNotificationContent({
@@ -61,6 +63,8 @@ export const sendNotification = async ({
           comment,
           like,
         });
+
+        console.log("content", content);
 
         if (content) {
           const message: ExpoPushMessage = {
@@ -77,6 +81,8 @@ export const sendNotification = async ({
           };
 
           await expo.sendPushNotificationsAsync([message]);
+
+          console.log("push notification sent");
         }
       }
     } catch (error) {

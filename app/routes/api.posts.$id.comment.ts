@@ -54,6 +54,11 @@ export const action = async (args: ActionFunctionArgs) => {
       Posts: {
         select: {
           userId: true,
+          user: {
+            select: {
+              pushToken: true,
+            },
+          },
         },
       },
       user: {
@@ -61,7 +66,6 @@ export const action = async (args: ActionFunctionArgs) => {
           firstName: true,
           lastName: true,
           image: true,
-          pushToken: true,
         },
       },
     },
@@ -79,7 +83,7 @@ export const action = async (args: ActionFunctionArgs) => {
     notificationsToCreate.push({
       userId: comment.Posts.userId,
       commentId: comment.id,
-      pushToken: comment.user.pushToken,
+      pushToken: comment.Posts.user.pushToken,
     });
   }
 
