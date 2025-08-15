@@ -174,6 +174,7 @@ const NotificationsPage = () => {
                 </styled.p>
                 <LinkOverlay
                   to={`/posts/${notification.comment?.postId ?? notification.like?.postId}`}
+                  replace
                 >
                   <styled.p>{content}</styled.p>
                 </LinkOverlay>
