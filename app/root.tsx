@@ -140,6 +140,11 @@ export function ErrorBoundary() {
   );
 }
 
+const ExpoPushToken = () => {
+  useExpoPushTokenSync();
+  return null;
+};
+
 function App({
   loaderData,
 }: {
@@ -149,9 +154,6 @@ function App({
   const { user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
-
-  // Sync Expo push token when available
-  useExpoPushTokenSync();
 
   useEffect(() => {
     if (isApp) {
@@ -232,6 +234,7 @@ function App({
       <QueryClientProvider client={queryClient}>
         <AppProvider value={isApp}>
           <EmbedProvider value={isEmbed}>
+            <ExpoPushToken />
             {isApp && <AppHeader />}
 
             {!isEmbed && (
