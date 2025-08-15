@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { sendNotification } from "~/utils/sendNotification.server";
 
 const extractTaggedUsers = (text: string): number[] => {
   if (!text) return [];
@@ -49,22 +50,36 @@ export const action = async (args: ActionFunctionArgs) => {
     },
     select: {
       id: true,
+      postId: true,
       Posts: {
         select: {
           userId: true,
+        },
+      },
+      user: {
+        select: {
+          firstName: true,
+          lastName: true,
+          image: true,
+          pushToken: true,
         },
       },
     },
   });
 
   // Create notifications
-  const notificationsToCreate: { userId: string; commentId: number }[] = [];
+  const notificationsToCreate: {
+    userId: string;
+    commentId: number;
+    pushToken: string | null;
+  }[] = [];
 
   // Notification for the post author (if they're not the commenter)
   if (comment.Posts?.userId && comment.Posts.userId !== userId) {
     notificationsToCreate.push({
       userId: comment.Posts.userId,
       commentId: comment.id,
+      pushToken: comment.user.pushToken,
     });
   }
 
@@ -80,6 +95,7 @@ export const action = async (args: ActionFunctionArgs) => {
       select: {
         id: true,
         driverId: true,
+        pushToken: true,
       },
     });
 
@@ -93,6 +109,7 @@ export const action = async (args: ActionFunctionArgs) => {
         notificationsToCreate.push({
           userId: taggedUser.id,
           commentId: comment.id,
+          pushToken: taggedUser.pushToken,
         });
       }
     }
@@ -100,9 +117,15 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create all notifications at once
   if (notificationsToCreate.length > 0) {
-    await prisma.userNotifications.createMany({
-      data: notificationsToCreate,
-    });
+    await Promise.all(
+      notificationsToCreate.map((notification) =>
+        sendNotification({
+          pushToken: notification.pushToken,
+          userId: notification.userId,
+          comment,
+        }),
+      ),
+    );
   }
 
   return null;

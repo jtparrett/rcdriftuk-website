@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { sendNotification } from "~/utils/sendNotification.server";
 
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -32,20 +33,28 @@ export const action = async (args: ActionFunctionArgs) => {
       },
       select: {
         id: true,
+        postId: true,
         Posts: {
           select: {
             userId: true,
+          },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            image: true,
+            pushToken: true,
           },
         },
       },
     });
 
     if (like.Posts?.userId && like.Posts.userId !== userId) {
-      await prisma.userNotifications.create({
-        data: {
-          userId: like.Posts?.userId,
-          likeId: like.id,
-        },
+      await sendNotification({
+        userId: like.Posts.userId,
+        like,
+        pushToken: like.user.pushToken,
       });
     }
   }

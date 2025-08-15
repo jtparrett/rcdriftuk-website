@@ -6,6 +6,7 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
+import { getNotificationContent } from "~/utils/getNotificationContent";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 
@@ -73,39 +74,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return notifications;
 };
 
-const getNotificationContent = (
-  notification: Awaited<ReturnType<typeof loader>>[number],
-) => {
-  if (notification.comment) {
-    if (notification.comment.Posts?.userId !== notification.userId) {
-      return (
-        <>
-          {notification.comment?.user.firstName}{" "}
-          {notification.comment?.user.lastName} mentioned you in a comment
-        </>
-      );
-    }
-
-    return (
-      <>
-        {notification.comment?.user.firstName}{" "}
-        {notification.comment?.user.lastName} commented on your post
-      </>
-    );
-  }
-
-  if (notification.like) {
-    return (
-      <>
-        {notification.like?.user.firstName} {notification.like?.user.lastName}{" "}
-        liked your post
-      </>
-    );
-  }
-
-  return null;
-};
-
 const NotificationsPage = () => {
   const notifications = useLoaderData<typeof loader>();
   const queryClient = useQueryClient();
@@ -157,9 +125,7 @@ const NotificationsPage = () => {
             >
               <Box w={10} h={10} rounded="full" overflow="hidden">
                 <styled.img
-                  src={
-                    notification.like?.user.image ?? "/blank-driver-right.jpg"
-                  }
+                  src={content.userImage ?? "/blank-driver-right.jpg"}
                   alt="Avatar"
                   w="full"
                   h="full"
@@ -172,11 +138,8 @@ const NotificationsPage = () => {
                     addSuffix: true,
                   })}
                 </styled.p>
-                <LinkOverlay
-                  to={`/posts/${notification.comment?.postId ?? notification.like?.postId}`}
-                  replace
-                >
-                  <styled.p>{content}</styled.p>
+                <LinkOverlay to={`/posts/${content.postId}`} replace>
+                  <styled.p>{content.text}</styled.p>
                 </LinkOverlay>
               </Box>
             </Flex>
