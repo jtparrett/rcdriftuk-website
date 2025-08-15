@@ -286,6 +286,7 @@ model Users {
   lastBattleDate          DateTime?
   notifications           UserNotifications[]
   notificationsLastReadAt DateTime            @default(now())
+  pushToken               String?
 
   @@index([elo])
   @@index([totalBattles])

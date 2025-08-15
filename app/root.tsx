@@ -32,6 +32,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
 import { useEffect } from "react";
+import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -148,6 +149,9 @@ function App({
   const { user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
+
+  // Sync Expo push token when available
+  useExpoPushTokenSync();
 
   useEffect(() => {
     if (isApp) {
