@@ -1,11 +1,16 @@
 import { Box, Center, Spacer, styled } from "~/styled-system/jsx";
 import { useDelayedLoader } from "./Header";
 import { Link, useLocation, useNavigate } from "react-router";
-import { RiArrowLeftSLine, RiNotificationLine } from "react-icons/ri";
+import {
+  RiArrowLeftSLine,
+  RiChat3Line,
+  RiNotificationLine,
+} from "react-icons/ri";
 import { useScroll, motion, useTransform } from "motion/react";
 import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
+import { SignedIn } from "@clerk/react-router";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -109,16 +114,18 @@ export const AppHeader = () => {
             </Link>
           </Box>
 
-          <IconButton to="/notifications" pos="relative">
-            <RiNotificationLine size={16} />
-            <styled.span srOnly>Notifications</styled.span>
-            <NotificationsBadge />
-          </IconButton>
+          <SignedIn>
+            <IconButton to="/notifications" pos="relative">
+              <RiNotificationLine size={16} />
+              <styled.span srOnly>Notifications</styled.span>
+              <NotificationsBadge />
+            </IconButton>
 
-          {/* <IconButton to="/inbox">
-            <RiChat3Line size={16} />
-            <styled.span srOnly>Inbox</styled.span>
-          </IconButton> */}
+            <IconButton to="/inbox">
+              <RiChat3Line size={16} />
+              <styled.span srOnly>Inbox</styled.span>
+            </IconButton>
+          </SignedIn>
         </motion.div>
       </motion.div>
 

@@ -162,11 +162,12 @@ const FinalResults = () => {
           <Flex
             key={driver.id}
             overflow="hidden"
-            style={{
-              // @ts-ignore
-              "--bg": bgColor,
-              "--ml": i === 0 ? 0 : i === 1 ? "12px" : "24px",
-            }}
+            style={
+              {
+                "--bg": bgColor,
+                "--ml": i === 0 ? 0 : i === 1 ? "12px" : "24px",
+              } as React.CSSProperties
+            }
             bgColor="var(--bg)"
             ml="var(--ml)"
             rounded="xl"

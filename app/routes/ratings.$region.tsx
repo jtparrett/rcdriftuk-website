@@ -89,11 +89,12 @@ const Row = ({
 
   return (
     <Box
-      style={{
-        // @ts-ignore
-        "--row-bg": bg,
-        "--row-hover": hover,
-      }}
+      style={
+        {
+          "--row-bg": bg,
+          "--row-hover": hover,
+        } as React.CSSProperties
+      }
       transition="all 0.2s"
       _hover={{
         md: {
@@ -278,10 +279,11 @@ const RankSection = () => {
                   borderColor="gray.800"
                   rounded="lg"
                   bgColor="var(--rank-bg)"
-                  style={{
-                    // @ts-ignore
-                    "--rank-bg": bg,
-                  }}
+                  style={
+                    {
+                      "--rank-bg": bg,
+                    } as React.CSSProperties
+                  }
                 >
                   <styled.img src={`/badges/${rank}.png`} w={8} alt={rank} />
                   <styled.p fontSize="sm" fontWeight="medium">

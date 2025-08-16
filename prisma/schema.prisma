@@ -287,6 +287,7 @@ model Users {
   notifications           UserNotifications[]
   notificationsLastReadAt DateTime            @default(now())
   pushToken               String?
+  threads                 ThreadUsers[]
 
   @@index([elo])
   @@index([totalBattles])
@@ -455,6 +456,46 @@ model UserNotifications {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model Threads {
+  id        Int              @id @default(autoincrement())
+  createdAt DateTime         @default(now())
+  messages  ThreadMessages[]
+  users     ThreadUsers[]
+
+  @@index([createdAt])
+}
+
+model ThreadUsers {
+  id        Int              @id @default(autoincrement())
+  createdAt DateTime         @default(now())
+  threadId  Int
+  userId    String
+  user      Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread    Threads          @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  messages  ThreadMessages[]
+
+  @@unique([threadId, userId])
+  @@index([threadId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, threadId])
+}
+
+model ThreadMessages {
+  id           Int         @id @default(autoincrement())
+  threadId     Int
+  content      String
+  createdAt    DateTime    @default(now())
+  threadUserId Int
+  threadUser   ThreadUsers @relation(fields: [threadUserId], references: [id], onDelete: Cascade)
+  thread       Threads     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([threadUserId])
+  @@index([createdAt])
+  @@index([threadId, createdAt])
 }
 
 enum TrackTypes {

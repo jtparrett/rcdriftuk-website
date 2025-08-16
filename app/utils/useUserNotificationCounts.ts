@@ -17,7 +17,7 @@ export const useUserNotificationCounts = () => {
         })
         .parse(data);
     },
-    refetchInterval: 60000,
+    refetchInterval: 30000,
     enabled: !!userId,
     initialData: {
       unreadNotifications: 0,

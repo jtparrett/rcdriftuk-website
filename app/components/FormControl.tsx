@@ -12,12 +12,13 @@ export const FormControl = ({ error, children, ...props }: Props) => {
   return (
     <Box
       {...props}
-      style={{
-        // @ts-expect-error
-        "--border-color": error
-          ? token("colors.brand.500")
-          : token("colors.gray.800"),
-      }}
+      style={
+        {
+          "--border-color": error
+            ? token("colors.brand.500")
+            : token("colors.gray.800"),
+        } as React.CSSProperties
+      }
       className={css({
         "& > *": {
           borderColor: "var(--border-color) !important",
