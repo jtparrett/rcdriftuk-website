@@ -1,7 +1,7 @@
 import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
 import { Link, useLocation, useNavigation } from "react-router";
 import { Button, LinkButton } from "./Button";
-import { RiMenuFill, RiNotificationLine } from "react-icons/ri";
+import { RiChat3Line, RiMenuFill, RiNotificationLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { SignedOut } from "@clerk/react-router";
@@ -115,7 +115,7 @@ export const Header = ({ user }: Props) => {
       transform="translate3d(0, 0, 0)"
     >
       <Container maxW={1100} w="full" px={4} h="64px">
-        <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={2}>
+        <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={1}>
           <Link to="/" viewTransition>
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
           </Link>
@@ -178,6 +178,19 @@ export const Header = ({ user }: Props) => {
                 <styled.span srOnly>Notifications</styled.span>
                 <NotificationsBadge />
               </LinkButton>
+
+              {/* <LinkButton
+                to="/inbox"
+                pos="relative"
+                w={10}
+                h={10}
+                variant="outline"
+                px={0}
+                py={0}
+              >
+                <RiChat3Line size={16} />
+                <styled.span srOnly>Inbox</styled.span>
+              </LinkButton> */}
 
               <Link to={`/drivers/${user.driverId}`}>
                 <styled.div

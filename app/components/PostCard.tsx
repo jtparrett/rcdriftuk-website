@@ -250,10 +250,11 @@ export const PostCard = ({
               gap={1}
               key={comment.id}
               px={4}
-              style={{
-                // @ts-ignore
-                "--order": index,
-              }}
+              style={
+                {
+                  "--order": index,
+                } as React.CSSProperties
+              }
               order="var(--order)"
             >
               <Flex alignItems="flex-start" gap={2}>
