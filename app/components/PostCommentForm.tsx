@@ -40,6 +40,7 @@ export const PostCommentForm = ({
     : null;
 
   const formik = useFormik({
+    isInitialValid: false,
     validationSchema,
     initialValues: {
       comment: initialComment ?? "",

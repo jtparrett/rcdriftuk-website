@@ -179,7 +179,7 @@ export const Header = ({ user }: Props) => {
                 <NotificationsBadge />
               </LinkButton>
 
-              <LinkButton
+              {/* <LinkButton
                 to="/inbox"
                 pos="relative"
                 w={10}
@@ -190,7 +190,7 @@ export const Header = ({ user }: Props) => {
               >
                 <RiChat3Line size={16} />
                 <styled.span srOnly>Inbox</styled.span>
-              </LinkButton>
+              </LinkButton> */}
 
               <Link to={`/drivers/${user.driverId}`}>
                 <styled.div

@@ -121,10 +121,10 @@ export const AppHeader = () => {
               <NotificationsBadge />
             </IconButton>
 
-            <IconButton to="/inbox">
+            {/* <IconButton to="/inbox">
               <RiChat3Line size={16} />
               <styled.span srOnly>Inbox</styled.span>
-            </IconButton>
+            </IconButton> */}
           </SignedIn>
         </motion.div>
       </motion.div>

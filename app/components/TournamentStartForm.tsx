@@ -7,7 +7,7 @@ import { Regions, TournamentsFormat } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
-import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
+import { RiDeleteBinFill, RiDraggable, RiShuffleLine } from "react-icons/ri";
 import { StepDot } from "./StepDot";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
@@ -24,11 +24,13 @@ const PeopleForm = ({
   defaultValue,
   name,
   allowNewDrivers = false,
+  allowRandomize = false,
 }: {
   users: GetUsers;
   defaultValue: number[];
   name: string;
   allowNewDrivers?: boolean;
+  allowRandomize?: boolean;
 }) => {
   const [value, onChange] = useState<(number | string)[]>(defaultValue);
   const [focused, setFocused] = useState(false);
@@ -46,6 +48,20 @@ const PeopleForm = ({
 
   return (
     <Box>
+      {allowRandomize && (
+        <Button
+          variant="outline"
+          size="sm"
+          mb={2}
+          type="button"
+          onClick={() => {
+            onChange([...value].sort(() => Math.random() - 0.5));
+          }}
+        >
+          <RiShuffleLine /> Randomize Order
+        </Button>
+      )}
+
       {value.length > 0 && (
         <Box
           bgColor="gray.900"
@@ -131,7 +147,7 @@ const PeopleForm = ({
       <Box pos="relative">
         <Input
           placeholder="Type to search..."
-          onBlur={(e) => {
+          onBlur={(_e) => {
             setTimeout(() => {
               const active = document.activeElement;
               const listbox = document.querySelector('[role="listbox"]');
@@ -273,6 +289,7 @@ export const TournamentStartForm = ({
 
             <PeopleForm
               allowNewDrivers
+              allowRandomize
               users={users}
               defaultValue={Array.from(
                 new Set([
