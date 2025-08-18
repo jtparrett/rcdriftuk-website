@@ -65,6 +65,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       elo_APAC: true,
       elo_LATAM: true,
       elo_MEA: true,
+      elo_SA: true,
       totalBattles: true,
       carSetupChanges: {
         orderBy: {
@@ -243,6 +244,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       elo_APAC: adjustDriverElo(driver.elo_APAC, driver.lastBattleDate),
       elo_LATAM: adjustDriverElo(driver.elo_LATAM, driver.lastBattleDate),
       elo_MEA: adjustDriverElo(driver.elo_MEA, driver.lastBattleDate),
+      elo_SA: adjustDriverElo(driver.elo_SA, driver.lastBattleDate),
       inactivityPenalty: calculateInactivityPenaltyOverPeriod(
         driver.lastBattleDate,
         new Date(),

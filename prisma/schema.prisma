@@ -271,6 +271,7 @@ model Users {
   elo_APAC                Float               @default(1000)
   elo_LATAM               Float               @default(1000)
   elo_MEA                 Float               @default(1000)
+  elo_SA                  Float               @default(1000)
   totalBattles            Int                 @default(0)
   events                  EventResponses[]
   Tournaments             Tournaments[]

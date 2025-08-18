@@ -46,7 +46,7 @@ const REGION_LOCATIONS = {
     lng: -60,
     zoom: 3,
   },
-  [Regions.MEA]: {
+  [Regions.SA]: {
     lat: 25,
     lng: 45,
     zoom: 2,

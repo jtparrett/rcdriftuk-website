@@ -31,6 +31,7 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
       elo_APAC: true,
       elo_LATAM: true,
       elo_MEA: true,
+      elo_SA: true,
       image: true,
       team: true,
       totalBattles: true,
@@ -48,6 +49,7 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
       elo_APAC: adjustDriverElo(user.elo_APAC, user.lastBattleDate),
       elo_LATAM: adjustDriverElo(user.elo_LATAM, user.lastBattleDate),
       elo_MEA: adjustDriverElo(user.elo_MEA, user.lastBattleDate),
+      elo_SA: adjustDriverElo(user.elo_SA, user.lastBattleDate),
     }))
     .sort((a, b) => b.elo - a.elo);
 };
