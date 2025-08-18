@@ -265,9 +265,9 @@ const run = async () => {
   await computeRatingsForRegion(Regions.UK);
   await computeRatingsForRegion(Regions.EU);
   await computeRatingsForRegion(Regions.NA);
-  await computeRatingsForRegion(Regions.APAC);
-  await computeRatingsForRegion(Regions.LATAM);
-  await computeRatingsForRegion(Regions.SA);
+  await computeRatingsForRegion(Regions.ZA);
+  await computeRatingsForRegion(Regions.LA);
+  await computeRatingsForRegion(Regions.AP);
 };
 
 run().catch((error) => {

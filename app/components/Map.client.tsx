@@ -36,20 +36,20 @@ const REGION_LOCATIONS = {
     lng: -98.6,
     zoom: 3,
   },
-  [Regions.APAC]: {
-    lat: 35.936876,
-    lng: 138.362503,
-    zoom: 3,
+  [Regions.ZA]: {
+    lat: 25,
+    lng: 45,
+    zoom: 2,
   },
-  [Regions.LATAM]: {
+  [Regions.LA]: {
     lat: -14,
     lng: -60,
     zoom: 3,
   },
-  [Regions.SA]: {
-    lat: 25,
-    lng: 45,
-    zoom: 2,
+  [Regions.AP]: {
+    lat: 35.936876,
+    lng: 138.362503,
+    zoom: 3,
   },
 };
 

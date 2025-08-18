@@ -268,10 +268,9 @@ model Users {
   elo_UK                  Float               @default(1000)
   elo_EU                  Float               @default(1000)
   elo_NA                  Float               @default(1000)
-  elo_APAC                Float               @default(1000)
-  elo_LATAM               Float               @default(1000)
-  elo_MEA                 Float               @default(1000)
-  elo_SA                  Float               @default(1000)
+  elo_ZA                  Float               @default(1000)
+  elo_LA                  Float               @default(1000)
+  elo_AP                  Float               @default(1000)
   totalBattles            Int                 @default(0)
   events                  EventResponses[]
   Tournaments             Tournaments[]
@@ -550,8 +549,7 @@ enum Regions {
   UK
   EU
   NA
-  APAC
-  LATAM
-  SA
-  MEA
+  ZA
+  LA
+  AP
 }
