@@ -551,5 +551,6 @@ enum Regions {
   NA
   APAC
   LATAM
+  SA
   MEA
 }

@@ -67,7 +67,7 @@ export const Regions = {
   NA: "NA",
   APAC: "APAC",
   LATAM: "LATAM",
-  MEA: "MEA",
+  SA: "SA",
 } as const;
 
 export type Regions = Values<typeof Regions>;
