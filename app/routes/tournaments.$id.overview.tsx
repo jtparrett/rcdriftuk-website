@@ -1,9 +1,10 @@
 import { TournamentsState } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { capitalCase } from "change-case";
+import { capitalCase, sentenceCase } from "change-case";
 import { z } from "zod";
 import { Glow } from "~/components/Glow";
+import numberToWords from "number-to-words";
 import {
   AspectRatio,
   Box,
@@ -15,10 +16,15 @@ import {
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { motion } from "motion/react";
-import { RiTrophyLine } from "react-icons/ri";
+import {
+  RiArrowLeftDoubleFill,
+  RiArrowRightDoubleFill,
+  RiTrophyLine,
+} from "react-icons/ri";
 import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { useIsEmbed } from "~/utils/EmbedContext";
 import { getRankColor, RANKS } from "~/utils/getDriverRank";
+import { css } from "~/styled-system/css";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -79,6 +85,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                   image: true,
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
             },
@@ -90,6 +97,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                   image: true,
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
             },
@@ -120,15 +128,15 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                   image: true,
                   firstName: true,
                   lastName: true,
-                },
-              },
-              laps: {
-                where: {
-                  scores: {
-                    none: {},
+                  driverId: true,
+                  carSetupChanges: {
+                    where: {
+                      type: "CHASSIS",
+                    },
                   },
                 },
               },
+              laps: true,
             },
           },
         },
@@ -243,6 +251,134 @@ const FinalResults = () => {
     </Flex>
   );
 };
+
+const RightInfoBox = ({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      className={css({
+        display: "flex",
+        overflow: "hidden",
+      })}
+      initial={{ x: 200, opacity: 0, filter: "blur(8px)" }}
+      animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut",
+        delay,
+      }}
+    >
+      <Spacer />
+      <Box
+        bgGradient="to-b"
+        gradientFrom="gray.800"
+        gradientTo="gray.900"
+        py={2}
+        pl={{ base: 4, md: 8 }}
+        pr={{ base: 4, md: 10 }}
+        transform="skewX(-16deg)"
+        mr={-2}
+        borderLeftWidth={4}
+        borderColor="brand.500"
+        whiteSpace="nowrap"
+      >
+        <Box transform="skewX(16deg)" textAlign="right">
+          {children}
+        </Box>
+      </Box>
+    </motion.div>
+  );
+};
+
+const DriverNameBoxLeft = ({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      className={css({
+        pos: "absolute",
+        bottom: 0,
+        left: 0,
+      })}
+      initial={{ x: -200, opacity: 0, filter: "blur(8px)" }}
+      animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut",
+        delay,
+      }}
+    >
+      <Box
+        ml={-4}
+        pl={{ base: 4, md: 8 }}
+        pr={{ base: 2, md: 6 }}
+        py={{ base: 1, md: 2 }}
+        bgColor="rgba(242, 12, 78, 0.9)"
+        zIndex={2}
+        backdropFilter="blur(8px)"
+        transform="skewX(16deg)"
+        whiteSpace="nowrap"
+        w="fit-content"
+        minW="120%"
+      >
+        <Box transform="skewX(-16deg)">{children}</Box>
+      </Box>
+    </motion.div>
+  );
+};
+
+const DriverNameBoxRight = ({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      className={css({
+        pos: "absolute",
+        bottom: 0,
+        right: 0,
+        display: "flex",
+        justifyContent: "flex-end",
+      })}
+      initial={{ x: 200, opacity: 0, filter: "blur(8px)" }}
+      animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut",
+        delay,
+      }}
+    >
+      <Box
+        mr={-4}
+        pl={{ base: 2, md: 6 }}
+        pr={{ base: 4, md: 8 }}
+        py={{ base: 1, md: 2 }}
+        bgColor="rgba(242, 12, 78, 0.9)"
+        zIndex={2}
+        backdropFilter="blur(8px)"
+        transform="skewX(-16deg)"
+        whiteSpace="nowrap"
+        w="fit-content"
+        minW="120%"
+      >
+        <Box transform="skewX(16deg)">{children}</Box>
+      </Box>
+    </motion.div>
+  );
+};
+
 const TournamentsOverviewPage = () => {
   const tournament = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
@@ -269,6 +405,7 @@ const TournamentsOverviewPage = () => {
       borderColor="gray.800"
       minH={isEmbed ? "100dvh" : "60dvh"}
       className="main"
+      letterSpacing="tight"
     >
       <Center
         flexGrow={1}
@@ -282,6 +419,7 @@ const TournamentsOverviewPage = () => {
         rounded="2xl"
         borderColor="gray.800"
         className="bg"
+        px={2}
       >
         <Box
           bgColor="black"
@@ -313,12 +451,18 @@ const TournamentsOverviewPage = () => {
               borderTopRadius="11px"
               boxShadow="inset 0 1px rgba(255, 255, 255, 0.3)"
             >
-              <styled.p fontWeight="semibold">
+              <styled.p
+                fontSize="xl"
+                fontWeight="extrabold"
+                textTransform="uppercase"
+                textShadow="1px 1px 2px rgba(0, 0, 0, 0.5)"
+              >
+                {tournament.name} |{" "}
                 {capitalCase(
                   tournament.state === TournamentsState.END
                     ? "Final Result"
                     : tournament.state,
-                )}
+                )}{" "}
               </styled.p>
             </Box>
 
@@ -326,100 +470,214 @@ const TournamentsOverviewPage = () => {
 
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
-                <>
-                  <Box p={4}>
-                    <styled.p fontSize="lg" fontWeight="extrabold">
-                      {tournament.nextQualifyingLap.driver.user.firstName}{" "}
-                      {tournament.nextQualifyingLap.driver.user.lastName}
-                    </styled.p>
-                    {!qualiJudgingComplete && (
-                      <styled.p fontSize="sm" color="gray.400">
-                        Qualifying Run {qualifyingRun}
+                <Flex w={600} maxW="full" key={tournament.nextQualifyingLapId}>
+                  <Box
+                    pos="relative"
+                    _after={{
+                      content: '""',
+                      pos: "absolute",
+                      inset: 0,
+                      bgGradient: "radial",
+                      gradientFrom: "rgba(0, 0, 0, 0)",
+                      gradientTo: "gray.950",
+                      zIndex: 1,
+                    }}
+                    zIndex={1}
+                    w="40%"
+                  >
+                    <motion.div
+                      initial={{ x: -200, opacity: 0, filter: "blur(8px)" }}
+                      animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+                      transition={{
+                        duration: 0.3,
+                        ease: "easeInOut",
+                      }}
+                      className={css({
+                        w: "full",
+                      })}
+                    >
+                      <AspectRatio w="full" ratio={0.75}>
+                        <styled.img
+                          src={
+                            tournament.nextQualifyingLap.driver.user.image ??
+                            "/blank-driver-right.jpg"
+                          }
+                        />
+                      </AspectRatio>
+                    </motion.div>
+                    <DriverNameBoxLeft>
+                      <styled.p
+                        fontSize={{ base: "sm", md: "lg" }}
+                        fontWeight="extrabold"
+                        textTransform="uppercase"
+                        fontStyle="italic"
+                        textShadow="1px 1px 2px rgba(0, 0, 0, 0.5)"
+                      >
+                        {tournament.nextQualifyingLap.driver.user.firstName}{" "}
+                        {tournament.nextQualifyingLap.driver.user.lastName} #
+                        {tournament.nextQualifyingLap.driver.user.driverId}
                       </styled.p>
-                    )}
+                    </DriverNameBoxLeft>
                   </Box>
 
-                  {qualiJudgingComplete && (
-                    <Box>
-                      <styled.p fontSize="6xl" fontWeight="extrabold" pb={4}>
-                        {sumScores(
-                          tournament.nextQualifyingLap.scores,
-                          tournament.judges.length,
+                  <Flex
+                    flex={1}
+                    flexDir="column"
+                    gap={2}
+                    justify="center"
+                    pb={12}
+                  >
+                    {!qualiJudgingComplete && (
+                      <>
+                        <RightInfoBox delay={0}>
+                          <styled.p
+                            fontWeight="bold"
+                            fontSize={{ base: "md", md: "xl" }}
+                          >
+                            {numberToWords.toOrdinal(qualifyingRun)} Qualifying
+                            Run
+                          </styled.p>
+                        </RightInfoBox>
+
+                        {tournament.nextQualifyingLap.driver?.user.carSetupChanges.map(
+                          (change, index) => {
+                            return (
+                              <RightInfoBox
+                                key={change.id}
+                                delay={0.1 * (index + 1)}
+                              >
+                                <styled.p
+                                  fontWeight="bold"
+                                  fontSize={{ base: "md", md: "xl" }}
+                                >
+                                  {sentenceCase(change.type.toLowerCase())}:{" "}
+                                  {change.value}
+                                </styled.p>
+                              </RightInfoBox>
+                            );
+                          },
                         )}
-                      </styled.p>
-                      <Flex textAlign="center" gap="1px">
+
+                        <RightInfoBox
+                          delay={
+                            0.1 *
+                            (tournament.nextQualifyingLap.driver?.user
+                              .carSetupChanges.length +
+                              1)
+                          }
+                        >
+                          <styled.p
+                            fontWeight="bold"
+                            fontSize={{ base: "md", md: "xl" }}
+                          >
+                            Home Track: N/A
+                          </styled.p>
+                        </RightInfoBox>
+                      </>
+                    )}
+
+                    {qualiJudgingComplete && (
+                      <>
+                        <RightInfoBox>
+                          <styled.p
+                            fontSize={{ base: "4xl", md: "6xl" }}
+                            fontWeight="black"
+                            pr={20}
+                          >
+                            {sumScores(
+                              tournament.nextQualifyingLap.scores,
+                              tournament.judges.length,
+                            )}{" "}
+                          </styled.p>
+                        </RightInfoBox>
+
                         {tournament.nextQualifyingLap.scores.map((score, i) => {
                           return (
-                            <Box
-                              key={i}
-                              flex={1}
-                              lineHeight="1"
-                              py={2}
-                              bgColor="gray.900"
-                            >
-                              <styled.p fontSize="lg">{score.score}</styled.p>
+                            <RightInfoBox key={i} delay={0.1 * (i + 1)}>
                               <styled.p fontSize="sm">
-                                {score.judge.user.firstName}{" "}
-                                {score.judge.user.lastName}
+                                {score.judge.user.firstName}: {score.score}
                               </styled.p>
-                            </Box>
+                            </RightInfoBox>
                           );
                         })}
-                      </Flex>
-                    </Box>
-                  )}
-                </>
+                      </>
+                    )}
+                  </Flex>
+                </Flex>
               )}
 
             {tournament?.state === TournamentsState.BATTLES &&
               tournament.nextBattle && (
-                <Flex w={isEmbed ? 1100 : 700} maxW="full">
-                  <Box
-                    flex={1}
-                    borderRightWidth={1}
-                    borderColor="brand.500"
-                    overflow="hidden"
-                  >
-                    <AspectRatio ratio={0.75} w="full">
-                      <styled.img
-                        src={
-                          tournament.nextBattle.driverLeft?.user.image ??
-                          "/blank-driver-left.jpg"
-                        }
-                      />
-                    </AspectRatio>
-                    <styled.p
-                      w="full"
-                      textOverflow="ellipsis"
-                      overflow="hidden"
-                      whiteSpace="nowrap"
-                      fontSize={{ base: "sm", md: "lg" }}
-                      fontWeight="extrabold"
-                      py={2}
+                <Flex
+                  w={isEmbed ? 900 : 700}
+                  maxW="full"
+                  key={tournament.nextBattleId}
+                >
+                  <Box flex={1} pos="relative">
+                    <motion.div
+                      initial={{ x: -200, opacity: 0, filter: "blur(8px)" }}
+                      animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+                      transition={{
+                        duration: 0.3,
+                        ease: "easeInOut",
+                      }}
                     >
-                      {tournament.nextBattle.driverLeft?.user.firstName}{" "}
-                      {tournament.nextBattle.driverLeft?.user.lastName}
-                    </styled.p>
+                      <AspectRatio ratio={0.75} w="full">
+                        <styled.img
+                          src={
+                            tournament.nextBattle.driverLeft?.user.image ??
+                            "/blank-driver-left.jpg"
+                          }
+                        />
+                      </AspectRatio>
+                    </motion.div>
+
+                    <DriverNameBoxLeft delay={0.1}>
+                      <styled.p
+                        fontSize={{ base: "sm", md: "lg" }}
+                        fontWeight="extrabold"
+                        textTransform="uppercase"
+                        fontStyle="italic"
+                        textShadow="1px 1px 2px rgba(0, 0, 0, 0.5)"
+                      >
+                        {tournament.nextBattle.driverLeft?.user.firstName}{" "}
+                        {tournament.nextBattle.driverLeft?.user.lastName} #
+                        {tournament.nextBattle.driverLeft?.user.driverId}
+                      </styled.p>
+                    </DriverNameBoxLeft>
                   </Box>
                   <Box
                     flex={1.2}
-                    py={{ base: 8, md: 12 }}
                     pos="relative"
                     zIndex={1}
+                    py={1}
                     _after={{
                       content: '""',
                       pos: "absolute",
                       top: 0,
                       bottom: 0,
-                      w: "1px",
+                      w: "3px",
+                      left: "50%",
                       bgColor: "gray.800",
                       zIndex: -1,
                     }}
                   >
                     {battleJudgingComplete && (
                       <>
-                        {tournament.nextBattle.BattleVotes.map((vote, i) => {
+                        {[
+                          tournament.nextBattle.BattleVotes[0],
+                          tournament.nextBattle.BattleVotes[0],
+                          tournament.nextBattle.BattleVotes[0],
+                        ].map((vote, i) => {
                           const winnerDirection =
+                            vote.winnerId === null
+                              ? undefined
+                              : vote.winnerId ===
+                                  tournament.nextBattle?.driverLeftId
+                                ? "left"
+                                : "right";
+
+                          const winnerX =
                             vote.winnerId === null
                               ? "0%"
                               : vote.winnerId ===
@@ -430,22 +688,24 @@ const TournamentsOverviewPage = () => {
                           return (
                             <motion.div
                               key={i}
-                              animate={{ x: winnerDirection }}
+                              animate={{ x: winnerX }}
                               transition={{
                                 duration: 1,
                                 ease: "anticipate",
+                                delay: 0.1 * i,
                               }}
                             >
                               <Box
-                                rounded="xl"
                                 bgGradient="to-b"
                                 gradientFrom="brand.500"
                                 gradientTo="brand.700"
-                                w={{ base: "85px", md: "120px" }}
+                                w="fit-content"
                                 mx="auto"
-                                mb={2}
                                 py={2}
+                                px={1}
+                                rounded="md"
                                 textAlign="center"
+                                mb={0.5}
                               >
                                 <styled.p
                                   fontWeight="bold"
@@ -454,18 +714,41 @@ const TournamentsOverviewPage = () => {
                                   whiteSpace="nowrap"
                                   textOverflow="ellipsis"
                                   overflow="hidden"
+                                  color="brand.100"
+                                  display={{
+                                    base: "none",
+                                    md: "block",
+                                  }}
                                 >
                                   {vote.judge.user.firstName}{" "}
                                   {vote.judge.user.lastName}
                                 </styled.p>
-                                <styled.p
-                                  lineHeight={1}
-                                  fontSize={{ base: "sm", md: "lg" }}
-                                  fontWeight="extrabold"
-                                  textTransform="uppercase"
-                                >
-                                  {vote.omt ? "OMT" : "Advance"}
-                                </styled.p>
+                                <Flex align="center" justify="center">
+                                  <Box
+                                    style={{
+                                      opacity:
+                                        winnerDirection === "left" ? 1 : 0.3,
+                                    }}
+                                  >
+                                    <RiArrowLeftDoubleFill />
+                                  </Box>
+                                  <styled.p
+                                    lineHeight={1}
+                                    fontSize={{ base: "sm", md: "lg" }}
+                                    fontWeight="extrabold"
+                                    textTransform="uppercase"
+                                  >
+                                    {vote.omt ? "OMT" : "Advance"}
+                                  </styled.p>
+                                  <Box
+                                    style={{
+                                      opacity:
+                                        winnerDirection === "right" ? 1 : 0.3,
+                                    }}
+                                  >
+                                    <RiArrowRightDoubleFill />
+                                  </Box>
+                                </Flex>
                               </Box>
                             </motion.div>
                           );
@@ -473,32 +756,38 @@ const TournamentsOverviewPage = () => {
                       </>
                     )}
                   </Box>
-                  <Box
-                    flex={1}
-                    borderLeftWidth={1}
-                    borderColor="brand.500"
-                    overflow="hidden"
-                  >
-                    <AspectRatio ratio={0.75} w="full">
-                      <styled.img
-                        src={
-                          tournament.nextBattle.driverRight?.user.image ??
-                          "/blank-driver-right.jpg"
-                        }
-                      />
-                    </AspectRatio>
-                    <styled.p
-                      w="full"
-                      textOverflow="ellipsis"
-                      overflow="hidden"
-                      whiteSpace="nowrap"
-                      fontSize={{ base: "sm", md: "lg" }}
-                      fontWeight="extrabold"
-                      py={2}
+                  <Box flex={1} pos="relative">
+                    <motion.div
+                      initial={{ x: 200, opacity: 0, filter: "blur(8px)" }}
+                      animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+                      transition={{
+                        duration: 0.3,
+                        ease: "easeInOut",
+                      }}
                     >
-                      {tournament.nextBattle.driverRight?.user.firstName}{" "}
-                      {tournament.nextBattle.driverRight?.user.lastName}
-                    </styled.p>
+                      <AspectRatio ratio={0.75} w="full">
+                        <styled.img
+                          src={
+                            tournament.nextBattle.driverRight?.user.image ??
+                            "/blank-driver-right.jpg"
+                          }
+                        />
+                      </AspectRatio>
+                    </motion.div>
+
+                    <DriverNameBoxRight delay={0.1}>
+                      <styled.p
+                        fontSize={{ base: "sm", md: "lg" }}
+                        fontWeight="extrabold"
+                        textTransform="uppercase"
+                        fontStyle="italic"
+                        textShadow="1px 1px 2px rgba(0, 0, 0, 0.5)"
+                      >
+                        {tournament.nextBattle.driverRight?.user.firstName}{" "}
+                        {tournament.nextBattle.driverRight?.user.lastName} #
+                        {tournament.nextBattle.driverRight?.user.driverId}
+                      </styled.p>
+                    </DriverNameBoxRight>
                   </Box>
                 </Flex>
               )}
