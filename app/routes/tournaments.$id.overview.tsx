@@ -377,7 +377,7 @@ const DriverNameBoxRight = ({
     <motion.div
       className={css({
         pos: "absolute",
-        bottom: 0,
+        top: 0,
         right: 0,
         display: "flex",
         justifyContent: "flex-end",
@@ -396,13 +396,13 @@ const DriverNameBoxRight = ({
         gradientFrom="brand.500"
         gradientTo="brand.700"
         zIndex={2}
-        transform="skewX(-16deg)"
+        transform="skewX(16deg)"
         whiteSpace="nowrap"
         w="fit-content"
-        shadow="0 -4px 8px rgba(0, 0, 0, 0.2)"
-        borderTopLeftRadius="xl"
+        shadow="0 4px 8px rgba(0, 0, 0, 0.2)"
+        borderBottomLeftRadius="xl"
       >
-        <Flex transform="skewX(16deg)">
+        <Flex transform="skewX(-16deg)">
           <styled.p
             fontWeight="semibold"
             textTransform="uppercase"
@@ -419,11 +419,11 @@ const DriverNameBoxRight = ({
             py={{ base: 1, md: 2 }}
             pl={3}
             pr={7}
-            transform="skewX(-16deg)"
+            transform="skewX(16deg)"
           >
             <styled.p
               fontWeight="semibold"
-              transform="skewX(16deg)"
+              transform="skewX(-16deg)"
               fontSize={{ base: "sm", md: "lg" }}
             >
               {driverNo}
@@ -681,6 +681,7 @@ const TournamentsOverviewPage = () => {
                   w={isEmbed ? 900 : 700}
                   maxW="full"
                   key={tournament.nextBattleId}
+                  overflow="hidden"
                 >
                   <Box
                     flex={1}
@@ -722,11 +723,13 @@ const TournamentsOverviewPage = () => {
                       driverNo={tournament.nextBattle.driverLeft?.user.driverId}
                     />
                   </Box>
-                  <Box
+                  <Flex
                     flex={1.2}
                     pos="relative"
+                    justifyContent="center"
+                    flexDir="column"
                     zIndex={1}
-                    py={1}
+                    pb={8}
                     _after={{
                       content: '""',
                       pos: "absolute",
@@ -827,7 +830,7 @@ const TournamentsOverviewPage = () => {
                         })}
                       </>
                     )}
-                  </Box>
+                  </Flex>
                   <Box
                     flex={1}
                     pos="relative"
