@@ -452,10 +452,11 @@ const TournamentsOverviewPage = () => {
               boxShadow="inset 0 1px rgba(255, 255, 255, 0.3)"
             >
               <styled.p
-                fontSize="xl"
+                fontSize={{ base: "md", md: "xl" }}
                 fontWeight="extrabold"
                 textTransform="uppercase"
                 textShadow="1px 1px 2px rgba(0, 0, 0, 0.5)"
+                lineHeight={1.1}
               >
                 {tournament.name} |{" "}
                 {capitalCase(
