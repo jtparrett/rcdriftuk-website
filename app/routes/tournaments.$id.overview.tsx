@@ -665,11 +665,7 @@ const TournamentsOverviewPage = () => {
                   >
                     {battleJudgingComplete && (
                       <>
-                        {[
-                          tournament.nextBattle.BattleVotes[0],
-                          tournament.nextBattle.BattleVotes[0],
-                          tournament.nextBattle.BattleVotes[0],
-                        ].map((vote, i) => {
+                        {tournament.nextBattle.BattleVotes.map((vote, i) => {
                           const winnerDirection =
                             vote.winnerId === null
                               ? undefined
