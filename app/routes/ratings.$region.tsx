@@ -32,6 +32,10 @@ export const meta: Route.MetaFunction = () => {
       "og:description":
         "Global RC Drift Driver Ratings, see where you rank amoungst some of the best drivers in the world.",
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

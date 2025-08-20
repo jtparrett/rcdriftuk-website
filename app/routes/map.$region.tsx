@@ -12,6 +12,10 @@ export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | Map" },
     { name: "description", content: "Welcome to RCDrift.uk" },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

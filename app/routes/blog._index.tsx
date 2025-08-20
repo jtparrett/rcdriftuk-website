@@ -13,6 +13,10 @@ export const meta: MetaFunction = () => {
       name: "description",
       content: "RC Drift UK's Insights Blog.",
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

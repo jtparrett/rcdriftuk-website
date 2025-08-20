@@ -14,7 +14,13 @@ import { TrackTournamentsForm } from "~/components/TrackTournamentsForm";
 import type { Route } from "./+types/edit.track.$slug";
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `RC Drift UK | ${data?.track.name} | Edit Track` }];
+  return [
+    { title: `RC Drift UK | ${data?.track.name} | Edit Track` },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
+  ];
 };
 
 export const loader = async (args: LoaderFunctionArgs) => {

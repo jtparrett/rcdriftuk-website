@@ -12,6 +12,10 @@ export const meta: Route.MetaFunction = ({ data }) => {
     return [
       { title: "RC Drift UK | Insights Blog" },
       { name: "description", content: "RC Drift UK's Insights Blog." },
+      {
+        property: "og:image",
+        content: "https://rcdrift.uk/og-image.jpg",
+      },
     ];
   }
 

@@ -234,7 +234,13 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `RC Drift UK | ${data?.tournament.name}` }];
+  return [
+    { title: `RC Drift UK | ${data?.tournament.name}` },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
+  ];
 };
 
 const TournamentPage = () => {

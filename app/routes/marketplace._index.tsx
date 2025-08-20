@@ -25,11 +25,14 @@ export const meta: Route.MetaFunction = () => {
   return [
     {
       title: `RC Drift UK | Marketplace`,
+    },
+    {
       description:
         "We've scraped shops from across the world to bring you a comprehensive parts marketplace.",
-      "og:title": "RC Drift UK | Marketplace",
-      "og:description":
-        "We've scraped shops from across the world to bring you a comprehensive parts marketplace.",
+    },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
     },
   ];
 };

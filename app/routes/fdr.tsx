@@ -27,6 +27,10 @@ export const meta: Route.MetaFunction = () => {
   return [
     { title: `RC Drift UK | FDR Calculator` },
     { name: "description", content: "Calculate your FDR" },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

@@ -16,6 +16,10 @@ export const meta: Route.MetaFunction = () => {
       content:
         "Here you can find a list of all the tracks from across the world.",
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

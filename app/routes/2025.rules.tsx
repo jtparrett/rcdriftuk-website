@@ -9,6 +9,10 @@ export const meta: Route.MetaFunction = () => {
       name: "description",
       content: "Official rules and regulations for RCDrift UK 2025 events",
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

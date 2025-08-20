@@ -10,6 +10,10 @@ export const meta: Route.MetaFunction = () => {
       content:
         "Official judging criteria and scoring system for RCDrift UK 2025 events",
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 

@@ -259,6 +259,10 @@ export const meta: Route.MetaFunction = ({ data }) => {
     {
       title: `RC Drift UK | Driver Ratings | ${data.driver.firstName} ${data.driver.lastName}`,
     },
+    {
+      property: "og:image",
+      content: "https://rcdrift.uk/og-image.jpg",
+    },
   ];
 };
 
