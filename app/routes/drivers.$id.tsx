@@ -35,6 +35,7 @@ import { TabsBar } from "~/components/TabsBar";
 import { CarSetupSummary } from "~/components/CarSetupSummary";
 import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
+import notFoundInvariant from "~/utils/notFoundInvariant";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -47,7 +48,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     user = await getUser(userId);
   }
 
-  const driver = await prisma.users.findFirstOrThrow({
+  const driver = await prisma.users.findFirst({
     where: {
       driverId,
     },
@@ -232,6 +233,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     },
   });
+
+  notFoundInvariant(driver, "Driver not found");
 
   return {
     driver: {
