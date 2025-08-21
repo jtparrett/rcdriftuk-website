@@ -264,45 +264,7 @@ const Page = () => {
           >
             <styled.section>
               <Container maxW={1100} px={0}>
-                <Intro number="01" title="Our Partners" />
-                <Flex gap={4} py={12} px={4} justify="space-around">
-                  {[
-                    ["zerofeel", "https://zerofeel.co.uk"],
-                    ["rcdn", "https://rc-driftnetwork.com/"],
-                    ["dm", "https://www.instagram.com/damnmillennials.rc"],
-                  ].map(([partner, url]) => (
-                    <Box
-                      w={{ base: "100px", md: "120px" }}
-                      h={12}
-                      key={partner}
-                      pos="relative"
-                      opacity={0.5}
-                      _hover={{
-                        md: {
-                          opacity: 1,
-                        },
-                      }}
-                      transition="opacity 0.2s ease-in-out"
-                    >
-                      <Link to={url} target="_blank">
-                        <styled.img
-                          src={`/${partner}.png`}
-                          w="full"
-                          h="full"
-                          objectFit="contain"
-                          alt={`${partner} logo`}
-                        />
-                        <styled.span srOnly>{partner}</styled.span>
-                      </Link>
-                    </Box>
-                  ))}
-                </Flex>
-              </Container>
-            </styled.section>
-
-            <styled.section>
-              <Container maxW={1100} px={0}>
-                <Intro number="02" title="Innovative Tools" />
+                <Intro number="01" title="What we do" />
 
                 <Flex gap={2} flexDir={{ base: "column", md: "row" }} p={2}>
                   <Card p={0} flex={1}>
@@ -455,7 +417,7 @@ const Page = () => {
         >
           <styled.section>
             <Container maxW={1100} px={0}>
-              <Intro number="03" title="For the Professionals" />
+              <Intro number="02" title="For the Professionals" />
               <Box
                 bgImage="url(/main-event-bg.jpg)"
                 bgSize="cover"
@@ -511,6 +473,44 @@ const Page = () => {
                   </Box>
                 </Flex>
               </Box>
+            </Container>
+          </styled.section>
+
+          <styled.section>
+            <Container maxW={1100} px={0}>
+              <Intro number="03" title="Our Partners" />
+              <Flex gap={4} py={12} px={4} justify="space-around">
+                {[
+                  ["zerofeel", "https://zerofeel.co.uk"],
+                  ["rcdn", "https://rc-driftnetwork.com/"],
+                  ["dm", "https://www.instagram.com/damnmillennials.rc"],
+                ].map(([partner, url]) => (
+                  <Box
+                    w={{ base: "100px", md: "120px" }}
+                    h={12}
+                    key={partner}
+                    pos="relative"
+                    opacity={0.5}
+                    _hover={{
+                      md: {
+                        opacity: 1,
+                      },
+                    }}
+                    transition="opacity 0.2s ease-in-out"
+                  >
+                    <Link to={url} target="_blank">
+                      <styled.img
+                        src={`/${partner}.png`}
+                        w="full"
+                        h="full"
+                        objectFit="contain"
+                        alt={`${partner} logo`}
+                      />
+                      <styled.span srOnly>{partner}</styled.span>
+                    </Link>
+                  </Box>
+                ))}
+              </Flex>
             </Container>
           </styled.section>
 
