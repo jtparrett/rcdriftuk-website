@@ -465,7 +465,7 @@ const Page = () => {
                       letterSpacing="tight"
                       lineHeight={1.1}
                     >
-                      RCDIO 2025
+                      2025 Season
                     </styled.h1>
                     <styled.p textWrap="balance" mb={4}>
                       The UK's professional RC Drifting Series.
