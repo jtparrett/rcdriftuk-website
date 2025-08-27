@@ -181,12 +181,11 @@ const GettingStartedPage = () => {
           <Box textAlign="center" mb={12}>
             <H1>Getting Started in RC Drifting: A Beginner's Guide</H1>
             <P maxW={600} mx="auto" mt={4} textWrap="balance">
-              Welcome to the exciting world of RC drifting! At RCDrift.uk, we're
-              here to help you start your drifting journey. Whether you're a
-              complete novice or have some RC experience, this guide will
-              provide you with everything you need to know to begin. RC drifting
-              combines skill, precision, and style, making it a thrilling and
-              rewarding hobby.
+              Welcome to the exciting world of RC drifting! We're here to help
+              you start your drifting journey. Whether you're a complete novice
+              or have some RC experience, this guide will provide you with
+              everything you need to know to begin. RC drifting combines skill,
+              precision, and style, making it a thrilling and rewarding hobby.
             </P>
           </Box>
 
@@ -200,9 +199,9 @@ const GettingStartedPage = () => {
               </P>
 
               <P>
-                <STRONG>Visit the RCDrift.uk map:</STRONG> Our website has a
-                comprehensive list of all the RC drifting events, tracks, clubs,
-                and shops across the world.
+                <STRONG>Visit our map:</STRONG> Our website has a comprehensive
+                list of all the RC drifting events, tracks, clubs, and shops
+                across the world.
               </P>
 
               <P>

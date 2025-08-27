@@ -36,8 +36,7 @@ import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK" },
-    { name: "description", content: "Welcome to RCDrift.uk" },
+    { title: "RC Drift UK | Driving the Future of RC Drifting" },
     {
       property: "og:image",
       content: "https://rcdrift.uk/og-image.jpg",

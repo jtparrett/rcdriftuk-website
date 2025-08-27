@@ -18,7 +18,7 @@ export const meta: Route.MetaFunction = () => {
     { title: "RC Drift UK | 2025" },
     {
       name: "description",
-      content: "Welcome to RCDrift.uk 2025",
+      content: "Welcome to the 2025 season",
     },
     {
       property: "og:image",
@@ -276,15 +276,16 @@ const Page = () => {
               <ImageContainer>
                 <styled.img
                   src="/2025-cover.jpg"
-                  alt="RCDrift UK 2025 Main Event"
+                  alt="2025 Main Event"
                   width="100%"
                 />
               </ImageContainer>
-              <H1>RC Drift UK 2025</H1>
+              <H1>2025 Season</H1>
               <P fontSize="lg" maxW={600} mx="auto" mt={2}>
-                We are thrilled to introduce "RCDrift.uk 2025," an innovative
-                platform that invites every driver and track to join the
-                excitement of a brand-new competitive format.
+                We are thrilled to be introducing the most competitive RC
+                drifting season ever - an innovative platform that welcomes
+                every driver and track to join an exciting new competitive
+                format.
               </P>
 
               <Box maxW={400} mx="auto" mt={6}>
@@ -319,7 +320,7 @@ const Page = () => {
                   <styled.li>10+ certified competitions</styled.li>
                   <styled.li>Hosted across the UK</styled.li>
                   <styled.li>Real-time results system</styled.li>
-                  <styled.li>RCDrift.uk prizes</styled.li>
+                  <styled.li>Branded prizes</styled.li>
                   <styled.li>Driver Rating contribution</styled.li>
                   <styled.li>Official judging criteria</styled.li>
                 </UL>
@@ -337,7 +338,7 @@ const Page = () => {
             <ImageContainer>
               <styled.img
                 src="/2025/tournament-structure.jpg"
-                alt="RCDrift UK 2025 Competition Structure"
+                alt="2025 Competition Structure"
                 width="100%"
               />
             </ImageContainer>
@@ -400,21 +401,20 @@ const Page = () => {
               </P>
 
               <P>
-                A qualifying standing will then be produced using the RCDrift.uk
-                driver ratings combined with the international qualifying
-                results, and used to seed the competition's double-elimination
-                battle tree.
+                A qualifying standing will then be produced using the driver
+                ratings combined with the international qualifying results, and
+                used to seed the competition's double-elimination battle tree.
               </P>
               <P>
-                RCDrift.uk will be running a high-end live stream production
-                across all social channels and on the RCDrift.uk website using
-                their real-time results software and talented production crew,
-                ensuring every moment of the action is captured in every detail
-                and shared with the world.
+                We will be running a high-end live stream production across all
+                social channels and on our website using their real-time results
+                software and talented production crew, ensuring every moment of
+                the action is captured in every detail and shared with the
+                world.
               </P>
               <P>
                 The competition winners will receive a large cash sum, prizes
-                from sponsors, and the title of the RCDrift.uk 2025 Champion.
+                from sponsors, and the title of the 2025 Champion.
               </P>
 
               <P>
@@ -450,7 +450,7 @@ const Page = () => {
               <ImageContainer>
                 <styled.img
                   src="/2025/prize-pool.jpg"
-                  alt="RCDrift UK 2025 Prize Pool"
+                  alt="2025 Prize Pool"
                   width="full"
                 />
               </ImageContainer>
@@ -458,7 +458,7 @@ const Page = () => {
               <ImageContainer>
                 <styled.img
                   src="/2025/rcdriftuk-map.jpg"
-                  alt="RCDrift UK 2025 Main Event Map"
+                  alt="2025 Main Event Map"
                   width="full"
                 />
               </ImageContainer>
@@ -564,15 +564,14 @@ const Page = () => {
               <ImageContainer>
                 <styled.img
                   src="/2025/feeder-round-logo.jpg"
-                  alt="RCDrift UK 2025 Feeder Rounds"
+                  alt="2025 Feeder Rounds"
                   width="100%"
                 />
               </ImageContainer>
               <P>
-                Feeder rounds are RCDrift.uk certified competitions hosted at
-                any U.K track or club. They are organised in partnership with
-                RCDrift.uk, ensuring tracks have control while receiving support
-                with:
+                Feeder rounds are certified competitions hosted at any U.K.
+                track or club. They are organised in partnership, ensuring
+                tracks maintain control while receiving support with:
               </P>
               <UL>
                 <styled.li>Prizes</styled.li>
@@ -589,8 +588,8 @@ const Page = () => {
 
             <CollapsibleCard title="International Participation">
               <P>
-                RCDrift.uk is proud to welcome drivers from all over the world
-                to compete in our events.
+                We are proud to welcome drivers from all over the world to
+                compete in our events.
               </P>
               <P>
                 To qualify for the main event, unranked non-UK residential
@@ -598,18 +597,16 @@ const Page = () => {
                 main event.
               </P>
               <P>
-                A qualifying standing will then be produced using the RCDrift.uk
-                driver ratings combined with the international qualifying
-                results, and used to seed the competition's double-elimination
-                battle tree.
+                A qualifying standing will then be produced using the driver
+                ratings combined with the international qualifying results, and
+                used to seed the competition's double-elimination battle tree.
               </P>
             </CollapsibleCard>
 
             <CollapsibleCard title="General Information">
               <P mb={2}>
-                All rules &amp; regulations governing RCDrift.uk-sanctioned
-                tournaments and events are available for review at the following
-                link:
+                All rules &amp; regulations governing sanctioned tournaments and
+                events are available for review at the following link:
               </P>
 
               <LinkButton to="/2025/rules">
@@ -651,9 +648,8 @@ const Page = () => {
               <Divider borderColor="gray.700" />
 
               <P>
-                RCDrift.uk now offers online driver profiles showing ratings,
-                ranks, and achievement badges. Sign up and claim your profile
-                today!
+                We are now offers online driver profiles showing ratings, ranks,
+                and achievement badges. Sign up and claim your profile today!
               </P>
 
               <ImageContainer>
@@ -663,8 +659,7 @@ const Page = () => {
 
             <CollapsibleCard title="Affiliations">
               <P mb={4}>
-                RCDrift.uk is proud to be affiliated with the following
-                organisations:
+                We are proud to be affiliated with the following organisations:
               </P>
 
               <Flex flexWrap="wrap" gap={4}>
@@ -716,7 +711,7 @@ const Page = () => {
                 <FAQHeader>
                   <H2>Frequently Asked Questions</H2>
                   <P color="brand.500">
-                    Everything you need to know about RCDrift UK 2025
+                    Everything you need to know about the 2025 season
                   </P>
                 </FAQHeader>
 
@@ -732,7 +727,7 @@ const Page = () => {
 
                 <CollapsibleFAQ
                   question="Do international drivers have an advantage over UK drivers?"
-                  answer="No, when merging the international qualifying results with the RCDrift.uk driver ratings, the top UK ranked driver will be compared to 120 international qualifying points. Ensuring a fair distribution of effort."
+                  answer="No, when merging the international qualifying results with the driver ratings, the top UK ranked driver will be compared to 120 international qualifying points. Ensuring a fair distribution of effort."
                 />
 
                 <CollapsibleFAQ
@@ -752,27 +747,27 @@ const Page = () => {
 
                 <CollapsibleFAQ
                   question="What are Feeder Rounds?"
-                  answer="Feeder Rounds are RCDrift.uk certified competitions hosted across the UK, featuring official judging criteria, real-time results, and contribution to driver rating points. Tracks receive support with prizes, judges, tournament software, and promotional materials."
+                  answer="Feeder Rounds are certified competitions hosted across the UK, featuring official judging criteria, real-time results, and contribution to driver rating points. Tracks receive support with prizes, judges, tournament software, and promotional materials."
                 />
 
                 <CollapsibleFAQ
                   question="How does international qualifying work?"
-                  answer="Non-UK residential drivers complete two judged qualifying laps, with a maximum of 100 points available per run. These results are combined with RCDrift.uk driver ratings to create the competition's qualifying standings, which determine seeding in the battle tree."
+                  answer="Non-UK residential drivers complete two judged qualifying laps, with a maximum of 100 points available per run. These results are combined with driver ratings to create the competition's qualifying standings, which determine seeding in the battle tree."
                 />
 
                 <CollapsibleFAQ
                   question="What support is provided at Feeder Rounds?"
-                  answer="RCDrift.uk provides comprehensive support including: prizes, assistance with sourcing qualified judges, tournament management software, standardized judging criteria, and promotional materials. Each track maintains control while benefiting from official certified."
+                  answer="We provide comprehensive support including: prizes, assistance with sourcing qualified judges, tournament management software, standardized judging criteria, and promotional materials. Each track maintains control while benefiting from official certified."
                 />
 
                 <CollapsibleFAQ
                   question="How can I follow the competition results?"
-                  answer="RCDrift.uk provides a high-end live stream production across all social channels and the website. Additionally, our free online tournament software allows real-time viewing of event results, functioning as a results-only live stream."
+                  answer="We provide a high-end live stream production across all social channels and the website. Additionally, our free online tournament software allows real-time viewing of event results, functioning as a results-only live stream."
                 />
 
                 <CollapsibleFAQ
-                  question="How can I participate in RCDrift.uk 2025?"
-                  answer="You can participate by attending any of the Feeder Rounds happening across the UK. Sign up for a driver profile on RCDrift.uk to track your ratings, ranks, and achievement badges throughout the championship."
+                  question="How can I participate in the 2025 season?"
+                  answer="You can participate by attending any of the Feeder Rounds happening across the UK. Sign up for a driver profile on our website to track your ratings, ranks, and achievement badges throughout the championship."
                 />
               </FAQSection>
             </Box>

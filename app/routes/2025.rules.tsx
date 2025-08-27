@@ -7,7 +7,7 @@ export const meta: Route.MetaFunction = () => {
     { title: "RC Drift UK | 2025 Rules" },
     {
       name: "description",
-      content: "Official rules and regulations for RCDrift UK 2025 events",
+      content: "Official rules and regulations for the 2025 season",
     },
     {
       property: "og:image",

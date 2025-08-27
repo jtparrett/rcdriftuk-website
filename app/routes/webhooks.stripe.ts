@@ -103,7 +103,7 @@ export async function action(args: ActionFunctionArgs) {
           <div style="background: #fff8dc; border: 1px solid #deb887; border-radius: 8px; padding: 16px; margin: 24px 0;">
             <h2 style="color: #333; font-size: 18px; margin-bottom: 12px;">Important Notice</h2>
             <p style="color: #666; font-size: 14px; line-height: 1.5;">
-              By purchasing this ticket and attending this RCDrift.uk event, you expressly acknowledge and agree to comply with all event rules and regulations. Failure to adhere to these rules may result in removal from the event and forfeit of your ticket without refund.
+              By purchasing this ticket and attending this event, you expressly acknowledge and agree to comply with all event rules and regulations. Failure to adhere to these rules may result in removal from the event and forfeit of your ticket without refund.
             </p>
             <p style="color: #666; font-size: 14px; line-height: 1.5; margin-top: 12px;">
               Please review our complete rules and regulations at <a href="https://rcdrift.uk/2025/rules" style="color: #0066cc; text-decoration: none;">https://rcdrift.uk/2025/rules</a>
@@ -117,7 +117,7 @@ export async function action(args: ActionFunctionArgs) {
           <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
           
           <p style="color: #999; font-size: 14px;">
-            This is an automated message from RC Drift UK. Please do not reply to this email.
+            This is an automated message. Please do not reply to this email.
           </p>
         </div>
         `,

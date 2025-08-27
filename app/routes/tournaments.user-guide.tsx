@@ -9,8 +9,7 @@ export const meta: Route.MetaFunction = () => {
     { title: "RC Drift UK | Tournament User Guide" },
     {
       name: "description",
-      content:
-        "A comprehensive guide to using the RCDrift.uk tournament system",
+      content: "A comprehensive guide to using our tournament system",
     },
   ];
 };
@@ -134,8 +133,8 @@ const Page = () => {
       <Box mb={12} textAlign="center" maxW={600} mx="auto">
         <H1>Tournaments: User Guide</H1>
         <P>
-          RCDrift.uk have built a free online platform to help assist with
-          running Radio-Controlled Drifting tournaments and competitions.
+          We have built a free online platform to help assist with hosting
+          Radio-Controlled Drifting tournaments and competitions.
         </P>
       </Box>
 
@@ -145,7 +144,7 @@ const Page = () => {
 
           <OL mt={2}>
             <styled.li>
-              Visit rcdrift.uk and <B>login or create a new account</B>
+              Visit our website and <B>login or create a new account</B>
             </styled.li>
             <styled.li>
               Once logged in, <B>open the menu (≡)</B> at the top of the page{" "}
@@ -170,12 +169,12 @@ const Page = () => {
                 </styled.li>
                 <styled.li>
                   Tournament judges: Selected{" "}
-                  <B>judges must have an RCDrift.uk account</B> to appear in the
-                  list
+                  <B>judges must have an account on the website</B> to appear in
+                  the list
                 </styled.li>
                 <styled.li>
                   Tournament drivers: Similarly,{" "}
-                  <B>all drivers must have RCDrift.uk accounts</B>
+                  <B>all drivers must have an account on the website</B>
                 </styled.li>
               </UL>
             </styled.li>
@@ -234,7 +233,7 @@ const Page = () => {
             <B>How to Access the Judging Remote:</B>
           </P>
           <OL>
-            <styled.li>Login to your RCDrift.uk account.</styled.li>
+            <styled.li>Login to your account.</styled.li>
             <styled.li>
               Navigate to the <B>“Tournaments”</B> page.
             </styled.li>

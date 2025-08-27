@@ -8,7 +8,7 @@ export const meta: Route.MetaFunction = () => {
     {
       name: "description",
       content:
-        "Official judging criteria and scoring system for RCDrift UK 2025 events",
+        "Official judging criteria and scoring system for the 2025 season",
     },
     {
       property: "og:image",
@@ -328,9 +328,9 @@ export default function JudgingCriteriaPage() {
               <Highlight>rematch</Highlight> can be called. Judges will announce
               a <Highlight>One More Time</Highlight> when a battle is
               essentially a draw. The drivers will run the track again in a new
-              set of runs to give judges another chance to pick a winner.
-              RCDrift.uk follows the common practice of limiting repeated OMT
-              calls to keep the tournament moving – up to{" "}
+              set of runs to give judges another chance to pick a winner. The
+              common practice of limiting repeated OMT calls to keep the
+              tournament moving will be followed – up to{" "}
               <Highlight>2 One-More-Time rematches</Highlight> can be called for
               a pair of drivers. After <Highlight>two OMTs</Highlight> (which
               would mean the drivers have run up to three sets of battles
@@ -349,7 +349,7 @@ export default function JudgingCriteriaPage() {
               the organizers will use a <Highlight>sudden-death run</Highlight>{" "}
               to break the tie. Typically, this means each tied driver may be
               asked to do one more qualifying run (under the same criteria) to
-              earn a new score. Alternatively, RCDrift.uk may arrange a{" "}
+              earn a new score. Alternatively, we may arrange a{" "}
               <Highlight>head-to-head "tie-breaker battle"</Highlight> between
               the tied drivers if time permits, even though it's outside the
               normal bracket, to determine who ranks higher. This head-to-head
@@ -376,13 +376,12 @@ export default function JudgingCriteriaPage() {
               </styled.li>
               <styled.li>
                 All final decisions lie with the judges, and protests will
-                follow RCDrift.uk's official procedures.
+                follow official procedures.
               </styled.li>
             </UL>
             <P>
               This structured criteria ensures fair, consistent, and transparent
-              judging throughout the 2025 RC drift tournament hosted by
-              RCDrift.uk.
+              judging throughout the 2025 season.
             </P>
           </CollapsibleCard>
         </Stack>

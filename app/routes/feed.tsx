@@ -25,7 +25,7 @@ export const meta: Route.MetaFunction = () => {
     { title: "RC Drift UK | Community Feed" },
     {
       name: "description",
-      content: "Welcome to the RCDrift.uk community feed",
+      content: "Welcome to the community feed",
     },
     {
       property: "og:image",

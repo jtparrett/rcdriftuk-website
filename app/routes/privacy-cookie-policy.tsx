@@ -6,7 +6,7 @@ const Page = () => {
       <styled.h1 fontSize="4xl" fontWeight="extrabold" mb={4}>
         Cookie Privacy Policy
       </styled.h1>
-      <styled.p>RCDrift UK</styled.p>
+      <styled.p>RC Drift LTD</styled.p>
       <styled.p>info@rcdrift.uk</styled.p>
       <styled.p>https://rcdrift.uk</styled.p>
       <styled.p>Last Updated: 07/03/2024</styled.p>

@@ -89,8 +89,12 @@ export const loader = async () => {
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Home" },
-    { name: "description", content: "Welcome to RCDrift.uk" },
+    { title: "RC Drift UK | Driving the Future of RC Drifting" },
+    {
+      name: "description",
+      content:
+        "We're empowering the Radio-Controlled Drifting community with powerful tools, major events, beginner guides, and innovative driver analytics.",
+    },
     {
       property: "og:image",
       content: "https://rcdrift.uk/og-image.jpg",
@@ -172,7 +176,7 @@ const Page = () => {
                   shadow="0 6px 24px rgba(242, 12, 78, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.2)"
                 >
                   <RiTrophyLine />
-                  RC Drift UK 2025
+                  2025 Season
                   <RiArrowRightLine />
                 </styled.span>
               </Link>
@@ -461,7 +465,7 @@ const Page = () => {
                       letterSpacing="tight"
                       lineHeight={1.1}
                     >
-                      RC Drift UK 2025
+                      RCDIO 2025
                     </styled.h1>
                     <styled.p textWrap="balance" mb={4}>
                       The UK's professional RC Drifting Series.

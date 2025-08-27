@@ -11,7 +11,7 @@ import { startOfDay } from "date-fns";
 export const meta: Route.MetaFunction = () => {
   return [
     { title: "RC Drift UK | Map" },
-    { name: "description", content: "Welcome to RCDrift.uk" },
+    { name: "description", content: "Find your local RC Drift track" },
     {
       property: "og:image",
       content: "https://rcdrift.uk/og-image.jpg",
