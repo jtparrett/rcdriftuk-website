@@ -108,9 +108,28 @@ export const getTournamentStandings = (battles: Battle[]) => {
     });
   };
 
-  // For drift wars format, use standard sorting for all positions
+  // For drift wars format, sort by wins first (descending)
   if (tournament.format === TournamentsFormat.DRIFT_WARS) {
-    return sortDrivers(allDrivers);
+    return allDrivers.sort((a, b) => {
+      // Sort by win count first (descending) - most wins first
+      if (b.winCount !== a.winCount) {
+        return b.winCount - a.winCount;
+      }
+      // Then by battle count (descending)
+      if (b.battleCount !== a.battleCount) {
+        return b.battleCount - a.battleCount;
+      }
+      // Then by qualifying position (ascending, null treated as high value)
+      const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+      const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+      if (aQualPos !== bQualPos) {
+        return aQualPos - bQualPos;
+      }
+      // Finally by name (ascending)
+      return `${a.lastName}${a.firstName}`.localeCompare(
+        `${b.lastName}${b.firstName}`,
+      );
+    });
   }
 
   // For other formats, handle special top positions
