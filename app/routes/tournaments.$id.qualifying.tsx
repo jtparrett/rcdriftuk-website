@@ -29,6 +29,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       state: true,
       qualifyingLaps: true,
       userId: true,
+      scoreFormula: true,
       nextQualifyingLap: {
         select: {
           driver: {
@@ -92,7 +93,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
       .map((driver) => {
         const lapScores = driver.laps
           .filter((lap) => lap.scores.length === tournament._count.judges)
-          .map((lap) => sumScores(lap.scores, tournament._count.judges));
+          .map((lap) =>
+            sumScores(
+              lap.scores,
+              tournament._count.judges,
+              tournament.scoreFormula,
+            ),
+          );
 
         return {
           ...driver,

@@ -71,3 +71,10 @@ export const Regions = {
 } as const;
 
 export type Regions = Values<typeof Regions>;
+
+export const ScoreFormula = {
+  CUMULATIVE: "CUMULATIVE",
+  AVERAGED: "AVERAGED",
+} as const;
+
+export type ScoreFormula = Values<typeof ScoreFormula>;

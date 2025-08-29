@@ -11,7 +11,9 @@ import { sumScores } from "~/utils/sumScores";
 import { pow2Floor } from "~/utils/tournament.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
 
-const addByeDriverToTournament = async (tournament: Tournaments) => {
+const addByeDriverToTournament = async (
+  tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
+) => {
   const byeDriver = await prisma.users.findFirstOrThrow({
     where: {
       firstName: "BYE",
@@ -46,7 +48,12 @@ export const tournamentEndQualifying = async (id: string) => {
       state: TournamentsState.BATTLES,
       nextQualifyingLapId: null,
     },
-    include: {
+    select: {
+      id: true,
+      scoreFormula: true,
+      fullInclusion: true,
+      format: true,
+      qualifyingLaps: true,
       _count: {
         select: {
           judges: true,
@@ -95,7 +102,11 @@ export const tournamentEndQualifying = async (id: string) => {
   ]
     .map((driver) => {
       const lapScores = driver.laps.map((lap) =>
-        sumScores(lap.scores, tournament._count.judges),
+        sumScores(
+          lap.scores,
+          tournament._count.judges,
+          tournament.scoreFormula,
+        ),
       );
 
       return {

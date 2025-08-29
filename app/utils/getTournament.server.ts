@@ -24,6 +24,7 @@ export const getTournament = (id: string, userId: string | null) => {
       state: true,
       userId: true,
       liveUrl: true,
+      scoreFormula: true,
       nextQualifyingLap: {
         include: {
           scores: true,

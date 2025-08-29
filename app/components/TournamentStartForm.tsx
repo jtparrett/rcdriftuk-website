@@ -3,7 +3,7 @@ import { styled, Box, Flex } from "~/styled-system/jsx";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { Input } from "./Input";
 import { Button } from "./Button";
-import { Regions, TournamentsFormat } from "~/utils/enums";
+import { Regions, TournamentsFormat, ScoreFormula } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
@@ -216,6 +216,9 @@ export const TournamentStartForm = ({
   const [format, setFormat] = useState(
     tournament?.format ?? TournamentsFormat.STANDARD,
   );
+  const [scoreFormula, setScoreFormula] = useState<ScoreFormula>(
+    tournament?.scoreFormula ?? ScoreFormula.CUMULATIVE,
+  );
 
   return (
     <Form method="post" action={`/api/tournaments/${tournament?.id}/start`}>
@@ -259,6 +262,33 @@ export const TournamentStartForm = ({
                 min={1}
                 defaultValue={tournament?.qualifyingLaps}
               />
+            </Box>
+          </Flex>
+        )}
+
+        {(format === TournamentsFormat.STANDARD ||
+          format === TournamentsFormat.DOUBLE_ELIMINATION) && (
+          <Flex gap={4}>
+            <StepDot />
+            <Box flex={1}>
+              <styled.label mb={2} display="block">
+                What score formula should be used?
+              </styled.label>
+              <input type="hidden" name="scoreFormula" value={scoreFormula} />
+              <TabGroup>
+                {Object.values(ScoreFormula).map((item) => {
+                  return (
+                    <TabButton
+                      key={item}
+                      type="button"
+                      isActive={scoreFormula === item}
+                      onClick={() => setScoreFormula(item)}
+                    >
+                      {capitalCase(item)}
+                    </TabButton>
+                  );
+                })}
+              </TabGroup>
             </Box>
           </Flex>
         )}

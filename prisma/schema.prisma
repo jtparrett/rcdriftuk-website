@@ -85,6 +85,7 @@ model Tournaments {
   fullInclusion       Boolean             @default(false)
   region              Regions?
   rated               Boolean             @default(false)
+  scoreFormula        ScoreFormula        @default(AVERAGED)
   tracks              TrackTournaments[]
 
   @@index([state])
@@ -126,6 +127,7 @@ model TournamentJudges {
   user         Users                   @relation(fields: [driverId], references: [driverId])
   scores       LapScores[]
   BattleVotes  TournamentBattleVotes[]
+  points       Int                     @default(100)
 
   @@unique([tournamentId, driverId])
 }
@@ -552,4 +554,9 @@ enum Regions {
   ZA
   LA
   AP
+}
+
+enum ScoreFormula {
+  CUMULATIVE
+  AVERAGED
 }

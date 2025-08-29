@@ -656,6 +656,7 @@ const TournamentsOverviewPage = () => {
                             {sumScores(
                               tournament.nextQualifyingLap.scores,
                               tournament.judges.length,
+                              tournament.scoreFormula,
                             )}{" "}
                           </styled.p>
                         </RightInfoBox>

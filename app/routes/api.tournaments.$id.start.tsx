@@ -1,4 +1,9 @@
-import { Regions, TournamentsFormat, TournamentsState } from "~/utils/enums";
+import {
+  Regions,
+  TournamentsFormat,
+  TournamentsState,
+  ScoreFormula,
+} from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import invariant from "~/utils/invariant";
@@ -33,6 +38,9 @@ export const action = async (args: ActionFunctionArgs) => {
   const fullInclusion =
     z.string().parse(formData.get("fullInclusion") || "false") === "true";
   const region = z.nativeEnum(Regions).parse(formData.get("region"));
+  const scoreFormula = z
+    .nativeEnum(ScoreFormula)
+    .parse(formData.get("scoreFormula") || ScoreFormula.CUMULATIVE);
 
   if (judges.length <= 0) {
     throw new Error("Please add at least one judge to the tournament");
@@ -119,6 +127,7 @@ export const action = async (args: ActionFunctionArgs) => {
         qualifyingLaps: 0,
         format,
         nextBattleId: nextBattle.id,
+        scoreFormula,
       },
     });
 
@@ -164,6 +173,7 @@ export const action = async (args: ActionFunctionArgs) => {
       format,
       fullInclusion,
       region,
+      scoreFormula,
     },
   });
 

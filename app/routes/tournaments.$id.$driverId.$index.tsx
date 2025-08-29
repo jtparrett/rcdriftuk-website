@@ -158,7 +158,7 @@ const Page = () => {
             <Box pt={4}>
               <styled.p fontWeight="bold">Total Score:</styled.p>
               <styled.p fontSize="2xl">
-                {sumScores(lap.scores, totalJudges)}
+                {sumScores(lap.scores, totalJudges, tournament.scoreFormula)}
               </styled.p>
             </Box>
           </VStack>
