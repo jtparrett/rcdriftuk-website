@@ -11,7 +11,7 @@ import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
-import { Button } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { Glow } from "~/components/Glow";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
@@ -30,6 +30,7 @@ import { prisma } from "~/utils/prisma.server";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import { css } from "~/styled-system/css";
+import { RiArrowLeftLine } from "react-icons/ri";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);
@@ -393,6 +394,18 @@ const JudgePage = () => {
         }}
       >
         <Container w={500} maxW="full">
+          <LinkButton
+            to={`/tournaments/${tournament.id}/overview`}
+            mb={2}
+            size="sm"
+            variant="outline"
+            bgColor="black"
+            py={1.5}
+            pr={4}
+          >
+            <RiArrowLeftLine />
+            Back
+          </LinkButton>
           <Box
             bgColor="black"
             pos="relative"
