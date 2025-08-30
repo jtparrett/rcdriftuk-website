@@ -525,7 +525,6 @@ enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
   EXHIBITION
-  DRIFT_WARS
 }
 
 enum BattlesBracket {
