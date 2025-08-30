@@ -25,6 +25,7 @@ export const getTournament = (id: string, userId: string | null) => {
       userId: true,
       liveUrl: true,
       scoreFormula: true,
+      fullInclusion: true,
       nextQualifyingLap: {
         include: {
           scores: true,
@@ -79,6 +80,7 @@ export const getTournament = (id: string, userId: string | null) => {
         select: {
           id: true,
           driverId: true,
+          points: true,
           user: {
             select: {
               id: true,

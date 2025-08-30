@@ -19,18 +19,42 @@ interface Props {
   eventDrivers: number[];
 }
 
+const PersonPointsInput = ({ name }: { name: string }) => {
+  const [points, setPoints] = useState(100);
+  return (
+    <styled.select
+      name={name + "Points"}
+      value={points}
+      onChange={(e) => setPoints(Number(e.target.value))}
+      fontSize="sm"
+      borderWidth={1}
+      borderColor="gray.800"
+      rounded="sm"
+      fontFamily="mono"
+    >
+      {Array.from({ length: 10 }, (_, i) => i + 1).map((points) => (
+        <option key={points} value={points * 10}>
+          {points * 10}
+        </option>
+      ))}
+    </styled.select>
+  );
+};
+
 const PeopleForm = ({
   users,
   defaultValue,
   name,
   allowNewDrivers = false,
   allowRandomize = false,
+  allowPoints = false,
 }: {
   users: GetUsers;
   defaultValue: number[];
   name: string;
   allowNewDrivers?: boolean;
   allowRandomize?: boolean;
+  allowPoints?: boolean;
 }) => {
   const [value, onChange] = useState<(number | string)[]>(defaultValue);
   const [focused, setFocused] = useState(false);
@@ -122,6 +146,8 @@ const PeopleForm = ({
                     >
                       {user ? `${user.firstName} ${user.lastName}` : userId}
                     </styled.p>
+
+                    {allowPoints && <PersonPointsInput name={name} />}
 
                     <Box p={1}>
                       <Button
@@ -306,6 +332,7 @@ export const TournamentStartForm = ({
                 tournament?.judges.map((judge) => judge.driverId) ?? []
               }
               name="judges"
+              allowPoints
             />
           </Box>
         </Flex>

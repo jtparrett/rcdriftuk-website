@@ -151,7 +151,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
         },
       },
       update: {
-        score,
+        score: Math.min(score, judge.points),
       },
       create: {
         judgeId,
@@ -246,11 +246,13 @@ const QualiForm = () => {
                   }}
                 >
                   <option value="">Select a value</option>
-                  {Array.from(new Array(101)).map((_, i) => (
-                    <option key={i} value={i}>
-                      {i}
-                    </option>
-                  ))}
+                  {Array.from(new Array(tournament.judges[0].points + 1)).map(
+                    (_, i) => (
+                      <option key={i} value={i}>
+                        {i}
+                      </option>
+                    ),
+                  )}
                 </Select>
               </Box>
             </VStack>

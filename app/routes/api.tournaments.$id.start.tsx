@@ -28,6 +28,10 @@ export const action = async (args: ActionFunctionArgs) => {
   const formData = await args.request.formData();
 
   const judges = z.array(z.string()).parse(formData.getAll("judges"));
+  const judgesPoints = z
+    .array(z.coerce.number())
+    .min(judges.length, "Please add points for all judges")
+    .parse(formData.getAll("judgesPoints"));
   const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
 
   const qualifyingLaps = z.coerce
@@ -58,10 +62,12 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create judges
   await prisma.tournamentJudges.createMany({
-    data: judges.map((judgeId) => {
+    data: judges.map((judgeId, index) => {
+      const points = judgesPoints[index];
       return {
         driverId: Number(judgeId),
         tournamentId: id,
+        points,
       };
     }),
     skipDuplicates: true,
