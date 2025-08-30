@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useSearchParams } from "react-router";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { Input } from "./Input";
@@ -12,6 +12,7 @@ import { StepDot } from "./StepDot";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
 import { Reorder } from "motion/react";
+import { TOURNAMENT_TEMPLATES } from "~/utils/tournamentTemplates";
 
 interface Props {
   tournament: GetTournament;
@@ -237,13 +238,23 @@ export const TournamentStartForm = ({
   users,
   eventDrivers,
 }: Props) => {
+  const [searchParams] = useSearchParams();
+  const templateId = searchParams.get("template");
+  const template =
+    templateId && templateId in TOURNAMENT_TEMPLATES
+      ? TOURNAMENT_TEMPLATES[templateId]
+      : null;
   const [fullInclusion, setFullInclusion] = useState(false);
-  const [region, setRegion] = useState<Regions>(Regions.UK);
+  const [region, setRegion] = useState<Regions>(
+    template?.region ?? tournament?.region ?? Regions.UK,
+  );
   const [format, setFormat] = useState(
-    tournament?.format ?? TournamentsFormat.STANDARD,
+    template?.format ?? tournament?.format ?? TournamentsFormat.STANDARD,
   );
   const [scoreFormula, setScoreFormula] = useState<ScoreFormula>(
-    tournament?.scoreFormula ?? ScoreFormula.CUMULATIVE,
+    template?.scoreFormula ??
+      tournament?.scoreFormula ??
+      ScoreFormula.CUMULATIVE,
   );
 
   return (
