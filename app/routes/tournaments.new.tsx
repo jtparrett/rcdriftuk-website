@@ -12,6 +12,9 @@ import { prisma } from "~/utils/prisma.server";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
+import { Select } from "~/components/Select";
+import { TOURNAMENT_TEMPLATES } from "~/utils/tournamentTemplates";
+import { capitalCase } from "change-case";
 
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -19,7 +22,16 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(userId, "User not found");
 
   const formData = await args.request.formData();
-  const eventId = z.string().optional().parse(formData.get("eventId"));
+  const eventId = z
+    .string()
+    .optional()
+    .nullable()
+    .parse(formData.get("eventId"));
+  const template = z
+    .string()
+    .optional()
+    .nullable()
+    .parse(formData.get("template"));
   const name = z.string().min(1).parse(formData.get("name"));
 
   const tournament = await prisma.tournaments.create({
@@ -35,11 +47,16 @@ export const action = async (args: ActionFunctionArgs) => {
     searchParams.set("eventId", eventId);
   }
 
+  if (template) {
+    searchParams.set("template", template);
+  }
+
   return redirect(`/tournaments/${tournament.id}?${searchParams.toString()}`);
 };
 
 const formSchema = z.object({
   name: z.string().min(1),
+  template: z.string().optional(),
 });
 
 const validationSchema = toFormikValidationSchema(formSchema);
@@ -52,6 +69,7 @@ const Page = () => {
   const formik = useFormik({
     initialValues: {
       name: "",
+      template: "",
     },
     validationSchema,
     async onSubmit(values) {
@@ -61,6 +79,10 @@ const Page = () => {
 
       if (eventId) {
         formData.append("eventId", eventId);
+      }
+
+      if (values.template) {
+        formData.append("template", values.template);
       }
 
       await fetcher.submit(formData, {
@@ -98,10 +120,27 @@ const Page = () => {
                   onChange={formik.handleChange}
                 />
               </FormControl>
+
+              <FormControl>
+                <Label>Template (Optional)</Label>
+
+                <Select
+                  name="template"
+                  value={formik.values.template}
+                  onChange={formik.handleChange}
+                >
+                  <option>Select a template...</option>
+                  {Object.entries(TOURNAMENT_TEMPLATES).map(([key]) => (
+                    <option value={key}>{capitalCase(key)}</option>
+                  ))}
+                </Select>
+              </FormControl>
+
               <Button
                 type="submit"
                 isLoading={formik.isSubmitting}
                 disabled={formik.isSubmitting}
+                mt={2}
               >
                 Create Tournament
               </Button>
