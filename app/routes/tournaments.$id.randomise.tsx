@@ -69,7 +69,7 @@ export const action = async (args: ActionFunctionArgs) => {
       return judges.flatMap((judge) => {
         return driver.laps.flatMap((lap) => {
           return {
-            score: Math.floor(Math.random() * 100),
+            score: Math.floor(Math.random() * judge.points),
             lapId: lap.id,
             judgeId: judge.id,
           };

@@ -156,7 +156,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
       create: {
         judgeId,
         lapId: judge.tournament.nextQualifyingLapId,
-        score,
+        score: Math.min(score, judge.points),
       },
     });
   }
