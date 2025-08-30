@@ -447,7 +447,7 @@ const Page = () => {
 
                     <LinkButton
                       w="full"
-                      to={`/events/${event.id}/create-tournament`}
+                      to={`/tournaments/new?eventId=${event.id}`}
                       variant="outline"
                     >
                       Create Tournament

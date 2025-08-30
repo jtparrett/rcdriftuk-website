@@ -1,6 +1,6 @@
 import { getAuth } from "~/utils/getAuth.server";
 import type { ActionFunctionArgs } from "react-router";
-import { Form, redirect, useFetcher } from "react-router";
+import { Form, redirect, useFetcher, useSearchParams } from "react-router";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { Button } from "~/components/Button";
@@ -19,6 +19,7 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(userId, "User not found");
 
   const formData = await args.request.formData();
+  const eventId = z.string().optional().parse(formData.get("eventId"));
   const name = z.string().min(1).parse(formData.get("name"));
 
   const tournament = await prisma.tournaments.create({
@@ -28,7 +29,13 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/tournaments/${tournament.id}`);
+  const searchParams = new URLSearchParams();
+
+  if (eventId) {
+    searchParams.set("eventId", eventId);
+  }
+
+  return redirect(`/tournaments/${tournament.id}?${searchParams.toString()}`);
 };
 
 const formSchema = z.object({
@@ -39,6 +46,8 @@ const validationSchema = toFormikValidationSchema(formSchema);
 
 const Page = () => {
   const fetcher = useFetcher();
+  const [searchParams] = useSearchParams();
+  const eventId = searchParams.get("eventId");
 
   const formik = useFormik({
     initialValues: {
@@ -47,7 +56,12 @@ const Page = () => {
     validationSchema,
     async onSubmit(values) {
       const formData = new FormData();
+
       formData.append("name", values.name);
+
+      if (eventId) {
+        formData.append("eventId", eventId);
+      }
 
       await fetcher.submit(formData, {
         method: "POST",
