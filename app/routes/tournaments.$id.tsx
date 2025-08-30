@@ -415,7 +415,7 @@ const TournamentPage = () => {
                 Battles
               </Tab>
               {(tournament.state === TournamentsState.END ||
-                tournament.format === TournamentsFormat.DRIFT_WARS) && (
+                tournament.format === TournamentsFormat.EXHIBITION) && (
                 <Tab
                   to={`/tournaments/${tournament.id}/standings`}
                   isActive={isStandingsTab}
@@ -496,7 +496,7 @@ const TournamentPage = () => {
 
                   {isOwner &&
                     tournament.state === TournamentsState.BATTLES &&
-                    tournament.format === TournamentsFormat.DRIFT_WARS &&
+                    tournament.format === TournamentsFormat.EXHIBITION &&
                     judgingCompleteForNextBattle &&
                     !isOMT &&
                     !hasUnresolvedProtest && (
@@ -573,7 +573,7 @@ const TournamentPage = () => {
                   {isOwner &&
                     tournament.state === TournamentsState.BATTLES &&
                     judgingCompleteForNextBattle &&
-                    tournament.format !== TournamentsFormat.DRIFT_WARS &&
+                    tournament.format !== TournamentsFormat.EXHIBITION &&
                     !hasUnresolvedProtest &&
                     secondsRemaining <= 0 && (
                       <Form method="post">

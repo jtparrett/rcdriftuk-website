@@ -51,7 +51,7 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   if (
-    fullInclusion || format === TournamentsFormat.DRIFT_WARS
+    fullInclusion || format === TournamentsFormat.EXHIBITION
       ? drivers.length < 2
       : drivers.length < 4
   ) {
@@ -112,9 +112,9 @@ export const action = async (args: ActionFunctionArgs) => {
     }),
   });
 
-  const isDriftWars = format === TournamentsFormat.DRIFT_WARS;
+  const isExhibition = format === TournamentsFormat.EXHIBITION;
 
-  if (isDriftWars) {
+  if (isExhibition) {
     const nextBattle = await prisma.tournamentBattles.create({
       data: {
         tournamentId: id,

@@ -108,8 +108,8 @@ export const getTournamentStandings = (battles: Battle[]) => {
     });
   };
 
-  // For drift wars format, sort by wins first (descending)
-  if (tournament.format === TournamentsFormat.DRIFT_WARS) {
+  // For EXHIBITION format, sort by wins first (descending)
+  if (tournament.format === TournamentsFormat.EXHIBITION) {
     return allDrivers.sort((a, b) => {
       // Sort by win count first (descending) - most wins first
       if (b.winCount !== a.winCount) {

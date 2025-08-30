@@ -165,7 +165,7 @@ export const tournamentNextBattle = async (id: string) => {
     return null;
   }
 
-  if (winnerId && tournament.format === TournamentsFormat.DRIFT_WARS) {
+  if (winnerId && tournament.format === TournamentsFormat.EXHIBITION) {
     await prisma.tournamentBattles.update({
       where: {
         id: tournament.nextBattleId,

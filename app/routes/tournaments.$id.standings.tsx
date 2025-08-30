@@ -18,7 +18,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
             state: TournamentsState.END,
           },
           {
-            format: TournamentsFormat.DRIFT_WARS,
+            format: TournamentsFormat.EXHIBITION,
           },
         ],
       },

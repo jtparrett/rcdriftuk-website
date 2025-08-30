@@ -156,7 +156,7 @@ const TournamentBattlesPage = () => {
 
   const battlesInRound = Object.values(battlesByRound).reduce<Battle[][]>(
     (agg, round) => {
-      if (tournament.format === TournamentsFormat.DRIFT_WARS) {
+      if (tournament.format === TournamentsFormat.EXHIBITION) {
         return [round];
       }
 
@@ -219,7 +219,7 @@ const TournamentBattlesPage = () => {
           bgSize="16px"
           bgPosition="center"
           justifyContent={
-            tournament.format === TournamentsFormat.DRIFT_WARS
+            tournament.format === TournamentsFormat.EXHIBITION
               ? "center"
               : undefined
           }
@@ -233,7 +233,7 @@ const TournamentBattlesPage = () => {
           {battlesInRound.map((battles, i) => {
             return (
               <Box key={i} w={240} flex="none">
-                {tournament.format !== TournamentsFormat.DRIFT_WARS && (
+                {tournament.format !== TournamentsFormat.EXHIBITION && (
                   <styled.p
                     fontSize="sm"
                     textAlign="center"
@@ -263,7 +263,7 @@ const TournamentBattlesPage = () => {
                         <Box position="relative" flex="none" zIndex={1}>
                           {(battles.length <= 1 ||
                             tournament.format ===
-                              TournamentsFormat.DRIFT_WARS) && (
+                              TournamentsFormat.EXHIBITION) && (
                             <Box
                               pos="absolute"
                               top="50%"
@@ -302,7 +302,7 @@ const TournamentBattlesPage = () => {
 
                         {i % 2 === 0 &&
                         battles.length > 1 &&
-                        tournament.format !== TournamentsFormat.DRIFT_WARS ? (
+                        tournament.format !== TournamentsFormat.EXHIBITION ? (
                           <Box
                             borderRightWidth={1}
                             borderTopWidth={1}

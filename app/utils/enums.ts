@@ -30,7 +30,7 @@ export type TournamentsState = Values<typeof TournamentsState>;
 export const TournamentsFormat = {
   STANDARD: "STANDARD",
   DOUBLE_ELIMINATION: "DOUBLE_ELIMINATION",
-  DRIFT_WARS: "DRIFT_WARS",
+  EXHIBITION: "EXHIBITION",
 } as const;
 
 export type TournamentsFormat = Values<typeof TournamentsFormat>;
