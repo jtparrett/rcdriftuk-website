@@ -33,6 +33,7 @@ import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
 import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
+import { PostHogProvider } from "./components/PostHogProvider";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -57,6 +58,12 @@ export const loader = (args: LoaderFunctionArgs) =>
 
     const { userId } = request.auth;
 
+    // PostHog environment variables
+    const posthog = {
+      POSTHOG_API_KEY: process.env.POSTHOG_API_KEY,
+      POSTHOG_HOST: process.env.POSTHOG_HOST,
+    };
+
     if (userId) {
       const user = await getUser(userId);
       return {
@@ -64,6 +71,7 @@ export const loader = (args: LoaderFunctionArgs) =>
         isEmbed,
         isApp,
         hideBanner: cookie.hideBanner,
+        posthog,
       };
     }
 
@@ -72,6 +80,7 @@ export const loader = (args: LoaderFunctionArgs) =>
       isEmbed,
       isApp,
       hideBanner: cookie.hideBanner,
+      posthog,
     };
   });
 
@@ -149,8 +158,7 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { hideBanner, isEmbed, isApp } = loaderData || {};
-  const { user } = loaderData || {};
+  const { hideBanner, isEmbed, isApp, posthog, user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
 
@@ -231,25 +239,30 @@ function App({
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <AppProvider value={isApp}>
-          <EmbedProvider value={isEmbed}>
-            <ExpoPushToken />
-            {isApp && <AppHeader />}
+        <PostHogProvider
+          apiKey={posthog?.POSTHOG_API_KEY}
+          host={posthog?.POSTHOG_HOST}
+        >
+          <AppProvider value={isApp}>
+            <EmbedProvider value={isEmbed}>
+              <ExpoPushToken />
+              {isApp && <AppHeader />}
 
-            {!isEmbed && (
-              <>
-                {!isApp && <AnnouncementBanner />}
-                {!hideBanner && !isApp && <CookieBanner />}
-                {!isApp && <Header user={user} />}
-              </>
-            )}
+              {!isEmbed && (
+                <>
+                  {!isApp && <AnnouncementBanner />}
+                  {!hideBanner && !isApp && <CookieBanner />}
+                  {!isApp && <Header user={user} />}
+                </>
+              )}
 
-            <Outlet />
+              <Outlet />
 
-            {isApp && <AppNav />}
-            {!isMap && !isEmbed && !isApp && <Footer />}
-          </EmbedProvider>
-        </AppProvider>
+              {isApp && <AppNav />}
+              {!isMap && !isEmbed && !isApp && <Footer />}
+            </EmbedProvider>
+          </AppProvider>
+        </PostHogProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );

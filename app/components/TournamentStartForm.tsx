@@ -47,14 +47,14 @@ const PeopleForm = ({
   defaultValue,
   name,
   allowNewDrivers = false,
-  allowRandomize = false,
+  allowRandomise = false,
   allowPoints = false,
 }: {
   users: GetUsers;
   defaultValue: number[];
   name: string;
   allowNewDrivers?: boolean;
-  allowRandomize?: boolean;
+  allowRandomise?: boolean;
   allowPoints?: boolean;
 }) => {
   const [value, onChange] = useState<(number | string)[]>(defaultValue);
@@ -73,7 +73,7 @@ const PeopleForm = ({
 
   return (
     <Box>
-      {allowRandomize && (
+      {allowRandomise && (
         <Button
           variant="outline"
           size="sm"
@@ -83,7 +83,7 @@ const PeopleForm = ({
             onChange([...value].sort(() => Math.random() - 0.5));
           }}
         >
-          <RiShuffleLine /> Randomize Order
+          <RiShuffleLine /> Shuffle Order
         </Button>
       )}
 
@@ -357,7 +357,7 @@ export const TournamentStartForm = ({
 
             <PeopleForm
               allowNewDrivers
-              allowRandomize
+              allowRandomise
               users={users}
               defaultValue={Array.from(
                 new Set([
