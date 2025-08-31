@@ -64,29 +64,30 @@ model EventResponses {
 }
 
 model Tournaments {
-  id                  String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String
-  archived            Boolean             @default(false)
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @default(now()) @updatedAt
-  nextBattleId        Int?                @unique
-  format              TournamentsFormat   @default(STANDARD)
-  qualifyingLaps      Int                 @default(1)
-  state               TournamentsState    @default(START)
+  archived            Boolean                  @default(false)
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @default(now()) @updatedAt
+  nextBattleId        Int?                     @unique
+  format              TournamentsFormat        @default(STANDARD)
+  qualifyingLaps      Int                      @default(1)
+  state               TournamentsState         @default(START)
   userId              String?
-  nextQualifyingLapId Int?                @unique
+  nextQualifyingLapId Int?                     @unique
   liveUrl             String?
   drivers             TournamentDrivers[]
   judges              TournamentJudges[]
-  user                Users?              @relation(fields: [userId], references: [id])
-  nextQualifyingLap   Laps?               @relation(fields: [nextQualifyingLapId], references: [id])
+  user                Users?                   @relation(fields: [userId], references: [id])
+  nextQualifyingLap   Laps?                    @relation(fields: [nextQualifyingLapId], references: [id])
   battles             TournamentBattles[]
-  nextBattle          TournamentBattles?  @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
-  fullInclusion       Boolean             @default(false)
+  nextBattle          TournamentBattles?       @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
+  fullInclusion       Boolean                  @default(false)
   region              Regions?
-  rated               Boolean             @default(false)
-  scoreFormula        ScoreFormula        @default(AVERAGED)
+  rated               Boolean                  @default(false)
+  scoreFormula        ScoreFormula             @default(AVERAGED)
   tracks              TrackTournaments[]
+  leaderboards        LeaderboardTournaments[]
 
   @@index([state])
   @@index([archived])
@@ -258,22 +259,22 @@ model TrackTournaments {
 }
 
 model Users {
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @default(now()) @updatedAt
-  driverId                Int                 @id @default(autoincrement())
-  id                      String?             @unique
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @default(now()) @updatedAt
+  driverId                Int                  @id @default(autoincrement())
+  id                      String?              @unique
   firstName               String?
   image                   String?
   lastName                String?
   team                    String?
-  elo                     Float               @default(1000)
-  elo_UK                  Float               @default(1000)
-  elo_EU                  Float               @default(1000)
-  elo_NA                  Float               @default(1000)
-  elo_ZA                  Float               @default(1000)
-  elo_LA                  Float               @default(1000)
-  elo_AP                  Float               @default(1000)
-  totalBattles            Int                 @default(0)
+  elo                     Float                @default(1000)
+  elo_UK                  Float                @default(1000)
+  elo_EU                  Float                @default(1000)
+  elo_NA                  Float                @default(1000)
+  elo_ZA                  Float                @default(1000)
+  elo_LA                  Float                @default(1000)
+  elo_AP                  Float                @default(1000)
+  totalBattles            Int                  @default(0)
   events                  EventResponses[]
   Tournaments             Tournaments[]
   TournamentJudges        TournamentJudges[]
@@ -283,13 +284,15 @@ model Users {
   PostLikes               PostLikes[]
   PostComments            PostComments[]
   Posts                   Posts[]
-  archived                Boolean             @default(false)
+  archived                Boolean              @default(false)
   carSetupChanges         CarSetupChanges[]
   lastBattleDate          DateTime?
   notifications           UserNotifications[]
-  notificationsLastReadAt DateTime            @default(now())
+  notificationsLastReadAt DateTime             @default(now())
   pushToken               String?
   threads                 ThreadUsers[]
+  leaderboards            LeaderboardDrivers[]
+  Leaderboards            Leaderboards[]
 
   @@index([elo])
   @@index([totalBattles])
@@ -498,6 +501,49 @@ model ThreadMessages {
   @@index([threadUserId])
   @@index([createdAt])
   @@index([threadId, createdAt])
+}
+
+model Leaderboards {
+  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @default(now()) @updatedAt
+  userId      String
+  user        Users                    @relation(fields: [userId], references: [id])
+  type        LeaderboardType          @default(TOURNAMENTS)
+  tournaments LeaderboardTournaments[]
+  drivers     LeaderboardDrivers[]
+}
+
+model LeaderboardTournaments {
+  id            Int          @id @default(autoincrement())
+  leaderboardId String       @db.Uuid
+  tournamentId  String       @db.Uuid
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
+  tournament    Tournaments  @relation(fields: [tournamentId], references: [id])
+
+  @@unique([leaderboardId, tournamentId])
+  @@index([leaderboardId])
+  @@index([tournamentId])
+  @@index([leaderboardId, tournamentId])
+}
+
+model LeaderboardDrivers {
+  id            Int          @id @default(autoincrement())
+  leaderboardId String       @db.Uuid
+  driverId      Int
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
+  driver        Users        @relation(fields: [driverId], references: [driverId])
+
+  @@unique([leaderboardId, driverId])
+  @@index([leaderboardId])
+  @@index([driverId])
+  @@index([leaderboardId, driverId])
+}
+
+enum LeaderboardType {
+  TOURNAMENTS
+  DRIVERS
 }
 
 enum TrackTypes {

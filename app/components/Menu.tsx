@@ -1,5 +1,6 @@
 import { useAuth } from "@clerk/react-router";
 import {
+  RiAwardLine,
   RiBook2Line,
   RiCalendarLine,
   RiCameraLensLine,
@@ -129,6 +130,18 @@ export const Menu = () => {
           <RiVipCrown2Line />
         </MenuIcon>
         Tournaments
+      </MenuLink>
+
+      <MenuLink
+        to="/leaderboards"
+        active={
+          location.pathname.startsWith("/leaderboards") ? "active" : "inactive"
+        }
+      >
+        <MenuIcon>
+          <RiAwardLine />
+        </MenuIcon>
+        Leaderboards
       </MenuLink>
 
       <MenuLink
