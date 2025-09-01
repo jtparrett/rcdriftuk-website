@@ -66,7 +66,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
                 select: {
                   id: true,
                   winnerId: true,
-                  round: true,
                   bracket: true,
                   tournament: {
                     select: {
