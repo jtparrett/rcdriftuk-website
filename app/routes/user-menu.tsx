@@ -1,4 +1,5 @@
 import {
+  RiAwardLine,
   RiCameraLensLine,
   RiGamepadLine,
   RiRocketLine,
@@ -88,6 +89,13 @@ const UserMenuPage = () => {
           <RiTrophyLine />
         </MenuIcon>
         Competitions
+      </MenuLink>
+
+      <MenuLink to="/leaderboards">
+        <MenuIcon>
+          <RiAwardLine />
+        </MenuIcon>
+        Leaderboards
       </MenuLink>
 
       <UserMenu />
