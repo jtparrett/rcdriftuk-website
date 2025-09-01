@@ -94,6 +94,7 @@ export const getTournamentStandings = (battles: Battle[]) => {
       // Then by qualifying position (ascending, null treated as high value)
       const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
       const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+
       if (aQualPos !== bQualPos) {
         return aQualPos - bQualPos;
       }
@@ -117,49 +118,57 @@ export const getTournamentStandings = (battles: Battle[]) => {
     return true;
   };
 
-  // Find final battle and determine 1st and 2nd place
-  const finalBattle = battles[battles.length - 1];
-  if (finalBattle?.winnerId) {
-    // 1st place: winner of final battle
-    moveDriverToStandings(finalBattle.winnerId);
+  // Find final battle (round 1000) and determine 1st and 2nd place
+  const finalBattleIndex = battles.findIndex((battle) => battle.round === 1000);
+  const finalBattle = battles[finalBattleIndex];
 
-    // 2nd place: loser of final battle
-    const loserId =
-      finalBattle.driverLeft?.id === finalBattle.winnerId
-        ? finalBattle.driverRight?.id
-        : finalBattle.driverLeft?.id;
-    moveDriverToStandings(loserId);
-  }
+  // Confirm it's a single tournament and not a leaderboard
+  // Note: leaderboards should not include rounds on battles
+  if (finalBattleIndex !== -1) {
+    if (finalBattle?.winnerId) {
+      // 1st place: winner of final battle
+      moveDriverToStandings(finalBattle.winnerId);
 
-  // Handle 3rd and 4th place based on tournament format
-  if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
-    // Find final lower bracket battle for 3rd/4th place
-    const lowerBracketBattles = battles.filter(
-      (battle) =>
-        battle.bracket === BattlesBracket.LOWER && battle.winnerId !== null,
-    );
+      // 2nd place: loser of final battle
+      const loserId =
+        finalBattle.driverLeft?.id === finalBattle.winnerId
+          ? finalBattle.driverRight?.id
+          : finalBattle.driverLeft?.id;
 
-    if (lowerBracketBattles.length > 0) {
-      const finalLowerBattle = lowerBracketBattles.reduce((latest, current) =>
-        (current.round || 0) > (latest.round || 0) ? current : latest,
+      moveDriverToStandings(loserId);
+    }
+
+    // Handle 3rd and 4th place based on tournament format
+    if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+      // Find final lower bracket battle for 3rd/4th place
+      const lowerBracketBattles = battles.filter(
+        (battle) =>
+          battle.bracket === BattlesBracket.LOWER && battle.winnerId !== null,
       );
 
-      if (finalLowerBattle.winnerId) {
-        // 3rd place: winner of final lower bracket battle
-        moveDriverToStandings(finalLowerBattle.winnerId);
+      if (lowerBracketBattles.length > 0) {
+        const finalLowerBattle = lowerBracketBattles.reduce(
+          (latest, current) =>
+            (current.round || 0) > (latest.round || 0) ? current : latest,
+        );
 
-        // 4th place: loser of final lower bracket battle
-        const lowerLoserId =
-          finalLowerBattle.driverLeft?.id === finalLowerBattle.winnerId
-            ? finalLowerBattle.driverRight?.id
-            : finalLowerBattle.driverLeft?.id;
-        moveDriverToStandings(lowerLoserId);
+        if (finalLowerBattle.winnerId) {
+          // 3rd place: winner of final lower bracket battle
+          moveDriverToStandings(finalLowerBattle.winnerId);
+
+          // 4th place: loser of final lower bracket battle
+          const lowerLoserId =
+            finalLowerBattle.driverLeft?.id === finalLowerBattle.winnerId
+              ? finalLowerBattle.driverRight?.id
+              : finalLowerBattle.driverLeft?.id;
+
+          moveDriverToStandings(lowerLoserId);
+        }
       }
-    }
-  } else {
-    // For standard format, use second-to-last battle for 3rd place
-    if (battles.length >= 2) {
-      const semiFinalBattle = battles[battles.length - 2];
+    } else {
+      // For standard format, use second-to-last battle for 3rd place
+      const semiFinalBattle = battles[finalBattleIndex - 1];
+
       if (semiFinalBattle?.winnerId) {
         moveDriverToStandings(semiFinalBattle.winnerId);
       }

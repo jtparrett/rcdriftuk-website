@@ -512,8 +512,8 @@ model LeaderboardTournaments {
   id            Int          @id @default(autoincrement())
   leaderboardId String       @db.Uuid
   tournamentId  String       @db.Uuid
-  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
-  tournament    Tournaments  @relation(fields: [tournamentId], references: [id])
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  tournament    Tournaments  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
 
   @@unique([leaderboardId, tournamentId])
   @@index([leaderboardId])
@@ -525,8 +525,8 @@ model LeaderboardDrivers {
   id            Int          @id @default(autoincrement())
   leaderboardId String       @db.Uuid
   driverId      Int
-  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
-  driver        Users        @relation(fields: [driverId], references: [driverId])
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  driver        Users        @relation(fields: [driverId], references: [driverId], onDelete: Cascade)
 
   @@unique([leaderboardId, driverId])
   @@index([leaderboardId])
