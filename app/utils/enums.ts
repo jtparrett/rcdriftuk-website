@@ -78,3 +78,10 @@ export const ScoreFormula = {
 } as const;
 
 export type ScoreFormula = Values<typeof ScoreFormula>;
+
+export const LeaderboardType = {
+  TOURNAMENTS: "TOURNAMENTS",
+  DRIVERS: "DRIVERS",
+} as const;
+
+export type LeaderboardType = Values<typeof LeaderboardType>;

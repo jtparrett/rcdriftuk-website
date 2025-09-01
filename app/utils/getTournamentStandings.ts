@@ -87,10 +87,6 @@ export const getTournamentStandings = (battles: Battle[]) => {
   // Helper function for standard driver sorting
   const sortDrivers = (drivers: DriverStats[]) => {
     return drivers.sort((a, b) => {
-      // Sort by battle count (descending)
-      if (b.battleCount !== a.battleCount) {
-        return b.battleCount - a.battleCount;
-      }
       // Then by win count (descending)
       if (b.winCount !== a.winCount) {
         return b.winCount - a.winCount;
@@ -107,30 +103,6 @@ export const getTournamentStandings = (battles: Battle[]) => {
       );
     });
   };
-
-  // For EXHIBITION format, sort by wins first (descending)
-  if (tournament.format === TournamentsFormat.EXHIBITION) {
-    return allDrivers.sort((a, b) => {
-      // Sort by win count first (descending) - most wins first
-      if (b.winCount !== a.winCount) {
-        return b.winCount - a.winCount;
-      }
-      // Then by battle count (descending)
-      if (b.battleCount !== a.battleCount) {
-        return b.battleCount - a.battleCount;
-      }
-      // Then by qualifying position (ascending, null treated as high value)
-      const aQualPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
-      const bQualPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
-      if (aQualPos !== bQualPos) {
-        return aQualPos - bQualPos;
-      }
-      // Finally by name (ascending)
-      return `${a.lastName}${a.firstName}`.localeCompare(
-        `${b.lastName}${b.firstName}`,
-      );
-    });
-  }
 
   // For other formats, handle special top positions
   const finalStandings: DriverStats[] = [];
