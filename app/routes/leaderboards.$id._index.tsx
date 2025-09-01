@@ -13,7 +13,7 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { getAuth } from "~/utils/getAuth.server";
 import { Button, LinkButton } from "~/components/Button";
 import {
-  RiEditFill,
+  RiEditCircleFill,
   RiFullscreenFill,
   RiShareForwardFill,
 } from "react-icons/ri";
@@ -160,7 +160,7 @@ const LeaderboardsPage = () => {
             variant="outline"
             py={1.5}
           >
-            Edit <RiEditFill />
+            Edit <RiEditCircleFill />
           </LinkButton>
         )}
         <Button

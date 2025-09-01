@@ -3,7 +3,7 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkButton } from "~/components/Button";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { TabsBar } from "~/components/TabsBar";
-import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
@@ -12,7 +12,38 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const leaderboards = await prisma.leaderboards.findMany({
     where: {
-      userId: userId!,
+      OR: [
+        {
+          userId: userId!,
+        },
+        {
+          drivers: {
+            some: {
+              driver: {
+                id: userId!,
+              },
+            },
+          },
+        },
+        {
+          tournaments: {
+            some: {
+              tournament: {
+                drivers: {
+                  some: {
+                    user: {
+                      id: userId!,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 

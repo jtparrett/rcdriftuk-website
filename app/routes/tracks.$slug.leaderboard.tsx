@@ -111,29 +111,51 @@ export const loader = async (args: LoaderFunctionArgs) => {
       ),
     );
 
-    return standings;
+    return {
+      standings,
+      leaderboard: track.leaderboard,
+    };
   }
 
   if (track.leaderboard?.type === LeaderboardType.DRIVERS) {
-    return track.leaderboard?.drivers.map((driver) => driver.driver);
+    const standings = track.leaderboard?.drivers.map((driver) => driver.driver);
+
+    return {
+      standings,
+      leaderboard: track.leaderboard,
+    };
   }
 
-  return [];
+  return {
+    standings: [],
+    leaderboard: track.leaderboard,
+  };
 };
 
 const TrackLeaderboardPage = () => {
-  const standings = useLoaderData<typeof loader>();
+  const { standings, leaderboard } = useLoaderData<typeof loader>();
+  const cutoff = leaderboard?.cutoff ?? 0;
 
   return (
     <Box p={4}>
       {standings.length <= 0 && <styled.p>No tournaments here yet...</styled.p>}
 
       <styled.table w="full">
-        <styled.tbody>
-          {standings.map((driver, index) => (
-            <styled.tr key={driver.driverId}>
-              <styled.td textAlign="center" fontFamily="mono" w={8}>
-                {index + 1}
+        <tbody>
+          {standings.map((driver, i) => (
+            <tr
+              key={driver.driverId}
+              style={
+                cutoff > 0
+                  ? {
+                      opacity: i >= cutoff ? 0.5 : 1,
+                      borderTop: i === cutoff ? "1px solid red" : undefined,
+                    }
+                  : undefined
+              }
+            >
+              <styled.td textAlign="center" fontFamily="mono">
+                {i + 1}
               </styled.td>
               <styled.td py={1} pl={2}>
                 <Flex pos="relative" alignItems="center" gap={2}>
@@ -150,9 +172,9 @@ const TrackLeaderboardPage = () => {
                   {driver.firstName} {driver.lastName}
                 </Flex>
               </styled.td>
-            </styled.tr>
+            </tr>
           ))}
-        </styled.tbody>
+        </tbody>
       </styled.table>
     </Box>
   );
