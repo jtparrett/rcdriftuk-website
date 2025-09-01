@@ -2,73 +2,99 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { z } from "zod";
-import { getTournamentStandings } from "~/utils/getTournamentStandings";
-import { TournamentsState } from "~/utils/enums";
 import { LinkOverlay } from "~/components/LinkOverlay";
+import notFoundInvariant from "~/utils/notFoundInvariant";
+import { getTournamentStandings } from "~/utils/getTournamentStandings";
+import { LeaderboardType } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const slug = z.string().parse(params.slug);
 
-  const battles = await prisma.tournamentBattles.findMany({
+  const track = await prisma.tracks.findFirst({
     where: {
-      tournament: {
-        tracks: {
-          some: {
-            track: {
-              slug,
-            },
-          },
-        },
-        state: TournamentsState.END,
-      },
+      slug,
     },
-    orderBy: [
-      {
-        tournament: {
-          updatedAt: "desc",
-        },
-      },
-      { round: "asc" },
-      { bracket: "asc" },
-      {
-        id: "asc",
-      },
-    ],
-    select: {
-      id: true,
-      winnerId: true,
-      tournament: {
-        select: {
-          format: true,
-        },
-      },
-      driverLeft: {
-        select: {
-          isBye: true,
-          id: true,
-          qualifyingPosition: true,
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-              driverId: true,
+    include: {
+      leaderboard: {
+        include: {
+          drivers: {
+            orderBy: {
+              id: "asc",
+            },
+            include: {
+              driver: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                  driverId: true,
+                },
+              },
             },
           },
-        },
-      },
-      driverRight: {
-        select: {
-          isBye: true,
-          id: true,
-          qualifyingPosition: true,
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-              driverId: true,
+          tournaments: {
+            orderBy: {
+              id: "asc",
+            },
+            include: {
+              tournament: {
+                include: {
+                  battles: {
+                    orderBy: [
+                      {
+                        tournament: {
+                          updatedAt: "desc",
+                        },
+                      },
+                      { round: "asc" },
+                      { bracket: "asc" },
+                      {
+                        id: "asc",
+                      },
+                    ],
+                    select: {
+                      id: true,
+                      winnerId: true,
+                      tournament: {
+                        select: {
+                          format: true,
+                        },
+                      },
+                      driverLeft: {
+                        select: {
+                          isBye: true,
+                          id: true,
+                          qualifyingPosition: true,
+                          user: {
+                            select: {
+                              firstName: true,
+                              lastName: true,
+                              image: true,
+                              driverId: true,
+                            },
+                          },
+                        },
+                      },
+                      driverRight: {
+                        select: {
+                          isBye: true,
+                          id: true,
+                          qualifyingPosition: true,
+                          user: {
+                            select: {
+                              firstName: true,
+                              lastName: true,
+                              image: true,
+                              driverId: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -76,7 +102,23 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return getTournamentStandings(battles);
+  notFoundInvariant(track, "Track not found");
+
+  if (track.leaderboard?.type === LeaderboardType.TOURNAMENTS) {
+    const standings = getTournamentStandings(
+      track.leaderboard?.tournaments.flatMap(
+        (tournament) => tournament.tournament.battles,
+      ),
+    );
+
+    return standings;
+  }
+
+  if (track.leaderboard?.type === LeaderboardType.DRIVERS) {
+    return track.leaderboard?.drivers.map((driver) => driver.driver);
+  }
+
+  return [];
 };
 
 const TrackLeaderboardPage = () => {
@@ -89,7 +131,7 @@ const TrackLeaderboardPage = () => {
       <styled.table w="full">
         <styled.tbody>
           {standings.map((driver, index) => (
-            <styled.tr key={driver.id}>
+            <styled.tr key={driver.driverId}>
               <styled.td textAlign="center" fontFamily="mono" w={8}>
                 {index + 1}
               </styled.td>

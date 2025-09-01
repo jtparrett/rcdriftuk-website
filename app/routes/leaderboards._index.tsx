@@ -36,6 +36,12 @@ const LeaderboardsPage = () => {
       </TabsBar>
       <Container maxW={1100} px={2} py={4}>
         <Flex flexDir="column" gap={2}>
+          {leaderboards.length === 0 && (
+            <styled.p textAlign="center" color="gray.500">
+              Looks like you don't have any leaderboards yet.
+            </styled.p>
+          )}
+
           {leaderboards.map((leaderboard) => (
             <styled.article
               key={leaderboard.id}

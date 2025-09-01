@@ -15,9 +15,12 @@ import { useFormik } from "formik";
 import { FormControl } from "./FormControl";
 import { useFetcher } from "react-router";
 import { resizeImage } from "~/utils/resizeImage";
+import type { Leaderboards } from "@prisma/client";
+import { Select } from "./Select";
 
 interface Props {
   track?: GetUserOwnedTrackBySlug;
+  leaderboards?: Leaderboards[];
 }
 
 const formSchema = z.object({
@@ -29,11 +32,12 @@ const formSchema = z.object({
   lng: z.number(),
   image: z.union([z.instanceof(File), z.string()]),
   cover: z.union([z.instanceof(File), z.string()]).optional(),
+  leaderboardId: z.string().optional(),
 });
 
 const validationSchema = toFormikValidationSchema(formSchema);
 
-export const TrackForm = ({ track }: Props) => {
+export const TrackForm = ({ track, leaderboards }: Props) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const fetcher = useFetcher();
@@ -49,6 +53,7 @@ export const TrackForm = ({ track }: Props) => {
       lng: track?.lng ?? 0,
       image: track?.image ?? "",
       cover: track?.cover ?? "",
+      leaderboardId: track?.leaderboardId ?? "",
     },
     onSubmit: async (values) => {
       const formData = new FormData();
@@ -73,6 +78,7 @@ export const TrackForm = ({ track }: Props) => {
       formData.append("address", values.address);
       formData.append("lat", values.lat.toString());
       formData.append("lng", values.lng.toString());
+      formData.append("leaderboardId", values.leaderboardId ?? "");
 
       await fetcher.submit(formData, {
         method: "POST",
@@ -167,6 +173,27 @@ export const TrackForm = ({ track }: Props) => {
             onChange={formik.handleChange}
           />
         </FormControl>
+
+        {(leaderboards?.length ?? 0) > 0 && (
+          <>
+            <Divider borderColor="gray.800" />
+            <FormControl error={formik.errors.leaderboardId}>
+              <Label>Leaderboard</Label>
+              <Select
+                name="leaderboardId"
+                value={formik.values.leaderboardId}
+                onChange={formik.handleChange}
+              >
+                <option value="">Select an option...</option>
+                {leaderboards?.map((leaderboard) => (
+                  <option key={leaderboard.id} value={leaderboard.id}>
+                    {leaderboard.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          </>
+        )}
 
         <Divider borderColor="gray.800" />
 

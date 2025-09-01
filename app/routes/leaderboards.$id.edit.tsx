@@ -5,6 +5,7 @@ import { Label } from "~/components/Label";
 import { Box, Container, Flex, styled, VStack } from "~/styled-system/jsx";
 import { z } from "zod";
 import {
+  redirect,
   useFetcher,
   useLoaderData,
   type LoaderFunctionArgs,
@@ -65,9 +66,79 @@ export const loader = async (args: LoaderFunctionArgs) => {
   };
 };
 
+export const action = async (args: LoaderFunctionArgs) => {
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "User not found");
+
+  const id = z.string().parse(args.params.id);
+  const formData = await args.request.formData();
+
+  const data = formSchema.parse({
+    name: formData.get("name"),
+    type: formData.get("type"),
+    cutoff: Number(formData.get("cutoff")),
+    tournaments: formData.getAll("tournaments"),
+    drivers: formData.getAll("drivers").map((driver) => Number(driver)),
+  });
+
+  await prisma.$transaction([
+    prisma.leaderboardDrivers.deleteMany({
+      where: {
+        leaderboardId: id,
+        leaderboard: {
+          userId,
+        },
+      },
+    }),
+    prisma.leaderboardTournaments.deleteMany({
+      where: {
+        leaderboardId: id,
+        leaderboard: {
+          userId,
+        },
+      },
+    }),
+  ]);
+
+  await prisma.$transaction([
+    // Update leaderboard
+    prisma.leaderboards.update({
+      where: {
+        id,
+        userId,
+      },
+      data: {
+        name: data.name,
+        type: data.type,
+        cutoff: data.cutoff,
+      },
+    }),
+
+    // Create tournaments
+    prisma.leaderboardTournaments.createMany({
+      data: data.tournaments.map((tournamentId) => ({
+        leaderboardId: id,
+        tournamentId,
+      })),
+    }),
+
+    // Create drivers
+    prisma.leaderboardDrivers.createMany({
+      data: data.drivers.map((driverId) => ({
+        leaderboardId: id,
+        driverId,
+      })),
+    }),
+  ]);
+
+  return redirect(`/leaderboards/${id}`);
+};
+
 const formSchema = z.object({
   name: z.string().min(1),
   type: z.nativeEnum(LeaderboardType),
+  cutoff: z.number(),
   tournaments: z.array(z.string()),
   drivers: z.array(z.number()),
 });
@@ -379,13 +450,27 @@ const LeaderboardsEditPage = () => {
     initialValues: {
       name: leaderboard.name,
       type: leaderboard.type,
+      cutoff: leaderboard.cutoff ?? 0,
       drivers: leaderboard.drivers.map((driver) => driver.driverId),
       tournaments: leaderboard.tournaments.map(
         (tournament) => tournament.tournamentId,
       ),
     },
     async onSubmit(values) {
-      await fetcher.submit(values, {
+      const formData = new FormData();
+
+      formData.append("name", values.name);
+      formData.append("type", values.type);
+      formData.append("cutoff", values.cutoff.toString());
+
+      values.drivers.forEach((driver) => {
+        formData.append("drivers", driver.toString());
+      });
+      values.tournaments.forEach((tournament) => {
+        formData.append("tournaments", tournament);
+      });
+
+      await fetcher.submit(formData, {
         method: "POST",
       });
     },
@@ -423,6 +508,16 @@ const LeaderboardsEditPage = () => {
                     );
                   })}
                 </TabGroup>
+              </FormControl>
+
+              <FormControl>
+                <Label>Cutoff Position</Label>
+                <Input
+                  type="number"
+                  name="cutoff"
+                  onChange={formik.handleChange}
+                  value={formik.values.cutoff}
+                />
               </FormControl>
 
               {formik.values.type === LeaderboardType.TOURNAMENTS && (

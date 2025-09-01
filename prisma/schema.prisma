@@ -86,7 +86,6 @@ model Tournaments {
   region              Regions?
   rated               Boolean                  @default(false)
   scoreFormula        ScoreFormula             @default(AVERAGED)
-  tracks              TrackTournaments[]
   leaderboards        LeaderboardTournaments[]
 
   @@index([state])
@@ -215,24 +214,25 @@ model TournamentBattleVotes {
 }
 
 model Tracks {
-  createdAt   DateTime           @default(now())
-  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  description String?
-  image       String
-  cover       String?
-  lat         Float
-  lng         Float
-  types       TrackTypes[]
-  url         String
-  slug        String             @unique
-  events      Events[]
-  Products    Products[]
-  Owners      TrackOwners[]
-  status      TrackStatus        @default(PENDING)
-  address     String?
-  tournaments TrackTournaments[]
-  posts       Posts[]
+  createdAt     DateTime      @default(now())
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  description   String?
+  image         String
+  cover         String?
+  lat           Float
+  lng           Float
+  types         TrackTypes[]
+  url           String
+  slug          String        @unique
+  events        Events[]
+  Products      Products[]
+  Owners        TrackOwners[]
+  status        TrackStatus   @default(PENDING)
+  address       String?
+  posts         Posts[]
+  leaderboardId String?       @db.Uuid
+  leaderboard   Leaderboards? @relation(fields: [leaderboardId], references: [id])
 
   @@index([status])
   @@index([types])
@@ -247,15 +247,6 @@ model TrackOwners {
   user    Users  @relation(fields: [userId], references: [id])
 
   @@unique([trackId, userId])
-}
-
-model TrackTournaments {
-  trackId      String      @db.Uuid
-  tournamentId String      @db.Uuid
-  track        Tracks      @relation(fields: [trackId], references: [id])
-  tournament   Tournaments @relation(fields: [tournamentId], references: [id])
-
-  @@unique([trackId, tournamentId])
 }
 
 model Users {
@@ -509,10 +500,12 @@ model Leaderboards {
   createdAt   DateTime                 @default(now())
   updatedAt   DateTime                 @default(now()) @updatedAt
   userId      String
+  cutoff      Int?
   user        Users                    @relation(fields: [userId], references: [id])
   type        LeaderboardType          @default(TOURNAMENTS)
   tournaments LeaderboardTournaments[]
   drivers     LeaderboardDrivers[]
+  tracks      Tracks[]
 }
 
 model LeaderboardTournaments {

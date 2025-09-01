@@ -45,7 +45,11 @@ const LeaderboardsNewPage = () => {
     },
     validationSchema,
     async onSubmit(values) {
-      await fetcher.submit(values, {
+      const formData = new FormData();
+
+      formData.append("name", values.name);
+
+      await fetcher.submit(formData, {
         method: "POST",
       });
     },
