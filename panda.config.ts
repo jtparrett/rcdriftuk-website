@@ -134,6 +134,11 @@ export default defineConfig({
             strokeDashoffset: "-200px",
           },
         },
+        flash: {
+          "100%": {
+            opacity: 0,
+          },
+        },
       },
     },
   },

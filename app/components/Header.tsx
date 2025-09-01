@@ -114,7 +114,7 @@ export const Header = ({ user }: Props) => {
       justifyContent="flex-end"
       transform="translate3d(0, 0, 0)"
     >
-      <Container maxW={1100} w="full" px={4} h="64px">
+      <Container maxW={1100} w="full" px={2} h="64px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={1}>
           <Link to="/" viewTransition>
             <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />

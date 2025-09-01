@@ -329,20 +329,35 @@ const TournamentPage = () => {
               >
                 {tournament.name}
               </styled.h1>
-              <styled.span
-                fontSize="sm"
-                fontWeight="medium"
-                borderWidth={1}
-                rounded="full"
-                borderColor="gray.700"
-                px={2}
-                color="gray.600"
-                display="block"
-                whiteSpace="nowrap"
-              >
-                {sentenceCase(tournament.format)}
-              </styled.span>
+
               <Spacer />
+
+              {(tournament.state === TournamentsState.QUALIFYING ||
+                tournament.state === TournamentsState.BATTLES) && (
+                <styled.span
+                  textTransform="uppercase"
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  display="flex"
+                  alignItems="center"
+                  gap={1.5}
+                  borderWidth={1}
+                  borderColor="gray.800"
+                  rounded="md"
+                  px={2}
+                  py={1}
+                >
+                  <Box
+                    w={2}
+                    h={2}
+                    rounded="full"
+                    bgColor="brand.500"
+                    animation="flash 0.7s alternate infinite"
+                  />
+                  Live
+                </styled.span>
+              )}
+
               <Button
                 px={2}
                 variant="ghost"
