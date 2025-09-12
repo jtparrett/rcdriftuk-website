@@ -47,13 +47,13 @@ import {
   RiShuffleLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
-import { sentenceCase } from "change-case";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab } from "~/components/Tab";
 import { TabsBar } from "~/components/TabsBar";
 import { getUser, type GetUser } from "~/utils/getUser.server";
 import { useEffect, useState } from "react";
 import pluralize from "pluralize";
+import { AppName } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -235,10 +235,10 @@ export const action = async (args: ActionFunctionArgs) => {
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
-    { title: `RC Drift UK | ${data?.tournament.name}` },
+    { title: `${AppName} | ${data?.tournament.name}` },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };
@@ -363,7 +363,7 @@ const TournamentPage = () => {
                 variant="ghost"
                 onClick={() => {
                   navigator.share({
-                    url: `https://rcdrift.uk/tournaments/${tournament.id}`,
+                    url: `https://rcdrift.io/tournaments/${tournament.id}`,
                   });
                 }}
               >

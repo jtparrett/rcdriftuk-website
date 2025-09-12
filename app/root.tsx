@@ -34,13 +34,14 @@ import type { Route } from "./+types/root";
 import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
+import { AppName } from "./utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Driving the Future of RC Drifting" },
+    { title: `${AppName} | Driving the Future of RC Drifting` },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

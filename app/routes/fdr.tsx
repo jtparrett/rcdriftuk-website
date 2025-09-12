@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Select } from "~/components/Select";
 import { Box, Container, styled } from "~/styled-system/jsx";
 import type { Route } from "./+types/fdr";
+import { AppName } from "~/utils/enums";
 
 const CHASSIS_RATIOS = {
   "Yokomo YD-2": 2.6,
@@ -25,11 +26,11 @@ function calculateFDR(pinion: number, spur: number, internalRatio: number) {
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: `RC Drift UK | FDR Calculator` },
+    { title: `${AppName} | FDR Calculator` },
     { name: "description", content: "Calculate your FDR" },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

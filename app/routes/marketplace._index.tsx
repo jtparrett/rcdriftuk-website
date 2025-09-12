@@ -20,11 +20,12 @@ import {
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/marketplace._index";
 import { TabsBar } from "~/components/TabsBar";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `RC Drift UK | Marketplace`,
+      title: `${AppName} | Marketplace`,
     },
     {
       description:
@@ -32,7 +33,7 @@ export const meta: Route.MetaFunction = () => {
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

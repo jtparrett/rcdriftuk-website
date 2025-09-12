@@ -7,14 +7,15 @@ import { Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/map.$region";
 import { startOfDay } from "date-fns";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Map" },
+    { title: `${AppName} | Map` },
     { name: "description", content: "Find your local RC Drift track" },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

@@ -1,5 +1,7 @@
 import type { Values } from "./values";
 
+export const AppName = "RC Drift International";
+
 export const TrackTypes = {
   ALL: "ALL",
   TRACKS: "TRACKS",

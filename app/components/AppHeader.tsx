@@ -11,6 +11,7 @@ import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { SignedIn } from "@clerk/react-router";
+import { AppName } from "~/utils/enums";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -108,8 +109,8 @@ export const AppHeader = () => {
                 style={{
                   scale,
                 }}
-                src="/rcdriftuk-26.svg"
-                alt="RC Drift UK"
+                src="/rcdriftio.svg"
+                alt={AppName}
               />
             </Link>
           </Box>

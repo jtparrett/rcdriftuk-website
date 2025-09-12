@@ -4,11 +4,12 @@ import { styled, Container, Flex, Box } from "~/styled-system/jsx";
 import { useDisclosure } from "~/utils/useDisclosure";
 import type { Route } from "./+types/getting-started";
 import { Link } from "react-router";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: "RC Drift UK | Getting Started | A Beginner's Guide",
+      title: `${AppName} | Getting Started | A Beginner's Guide`,
     },
     {
       name: "description",
@@ -16,7 +17,7 @@ export const meta: Route.MetaFunction = () => {
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/getting-started.png",
+      content: "https://rcdrift.io/getting-started.png",
     },
   ];
 };

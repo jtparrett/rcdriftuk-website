@@ -8,6 +8,7 @@ import { shopify } from "~/utils/shopify.server";
 import { Select } from "~/components/Select";
 import { RiArrowLeftLine } from "react-icons/ri";
 import type { Route } from "./+types/merch.$handle";
+import { AppName } from "~/utils/enums";
 
 const CartCreateResponseSchema = z.object({
   data: z.object({
@@ -294,7 +295,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const meta: Route.MetaFunction = ({ data }) => {
   const { product } = data ?? {};
   return [
-    { title: `RC Drift UK | Merch | ${product?.title}` },
+    { title: `${AppName} | Merch | ${product?.title}` },
     { description: product?.description },
   ];
 };

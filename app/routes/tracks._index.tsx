@@ -7,10 +7,11 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/tracks._index";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: `RC Drift UK | Tracks` },
+    { title: `${AppName} | Tracks` },
     {
       name: "description",
       content:
@@ -18,7 +19,7 @@ export const meta: Route.MetaFunction = () => {
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

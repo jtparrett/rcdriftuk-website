@@ -130,7 +130,7 @@ export const PostCard = ({
             aria-label="Share post"
             onClick={() => {
               navigator.share({
-                url: `https://rcdrift.uk/posts/${post.id}`,
+                url: `https://rcdrift.io/posts/${post.id}`,
               });
             }}
           >

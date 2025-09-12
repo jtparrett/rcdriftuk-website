@@ -9,6 +9,7 @@ import type { GetUser } from "~/utils/getUser.server";
 import { Menu, UserMenu } from "./Menu";
 import { UserTracks } from "./UserTracks";
 import { NotificationsBadge } from "./NotificationsBadge";
+import { AppName } from "~/utils/enums";
 
 export const HEADER_HEIGHT = 64;
 
@@ -117,7 +118,7 @@ export const Header = ({ user }: Props) => {
       <Container maxW={1100} w="full" px={2} h="64px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={1}>
           <Link to="/" viewTransition>
-            <styled.img w={140} src="/rcdriftuk-26.svg" alt="RC Drift UK" />
+            <styled.img w={140} src="/rcdriftio.svg" alt={AppName} />
           </Link>
 
           {isNavigating && (

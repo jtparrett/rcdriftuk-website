@@ -29,7 +29,7 @@ export const CookieBanner = () => {
               variant="secondary"
               size="xs"
               target="_blank"
-              to="https://rcdrift.uk/privacy-policy.html"
+              to="https://rcdrift.io/privacy-policy.html"
             >
               Privacy Policy
             </LinkButton>

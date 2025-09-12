@@ -33,6 +33,7 @@ import { css } from "~/styled-system/css";
 import { SignedIn, SignedOut } from "@clerk/react-router";
 import { MockPhone } from "~/components/MockPhone";
 import { DashedLine } from "~/components/DashedLine";
+import { AppName } from "~/utils/enums";
 
 const Card = styled("article", {
   base: {
@@ -89,7 +90,7 @@ export const loader = async () => {
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Driving the Future of RC Drifting" },
+    { title: `${AppName} | Driving the Future of RC Drifting` },
     {
       name: "description",
       content:
@@ -97,7 +98,7 @@ export const meta: Route.MetaFunction = () => {
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

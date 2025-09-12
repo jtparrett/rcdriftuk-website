@@ -21,20 +21,21 @@ import { Tab } from "~/components/Tab";
 import { z } from "zod";
 import { TabsBar } from "~/components/TabsBar";
 import { useCallback, useState } from "react";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `RC Drift UK | Driver Ratings`,
+      title: `${AppName} | Driver Ratings`,
       description:
         "Global RC Drift Driver Ratings, see where you rank amoungst some of the best drivers in the world.",
-      "og:title": "RC Drift UK | Driver Ratings",
+      "og:title": `${AppName} | Driver Ratings`,
       "og:description":
         "Global RC Drift Driver Ratings, see where you rank amoungst some of the best drivers in the world.",
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

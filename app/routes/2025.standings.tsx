@@ -7,10 +7,11 @@ import { Container, styled, Flex, Box } from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings.server";
 import { prisma } from "~/utils/prisma.server";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | 2025 Standings" },
+    { title: `${AppName} | 2025 Standings` },
     {
       name: "description",
       content:
@@ -18,7 +19,7 @@ export const meta: Route.MetaFunction = () => {
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/2025-cover.jpg",
+      content: "https://rcdrift.io/2025-cover.jpg",
     },
   ];
 };

@@ -3,10 +3,11 @@ import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { ImageContainer } from "~/components/ImageContainer";
 import type { Route } from "./+types/tournaments.user-guide";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Tournament User Guide" },
+    { title: `${AppName} | Tournament User Guide` },
     {
       name: "description",
       content: "A comprehensive guide to using our tournament system",

@@ -6,6 +6,7 @@ import { Tab } from "~/components/Tab";
 import { Container, Spacer, styled } from "~/styled-system/jsx";
 import type { Route } from "./+types/calendar";
 import { TabsBar } from "~/components/TabsBar";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = ({ params }) => {
   const today = format(new Date(), "dd-MM-yy");
@@ -16,7 +17,7 @@ export const meta: Route.MetaFunction = ({ params }) => {
   });
 
   return [
-    { title: "RC Drift UK | Calendar" },
+    { title: `${AppName} | Calendar` },
     {
       name: "description",
       content:
@@ -25,8 +26,8 @@ export const meta: Route.MetaFunction = ({ params }) => {
     {
       property: "og:image",
       content: thisWeek
-        ? "https://rcdrift.uk/thisweek-og-image.png"
-        : "https://rcdrift.uk/og-image.jpg",
+        ? "https://rcdrift.io/thisweek-og-image.png"
+        : "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

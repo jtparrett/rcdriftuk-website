@@ -36,6 +36,7 @@ import { CarSetupSummary } from "~/components/CarSetupSummary";
 import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
+import { AppName } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -260,11 +261,11 @@ export const meta: Route.MetaFunction = ({ data }) => {
 
   return [
     {
-      title: `RC Drift UK | Driver Ratings | ${data.driver.firstName} ${data.driver.lastName}`,
+      title: `${AppName} | Driver Ratings | ${data.driver.firstName} ${data.driver.lastName}`,
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

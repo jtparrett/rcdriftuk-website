@@ -33,16 +33,17 @@ import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { google } from "calendar-link";
 import type { Route } from "./+types/events.$id._index";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
-    { title: `RC Drift UK | Events | ${data?.event.name}` },
+    { title: `${AppName} | Events | ${data?.event.name}` },
     { name: "description", content: data?.event.description },
     {
       property: "og:image",
       content:
         data?.event.cover ??
-        `https://rcdrift.uk/${data?.event.eventTrack?.image}`,
+        `https://rcdrift.io/${data?.event.eventTrack?.image}`,
     },
   ];
 };
