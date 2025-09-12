@@ -245,6 +245,7 @@ export const TournamentStartForm = ({
       ? TOURNAMENT_TEMPLATES[templateId]
       : null;
   const [fullInclusion, setFullInclusion] = useState(false);
+  const [enableProtests, setEnableProtests] = useState(false);
   const [region, setRegion] = useState<Regions>(
     template?.region ?? tournament?.region ?? Regions.UK,
   );
@@ -333,41 +334,32 @@ export const TournamentStartForm = ({
         <Flex gap={4}>
           <StepDot />
           <Box flex={1}>
-            <styled.label mb={2} display="block">
-              Who are the tournament judges?
+            <styled.label display="block" mb={1}>
+              Enable protesting?
             </styled.label>
 
-            <PeopleForm
-              users={users}
-              defaultValue={
-                tournament?.judges.map((judge) => judge.driverId) ?? []
-              }
-              name="judges"
-              allowPoints
+            <input
+              type="hidden"
+              name="enableProtests"
+              value={enableProtests ? "true" : "false"}
             />
-          </Box>
-        </Flex>
 
-        <Flex gap={4}>
-          <StepDot />
-          <Box flex={1}>
-            <styled.label mb={2} display="block">
-              Who are the tournament drivers?
-            </styled.label>
-
-            <PeopleForm
-              allowNewDrivers
-              allowRandomise
-              users={users}
-              defaultValue={Array.from(
-                new Set([
-                  ...eventDrivers,
-                  ...(tournament?.drivers.map((driver) => driver.driverId) ??
-                    []),
-                ]),
-              )}
-              name="drivers"
-            />
+            <TabGroup>
+              <TabButton
+                type="button"
+                isActive={!enableProtests}
+                onClick={() => setEnableProtests(false)}
+              >
+                No
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={enableProtests}
+                onClick={() => setEnableProtests(true)}
+              >
+                Yes
+              </TabButton>
+            </TabGroup>
           </Box>
         </Flex>
 
@@ -443,6 +435,47 @@ export const TournamentStartForm = ({
                 );
               })}
             </TabGroup>
+          </Box>
+        </Flex>
+
+        <Flex gap={4}>
+          <StepDot />
+          <Box flex={1}>
+            <styled.label mb={2} display="block">
+              Who are the tournament judges?
+            </styled.label>
+
+            <PeopleForm
+              users={users}
+              defaultValue={
+                tournament?.judges.map((judge) => judge.driverId) ?? []
+              }
+              name="judges"
+              allowPoints
+            />
+          </Box>
+        </Flex>
+
+        <Flex gap={4}>
+          <StepDot />
+          <Box flex={1}>
+            <styled.label mb={2} display="block">
+              Who are the tournament drivers?
+            </styled.label>
+
+            <PeopleForm
+              allowNewDrivers
+              allowRandomise
+              users={users}
+              defaultValue={Array.from(
+                new Set([
+                  ...eventDrivers,
+                  ...(tournament?.drivers.map((driver) => driver.driverId) ??
+                    []),
+                ]),
+              )}
+              name="drivers"
+            />
           </Box>
         </Flex>
 

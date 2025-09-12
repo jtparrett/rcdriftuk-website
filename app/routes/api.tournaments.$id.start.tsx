@@ -41,6 +41,8 @@ export const action = async (args: ActionFunctionArgs) => {
   const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
   const fullInclusion =
     z.string().parse(formData.get("fullInclusion") || "false") === "true";
+  const enableProtests =
+    z.string().parse(formData.get("enableProtests") || "false") === "true";
   const region = z.nativeEnum(Regions).parse(formData.get("region"));
   const scoreFormula = z
     .nativeEnum(ScoreFormula)
@@ -178,6 +180,7 @@ export const action = async (args: ActionFunctionArgs) => {
       qualifyingLaps,
       format,
       fullInclusion,
+      enableProtests,
       region,
       scoreFormula,
     },

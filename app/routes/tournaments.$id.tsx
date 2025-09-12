@@ -288,6 +288,10 @@ const TournamentPage = () => {
     : null;
 
   const getProtestSecondsRemaining = () => {
+    if (!tournament.enableProtests) {
+      return 0;
+    }
+
     return judgingCompleteAt
       ? Math.max(
           0,

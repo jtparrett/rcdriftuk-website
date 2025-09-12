@@ -26,6 +26,7 @@ export const getTournament = (id: string, userId: string | null) => {
       liveUrl: true,
       scoreFormula: true,
       fullInclusion: true,
+      enableProtests: true,
       region: true,
       nextQualifyingLap: {
         include: {
