@@ -8,9 +8,10 @@ import { prisma } from "~/utils/prisma.server";
 import { uploadFile } from "~/utils/uploadFile.server";
 import slugify from "slugify";
 import type { Route } from "./+types/tracks.new";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "RC Drift UK | Create a Track" }];
+  return [{ title: `${AppName} | Create a Track` }];
 };
 
 export const loader = async (args: LoaderFunctionArgs) => {

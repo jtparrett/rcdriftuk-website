@@ -1,5 +1,6 @@
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
+import { AppName } from "~/utils/enums";
 
 export const Footer = () => {
   return (
@@ -12,10 +13,10 @@ export const Footer = () => {
         >
           <Box>
             <styled.img
-              src="/rcdriftuk-26-light.svg"
+              src="/rcdriftio-light.svg"
               w={120}
               mb={2}
-              alt="RC Drift UK"
+              alt={AppName}
             />
           </Box>
 
@@ -26,7 +27,7 @@ export const Footer = () => {
               variant="ghost"
               size="xs"
               target="_blank"
-              to="https://rcdrift.uk/privacy-policy.html"
+              to="https://rcdrift.io/privacy-policy.html"
             >
               Privacy Policy
             </LinkButton>

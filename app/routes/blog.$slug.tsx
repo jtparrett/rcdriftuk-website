@@ -6,15 +6,16 @@ import { Markdown } from "~/components/Markdown";
 import { Box, Container, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/blog.$slug";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data) {
     return [
-      { title: "RC Drift UK | Insights Blog" },
-      { name: "description", content: "RC Drift UK's Insights Blog." },
+      { title: `${AppName} | Insights Blog` },
+      { name: "description", content: `${AppName} Insights Blog.` },
       {
         property: "og:image",
-        content: "https://rcdrift.uk/og-image.jpg",
+        content: "https://rcdrift.io/og-image.jpg",
       },
     ];
   }
@@ -22,7 +23,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
   const intro = data.content.split("\n")[0] + "...";
 
   return [
-    { title: `${data.title} | RC Drift UK` },
+    { title: `${AppName} | ${data.title}` },
     {
       name: "description",
       content: intro,

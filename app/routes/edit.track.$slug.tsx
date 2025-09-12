@@ -11,13 +11,14 @@ import { getUserOwnedTrackBySlug } from "~/utils/getUserOwnedTrackBySlug.server"
 import { prisma } from "~/utils/prisma.server";
 import { uploadFile } from "~/utils/uploadFile.server";
 import type { Route } from "./+types/edit.track.$slug";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
-    { title: `RC Drift UK | ${data?.track.name} | Edit Track` },
+    { title: `${AppName} | ${data?.track.name} | Edit Track` },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

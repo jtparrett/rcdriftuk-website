@@ -3,11 +3,12 @@ import { Link, useLoaderData } from "react-router";
 import { z } from "zod";
 import { shopify } from "~/utils/shopify.server";
 import type { Route } from "./+types/merch._index";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Merch" },
-    { description: "RC Drift UK Merch Store" },
+    { title: `${AppName} | Merch` },
+    { description: `${AppName} Merch Store` },
   ];
 };
 

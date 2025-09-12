@@ -4,17 +4,18 @@ import { redirect } from "react-router";
 import { Outlet, useLocation } from "react-router";
 import { Tab } from "~/components/Tab";
 import { TabsBar } from "~/components/TabsBar";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | 2024 | Championship" },
+    { title: `${AppName} | 2024 | Championship` },
     {
       name: "description",
       content: "Welcome to the 2024 championship",
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/2024-cover.jpg",
+      content: "https://rcdrift.io/2024-cover.jpg",
     },
   ];
 };

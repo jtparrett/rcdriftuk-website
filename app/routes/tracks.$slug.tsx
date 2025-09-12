@@ -19,6 +19,7 @@ import { TrackSnippet } from "~/components/TrackSnippet";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { Label } from "~/components/Label";
 import { css } from "~/styled-system/css";
+import { AppName } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -55,11 +56,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
-    { title: `RC Drift UK | Tracks | ${data?.track.name}` },
+    { title: `${AppName} | Tracks | ${data?.track.name}` },
     { name: "description", content: data?.track.description },
     {
       property: "og:image",
-      content: `https://rcdrift.uk/${data?.track.image}`,
+      content: `https://rcdrift.io/${data?.track.image}`,
     },
   ];
 };

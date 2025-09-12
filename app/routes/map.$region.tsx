@@ -7,14 +7,15 @@ import { Flex } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/map.$region";
 import { startOfDay } from "date-fns";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Map" },
+    { title: `${AppName} | Map` },
     { name: "description", content: "Find your local RC Drift track" },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };
@@ -38,8 +39,8 @@ export const loader = async () => {
 
   return tracks
     .sort((a, b) => {
-      if (a.slug === "rcduk") return 1;
-      if (b.slug === "rcduk") return -1;
+      if (a.slug === "rcdio") return 1;
+      if (b.slug === "rcdio") return -1;
       if (a.slug === "drift-essex") return 1;
       if (b.slug === "drift-essex") return -1;
       return a.name.localeCompare(b.name);

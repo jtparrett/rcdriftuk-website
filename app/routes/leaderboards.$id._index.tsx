@@ -169,7 +169,7 @@ const LeaderboardsPage = () => {
           variant="outline"
           onClick={() => {
             navigator.share({
-              url: `https://rcdrift.uk/leaderboards/${leaderboard.id}`,
+              url: `https://rcdrift.io/leaderboards/${leaderboard.id}`,
             });
           }}
         >

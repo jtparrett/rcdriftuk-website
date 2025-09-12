@@ -8,17 +8,18 @@ import { getEventDate } from "~/utils/getEventDate";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { prisma } from "~/utils/prisma.server";
 import { format, isAfter, isBefore } from "date-fns";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | 2025 Schedule" },
+    { title: `${AppName} | 2025 Schedule` },
     {
       name: "description",
-      content: "Welcome to RCDrift.uk 2025 Schedule",
+      content: "2025 Schedule",
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/2025-cover.jpg",
+      content: "https://rcdrift.io/2025-cover.jpg",
     },
   ];
 };

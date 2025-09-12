@@ -19,9 +19,10 @@ import z from "zod";
 import { Button } from "~/components/Button";
 import { CarSetupSummary } from "~/components/CarSetupSummary";
 import { Input } from "~/components/Input";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `RC Drift UK | Setup Changes` }];
+  return [{ title: `${AppName} | Setup Changes` }];
 };
 
 export const loader = async (args: LoaderFunctionArgs) => {

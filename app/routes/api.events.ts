@@ -42,7 +42,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return events.map((event) => {
     return {
       ...event,
-      url: `https://rcdrift.uk/events/${event.id}`,
+      url: `https://rcdrift.io/events/${event.id}`,
     };
   });
 };

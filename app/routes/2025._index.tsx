@@ -12,17 +12,18 @@ import type { Route } from "./+types/2025";
 import { ImageContainer } from "~/components/ImageContainer";
 import { Glow } from "~/components/Glow";
 import { Link } from "react-router";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | 2025" },
+    { title: `${AppName} | 2025` },
     {
       name: "description",
       content: "Welcome to the 2025 season",
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/2025-cover.jpg",
+      content: "https://rcdrift.io/2025-cover.jpg",
     },
   ];
 };

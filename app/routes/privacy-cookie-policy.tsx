@@ -7,14 +7,14 @@ const Page = () => {
         Cookie Privacy Policy
       </styled.h1>
       <styled.p>RC Drift LTD</styled.p>
-      <styled.p>info@rcdrift.uk</styled.p>
-      <styled.p>https://rcdrift.uk</styled.p>
+      <styled.p>info@rcdrift.io</styled.p>
+      <styled.p>https://rcdrift.io</styled.p>
       <styled.p>Last Updated: 07/03/2024</styled.p>
       <styled.p>1. Introduction</styled.p>
       <styled.p>
         Welcome to [Your Website] ("us," "we," or "our"). This Privacy Policy
         explains how we collect, use, disclose, and safeguard your information
-        when you visit our website [rcdrift.uk].
+        when you visit our website [rcdrift.io].
       </styled.p>
       <styled.p>2. Information We Collect</styled.p>
       <styled.p>(a) Personal Information:</styled.p>

@@ -3,7 +3,6 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { PostCard } from "~/components/PostCard";
-import { Button } from "~/components/Button";
 import {
   Box,
   Center,
@@ -19,17 +18,18 @@ import type { Route } from "./+types/feed";
 import { useEffect, useRef } from "react";
 import { useInView } from "motion/react";
 import { TabsBar } from "~/components/TabsBar";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Community Feed" },
+    { title: `${AppName} | Community Feed` },
     {
       name: "description",
       content: "Welcome to the community feed",
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

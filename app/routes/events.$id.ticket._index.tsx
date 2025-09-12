@@ -174,8 +174,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     ],
     mode: "payment",
-    success_url: `https://rcdrift.uk/events/${event.id}/ticket/success?ticketId=${ticket.id}`,
-    cancel_url: `https://rcdrift.uk/events/${event.id}`,
+    success_url: `https://rcdrift.io/events/${event.id}/ticket/success?ticketId=${ticket.id}`,
+    cancel_url: `https://rcdrift.io/events/${event.id}`,
     metadata: {
       userId,
       ticketId: ticket.id,

@@ -20,9 +20,10 @@ import { FormControl } from "~/components/FormControl";
 import { ImageInput } from "~/components/ImageInput";
 import { uploadFile } from "~/utils/uploadFile.server";
 import { resizeImage } from "~/utils/resizeImage";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "RC Drift UK | Edit Profile" }];
+  return [{ title: `${AppName} | Edit Profile` }];
 };
 
 export const loader = async (args: LoaderFunctionArgs) => {

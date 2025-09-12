@@ -1,10 +1,11 @@
 import { Box, Container, Stack, styled } from "~/styled-system/jsx";
 import type { Route } from "./+types/2025";
 import { CollapsibleCard } from "~/components/CollapsibleCard";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "RC Drift UK | 2025 Judging Criteria" },
+    { title: `${AppName} | 2025 Judging Criteria` },
     {
       name: "description",
       content:
@@ -12,7 +13,7 @@ export const meta: Route.MetaFunction = () => {
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

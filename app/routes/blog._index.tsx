@@ -5,17 +5,18 @@ import { LinkButton } from "~/components/Button";
 import { Markdown } from "~/components/Markdown";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
+import { AppName } from "~/utils/enums";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "RC Drift UK | Insights Blog" },
+    { title: `${AppName} | Insights Blog` },
     {
       name: "description",
-      content: "RC Drift UK's Insights Blog.",
+      content: `${AppName} Insights Blog.`,
     },
     {
       property: "og:image",
-      content: "https://rcdrift.uk/og-image.jpg",
+      content: "https://rcdrift.io/og-image.jpg",
     },
   ];
 };

@@ -6,13 +6,14 @@ import { prisma } from "~/utils/prisma.server";
 import { RiLink } from "react-icons/ri";
 import { ProductStatus } from "~/components/ProductStatus";
 import type { Route } from "./+types/marketplace.$slug";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
     {
-      title: `RC Drift UK | ${data?.title}`,
+      title: `${AppName} | ${data?.title}`,
       description: data?.description,
-      "og:title": `RC Drift UK | ${data?.title}`,
+      "og:title": `${AppName} | ${data?.title}`,
       "og:description": data?.description,
       "og:image": data?.image,
     },

@@ -7,11 +7,12 @@ import { getPostById } from "~/utils/getPostById.server";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/posts.$id._index";
 import { PostCommentForm } from "~/components/PostCommentForm";
+import { AppName } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: "RC Drift UK | Post",
+      title: `${AppName} | Post`,
     },
   ];
 };
