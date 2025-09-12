@@ -5,6 +5,7 @@ export const sumScores = (
   lapScores: LapScores[],
   totalJudges: number,
   scoreFormula: ScoreFormula = ScoreFormula.AVERAGED,
+  penalty: number,
 ) => {
   const totalScore = lapScores.reduce(
     (agg, lapScore) => agg + lapScore.score,
@@ -12,9 +13,11 @@ export const sumScores = (
   );
 
   if (scoreFormula === ScoreFormula.CUMULATIVE) {
-    return totalScore;
+    return Math.max(0, totalScore + penalty);
   }
 
   // Default to AVERAGED (maintaining backward compatibility)
-  return Math.ceil(totalScore / totalJudges);
+  const total = Math.ceil(totalScore / totalJudges);
+
+  return Math.max(0, total + penalty);
 };

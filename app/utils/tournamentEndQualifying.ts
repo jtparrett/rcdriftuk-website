@@ -106,6 +106,7 @@ export const tournamentEndQualifying = async (id: string) => {
           lap.scores,
           tournament._count.judges,
           tournament.scoreFormula,
+          lap.penalty,
         ),
       );
 

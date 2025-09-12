@@ -70,6 +70,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
             },
             select: {
               scores: true,
+              penalty: true,
             },
           },
         },
@@ -98,6 +99,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
               lap.scores,
               tournament._count.judges,
               tournament.scoreFormula,
+              lap.penalty,
             ),
           );
 

@@ -151,6 +151,7 @@ model Laps {
   scores             LapScores[]
   driver             TournamentDrivers @relation(fields: [tournamentDriverId], references: [id])
   tournament         Tournaments?
+  penalty            Int               @default(0)
 }
 
 model LapScores {

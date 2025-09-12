@@ -592,7 +592,7 @@ const TournamentsOverviewPage = () => {
                   <Flex
                     flex={1}
                     flexDir="column"
-                    gap={2}
+                    gap={1}
                     justify="center"
                     pb={12}
                   >
@@ -651,15 +651,24 @@ const TournamentsOverviewPage = () => {
                           <styled.p
                             fontSize={{ base: "4xl", md: "6xl" }}
                             fontWeight="black"
-                            pr={20}
+                            pr={10}
                           >
                             {sumScores(
                               tournament.nextQualifyingLap.scores,
                               tournament.judges.length,
                               tournament.scoreFormula,
-                            )}{" "}
+                              tournament.nextQualifyingLap.penalty,
+                            )}
                           </styled.p>
                         </RightInfoBox>
+
+                        {tournament.nextQualifyingLap.penalty < 0 && (
+                          <RightInfoBox>
+                            <styled.p fontSize="sm" color="brand.500">
+                              Penalty: {tournament.nextQualifyingLap.penalty}
+                            </styled.p>
+                          </RightInfoBox>
+                        )}
 
                         {tournament.nextQualifyingLap.scores.map((score, i) => {
                           return (

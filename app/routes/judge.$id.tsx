@@ -4,6 +4,7 @@ import {
   Form,
   Link,
   redirect,
+  useFetcher,
   useLoaderData,
   useNavigation,
 } from "react-router";
@@ -31,6 +32,10 @@ import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import { css } from "~/styled-system/css";
 import { RiArrowLeftLine } from "react-icons/ri";
+import { TabButton, TabGroup } from "~/components/Tab";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { FormControl } from "~/components/FormControl";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);
@@ -142,23 +147,34 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   ) {
     const formData = await request.formData();
     const score = z.coerce.number().parse(formData.get("score"));
+    const penalty = z.coerce.number().parse(formData.get("penalty"));
 
-    await prisma.lapScores.upsert({
-      where: {
-        judgeId_lapId: {
+    await prisma.$transaction([
+      prisma.laps.update({
+        where: {
+          id: judge.tournament.nextQualifyingLapId,
+        },
+        data: {
+          penalty,
+        },
+      }),
+      prisma.lapScores.upsert({
+        where: {
+          judgeId_lapId: {
+            judgeId,
+            lapId: judge.tournament.nextQualifyingLapId,
+          },
+        },
+        update: {
+          score: Math.min(score, judge.points),
+        },
+        create: {
           judgeId,
           lapId: judge.tournament.nextQualifyingLapId,
+          score: Math.min(score, judge.points),
         },
-      },
-      update: {
-        score: Math.min(score, judge.points),
-      },
-      create: {
-        judgeId,
-        lapId: judge.tournament.nextQualifyingLapId,
-        score: Math.min(score, judge.points),
-      },
-    });
+      }),
+    ]);
   }
 
   if (
@@ -195,15 +211,48 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return redirect(`/judge/${judgeId}`);
 };
 
+const formSchema = z.object({
+  penalty: z.coerce.number(),
+  score: z.coerce.number({
+    message: "Score is required",
+  }),
+});
+
+const validationSchema = toFormikValidationSchema(formSchema);
+
 const QualiForm = () => {
   const { tournament } = useLoaderData<typeof loader>();
   const transition = useNavigation();
-
-  const scoreValue = tournament.nextQualifyingLap?.scores[0]?.score;
-  const qualifyingRun =
-    (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
+  const lapIndex =
+    tournament.nextQualifyingLap?.driver?.laps?.findIndex(
       (lap) => lap.id === tournament.nextQualifyingLapId,
-    ) ?? 0) + 1;
+    ) ?? 0;
+  const qualifyingRun = lapIndex + 1;
+  const fetcher = useFetcher();
+  const isSubmitting = transition.state !== "idle";
+
+  const formik = useFormik({
+    validationSchema,
+    enableReinitialize: true,
+    initialValues: {
+      penalty: tournament.nextQualifyingLap?.penalty ?? 0,
+      score: tournament.nextQualifyingLap?.scores[0]?.score,
+    },
+    onSubmit: (values) => {
+      const formData = new FormData();
+
+      formData.append("penalty", values.penalty.toString());
+      formData.append("score", values.score?.toString() ?? "");
+
+      fetcher.submit(formData, {
+        method: "POST",
+      });
+    },
+  });
+
+  const submit = () => {
+    setTimeout(formik.handleSubmit, 0);
+  };
 
   if (tournament.nextQualifyingLap === null) {
     return null;
@@ -211,54 +260,88 @@ const QualiForm = () => {
 
   return (
     <>
-      {transition.state !== "idle" ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <Flex mb={6}>
-            <styled.p fontWeight="semibold">
-              #
-              {tournament.nextQualifyingLap.driver.id
-                .toString()
-                .padStart(2, "0")}{" "}
-              {tournament.nextQualifyingLap.driver.user.firstName}{" "}
-              {tournament.nextQualifyingLap.driver.user.lastName}
-            </styled.p>
-            <Spacer />
-            <styled.span color="brand.500" fontWeight="bold">
-              Qualifying Run {qualifyingRun}
-            </styled.span>
-          </Flex>
+      <Flex mb={6}>
+        <styled.p fontWeight="semibold">
+          #{tournament.nextQualifyingLap.driver.id.toString().padStart(2, "0")}{" "}
+          {tournament.nextQualifyingLap.driver.user.firstName}{" "}
+          {tournament.nextQualifyingLap.driver.user.lastName}
+        </styled.p>
+        <Spacer />
+        <styled.span color="brand.500" fontWeight="bold">
+          Qualifying Run {qualifyingRun}
+        </styled.span>
+      </Flex>
 
-          <Form method="post">
-            <VStack alignItems="stretch" gap={6}>
-              <Box>
-                <Label>
-                  Score ({scoreValue} {pluralize("point", scoreValue)})
-                </Label>
+      <form onSubmit={formik.handleSubmit}>
+        <VStack alignItems="stretch" gap={4}>
+          <FormControl error={formik.errors.score}>
+            <Label>
+              Score ({formik.values.score}{" "}
+              {pluralize("point", formik.values.score)})
+            </Label>
 
-                <Select
-                  name="score"
-                  aria-label="score-select"
-                  value={scoreValue ?? ""}
-                  onChange={(e) => {
-                    e.target.form?.submit();
-                  }}
-                >
-                  <option value="">Select a value</option>
-                  {Array.from(new Array(tournament.judges[0].points + 1)).map(
-                    (_, i) => (
-                      <option key={i} value={i}>
-                        {i}
-                      </option>
-                    ),
-                  )}
-                </Select>
-              </Box>
-            </VStack>
-          </Form>
-        </>
-      )}
+            <Select
+              name="score"
+              aria-label="score-select"
+              value={formik.values.score ?? ""}
+              onChange={(e) => {
+                formik.setFieldValue("score", Number(e.target.value));
+                submit();
+              }}
+              disabled={isSubmitting}
+            >
+              <option value="">Select a value</option>
+              {Array.from(new Array(tournament.judges[0].points + 1)).map(
+                (_, i) => (
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                ),
+              )}
+            </Select>
+          </FormControl>
+
+          <FormControl error={formik.errors.penalty}>
+            <Label>Penalty</Label>
+
+            <TabGroup>
+              <TabButton
+                type="button"
+                isActive={formik.values.penalty === 0}
+                disabled={isSubmitting}
+                onClick={() => {
+                  formik.setFieldValue("penalty", 0);
+                  submit();
+                }}
+              >
+                None
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={formik.values.penalty === -20}
+                disabled={isSubmitting}
+                onClick={() => {
+                  formik.setFieldValue("penalty", -20);
+                  submit();
+                }}
+              >
+                -20
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={formik.values.penalty === -40}
+                disabled={isSubmitting}
+                onClick={() => {
+                  formik.setFieldValue("penalty", -40);
+                  submit();
+                }}
+              >
+                -40
+              </TabButton>
+            </TabGroup>
+          </FormControl>
+        </VStack>
+      </form>
     </>
   );
 };
