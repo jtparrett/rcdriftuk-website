@@ -674,7 +674,7 @@ const TournamentsOverviewPage = () => {
                           return (
                             <RightInfoBox key={i} delay={0.1 * (i + 1)}>
                               <styled.p fontSize="sm">
-                                {score.judge.user.firstName}: {score.score}
+                                Judge {i + 1}: {score.score}
                               </styled.p>
                             </RightInfoBox>
                           );
@@ -805,8 +805,7 @@ const TournamentsOverviewPage = () => {
                                     md: "block",
                                   }}
                                 >
-                                  {vote.judge.user.firstName}{" "}
-                                  {vote.judge.user.lastName}
+                                  Judge {i + 1}
                                 </styled.p>
                                 <Flex align="center" justify="center">
                                   <Box
