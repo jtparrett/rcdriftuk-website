@@ -3,34 +3,35 @@ import {
   useScroll,
   useTransform,
   useMotionValueEvent,
+  useMotionValue,
 } from "motion/react";
 import { css } from "~/styled-system/css";
 import { Box, Container, Flex } from "~/styled-system/jsx";
 import { useIsApp } from "~/utils/AppContext";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 
 export const TabsBar = ({ children }: { children: React.ReactNode }) => {
   const isApp = useIsApp();
   const { scrollY } = useScroll();
 
-  const [isScrollingUp, setIsScrollingUp] = useState(false);
-  const [scrollDirectionChangeY, setScrollDirectionChangeY] = useState(0);
-  const [headerPositionAtChange, setHeaderPositionAtChange] = useState(0);
+  // Motion values for tracking scroll state without re-renders
+  const isScrollingUp = useMotionValue(false);
+  const scrollDirectionChangeY = useMotionValue(0);
+  const headerPositionAtChange = useMotionValue(0);
   const lastScrollY = useRef(0);
-  const currentHeaderPosition = useRef(0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const direction = latest > lastScrollY.current ? "down" : "up";
-    const wasScrollingUp = isScrollingUp;
+    const wasScrollingUp = isScrollingUp.get();
     const nowScrollingUp = direction === "up";
 
     // If direction changed, record both scroll position and current header position
     if (wasScrollingUp !== nowScrollingUp) {
-      setScrollDirectionChangeY(latest);
-      setHeaderPositionAtChange(currentHeaderPosition.current);
+      scrollDirectionChangeY.set(latest);
+      headerPositionAtChange.set(translateY.get());
     }
 
-    setIsScrollingUp(nowScrollingUp);
+    isScrollingUp.set(nowScrollingUp);
     lastScrollY.current = latest;
   });
 
@@ -41,27 +42,22 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (value <= 0) {
-      currentHeaderPosition.current = 0;
       return 0;
     }
 
-    let newPosition;
+    const scrollingUp = isScrollingUp.get();
+    const changeY = scrollDirectionChangeY.get();
+    const positionAtChange = headerPositionAtChange.get();
 
-    if (isScrollingUp) {
+    if (scrollingUp) {
       // When scrolling up, translate back into view based on how much we've scrolled up
-      const scrolledUp = scrollDirectionChangeY - value;
-      newPosition = Math.max(
-        -64,
-        Math.min(0, headerPositionAtChange + scrolledUp),
-      );
+      const scrolledUp = changeY - value;
+      return Math.max(-64, Math.min(0, positionAtChange + scrolledUp));
     } else {
       // When scrolling down, continue from current position
-      const scrolledDown = value - scrollDirectionChangeY;
-      newPosition = Math.max(-64, headerPositionAtChange - scrolledDown);
+      const scrolledDown = value - changeY;
+      return Math.max(-64, positionAtChange - scrolledDown);
     }
-
-    currentHeaderPosition.current = newPosition;
-    return newPosition;
   });
 
   return (
