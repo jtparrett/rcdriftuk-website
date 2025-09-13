@@ -12,14 +12,13 @@ import {
   useTransform,
   AnimatePresence,
   useMotionValueEvent,
-  useMotionValue,
 } from "motion/react";
 import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { SignedIn } from "@clerk/react-router";
 import { AppName } from "~/utils/enums";
-import { useMemo, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -54,46 +53,22 @@ export const AppHeader = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
 
-  // Motion values for tracking scroll state without re-renders
-  const isScrollingUp = useMotionValue(false);
-  const scrollDirectionChangeY = useMotionValue(0);
-  const headerPositionAtChange = useMotionValue(0);
+  const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const direction = latest > lastScrollY.current ? "down" : "up";
-    const wasScrollingUp = isScrollingUp.get();
-    const nowScrollingUp = direction === "up";
-
-    // If direction changed, record both scroll position and current header position
-    if (wasScrollingUp !== nowScrollingUp) {
-      scrollDirectionChangeY.set(latest);
-      headerPositionAtChange.set(translateY.get());
+    if (latest <= 16) {
+      // Always show when near top
+      setIsVisible(true);
+    } else {
+      // Show when scrolling up, hide when scrolling down
+      const direction = latest > lastScrollY.current ? "down" : "up";
+      setIsVisible(direction === "up");
     }
-
-    isScrollingUp.set(nowScrollingUp);
     lastScrollY.current = latest;
   });
 
-  const translateY = useTransform(scrollY, (value) => {
-    if (value <= 0) {
-      return 0;
-    }
-
-    const scrollingUp = isScrollingUp.get();
-    const changeY = scrollDirectionChangeY.get();
-    const positionAtChange = headerPositionAtChange.get();
-
-    if (scrollingUp) {
-      // When scrolling up, translate back into view based on how much we've scrolled up
-      const scrolledUp = changeY - value;
-      return Math.max(-64, Math.min(0, positionAtChange + scrolledUp));
-    } else {
-      // When scrolling down, continue from current position
-      const scrolledDown = value - changeY;
-      return Math.max(-64, positionAtChange - scrolledDown);
-    }
-  });
+  // Use animate prop for smooth transitions
 
   const showBackButton = useMemo(() => {
     return !APP_TAB_ROUTES.some((route) =>
@@ -119,8 +94,12 @@ export const AppHeader = () => {
           borderBottomWidth: 1,
           borderColor: "gray.900",
         })}
-        style={{
-          translateY,
+        animate={{
+          translateY: isVisible ? 0 : -64,
+        }}
+        transition={{
+          duration: 0.3,
+          ease: "easeInOut",
         }}
       >
         <div
@@ -128,7 +107,7 @@ export const AppHeader = () => {
             h: "64px",
             display: "flex",
             alignItems: "center",
-            px: 2,
+            px: 3,
             pos: "relative",
             gap: 1,
           })}
