@@ -16,6 +16,7 @@ import {
 } from "react-icons/ri";
 import { Link, useLocation } from "react-router";
 import { APP_TAB_ROUTES } from "./AppHeader";
+import ProgressiveBlur from "./ProgressiveBlur";
 
 const Tab = styled(Link, {
   base: {
@@ -53,19 +54,25 @@ export const AppNav = () => {
         bottom={0}
         left={0}
         right={0}
-        borderTopWidth={1}
-        borderColor="gray.800"
+        // borderTopWidth={1}
+        // borderColor="gray.800"
         zIndex={15}
-        bgColor="rgba(12, 12, 12, 0.75)"
-        backdropFilter="blur(10px)"
+        // bgColor="rgba(12, 12, 12, 0.75)"
+        // backdropFilter="blur(10px)"
+        bgGradient="to-b"
+        gradientFrom="rgba(12, 12, 12, 0)"
+        gradientTo="rgba(12, 12, 12, 0.9)"
         pb="env(safe-area-inset-bottom)"
       >
+        <ProgressiveBlur position="bottom" />
         <Flex
           w="full"
           h="64px"
           px={2}
           justifyContent="space-between"
           alignItems="center"
+          pos="relative"
+          zIndex={1}
         >
           <Tab
             to="/app"

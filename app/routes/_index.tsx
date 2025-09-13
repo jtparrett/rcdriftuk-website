@@ -34,6 +34,7 @@ import { SignedIn, SignedOut } from "@clerk/react-router";
 import { MockPhone } from "~/components/MockPhone";
 import { DashedLine } from "~/components/DashedLine";
 import { AppName } from "~/utils/enums";
+import ProgressiveBlur from "~/components/ProgressiveBlur";
 
 const Card = styled("article", {
   base: {
@@ -441,12 +442,15 @@ const Page = () => {
                   rounded: "inherit",
                 }}
               >
+                <ProgressiveBlur position="right" intensity={60} />
                 <Flex
                   flexDir={{ base: "column", md: "row" }}
                   bgColor={{
                     base: "rgba(0, 0, 0, 0.8)",
                     md: "rgba(0, 0, 0, 0.6)",
                   }}
+                  pos="relative"
+                  zIndex={1}
                 >
                   <Spacer />
                   <Box textAlign="center" flex={1} py={32}>

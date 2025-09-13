@@ -8,6 +8,7 @@ import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/tracks._index";
 import { AppName } from "~/utils/enums";
+import ProgressiveBlur from "~/components/ProgressiveBlur";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -108,9 +109,10 @@ const TracksPage = () => {
                     pos="absolute"
                     inset={0}
                     bgGradient="to-b"
-                    gradientFrom="rgba(24, 24, 27, 0.9)"
+                    gradientFrom="rgba(24, 24, 27, 0.5)"
                     gradientTo="gray.900"
                   />
+                  <ProgressiveBlur position="bottom" />
                 </Box>
                 <Box
                   w={24}

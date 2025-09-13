@@ -6,12 +6,13 @@ import {
   RiChat3Line,
   RiNotificationLine,
 } from "react-icons/ri";
-import { useScroll, motion, useTransform } from "motion/react";
+import { useScroll, motion, useTransform, useMotionValue } from "motion/react";
 import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { SignedIn } from "@clerk/react-router";
 import { AppName } from "~/utils/enums";
+import { useEffect } from "react";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -49,6 +50,39 @@ export const AppHeader = () => {
   const scale = useTransform(scrollY, [0, 84], [1, 0.65]);
   const height = useTransform(scrollY, [0, 84], [64, 48]);
 
+  const headerY = useMotionValue(0);
+
+  useEffect(() => {
+    let lastScrollY = 0;
+    let headerOffset = 0;
+
+    const unsubscribe = scrollY.on("change", (currentScrollY) => {
+      const scrollDelta = currentScrollY - lastScrollY;
+
+      // Calculate the current header height based on scroll position
+      const progress = Math.min(currentScrollY / 84, 1);
+      const currentHeaderHeight = 64 - (64 - 48) * progress; // 64px -> 48px
+      // Move it the full header height to hide it completely
+      const maxHideDistance = currentHeaderHeight;
+
+      if (currentScrollY <= 0) {
+        // At top - always show header
+        headerOffset = 0;
+      } else if (scrollDelta > 0) {
+        // Scrolling down - hide header progressively
+        headerOffset = Math.min(headerOffset + scrollDelta, maxHideDistance);
+      } else if (scrollDelta < 0) {
+        // Scrolling up - show header progressively at rate of scroll change
+        headerOffset = Math.max(headerOffset + scrollDelta, 0);
+      }
+
+      headerY.set(-headerOffset);
+      lastScrollY = currentScrollY;
+    });
+
+    return () => unsubscribe();
+  }, [scrollY, headerY]);
+
   return (
     <>
       <motion.div
@@ -65,6 +99,9 @@ export const AppHeader = () => {
           borderBottomWidth: 1,
           borderColor: "gray.900",
         })}
+        style={{
+          y: headerY,
+        }}
       >
         <motion.div
           className={css({
