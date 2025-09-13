@@ -6,13 +6,13 @@ import {
   RiChat3Line,
   RiNotificationLine,
 } from "react-icons/ri";
-import { useScroll, motion, useTransform, useMotionValue } from "motion/react";
+import { useScroll, motion, useTransform, AnimatePresence } from "motion/react";
 import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { SignedIn } from "@clerk/react-router";
 import { AppName } from "~/utils/enums";
-import { useEffect } from "react";
+import { useMemo } from "react";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -50,38 +50,13 @@ export const AppHeader = () => {
   const scale = useTransform(scrollY, [0, 84], [1, 0.65]);
   const height = useTransform(scrollY, [0, 84], [64, 48]);
 
-  const headerY = useMotionValue(0);
-
-  useEffect(() => {
-    let lastScrollY = 0;
-    let headerOffset = 0;
-
-    const unsubscribe = scrollY.on("change", (currentScrollY) => {
-      const scrollDelta = currentScrollY - lastScrollY;
-
-      // Calculate the current header height based on scroll position
-      const progress = Math.min(currentScrollY / 84, 1);
-      const currentHeaderHeight = 64 - (64 - 48) * progress; // 64px -> 48px
-      // Move it the full header height to hide it completely
-      const maxHideDistance = currentHeaderHeight;
-
-      if (currentScrollY <= 0) {
-        // At top - always show header
-        headerOffset = 0;
-      } else if (scrollDelta > 0) {
-        // Scrolling down - hide header progressively
-        headerOffset = Math.min(headerOffset + scrollDelta, maxHideDistance);
-      } else if (scrollDelta < 0) {
-        // Scrolling up - show header progressively at rate of scroll change
-        headerOffset = Math.max(headerOffset + scrollDelta, 0);
-      }
-
-      headerY.set(-headerOffset);
-      lastScrollY = currentScrollY;
-    });
-
-    return () => unsubscribe();
-  }, [scrollY, headerY]);
+  const showBackButton = useMemo(() => {
+    return !APP_TAB_ROUTES.some((route) =>
+      route.endsWith("*")
+        ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
+        : location.pathname.toLowerCase() === route,
+    );
+  }, [location.pathname]);
 
   return (
     <>
@@ -99,9 +74,6 @@ export const AppHeader = () => {
           borderBottomWidth: 1,
           borderColor: "gray.900",
         })}
-        style={{
-          y: headerY,
-        }}
       >
         <motion.div
           className={css({
@@ -110,47 +82,57 @@ export const AppHeader = () => {
             alignItems: "center",
             px: 4,
             pos: "relative",
-            gap: 2,
+            gap: 1,
           })}
           style={{
             height,
           }}
         >
-          {!APP_TAB_ROUTES.some((route) =>
-            route.endsWith("*")
-              ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
-              : location.pathname.toLowerCase() === route,
-          ) && (
-            <styled.button
-              onClick={() => navigate(-1)}
-              type="button"
-              cursor="pointer"
-            >
-              <RiArrowLeftSLine size={24} />
-            </styled.button>
-          )}
+          <AnimatePresence mode="wait">
+            {showBackButton && (
+              <motion.div
+                key="back-button"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "auto", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeInOut",
+                  opacity: { duration: 0.2 },
+                }}
+                style={{ overflow: "hidden" }}
+              >
+                <styled.button
+                  onClick={() => navigate(-1)}
+                  type="button"
+                  cursor="pointer"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  minW="32px"
+                  h="32px"
+                >
+                  <RiArrowLeftSLine size={24} />
+                </styled.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <Link to="/app">
+            <motion.img
+              className={css({
+                w: 140,
+              })}
+              style={{
+                scale,
+                transformOrigin: "left center",
+              }}
+              src="/rcdriftio.svg"
+              alt={AppName}
+            />
+          </Link>
 
           <Spacer />
-
-          <Box
-            pos="absolute"
-            transform="translate3d(-50%, -50%, 0)"
-            top="50%"
-            left="50%"
-          >
-            <Link to="/app">
-              <motion.img
-                className={css({
-                  w: 140,
-                })}
-                style={{
-                  scale,
-                }}
-                src="/rcdriftio.svg"
-                alt={AppName}
-              />
-            </Link>
-          </Box>
 
           <SignedIn>
             <IconButton to="/notifications" pos="relative">
@@ -159,10 +141,10 @@ export const AppHeader = () => {
               <NotificationsBadge />
             </IconButton>
 
-            {/* <IconButton to="/inbox">
+            <IconButton to="/inbox">
               <RiChat3Line size={16} />
               <styled.span srOnly>Inbox</styled.span>
-            </IconButton> */}
+            </IconButton>
           </SignedIn>
         </motion.div>
       </motion.div>
