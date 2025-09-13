@@ -102,7 +102,7 @@ export const AppHeader = () => {
           ease: "easeInOut",
         }}
       >
-        <div
+        <motion.div
           className={css({
             h: "64px",
             display: "flex",
@@ -111,6 +111,14 @@ export const AppHeader = () => {
             pos: "relative",
             gap: 1,
           })}
+          animate={{
+            opacity: isVisible ? 1 : 0,
+            filter: isVisible ? "blur(0px)" : "blur(12px)",
+          }}
+          transition={{
+            duration: 0.3,
+            ease: "easeInOut",
+          }}
         >
           <AnimatePresence mode="wait">
             {showBackButton && (
@@ -166,7 +174,7 @@ export const AppHeader = () => {
               <styled.span srOnly>Inbox</styled.span>
             </IconButton> */}
           </SignedIn>
-        </div>
+        </motion.div>
       </motion.div>
 
       <Box h="calc(64px + env(safe-area-inset-top))" w="full" />

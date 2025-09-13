@@ -159,8 +159,7 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  let { hideBanner, isEmbed, isApp, posthog, user } = loaderData || {};
-  isApp = true;
+  const { hideBanner, isEmbed, isApp, posthog, user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
 
