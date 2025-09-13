@@ -54,102 +54,103 @@ export const AppNav = () => {
         bottom={0}
         left={0}
         right={0}
-        // borderTopWidth={1}
-        // borderColor="gray.800"
         zIndex={15}
-        // bgColor="rgba(12, 12, 12, 0.75)"
-        // backdropFilter="blur(10px)"
         bgGradient="to-b"
         gradientFrom="rgba(12, 12, 12, 0)"
         gradientTo="rgba(12, 12, 12, 0.9)"
         pb="env(safe-area-inset-bottom)"
       >
         <ProgressiveBlur position="bottom" />
-        <Flex
-          w="full"
-          h="64px"
-          px={2}
-          justifyContent="space-between"
-          alignItems="center"
-          pos="relative"
-          zIndex={1}
-        >
-          <Tab
-            to="/app"
-            isActive={
-              location.pathname === "/feed" || location.pathname === "/"
-            }
-            viewTransition
+        <Box h="64px" px={4} w="full">
+          <Flex
+            w="full"
+            px={4}
+            justifyContent="space-between"
+            alignItems="center"
+            pos="relative"
+            zIndex={1}
+            bgColor="rgba(12, 12, 12, 0.5)"
+            rounded="full"
+            borderWidth={1}
+            borderColor="gray.800"
           >
-            {location.pathname === "/feed" || location.pathname === "/" ? (
-              <RiHomeFill size={24} />
-            ) : (
-              <RiHomeLine size={24} />
-            )}
-          </Tab>
-          <Tab
-            to="/ratings"
-            isActive={location.pathname.startsWith("/ratings")}
-            viewTransition
-          >
-            <RiListOrdered2 size={24} />
-          </Tab>
-          <Tab
-            to="/tournaments"
-            isActive={location.pathname.startsWith("/tournaments")}
-            viewTransition
-          >
-            {location.pathname.startsWith("/tournaments") ? (
-              <RiVipCrown2Fill size={24} />
-            ) : (
-              <RiVipCrown2Line size={24} />
-            )}
-          </Tab>
-          <Tab
-            to="/map"
-            isActive={location.pathname.startsWith("/map")}
-            viewTransition
-          >
-            {location.pathname.startsWith("/map") ? (
-              <RiMapPin2Fill size={24} />
-            ) : (
-              <RiMapPin2Line size={24} />
-            )}
-          </Tab>
-          <Tab
-            to="/calendar"
-            isActive={location.pathname.startsWith("/calendar")}
-            viewTransition
-          >
-            {location.pathname.startsWith("/calendar") ? (
-              <RiCalendarFill size={24} />
-            ) : (
-              <RiCalendarLine size={24} />
-            )}
-          </Tab>
-          <Tab
-            to="/marketplace"
-            isActive={location.pathname.startsWith("/marketplace")}
-            viewTransition
-          >
-            {location.pathname.startsWith("/marketplace") ? (
-              <RiShoppingBagFill size={24} />
-            ) : (
-              <RiShoppingBagLine size={24} />
-            )}
-          </Tab>
-          <Tab
-            to="/user-menu"
-            isActive={location.pathname.startsWith("/user-menu")}
-            viewTransition
-          >
-            {location.pathname.startsWith("/user-menu") ? (
-              <RiAccountCircleFill size={24} />
-            ) : (
-              <RiAccountCircleLine size={24} />
-            )}
-          </Tab>
-        </Flex>
+            <Tab
+              to="/app"
+              isActive={
+                location.pathname === "/feed" || location.pathname === "/"
+              }
+              viewTransition
+            >
+              {location.pathname === "/feed" || location.pathname === "/" ? (
+                <RiHomeFill size={24} />
+              ) : (
+                <RiHomeLine size={24} />
+              )}
+            </Tab>
+            <Tab
+              to="/ratings"
+              isActive={location.pathname.startsWith("/ratings")}
+              viewTransition
+            >
+              <RiListOrdered2 size={24} />
+            </Tab>
+            <Tab
+              to="/tournaments"
+              isActive={location.pathname.startsWith("/tournaments")}
+              viewTransition
+            >
+              {location.pathname.startsWith("/tournaments") ? (
+                <RiVipCrown2Fill size={24} />
+              ) : (
+                <RiVipCrown2Line size={24} />
+              )}
+            </Tab>
+            <Tab
+              to="/map"
+              isActive={location.pathname.startsWith("/map")}
+              viewTransition
+            >
+              {location.pathname.startsWith("/map") ? (
+                <RiMapPin2Fill size={24} />
+              ) : (
+                <RiMapPin2Line size={24} />
+              )}
+            </Tab>
+            <Tab
+              to="/calendar"
+              isActive={location.pathname.startsWith("/calendar")}
+              viewTransition
+            >
+              {location.pathname.startsWith("/calendar") ? (
+                <RiCalendarFill size={24} />
+              ) : (
+                <RiCalendarLine size={24} />
+              )}
+            </Tab>
+            <Tab
+              to="/marketplace"
+              isActive={location.pathname.startsWith("/marketplace")}
+              viewTransition
+            >
+              {location.pathname.startsWith("/marketplace") ? (
+                <RiShoppingBagFill size={24} />
+              ) : (
+                <RiShoppingBagLine size={24} />
+              )}
+            </Tab>
+            <Tab
+              to="/user-menu"
+              isActive={location.pathname.startsWith("/user-menu")}
+              viewTransition
+            >
+              {location.pathname.startsWith("/user-menu") ? (
+                <RiAccountCircleFill size={24} />
+              ) : (
+                <RiAccountCircleLine size={24} />
+              )}
+            </Tab>
+          </Flex>
+        </Box>
       </Flex>
     </>
   );
