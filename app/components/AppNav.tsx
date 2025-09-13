@@ -69,7 +69,8 @@ export const AppNav = () => {
             alignItems="center"
             pos="relative"
             zIndex={1}
-            bgColor="rgba(12, 12, 12, 0.5)"
+            bgColor="rgba(12, 12, 12, 0.75)"
+            backdropFilter="blur(10px)"
             rounded="full"
             borderWidth={1}
             borderColor="gray.800"
