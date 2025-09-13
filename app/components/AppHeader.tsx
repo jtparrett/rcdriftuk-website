@@ -80,7 +80,7 @@ export const AppHeader = () => {
             h: "64px",
             display: "flex",
             alignItems: "center",
-            px: 4,
+            px: 2,
             pos: "relative",
             gap: 1,
           })}
@@ -141,10 +141,10 @@ export const AppHeader = () => {
               <NotificationsBadge />
             </IconButton>
 
-            <IconButton to="/inbox">
+            {/* <IconButton to="/inbox">
               <RiChat3Line size={16} />
               <styled.span srOnly>Inbox</styled.span>
-            </IconButton>
+            </IconButton> */}
           </SignedIn>
         </motion.div>
       </motion.div>
