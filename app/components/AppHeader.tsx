@@ -6,13 +6,19 @@ import {
   RiChat3Line,
   RiNotificationLine,
 } from "react-icons/ri";
-import { useScroll, motion, useTransform, AnimatePresence } from "motion/react";
+import {
+  useScroll,
+  motion,
+  useTransform,
+  AnimatePresence,
+  useMotionValueEvent,
+} from "motion/react";
 import { css } from "~/styled-system/css";
 import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { SignedIn } from "@clerk/react-router";
 import { AppName } from "~/utils/enums";
-import { useMemo } from "react";
+import { useMemo, useState, useRef } from "react";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -47,8 +53,51 @@ export const AppHeader = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
 
-  const scale = useTransform(scrollY, [0, 84], [1, 0.65]);
-  const height = useTransform(scrollY, [0, 84], [64, 48]);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const [scrollDirectionChangeY, setScrollDirectionChangeY] = useState(0);
+  const [headerPositionAtChange, setHeaderPositionAtChange] = useState(0);
+  const lastScrollY = useRef(0);
+  const currentHeaderPosition = useRef(0);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const direction = latest > lastScrollY.current ? "down" : "up";
+    const wasScrollingUp = isScrollingUp;
+    const nowScrollingUp = direction === "up";
+
+    // If direction changed, record both scroll position and current header position
+    if (wasScrollingUp !== nowScrollingUp) {
+      setScrollDirectionChangeY(latest);
+      setHeaderPositionAtChange(currentHeaderPosition.current);
+    }
+
+    setIsScrollingUp(nowScrollingUp);
+    lastScrollY.current = latest;
+  });
+
+  const translateY = useTransform(scrollY, (value) => {
+    if (value <= 0) {
+      currentHeaderPosition.current = 0;
+      return 0;
+    }
+
+    let newPosition;
+
+    if (isScrollingUp) {
+      // When scrolling up, translate back into view based on how much we've scrolled up
+      const scrolledUp = scrollDirectionChangeY - value;
+      newPosition = Math.max(
+        -64,
+        Math.min(0, headerPositionAtChange + scrolledUp),
+      );
+    } else {
+      // When scrolling down, continue from current position
+      const scrolledDown = value - scrollDirectionChangeY;
+      newPosition = Math.max(-64, headerPositionAtChange - scrolledDown);
+    }
+
+    currentHeaderPosition.current = newPosition;
+    return newPosition;
+  });
 
   const showBackButton = useMemo(() => {
     return !APP_TAB_ROUTES.some((route) =>
@@ -74,8 +123,11 @@ export const AppHeader = () => {
           borderBottomWidth: 1,
           borderColor: "gray.900",
         })}
+        style={{
+          translateY,
+        }}
       >
-        <motion.div
+        <div
           className={css({
             h: "64px",
             display: "flex",
@@ -84,9 +136,6 @@ export const AppHeader = () => {
             pos: "relative",
             gap: 1,
           })}
-          style={{
-            height,
-          }}
         >
           <AnimatePresence mode="wait">
             {showBackButton && (
@@ -119,14 +168,10 @@ export const AppHeader = () => {
           </AnimatePresence>
 
           <Link to="/app">
-            <motion.img
+            <img
               className={css({
                 w: 140,
               })}
-              style={{
-                scale,
-                transformOrigin: "left center",
-              }}
               src="/rcdriftio.svg"
               alt={AppName}
             />
@@ -146,7 +191,7 @@ export const AppHeader = () => {
               <styled.span srOnly>Inbox</styled.span>
             </IconButton> */}
           </SignedIn>
-        </motion.div>
+        </div>
       </motion.div>
 
       <Box h="calc(64px + env(safe-area-inset-top))" w="full" />
