@@ -15,8 +15,10 @@ import {
   RiVipCrown2Line,
 } from "react-icons/ri";
 import { Link, useLocation } from "react-router";
+import { motion, AnimatePresence } from "motion/react";
 import { APP_TAB_ROUTES } from "./AppHeader";
 import ProgressiveBlur from "./ProgressiveBlur";
+import { css } from "~/styled-system/css";
 
 const Tab = styled(Link, {
   base: {
@@ -42,117 +44,129 @@ export const AppNav = () => {
       : location.pathname.toLowerCase() === route,
   );
 
-  if (!isMainTab) {
-    return null;
-  }
-
   return (
-    <>
-      <Box h="calc(64px + env(safe-area-inset-bottom))" w="full" />
-      <Flex
-        position="fixed"
-        bottom={0}
-        left={0}
-        right={0}
-        zIndex={15}
-        bgGradient="to-b"
-        gradientFrom="rgba(12, 12, 12, 0)"
-        gradientTo="rgba(12, 12, 12, 0.9)"
-        pb="env(safe-area-inset-bottom)"
-      >
-        <ProgressiveBlur position="bottom" />
-        <Box h="64px" px={4} w="full">
+    <AnimatePresence>
+      {isMainTab && (
+        <>
+          <Box h="calc(64px + env(safe-area-inset-bottom))" w="full" />
           <Flex
-            w="full"
-            px={4}
-            justifyContent="space-between"
-            alignItems="center"
-            pos="relative"
-            zIndex={1}
-            bgColor="rgba(12, 12, 12, 0.75)"
-            backdropFilter="blur(10px)"
-            rounded="full"
-            borderWidth={1}
-            borderColor="gray.800"
+            position="fixed"
+            bottom={0}
+            left={0}
+            right={0}
+            zIndex={15}
+            bgGradient="to-b"
+            gradientFrom="rgba(12, 12, 12, 0)"
+            gradientTo="rgba(12, 12, 12, 0.9)"
+            pb="env(safe-area-inset-bottom)"
           >
-            <Tab
-              to="/app"
-              isActive={
-                location.pathname === "/feed" || location.pathname === "/"
-              }
-              viewTransition
+            <ProgressiveBlur position="bottom" />
+
+            <motion.div
+              className={css({ h: "64px", px: 4, w: "full" })}
+              key="app-nav"
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
             >
-              {location.pathname === "/feed" || location.pathname === "/" ? (
-                <RiHomeFill size={24} />
-              ) : (
-                <RiHomeLine size={24} />
-              )}
-            </Tab>
-            <Tab
-              to="/ratings"
-              isActive={location.pathname.startsWith("/ratings")}
-              viewTransition
-            >
-              <RiListOrdered2 size={24} />
-            </Tab>
-            <Tab
-              to="/tournaments"
-              isActive={location.pathname.startsWith("/tournaments")}
-              viewTransition
-            >
-              {location.pathname.startsWith("/tournaments") ? (
-                <RiVipCrown2Fill size={24} />
-              ) : (
-                <RiVipCrown2Line size={24} />
-              )}
-            </Tab>
-            <Tab
-              to="/map"
-              isActive={location.pathname.startsWith("/map")}
-              viewTransition
-            >
-              {location.pathname.startsWith("/map") ? (
-                <RiMapPin2Fill size={24} />
-              ) : (
-                <RiMapPin2Line size={24} />
-              )}
-            </Tab>
-            <Tab
-              to="/calendar"
-              isActive={location.pathname.startsWith("/calendar")}
-              viewTransition
-            >
-              {location.pathname.startsWith("/calendar") ? (
-                <RiCalendarFill size={24} />
-              ) : (
-                <RiCalendarLine size={24} />
-              )}
-            </Tab>
-            <Tab
-              to="/marketplace"
-              isActive={location.pathname.startsWith("/marketplace")}
-              viewTransition
-            >
-              {location.pathname.startsWith("/marketplace") ? (
-                <RiShoppingBagFill size={24} />
-              ) : (
-                <RiShoppingBagLine size={24} />
-              )}
-            </Tab>
-            <Tab
-              to="/user-menu"
-              isActive={location.pathname.startsWith("/user-menu")}
-              viewTransition
-            >
-              {location.pathname.startsWith("/user-menu") ? (
-                <RiAccountCircleFill size={24} />
-              ) : (
-                <RiAccountCircleLine size={24} />
-              )}
-            </Tab>
+              <Flex
+                w="full"
+                px={4}
+                justifyContent="space-between"
+                alignItems="center"
+                pos="relative"
+                zIndex={1}
+                bgColor="rgba(12, 12, 12, 0.75)"
+                backdropFilter="blur(10px)"
+                rounded="full"
+                borderWidth={1}
+                borderColor="gray.800"
+              >
+                <Tab
+                  to="/app"
+                  isActive={
+                    location.pathname === "/feed" || location.pathname === "/"
+                  }
+                  viewTransition
+                >
+                  {location.pathname === "/feed" ||
+                  location.pathname === "/" ? (
+                    <RiHomeFill size={24} />
+                  ) : (
+                    <RiHomeLine size={24} />
+                  )}
+                </Tab>
+                <Tab
+                  to="/ratings"
+                  isActive={location.pathname.startsWith("/ratings")}
+                  viewTransition
+                >
+                  <RiListOrdered2 size={24} />
+                </Tab>
+                <Tab
+                  to="/tournaments"
+                  isActive={location.pathname.startsWith("/tournaments")}
+                  viewTransition
+                >
+                  {location.pathname.startsWith("/tournaments") ? (
+                    <RiVipCrown2Fill size={24} />
+                  ) : (
+                    <RiVipCrown2Line size={24} />
+                  )}
+                </Tab>
+                <Tab
+                  to="/map"
+                  isActive={location.pathname.startsWith("/map")}
+                  viewTransition
+                >
+                  {location.pathname.startsWith("/map") ? (
+                    <RiMapPin2Fill size={24} />
+                  ) : (
+                    <RiMapPin2Line size={24} />
+                  )}
+                </Tab>
+                <Tab
+                  to="/calendar"
+                  isActive={location.pathname.startsWith("/calendar")}
+                  viewTransition
+                >
+                  {location.pathname.startsWith("/calendar") ? (
+                    <RiCalendarFill size={24} />
+                  ) : (
+                    <RiCalendarLine size={24} />
+                  )}
+                </Tab>
+                <Tab
+                  to="/marketplace"
+                  isActive={location.pathname.startsWith("/marketplace")}
+                  viewTransition
+                >
+                  {location.pathname.startsWith("/marketplace") ? (
+                    <RiShoppingBagFill size={24} />
+                  ) : (
+                    <RiShoppingBagLine size={24} />
+                  )}
+                </Tab>
+                <Tab
+                  to="/user-menu"
+                  isActive={location.pathname.startsWith("/user-menu")}
+                  viewTransition
+                >
+                  {location.pathname.startsWith("/user-menu") ? (
+                    <RiAccountCircleFill size={24} />
+                  ) : (
+                    <RiAccountCircleLine size={24} />
+                  )}
+                </Tab>
+              </Flex>
+            </motion.div>
           </Flex>
-        </Box>
-      </Flex>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
