@@ -49,25 +49,35 @@ export const AppNav = () => {
       {isMainTab && (
         <>
           <Box h="calc(64px + env(safe-area-inset-bottom))" w="full" />
-          <Flex
-            position="fixed"
-            bottom={0}
-            left={0}
-            right={0}
-            zIndex={15}
-            bgGradient="to-b"
-            gradientFrom="rgba(12, 12, 12, 0)"
-            gradientTo="rgba(12, 12, 12, 0.9)"
-            pb="env(safe-area-inset-bottom)"
+          <motion.div
+            className={css({
+              display: "flex",
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 15,
+              bgGradient: "to-b",
+              gradientFrom: "rgba(12, 12, 12, 0)",
+              gradientTo: "rgba(12, 12, 12, 0.9)",
+              pb: "env(safe-area-inset-bottom)",
+            })}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+            }}
           >
             <ProgressiveBlur position="bottom" />
 
             <motion.div
               className={css({ h: "64px", px: 4, w: "full" })}
               key="app-nav"
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              exit={{ y: 100 }}
               transition={{
                 duration: 0.3,
                 ease: "easeInOut",
@@ -164,7 +174,7 @@ export const AppNav = () => {
                 </Tab>
               </Flex>
             </motion.div>
-          </Flex>
+          </motion.div>
         </>
       )}
     </AnimatePresence>
