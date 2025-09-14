@@ -121,7 +121,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         );
 
         return (
-          bestB - bestA || secondB - secondA || thirdB - thirdA || b.id - a.id
+          bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
         );
       }),
   };

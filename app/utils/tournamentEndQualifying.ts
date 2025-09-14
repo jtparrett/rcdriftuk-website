@@ -156,7 +156,16 @@ const setupWildcardBattles = async (
   );
 
   await prisma.tournamentBattles.createMany({
-    data: [...lowerBracket, ...upperBracket],
+    data: [
+      ...lowerBracket,
+      ...upperBracket,
+      // FINAL BATTLE
+      {
+        tournamentId: tournament.id,
+        round: 1000,
+        bracket: BattlesBracket.UPPER,
+      },
+    ],
   });
 
   const [initialLowerBattles, initialUpperBattles] = await prisma.$transaction([
@@ -329,7 +338,7 @@ export const tournamentEndQualifying = async (id: string) => {
       );
 
       return (
-        bestB - bestA || secondB - secondA || thirdB - thirdA || b.id - a.id
+        bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
       );
     });
 

@@ -7,19 +7,19 @@ import {
 import { prisma } from "~/utils/prisma.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
 
-const advanceToNextBattle = async (tournamentId: string) => {
+const advanceToNextBattle = async (
+  tournamentId: string,
+  format: TournamentsFormat,
+) => {
   const nextBattle = await prisma.tournamentBattles.findFirst({
     where: {
       tournamentId,
       winnerId: null,
     },
     orderBy: [
-      {
-        round: "asc",
-      },
-      {
-        bracket: "asc",
-      },
+      ...(format === TournamentsFormat.WILDCARD
+        ? ([{ bracket: "desc" }, { round: "asc" }] as const)
+        : ([{ round: "asc" }, { bracket: "asc" }] as const)),
       {
         id: "asc",
       },
@@ -71,7 +71,7 @@ export const tournamentNextBattle = async (id: string) => {
 
   if (!tournament.nextBattleId || !tournament.nextBattle) {
     // End the comp!
-    await advanceToNextBattle(id);
+    await advanceToNextBattle(id, tournament.format);
     // After setting next battle, check if it's a bye run that needs auto-advancement
     await autoAdvanceByeRuns(id);
     return null;
@@ -135,14 +135,19 @@ export const tournamentNextBattle = async (id: string) => {
     });
   }
 
-  if (winnerId && tournament.format === TournamentsFormat.STANDARD) {
+  if (
+    winnerId &&
+    (tournament.format === TournamentsFormat.STANDARD ||
+      tournament.format === TournamentsFormat.WILDCARD)
+  ) {
     await advanceSingleEliminationBattleWinner({
       tournamentId: id,
       battleId: tournament.nextBattleId,
       winnerId,
+      format: tournament.format,
     });
 
-    await advanceToNextBattle(id);
+    await advanceToNextBattle(id, tournament.format);
 
     // After advancing, check if the next battle is a bye run that needs auto-advancement
     await autoAdvanceByeRuns(id);
@@ -157,7 +162,7 @@ export const tournamentNextBattle = async (id: string) => {
       winnerId,
     });
 
-    await advanceToNextBattle(id);
+    await advanceToNextBattle(id, tournament.format);
 
     // After advancing, check if the next battle is a bye run that needs auto-advancement
     await autoAdvanceByeRuns(id);
@@ -175,7 +180,7 @@ export const tournamentNextBattle = async (id: string) => {
       },
     });
 
-    await advanceToNextBattle(id);
+    await advanceToNextBattle(id, tournament.format);
 
     // After advancing, check if the next battle is a bye run that needs auto-advancement
     await autoAdvanceByeRuns(id);

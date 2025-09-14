@@ -1,4 +1,4 @@
-import { BattlesBracket } from "~/utils/enums";
+import { BattlesBracket, TournamentsFormat } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 
 export const pow2Ceil = (value: number) => {
@@ -14,12 +14,14 @@ interface Params {
   tournamentId: string;
   battleId: number;
   winnerId: number;
+  format: TournamentsFormat;
 }
 
 export const advanceSingleEliminationBattleWinner = async ({
   tournamentId,
   battleId,
   winnerId,
+  format,
 }: Params) => {
   const thisBattle = await prisma.tournamentBattles.update({
     where: {
@@ -43,8 +45,17 @@ export const advanceSingleEliminationBattleWinner = async ({
       ],
     },
     orderBy: [
-      { round: "asc" },
-      { bracket: "asc" },
+      ...(format === TournamentsFormat.WILDCARD
+        ? ([{ bracket: "desc" }, { round: "asc" }] as const)
+        : ([
+            {
+              round: "asc",
+            },
+            {
+              bracket: "asc",
+            },
+          ] as const)),
+
       {
         id: "asc",
       },
@@ -150,7 +161,7 @@ export const advanceDoubleEliminationBattleWinner = async ({
   tournamentId,
   battleId,
   winnerId,
-}: Params) => {
+}: Omit<Params, "format">) => {
   const thisBattle = await prisma.tournamentBattles.update({
     where: {
       id: battleId,
