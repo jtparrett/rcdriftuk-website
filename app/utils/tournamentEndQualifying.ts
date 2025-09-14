@@ -42,7 +42,9 @@ const setupRegularBattles = async (
   drivers: { id: number; lapScores: number[] }[],
   tournament: Pick<Tournaments, "id" | "fullInclusion" | "format">,
 ) => {
-  const totalDriversWithBuys = drivers.length;
+  // This is the total number of qualified drivers
+  const totalDriversWithBuys = pow2Floor(drivers.length);
+
   // Pairs top and bottom qualifiers into battles
   const initialBattleDrivers = sortByInnerOuter(
     Array.from(new Array(totalDriversWithBuys / 2)).map((_, i) => {
@@ -63,10 +65,14 @@ const setupRegularBattles = async (
           Math.log2(totalDriversWithBuys - (i + 1)),
       );
 
+      const drivers = initialBattleDrivers[i] ?? {};
+
       return {
         tournamentId: tournament.id,
         round: round === Infinity ? totalDriversWithBuys : round,
         bracket: BattlesBracket.UPPER,
+        driverLeftId: drivers.driverLeftId ?? null,
+        driverRightId: drivers.driverRightId ?? null,
       };
     },
   );
@@ -108,39 +114,15 @@ const setupRegularBattles = async (
   await prisma.tournamentBattles.createMany({
     data,
   });
-
-  // Get initial battles
-  const initialBattles = await prisma.tournamentBattles.findMany({
-    where: {
-      tournamentId: tournament.id,
-      round: 1,
-      bracket: BattlesBracket.UPPER,
-    },
-  });
-
-  // Assign initial battle drivers to battles
-  await prisma.$transaction(
-    initialBattles.map((battle, i) => {
-      const drivers = initialBattleDrivers[i];
-
-      return prisma.tournamentBattles.update({
-        where: {
-          id: battle.id,
-        },
-        data: {
-          driverLeftId: drivers.driverLeftId,
-          driverRightId: drivers.driverRightId,
-        },
-      });
-    }),
-  );
 };
 
 const setupWildcardBattles = async (
   drivers: { id: number; lapScores: number[] }[],
   tournament: Pick<Tournaments, "id" | "fullInclusion">,
 ) => {
-  const totalDriversWithBuys = drivers.length;
+  // This is the total number of qualified drivers
+  const totalDriversWithBuys = pow2Floor(drivers.length);
+
   const totalBattlesPerBracket = totalDriversWithBuys / 2;
 
   const lowerBracket = Array.from(new Array(totalBattlesPerBracket - 1)).map(
@@ -195,8 +177,9 @@ const setupWildcardBattles = async (
   ]);
 
   const totalDriversPerBracket = totalDriversWithBuys / 2;
-  const lowerDrivers = drivers.slice(totalDriversPerBracket);
-  const upperDrivers = drivers.slice(0, totalDriversPerBracket);
+  // Minus 1 to allow the lower bracket winner to enter the upper bracket
+  const lowerDrivers = drivers.slice(totalDriversPerBracket - 1);
+  const upperDrivers = drivers.slice(0, totalDriversPerBracket - 1);
 
   // Pairs top and bottom qualifiers into battles
   const initialLowerBattleDrivers = sortByInnerOuter(
@@ -211,9 +194,13 @@ const setupWildcardBattles = async (
     }),
   );
 
+  // The last driver in the last battle will be null
+  // leaving space for the lower bracket winner
   const initialUpperBattleDrivers = sortByInnerOuter(
     Array.from(new Array(totalDriversPerBracket / 2)).map((_, i) => {
-      let { id: driverLeftId } = upperDrivers[totalDriversPerBracket - i - 1];
+      let { id: driverLeftId } = upperDrivers[
+        totalDriversPerBracket - i - 1
+      ] ?? { id: null };
       let { id: driverRightId } = upperDrivers[i];
 
       return {
@@ -226,28 +213,28 @@ const setupWildcardBattles = async (
   // Assign initial battle drivers to battles
   await prisma.$transaction([
     ...initialLowerBattles.map((battle, i) => {
-      const drivers = initialLowerBattleDrivers[i];
+      const { driverLeftId, driverRightId } = initialLowerBattleDrivers[i];
 
       return prisma.tournamentBattles.update({
         where: {
           id: battle.id,
         },
         data: {
-          driverLeftId: drivers.driverLeftId,
-          driverRightId: drivers.driverRightId,
+          driverLeftId,
+          driverRightId,
         },
       });
     }),
     ...initialUpperBattles.map((battle, i) => {
-      const drivers = initialUpperBattleDrivers[i];
+      const { driverLeftId, driverRightId } = initialUpperBattleDrivers[i];
 
       return prisma.tournamentBattles.update({
         where: {
           id: battle.id,
         },
         data: {
-          driverLeftId: drivers.driverLeftId,
-          driverRightId: drivers.driverRightId,
+          driverLeftId,
+          driverRightId,
         },
       });
     }),
@@ -379,7 +366,8 @@ export const tournamentEndQualifying = async (id: string) => {
         round: "asc",
       },
       {
-        bracket: "asc",
+        bracket:
+          tournament.format === TournamentsFormat.WILDCARD ? "desc" : "asc",
       },
       {
         id: "asc",
