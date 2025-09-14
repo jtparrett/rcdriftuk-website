@@ -117,7 +117,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
           (lapA, lapB) => lapB - lapA,
         );
 
-        return bestB - bestA || secondB - secondA || thirdB - thirdA;
+        return (
+          bestB - bestA || secondB - secondA || thirdB - thirdA || b.id - a.id
+        );
       }),
   };
 };

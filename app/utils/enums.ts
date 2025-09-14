@@ -33,6 +33,7 @@ export const TournamentsFormat = {
   STANDARD: "STANDARD",
   DOUBLE_ELIMINATION: "DOUBLE_ELIMINATION",
   EXHIBITION: "EXHIBITION",
+  WILDCARD: "WILDCARD",
 } as const;
 
 export type TournamentsFormat = Values<typeof TournamentsFormat>;

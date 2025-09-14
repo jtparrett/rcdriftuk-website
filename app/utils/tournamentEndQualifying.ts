@@ -11,20 +11,21 @@ import { sumScores } from "~/utils/sumScores";
 import { pow2Floor } from "~/utils/tournament.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
 
+// Helper function to round up to next power of 2, or return same if already power of 2
+const nextPowerOf2OrSame = (n: number): number => {
+  if (n <= 0) return 1;
+  if (pow2Floor(n) === n) return n; // Already a power of 2
+  return pow2Floor(n * 2); // Same logic as pow2Ceil
+};
+
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
 ) => {
-  const byeDriver = await prisma.users.findFirstOrThrow({
-    where: {
-      firstName: "BYE",
-    },
-  });
-
   const byeTounamentDirver = await prisma.tournamentDrivers.create({
     data: {
       isBye: true,
       tournamentId: tournament.id,
-      driverId: byeDriver.driverId,
+      driverId: 0,
     },
   });
 
@@ -37,139 +38,20 @@ const addByeDriverToTournament = async (
   return byeTounamentDirver;
 };
 
-// Only run this if you're sure all laps have been judged
-export const tournamentEndQualifying = async (id: string) => {
-  const tournament = await prisma.tournaments.update({
-    where: {
-      id,
-      state: TournamentsState.QUALIFYING,
-    },
-    data: {
-      state: TournamentsState.BATTLES,
-      nextQualifyingLapId: null,
-    },
-    select: {
-      id: true,
-      scoreFormula: true,
-      fullInclusion: true,
-      format: true,
-      qualifyingLaps: true,
-      _count: {
-        select: {
-          judges: true,
-        },
-      },
-      drivers: {
-        orderBy: {
-          id: "asc",
-        },
-        include: {
-          laps: {
-            include: {
-              scores: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  invariant(tournament, "Missing tournament");
-
-  const byeTounamentDriver = await addByeDriverToTournament(tournament);
-
-  // Helper function to round up to next power of 2, or return same if already power of 2
-  const nextPowerOf2OrSame = (n: number): number => {
-    if (n <= 0) return 1;
-    if (pow2Floor(n) === n) return n; // Already a power of 2
-    return pow2Floor(n * 2); // Same logic as pow2Ceil
-  };
-
-  const totalDrivers = pow2Floor(tournament.drivers.length);
-  const totalBuysToCreate = tournament.fullInclusion
-    ? nextPowerOf2OrSame(tournament.drivers.length) - tournament.drivers.length
-    : 0;
-  const totalDriversWithBuys = pow2Floor(
-    tournament.drivers.length + totalBuysToCreate,
-  );
-
-  const sortedDrivers = [
-    ...tournament.drivers,
-    ...Array.from(new Array(totalBuysToCreate)).map(() => ({
-      id: byeTounamentDriver.id,
-      laps: [],
-    })),
-  ]
-    .map((driver) => {
-      const lapScores = driver.laps.map((lap) =>
-        sumScores(
-          lap.scores,
-          tournament._count.judges,
-          tournament.scoreFormula,
-          lap.penalty,
-        ),
-      );
-
-      return {
-        lapScores,
-        id: driver.id,
-      };
-    })
-    .sort((a, b) => {
-      const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
-        (lapA, lapB) => lapB - lapA,
-      );
-      const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
-        (lapA, lapB) => lapB - lapA,
-      );
-
-      return bestB - bestA || secondB - secondA || thirdB - thirdA;
-    });
-
-  // Set qualifying positions
-  await prisma.$transaction(
-    sortedDrivers.map((driver, i) => {
-      return prisma.tournamentDrivers.update({
-        where: {
-          id: driver.id,
-        },
-        data: {
-          qualifyingPosition: i + 1,
-        },
-      });
-    }),
-  );
-
+const setupRegularBattles = async (
+  drivers: { id: number; lapScores: number[] }[],
+  tournament: Pick<Tournaments, "id" | "fullInclusion" | "format">,
+) => {
+  const totalDriversWithBuys = drivers.length;
   // Pairs top and bottom qualifiers into battles
   const initialBattleDrivers = sortByInnerOuter(
     Array.from(new Array(totalDriversWithBuys / 2)).map((_, i) => {
-      let leftDriver = sortedDrivers[totalDriversWithBuys - i - 1];
-      let rightDriver = sortedDrivers[i];
-
-      // Convert non-qualified drivers into BYE runs
-      if (
-        !tournament.fullInclusion &&
-        leftDriver.lapScores.every((score) => score === 0)
-      ) {
-        leftDriver = {
-          id: byeTounamentDriver.id,
-          lapScores: [],
-        };
-      }
-
-      if (
-        !tournament.fullInclusion &&
-        rightDriver.lapScores.every((score) => score === 0)
-      ) {
-        rightDriver = {
-          id: byeTounamentDriver.id,
-          lapScores: [],
-        };
-      }
+      let { id: driverLeftId } = drivers[totalDriversWithBuys - i - 1];
+      let { id: driverRightId } = drivers[i];
 
       return {
-        driverLeftId: leftDriver.id,
-        driverRightId: rightDriver.id,
+        driverLeftId,
+        driverRightId,
       };
     }),
   );
@@ -252,6 +134,239 @@ export const tournamentEndQualifying = async (id: string) => {
       });
     }),
   );
+};
+
+const setupWildcardBattles = async (
+  drivers: { id: number; lapScores: number[] }[],
+  tournament: Pick<Tournaments, "id" | "fullInclusion">,
+) => {
+  const totalDriversWithBuys = drivers.length;
+  const totalBattlesPerBracket = totalDriversWithBuys / 2;
+
+  const lowerBracket = Array.from(new Array(totalBattlesPerBracket - 1)).map(
+    (_, i) => {
+      let round = Math.ceil(
+        Math.log2(totalBattlesPerBracket) -
+          Math.log2(totalBattlesPerBracket - (i + 1)),
+      );
+
+      return {
+        tournamentId: tournament.id,
+        round: round === Infinity ? totalBattlesPerBracket : round,
+        bracket: BattlesBracket.LOWER,
+      };
+    },
+  );
+
+  const upperBracket = Array.from(new Array(totalBattlesPerBracket - 1)).map(
+    (_, i) => {
+      let round = Math.ceil(
+        Math.log2(totalBattlesPerBracket) -
+          Math.log2(totalBattlesPerBracket - (i + 1)),
+      );
+
+      return {
+        tournamentId: tournament.id,
+        round: round === Infinity ? totalBattlesPerBracket : round,
+        bracket: BattlesBracket.UPPER,
+      };
+    },
+  );
+
+  await prisma.tournamentBattles.createMany({
+    data: [...lowerBracket, ...upperBracket],
+  });
+
+  const [initialLowerBattles, initialUpperBattles] = await prisma.$transaction([
+    prisma.tournamentBattles.findMany({
+      where: {
+        tournamentId: tournament.id,
+        round: 1,
+        bracket: BattlesBracket.LOWER,
+      },
+    }),
+    prisma.tournamentBattles.findMany({
+      where: {
+        tournamentId: tournament.id,
+        round: 1,
+        bracket: BattlesBracket.UPPER,
+      },
+    }),
+  ]);
+
+  const totalDriversPerBracket = totalDriversWithBuys / 2;
+  const lowerDrivers = drivers.slice(totalDriversPerBracket);
+  const upperDrivers = drivers.slice(0, totalDriversPerBracket);
+
+  // Pairs top and bottom qualifiers into battles
+  const initialLowerBattleDrivers = sortByInnerOuter(
+    Array.from(new Array(totalDriversPerBracket / 2)).map((_, i) => {
+      let { id: driverLeftId } = lowerDrivers[totalDriversPerBracket - i - 1];
+      let { id: driverRightId } = lowerDrivers[i];
+
+      return {
+        driverLeftId,
+        driverRightId,
+      };
+    }),
+  );
+
+  const initialUpperBattleDrivers = sortByInnerOuter(
+    Array.from(new Array(totalDriversPerBracket / 2)).map((_, i) => {
+      let { id: driverLeftId } = upperDrivers[totalDriversPerBracket - i - 1];
+      let { id: driverRightId } = upperDrivers[i];
+
+      return {
+        driverLeftId,
+        driverRightId,
+      };
+    }),
+  );
+
+  // Assign initial battle drivers to battles
+  await prisma.$transaction([
+    ...initialLowerBattles.map((battle, i) => {
+      const drivers = initialLowerBattleDrivers[i];
+
+      return prisma.tournamentBattles.update({
+        where: {
+          id: battle.id,
+        },
+        data: {
+          driverLeftId: drivers.driverLeftId,
+          driverRightId: drivers.driverRightId,
+        },
+      });
+    }),
+    ...initialUpperBattles.map((battle, i) => {
+      const drivers = initialUpperBattleDrivers[i];
+
+      return prisma.tournamentBattles.update({
+        where: {
+          id: battle.id,
+        },
+        data: {
+          driverLeftId: drivers.driverLeftId,
+          driverRightId: drivers.driverRightId,
+        },
+      });
+    }),
+  ]);
+};
+
+// Only run this if you're sure all laps have been judged
+export const tournamentEndQualifying = async (id: string) => {
+  const tournament = await prisma.tournaments.update({
+    where: {
+      id,
+      state: TournamentsState.QUALIFYING,
+    },
+    data: {
+      state: TournamentsState.BATTLES,
+      nextQualifyingLapId: null,
+    },
+    select: {
+      id: true,
+      scoreFormula: true,
+      fullInclusion: true,
+      format: true,
+      qualifyingLaps: true,
+      _count: {
+        select: {
+          judges: true,
+        },
+      },
+      drivers: {
+        orderBy: {
+          id: "asc",
+        },
+        include: {
+          laps: {
+            include: {
+              scores: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  invariant(tournament, "Missing tournament");
+
+  const byeTounamentDriver = await addByeDriverToTournament(tournament);
+
+  const totalBuysToCreate = tournament.fullInclusion
+    ? nextPowerOf2OrSame(tournament.drivers.length) - tournament.drivers.length
+    : 0;
+
+  const sortedDrivers = [
+    ...tournament.drivers,
+    ...Array.from(new Array(totalBuysToCreate)).map(() => ({
+      id: byeTounamentDriver.id,
+      laps: [],
+    })),
+  ]
+    .map((driver) => {
+      const lapScores = driver.laps.map((lap) =>
+        sumScores(
+          lap.scores,
+          tournament._count.judges,
+          tournament.scoreFormula,
+          lap.penalty,
+        ),
+      );
+
+      // If the driver has no scores, convert them into a BYE run
+      // only if the tournament is not full inclusion
+      if (
+        !tournament.fullInclusion &&
+        lapScores.every((score) => score === 0)
+      ) {
+        return {
+          lapScores: [],
+          id: byeTounamentDriver.id,
+        };
+      }
+
+      return {
+        lapScores,
+        id: driver.id,
+      };
+    })
+    .sort((a, b) => {
+      const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
+        (lapA, lapB) => lapB - lapA,
+      );
+      const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
+        (lapA, lapB) => lapB - lapA,
+      );
+
+      return (
+        bestB - bestA || secondB - secondA || thirdB - thirdA || b.id - a.id
+      );
+    });
+
+  // Set qualifying positions (exclude bye driver)
+  await prisma.$transaction(
+    sortedDrivers
+      .filter((driver) => driver.id !== byeTounamentDriver.id)
+      .map((driver, i) => {
+        return prisma.tournamentDrivers.update({
+          where: {
+            id: driver.id,
+          },
+          data: {
+            qualifyingPosition: i + 1,
+          },
+        });
+      }),
+  );
+
+  if (tournament.format === TournamentsFormat.WILDCARD) {
+    await setupWildcardBattles(sortedDrivers, tournament);
+  } else {
+    await setupRegularBattles(sortedDrivers, tournament);
+  }
 
   // Get next battle
   const nextBattle = await prisma.tournamentBattles.findFirst({

@@ -182,7 +182,8 @@ const TournamentBattlesPage = () => {
   return (
     <>
       <HiddenEmbed>
-        {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
+        {(tournament.format === TournamentsFormat.DOUBLE_ELIMINATION ||
+          tournament.format === TournamentsFormat.WILDCARD) && (
           <TabGroup mb={4}>
             {Object.values(BattlesBracket).map((sub) => {
               return (
