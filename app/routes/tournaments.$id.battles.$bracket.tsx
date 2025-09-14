@@ -244,7 +244,7 @@ const TournamentBattlesPage = () => {
                     {getBracketName(
                       battles[0].round,
                       battles[0].bracket,
-                      tournament.format,
+                      battles.length,
                     )}
                   </styled.p>
                 )}
