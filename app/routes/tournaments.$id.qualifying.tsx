@@ -9,6 +9,7 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
 import { getAuth } from "~/utils/getAuth.server";
+import { TournamentsFormat } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -26,6 +27,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
       id: true,
       fullInclusion: true,
+      format: true,
       state: true,
       qualifyingLaps: true,
       userId: true,
@@ -86,6 +88,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isOwner,
     id: tournament.id,
     fullInclusion: tournament.fullInclusion,
+    format: tournament.format,
     totalJudges: tournament._count.judges,
     state: tournament.state,
     qualifyingLaps: tournament.qualifyingLaps,
@@ -117,7 +120,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
           (lapA, lapB) => lapB - lapA,
         );
 
-        return bestB - bestA || secondB - secondA || thirdB - thirdA;
+        return (
+          bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
+        );
       }),
   };
 };
@@ -230,7 +235,12 @@ const QualifyingPage = () => {
   const driversWithoutBuys = tournament.drivers.filter(
     (driver) => !driver.isBye,
   );
-  const qualifyingCutOff = pow2Floor(driversWithoutBuys.length);
+
+  // Wildcard tournaments have one less qualifying driver
+  // to leave space for the lower bracket winner (counts for two)
+  const qualifyingCutOff =
+    pow2Floor(driversWithoutBuys.length) +
+    (tournament.format === TournamentsFormat.WILDCARD ? -1 : 0);
   const half = Math.ceil(driversWithoutBuys.length / 2);
 
   return (

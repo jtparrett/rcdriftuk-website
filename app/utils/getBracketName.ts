@@ -3,17 +3,15 @@ import { BattlesBracket, TournamentsFormat } from "~/utils/enums";
 export const getBracketName = (
   round: number,
   bracket: BattlesBracket,
-  format: TournamentsFormat,
+  totalBattles: number,
 ) => {
-  if (round === 1000) {
+  if (round === 1000 && bracket === BattlesBracket.UPPER) {
     return "Final";
   }
 
-  if (format === TournamentsFormat.DOUBLE_ELIMINATION) {
-    return `Round ${round} : ${
-      bracket === BattlesBracket.UPPER ? "Upper" : "Lower"
-    }`;
+  if (totalBattles === 1 && bracket === BattlesBracket.UPPER) {
+    return "Playoff";
   }
 
-  return `Round ${round}`;
+  return `Top ${totalBattles * 2}`;
 };

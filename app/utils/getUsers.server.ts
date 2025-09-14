@@ -5,8 +5,8 @@ export type GetUsers = Awaited<ReturnType<typeof getUsers>>;
 export const getUsers = async () => {
   const users = await prisma.users.findMany({
     where: {
-      firstName: {
-        not: "BYE",
+      driverId: {
+        not: 0,
       },
     },
     select: {

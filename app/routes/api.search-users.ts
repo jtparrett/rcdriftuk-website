@@ -20,8 +20,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
     where: {
       AND: [
         {
-          firstName: {
-            not: "BYE",
+          driverId: {
+            not: 0,
           },
         },
         {

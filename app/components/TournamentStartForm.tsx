@@ -286,7 +286,8 @@ export const TournamentStartForm = ({
         </Flex>
 
         {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION) && (
+          format === TournamentsFormat.DOUBLE_ELIMINATION ||
+          format === TournamentsFormat.WILDCARD) && (
           <Flex gap={4}>
             <StepDot />
             <Box flex={1}>
@@ -305,7 +306,8 @@ export const TournamentStartForm = ({
         )}
 
         {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION) && (
+          format === TournamentsFormat.DOUBLE_ELIMINATION ||
+          format === TournamentsFormat.WILDCARD) && (
           <Flex gap={4}>
             <StepDot />
             <Box flex={1}>
@@ -364,7 +366,8 @@ export const TournamentStartForm = ({
         </Flex>
 
         {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION) && (
+          format === TournamentsFormat.DOUBLE_ELIMINATION ||
+          format === TournamentsFormat.WILDCARD) && (
           <Flex gap={4}>
             <StepDot />
             <Box flex={1}>

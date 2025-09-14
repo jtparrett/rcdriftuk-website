@@ -143,30 +143,12 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   // Create laps
-  await prisma.laps.createMany({
+  const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
     data: tournamentDrivers.flatMap((driver) =>
       Array.from({ length: qualifyingLaps }, () => ({
         tournamentDriverId: driver.id,
       })),
     ),
-  });
-
-  // Get next qualifying lap
-  const nextQualifyingLap = await prisma.laps.findFirst({
-    where: {
-      driver: {
-        tournamentId: id,
-      },
-      scores: {
-        none: {},
-      },
-    },
-    orderBy: [
-      {
-        tournamentDriverId: "asc",
-      },
-      { id: "asc" },
-    ],
   });
 
   // Update tournament

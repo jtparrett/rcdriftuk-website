@@ -566,6 +566,7 @@ enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
   EXHIBITION
+  WILDCARD
 }
 
 enum BattlesBracket {
