@@ -33,6 +33,9 @@ export default defineConfig({
           },
         },
         colors: {
+          white: {
+            value: "#EDEEF0",
+          },
           black: {
             value: "#0c0c0c",
           },
