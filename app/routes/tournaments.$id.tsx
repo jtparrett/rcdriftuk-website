@@ -79,8 +79,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     (judge) => judge.user.id === userId,
   );
   const isBattlingDriver =
-    tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
-    tournament.nextBattle?.driverRight?.driverId === user?.driverId;
+    !!userId &&
+    (tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
+      tournament.nextBattle?.driverRight?.driverId === user?.driverId);
 
   const url = new URL(args.request.url);
   const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
@@ -114,6 +115,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return {
     tournament,
     users,
+    userId,
     tournamentJudge,
     eventDrivers,
     isBattlingDriver,
@@ -168,7 +170,7 @@ export const action = async (args: ActionFunctionArgs) => {
   ) {
     await tournamentEndQualifying(id);
     publishUpdate();
-    return redirect(`/tournaments/${id}/qualifying`);
+    return redirect(`/tournaments/${id}/qualifying/0`);
   }
 
   if (tournament.state === TournamentsState.QUALIFYING) {
@@ -230,7 +232,7 @@ export const action = async (args: ActionFunctionArgs) => {
     );
   }
 
-  return redirect(`/tournaments/${id}/qualifying`);
+  return redirect(`/tournaments/${id}/qualifying/0`);
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -419,7 +421,7 @@ const TournamentPage = () => {
               </Tab>
               {tournament.qualifyingLaps > 0 && (
                 <Tab
-                  to={`/tournaments/${tournament.id}/qualifying`}
+                  to={`/tournaments/${tournament.id}/qualifying/0`}
                   isActive={isQualifyingTab}
                   replace
                 >

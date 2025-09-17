@@ -9,6 +9,7 @@ export const StepDot = () => {
       bgColor="brand.500"
       fontSize="md"
       pos="relative"
+      flex="none"
     >
       <Box
         pos="absolute"

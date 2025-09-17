@@ -87,7 +87,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/tournaments/${id}/qualifying`);
+  return redirect(`/tournaments/${id}/qualifying/0`);
 };
 
 const RandomiseQualifyingPage = () => {

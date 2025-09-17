@@ -246,6 +246,9 @@ export const TournamentStartForm = ({
       : null;
   const [fullInclusion, setFullInclusion] = useState(false);
   const [enableProtests, setEnableProtests] = useState(false);
+  const [qualifyingLaps, setQualifyingLaps] = useState(
+    tournament?.qualifyingLaps ?? 1,
+  );
   const [region, setRegion] = useState<Regions>(
     template?.region ?? tournament?.region ?? Regions.UK,
   );
@@ -294,13 +297,34 @@ export const TournamentStartForm = ({
               <styled.label mb={2} display="block">
                 How many qualifying laps?
               </styled.label>
-              <Input
-                maxW={100}
-                type="number"
+              <input
+                type="hidden"
                 name="qualifyingLaps"
-                min={1}
-                defaultValue={tournament?.qualifyingLaps}
+                defaultValue={qualifyingLaps}
               />
+              <TabGroup>
+                <TabButton
+                  isActive={qualifyingLaps === 1}
+                  onClick={() => setQualifyingLaps(1)}
+                  type="button"
+                >
+                  1
+                </TabButton>
+                <TabButton
+                  isActive={qualifyingLaps === 2}
+                  onClick={() => setQualifyingLaps(2)}
+                  type="button"
+                >
+                  2
+                </TabButton>
+                <TabButton
+                  isActive={qualifyingLaps === 3}
+                  onClick={() => setQualifyingLaps(3)}
+                  type="button"
+                >
+                  3
+                </TabButton>
+              </TabGroup>
             </Box>
           </Flex>
         )}
