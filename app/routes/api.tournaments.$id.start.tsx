@@ -3,6 +3,7 @@ import {
   TournamentsFormat,
   TournamentsState,
   ScoreFormula,
+  QualifyingOrder,
 } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
@@ -10,6 +11,33 @@ import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
+
+export const tournamentFormSchema = z.object({
+  judges: z
+    .array(
+      z.object({
+        driverId: z.string(),
+        points: z.coerce.number(),
+      }),
+    )
+    .min(1, "Please add at least one judge to the tournament"),
+  drivers: z
+    .array(
+      z.object({
+        driverId: z.string(),
+      }),
+    )
+    .min(4, "Please add at least four drivers to the tournament"),
+  qualifyingLaps: z.coerce
+    .number()
+    .min(1, "Qualifying laps must be at least 1"),
+  format: z.nativeEnum(TournamentsFormat),
+  fullInclusion: z.boolean(),
+  enableProtests: z.boolean(),
+  region: z.nativeEnum(Regions),
+  scoreFormula: z.nativeEnum(ScoreFormula),
+  qualifyingOrder: z.nativeEnum(QualifyingOrder),
+});
 
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -25,32 +53,19 @@ export const action = async (args: ActionFunctionArgs) => {
 
   invariant(tournament, "Tournament not found");
 
-  const formData = await args.request.formData();
+  const body = await args.request.json();
 
-  const judges = z.array(z.string()).parse(formData.getAll("judges"));
-  const judgesPoints = z
-    .array(z.coerce.number())
-    .min(judges.length, "Please add points for all judges")
-    .parse(formData.getAll("judgesPoints"));
-  const drivers = z.array(z.string()).parse(formData.getAll("drivers"));
-
-  const qualifyingLaps = z.coerce
-    .number()
-    .min(1, "Qualifying laps must be at least 1")
-    .parse(formData.get("qualifyingLaps") || 1);
-  const format = z.nativeEnum(TournamentsFormat).parse(formData.get("format"));
-  const fullInclusion =
-    z.string().parse(formData.get("fullInclusion") || "false") === "true";
-  const enableProtests =
-    z.string().parse(formData.get("enableProtests") || "false") === "true";
-  const region = z.nativeEnum(Regions).parse(formData.get("region"));
-  const scoreFormula = z
-    .nativeEnum(ScoreFormula)
-    .parse(formData.get("scoreFormula") || ScoreFormula.CUMULATIVE);
-
-  if (judges.length <= 0) {
-    throw new Error("Please add at least one judge to the tournament");
-  }
+  const {
+    judges,
+    drivers,
+    qualifyingLaps,
+    format,
+    fullInclusion,
+    enableProtests,
+    region,
+    scoreFormula,
+    qualifyingOrder,
+  } = tournamentFormSchema.parse(body);
 
   if (
     fullInclusion || format === TournamentsFormat.EXHIBITION
@@ -64,31 +79,26 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create judges
   await prisma.tournamentJudges.createMany({
-    data: judges.map((judgeId, index) => {
-      const points = judgesPoints[index];
+    data: judges.map((judge) => {
       return {
-        driverId: Number(judgeId),
+        driverId: Number(judge.driverId),
         tournamentId: id,
-        points,
+        points: judge.points,
       };
     }),
     skipDuplicates: true,
   });
 
   // Create drivers
-  const newDrivers = drivers.filter((driverId) => !/^\d+$/.test(driverId));
-  let allDrivers = drivers.filter((driverId) => !newDrivers.includes(driverId));
+  const newDrivers = drivers.filter((driver) => !/^\d+$/.test(driver.driverId));
+  let allDrivers = drivers.filter(
+    (driver) => !newDrivers.some((d) => d.driverId === driver.driverId),
+  );
 
   if (newDrivers.length > 0) {
     const newUsers = await prisma.users.createManyAndReturn({
-      data: newDrivers.map((driverId) => {
-        const [firstName, lastName] = driverId.split(" ");
-
-        if (!firstName?.trim() || !lastName?.trim()) {
-          throw new Error(
-            `Invalid driver name: "${driverId}". Please provide both first and last name.`,
-          );
-        }
+      data: newDrivers.map((driver) => {
+        const [firstName, lastName] = driver.driverId.split(" ");
 
         return {
           firstName: firstName.trim(),
@@ -101,17 +111,20 @@ export const action = async (args: ActionFunctionArgs) => {
     });
 
     allDrivers = allDrivers.concat(
-      newUsers.map((user) => user.driverId.toString()),
+      newUsers.map((user) => ({
+        driverId: user.driverId.toString(),
+      })),
     );
   }
 
   const tournamentDrivers = await prisma.tournamentDrivers.createManyAndReturn({
-    data: allDrivers.map((driverId) => {
+    data: allDrivers.map((driver) => {
       return {
-        driverId: Number(driverId),
+        driverId: Number(driver.driverId),
         tournamentId: id,
       };
     }),
+    skipDuplicates: true,
   });
 
   const isExhibition = format === TournamentsFormat.EXHIBITION;
@@ -144,11 +157,13 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create laps
   const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
-    data: tournamentDrivers.flatMap((driver) =>
-      Array.from({ length: qualifyingLaps }, () => ({
-        tournamentDriverId: driver.id,
-      })),
-    ),
+    data: Array.from({ length: qualifyingLaps }).flatMap(() => {
+      return tournamentDrivers.map((driver) => {
+        return {
+          tournamentDriverId: driver.id,
+        };
+      });
+    }),
   });
 
   // Update tournament
@@ -159,6 +174,7 @@ export const action = async (args: ActionFunctionArgs) => {
     data: {
       state: TournamentsState.QUALIFYING,
       nextQualifyingLapId: nextQualifyingLap?.id,
+      qualifyingOrder,
       qualifyingLaps,
       format,
       fullInclusion,

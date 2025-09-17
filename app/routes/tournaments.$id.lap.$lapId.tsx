@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, useLoaderData, useParams } from "react-router";
+import { Form, useLoaderData } from "react-router";
 import { styled, Box, VStack } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
@@ -9,41 +9,37 @@ import notFoundInvariant from "~/utils/notFoundInvariant";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
-  const { id, driverId, index } = params;
+  const { lapId } = params;
   const { userId } = await getAuth(args);
 
   notFoundInvariant(userId, "Missing user id");
 
-  const tournament = await prisma.tournaments.findFirst({
+  const lap = await prisma.laps.findFirst({
     where: {
-      id,
-      userId,
-    },
-    include: {
-      judges: {
-        include: {
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-            },
-          },
+      id: Number(lapId),
+      driver: {
+        tournament: {
+          userId,
+          state: TournamentsState.QUALIFYING,
         },
       },
-      drivers: {
-        where: {
-          id: Number(driverId),
-        },
+    },
+    include: {
+      scores: true,
+      driver: {
         include: {
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-            },
-          },
-          laps: {
+          tournament: {
             include: {
-              scores: true,
+              judges: {
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -51,26 +47,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(tournament, "Tournament not found");
-  notFoundInvariant(
-    tournament.state === TournamentsState.QUALIFYING,
-    "Tournament is not in qualifying",
-  );
-  notFoundInvariant(
-    tournament.drivers.length > 0,
-    "No drivers found for tournament",
-  );
-
-  const driver = tournament.drivers[0];
-  const lap = driver.laps[Number(index)];
-
   notFoundInvariant(lap, "Lap not found");
+  notFoundInvariant(lap.driver.tournament, "Tournament not found");
 
   return {
-    tournament,
-    driver,
     lap,
-    totalJudges: tournament.judges.length,
+    totalJudges: lap.driver.tournament.judges.length,
+    tournament: lap.driver.tournament,
   };
 };
 
@@ -100,22 +83,14 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { tournament, driver, lap, totalJudges } =
-    useLoaderData<typeof loader>();
-  const params = useParams();
-  const lapIndex = Number(params.index);
+  const { lap, totalJudges, tournament } = useLoaderData<typeof loader>();
 
   return (
     <Box maxW="500px">
       <VStack gap={4} alignItems="stretch">
-        <Box>
-          <styled.h1 fontSize="2xl" fontWeight="bold">
-            Edit Qualifying Score
-          </styled.h1>
-          <styled.p color="gray.400">
-            {driver.user.firstName} {driver.user.lastName}: Lap {lapIndex + 1}
-          </styled.p>
-        </Box>
+        <styled.h1 fontSize="2xl" fontWeight="bold">
+          Edit Qualifying Score
+        </styled.h1>
 
         <Box p={6} rounded="xl" bgColor="gray.900">
           <VStack gap={4} alignItems="stretch">

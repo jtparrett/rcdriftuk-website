@@ -1,6 +1,7 @@
 import { useUser } from "@clerk/react-router";
 import {
   BattlesBracket,
+  QualifyingOrder,
   TicketStatus,
   TournamentsFormat,
   TournamentsState,
@@ -189,12 +190,15 @@ export const action = async (args: ActionFunctionArgs) => {
           none: {},
         },
       },
-      orderBy: [
-        {
-          tournamentDriverId: "asc",
-        },
-        { id: "asc" },
-      ],
+      orderBy:
+        tournament.qualifyingOrder === QualifyingOrder.DRIVERS
+          ? [
+              {
+                tournamentDriverId: "asc",
+              },
+              { id: "asc" },
+            ]
+          : [{ id: "asc" }],
     });
 
     await prisma.tournaments.update({
