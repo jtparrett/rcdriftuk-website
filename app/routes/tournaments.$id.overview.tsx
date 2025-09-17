@@ -692,6 +692,18 @@ const TournamentsOverviewPage = () => {
                   maxW="full"
                   key={tournament.nextBattleId}
                   overflow="hidden"
+                  pos="relative"
+                  zIndex={0}
+                  _after={{
+                    content: '""',
+                    pos: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    w: "1px",
+                    left: "50%",
+                    bgColor: "gray.800",
+                    zIndex: -1,
+                  }}
                 >
                   <Box
                     flex={1}
@@ -735,21 +747,9 @@ const TournamentsOverviewPage = () => {
                   </Box>
                   <Flex
                     flex={1.2}
-                    pos="relative"
                     justifyContent="center"
                     flexDir="column"
-                    zIndex={1}
                     pb={8}
-                    _after={{
-                      content: '""',
-                      pos: "absolute",
-                      top: 0,
-                      bottom: 0,
-                      w: "3px",
-                      left: "50%",
-                      bgColor: "gray.800",
-                      zIndex: -1,
-                    }}
                   >
                     {battleJudgingComplete && (
                       <>

@@ -240,6 +240,7 @@ const QualifyingPage = () => {
           <Tab
             to={`/tournaments/${tournament.id}/qualifying/0`}
             isActive={tournament.run === 0}
+            replace
           >
             Best
           </Tab>
@@ -249,6 +250,7 @@ const QualifyingPage = () => {
                 key={i}
                 isActive={tournament.run === i + 1}
                 to={`/tournaments/${tournament.id}/qualifying/${i + 1}`}
+                replace
               >
                 Run {i + 1}
               </Tab>

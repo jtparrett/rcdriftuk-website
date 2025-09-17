@@ -191,6 +191,7 @@ const TournamentBattlesPage = () => {
                   key={sub}
                   to={`/tournaments/${tournament.id}/battles/${sub}`}
                   isActive={sub === bracket}
+                  replace
                 >
                   {sentenceCase(sub)} Bracket
                 </Tab>
