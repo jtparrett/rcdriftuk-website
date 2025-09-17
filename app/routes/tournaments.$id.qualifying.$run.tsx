@@ -114,7 +114,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         return {
           ...driver,
           score: [best, ...lapScores][run],
-          lapId: driver.laps[run].id,
+          lapId: driver.laps[run]?.id,
         };
       })
       .sort((a, b) => {
