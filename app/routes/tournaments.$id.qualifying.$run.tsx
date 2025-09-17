@@ -114,7 +114,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         return {
           ...driver,
           score: [best, ...lapScores][run],
-          lapId: driver.laps[run]?.id,
+          lapId: driver.laps[run - 1]?.id,
         };
       })
       .sort((a, b) => {
@@ -139,7 +139,7 @@ const Table = ({
   const tournament = useLoaderData<typeof loader>();
 
   return (
-    <Box flex={1} p={{ base: 0, md: 1 }}>
+    <Box flex={1} p={{ base: 0, md: 1 }} overflow="hidden">
       {drivers.map((driver, i) => {
         const isNext = tournament.nextQualifyingDriver?.id === driver.id;
 
@@ -152,28 +152,40 @@ const Table = ({
               )}
             <Flex
               key={driver.id}
-              gap={3}
+              gap={2}
               pos="relative"
               zIndex={0}
               rounded="lg"
               py={0.5}
-              px={3}
+              pl={0.5}
+              pr={3}
               style={
                 {
                   "--bg": isNext ? token("colors.brand.900") : undefined,
                 } as React.CSSProperties
               }
               bg="var(--bg)"
+              alignItems="center"
             >
               {isNext && <Glow size="sm" />}
-              <styled.span
-                fontWeight="medium"
-                w={8}
-                fontFamily="mono"
-                textAlign="right"
+
+              <Center
+                w={7}
+                h={7}
+                bgGradient="to-b"
+                gradientFrom="brand.500"
+                gradientTo="brand.700"
+                rounded="lg"
               >
-                #{i + 1 + startPosition}
-              </styled.span>
+                <styled.span
+                  fontWeight="medium"
+                  fontFamily="mono"
+                  textAlign="center"
+                  fontSize="xs"
+                >
+                  #{i + 1 + startPosition}
+                </styled.span>
+              </Center>
 
               <styled.p
                 fontWeight="medium"
