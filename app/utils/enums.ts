@@ -88,3 +88,10 @@ export const LeaderboardType = {
 } as const;
 
 export type LeaderboardType = Values<typeof LeaderboardType>;
+
+export const QualifyingOrder = {
+  DRIVERS: "DRIVERS",
+  RUNS: "RUNS",
+} as const;
+
+export type QualifyingOrder = Values<typeof QualifyingOrder>;

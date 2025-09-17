@@ -1,9 +1,14 @@
-import { Form, useSearchParams } from "react-router";
+import { useFetcher, useSearchParams } from "react-router";
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import type { GetTournament } from "~/utils/getTournament.server";
 import { Input } from "./Input";
 import { Button } from "./Button";
-import { Regions, TournamentsFormat, ScoreFormula } from "~/utils/enums";
+import {
+  Regions,
+  TournamentsFormat,
+  ScoreFormula,
+  QualifyingOrder,
+} from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
@@ -13,6 +18,11 @@ import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
 import { Reorder } from "motion/react";
 import { TOURNAMENT_TEMPLATES } from "~/utils/tournamentTemplates";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { tournamentFormSchema } from "~/routes/api.tournaments.$id.start";
+import { Label } from "./Label";
+import { FormControl } from "./FormControl";
 
 interface Props {
   tournament: GetTournament;
@@ -20,51 +30,32 @@ interface Props {
   eventDrivers: number[];
 }
 
-const PersonPointsInput = ({ name }: { name: string }) => {
-  const [points, setPoints] = useState(100);
-  return (
-    <styled.select
-      name={name + "Points"}
-      value={points}
-      onChange={(e) => setPoints(Number(e.target.value))}
-      fontSize="sm"
-      borderWidth={1}
-      borderColor="gray.800"
-      rounded="sm"
-      fontFamily="mono"
-    >
-      {Array.from({ length: 10 }, (_, i) => i + 1).map((points) => (
-        <option key={points} value={points * 10}>
-          {points * 10}
-        </option>
-      ))}
-    </styled.select>
-  );
-};
-
-const PeopleForm = ({
-  users,
-  defaultValue,
-  name,
-  allowNewDrivers = false,
-  allowRandomise = false,
-  allowPoints = false,
-}: {
+interface PeopleFormProps {
   users: GetUsers;
-  defaultValue: number[];
   name: string;
   allowNewDrivers?: boolean;
   allowRandomise?: boolean;
   allowPoints?: boolean;
-}) => {
-  const [value, onChange] = useState<(number | string)[]>(defaultValue);
+  onChange: (value: { driverId: string; points?: number }[]) => void;
+  value: { driverId: string; points?: number }[];
+}
+
+const PeopleForm = ({
+  users,
+  value,
+  onChange,
+  name,
+  allowNewDrivers = false,
+  allowRandomise = false,
+  allowPoints = false,
+}: PeopleFormProps) => {
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
 
   const filteredUsers = useMemo(() => {
     return users.filter(
       (user) =>
-        !value.includes(user.driverId) &&
+        !value.some((v) => v.driverId === user.driverId.toString()) &&
         `${user.firstName} ${user.lastName}`
           .toLowerCase()
           .includes(search.toLowerCase()),
@@ -107,15 +98,15 @@ const PeopleForm = ({
               marginBottom: "-1px",
             }}
           >
-            {value.map((userId, i) => {
-              const user = users.find((user) =>
-                typeof userId === "string" ? false : user.driverId === userId,
+            {value.map((person, i) => {
+              const user = users.find(
+                (user) => user.driverId.toString() === person.driverId,
               );
 
               return (
                 <Reorder.Item
-                  key={userId}
-                  value={userId}
+                  key={person.driverId}
+                  value={person}
                   style={{ listStyle: "none" }}
                   whileDrag={{
                     zIndex: 1000,
@@ -133,8 +124,6 @@ const PeopleForm = ({
                     alignItems="center"
                     pl={2}
                   >
-                    <input type="hidden" name={name} value={userId} />
-
                     <RiDraggable size={16} />
 
                     <styled.p
@@ -145,10 +134,42 @@ const PeopleForm = ({
                       overflow="hidden"
                       py={1}
                     >
-                      {user ? `${user.firstName} ${user.lastName}` : userId}
+                      {user
+                        ? `${user.firstName} ${user.lastName}`
+                        : person.driverId}
                     </styled.p>
 
-                    {allowPoints && <PersonPointsInput name={name} />}
+                    {allowPoints && (
+                      <styled.select
+                        name={name + "Points"}
+                        fontSize="sm"
+                        borderWidth={1}
+                        borderColor="gray.800"
+                        rounded="sm"
+                        fontFamily="mono"
+                        value={person.points}
+                        onChange={(e) => {
+                          onChange(
+                            value.map((p, index) =>
+                              index === i
+                                ? {
+                                    ...p,
+                                    points: Number(e.target.value),
+                                  }
+                                : p,
+                            ),
+                          );
+                        }}
+                      >
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map(
+                          (points) => (
+                            <option key={points} value={points * 10}>
+                              {points * 10}
+                            </option>
+                          ),
+                        )}
+                      </styled.select>
+                    )}
 
                     <Box p={1}>
                       <Button
@@ -201,7 +222,13 @@ const PeopleForm = ({
                   key={user.driverId}
                   type="button"
                   onClick={() => {
-                    onChange([...value, user.driverId]);
+                    onChange([
+                      ...value,
+                      {
+                        driverId: user.driverId.toString(),
+                        points: 100,
+                      },
+                    ]);
                     setSearch("");
                   }}
                 >
@@ -219,7 +246,13 @@ const PeopleForm = ({
                 <Option
                   type="button"
                   onClick={() => {
-                    onChange([...value, search.trim()]);
+                    onChange([
+                      ...value,
+                      {
+                        driverId: search.trim(),
+                        points: 100,
+                      },
+                    ]);
                     setSearch("");
                   }}
                 >
@@ -233,160 +266,196 @@ const PeopleForm = ({
   );
 };
 
+const validationSchema = toFormikValidationSchema(tournamentFormSchema);
+
 export const TournamentStartForm = ({
   tournament,
   users,
   eventDrivers,
 }: Props) => {
+  const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get("template");
   const template =
     templateId && templateId in TOURNAMENT_TEMPLATES
       ? TOURNAMENT_TEMPLATES[templateId]
       : null;
-  const [fullInclusion, setFullInclusion] = useState(false);
-  const [enableProtests, setEnableProtests] = useState(false);
-  const [qualifyingLaps, setQualifyingLaps] = useState(
-    tournament?.qualifyingLaps ?? 1,
-  );
-  const [region, setRegion] = useState<Regions>(
-    template?.region ?? tournament?.region ?? Regions.UK,
-  );
-  const [format, setFormat] = useState(
-    template?.format ?? tournament?.format ?? TournamentsFormat.STANDARD,
-  );
-  const [scoreFormula, setScoreFormula] = useState<ScoreFormula>(
-    template?.scoreFormula ??
-      tournament?.scoreFormula ??
-      ScoreFormula.CUMULATIVE,
-  );
+
+  const formik = useFormik({
+    validationSchema,
+    enableReinitialize: true,
+    initialValues: {
+      judges:
+        tournament?.judges.map((judge) => ({
+          driverId: judge.driverId.toString(),
+          points: judge.points,
+        })) ?? [],
+      drivers: Array.from(
+        Array.from(
+          new Set([
+            ...eventDrivers.map((driver) => driver.toString()),
+            ...(tournament?.drivers.map((driver) =>
+              driver.driverId.toString(),
+            ) ?? []),
+          ]),
+        ).map((driver) => ({
+          driverId: driver,
+        })),
+      ),
+      fullInclusion: false,
+      enableProtests: false,
+      qualifyingLaps: tournament?.qualifyingLaps ?? 1,
+      region: template?.region ?? tournament?.region ?? Regions.UK,
+      format:
+        template?.format ?? tournament?.format ?? TournamentsFormat.STANDARD,
+      scoreFormula:
+        template?.scoreFormula ??
+        tournament?.scoreFormula ??
+        ScoreFormula.CUMULATIVE,
+      qualifyingOrder:
+        template?.qualifyingOrder ??
+        tournament?.qualifyingOrder ??
+        QualifyingOrder.DRIVERS,
+    },
+    onSubmit: (values) => {
+      fetcher.submit(JSON.stringify(values), {
+        method: "post",
+        action: `/api/tournaments/${tournament?.id}/start`,
+        encType: "application/json",
+      });
+    },
+  });
+
+  const { format } = formik.values;
 
   return (
-    <Form method="post" action={`/api/tournaments/${tournament?.id}/start`}>
+    <form onSubmit={formik.handleSubmit}>
       <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
         <Flex gap={4} pt={8}>
           <StepDot />
-          <Box flex={1}>
-            <styled.label mb={2} display="block">
-              What format is this tournament?
-            </styled.label>
-            <input type="hidden" name="format" value={format} />
+          <FormControl flex={1} error={formik.errors.format}>
+            <Label>What format is this tournament?</Label>
             <TabGroup>
               {Object.values(TournamentsFormat).map((item) => {
                 return (
                   <TabButton
                     key={item}
                     type="button"
-                    isActive={format === item}
-                    onClick={() => setFormat(item)}
+                    isActive={formik.values.format === item}
+                    onClick={() => formik.setFieldValue("format", item)}
                   >
                     {capitalCase(item)}
                   </TabButton>
                 );
               })}
             </TabGroup>
-          </Box>
+          </FormControl>
         </Flex>
 
         {(format === TournamentsFormat.STANDARD ||
           format === TournamentsFormat.DOUBLE_ELIMINATION ||
           format === TournamentsFormat.WILDCARD) && (
-          <Flex gap={4}>
-            <StepDot />
-            <Box flex={1}>
-              <styled.label mb={2} display="block">
-                How many qualifying laps?
-              </styled.label>
-              <input
-                type="hidden"
-                name="qualifyingLaps"
-                defaultValue={qualifyingLaps}
-              />
-              <TabGroup>
-                <TabButton
-                  isActive={qualifyingLaps === 1}
-                  onClick={() => setQualifyingLaps(1)}
-                  type="button"
-                >
-                  1
-                </TabButton>
-                <TabButton
-                  isActive={qualifyingLaps === 2}
-                  onClick={() => setQualifyingLaps(2)}
-                  type="button"
-                >
-                  2
-                </TabButton>
-                <TabButton
-                  isActive={qualifyingLaps === 3}
-                  onClick={() => setQualifyingLaps(3)}
-                  type="button"
-                >
-                  3
-                </TabButton>
-              </TabGroup>
-            </Box>
-          </Flex>
-        )}
+          <>
+            <Flex gap={4}>
+              <StepDot />
+              <FormControl flex={1} error={formik.errors.qualifyingLaps}>
+                <Label>How many qualifying laps?</Label>
+                <TabGroup>
+                  <TabButton
+                    isActive={formik.values.qualifyingLaps === 1}
+                    onClick={() => formik.setFieldValue("qualifyingLaps", 1)}
+                    type="button"
+                  >
+                    1
+                  </TabButton>
+                  <TabButton
+                    isActive={formik.values.qualifyingLaps === 2}
+                    onClick={() => formik.setFieldValue("qualifyingLaps", 2)}
+                    type="button"
+                  >
+                    2
+                  </TabButton>
+                  <TabButton
+                    isActive={formik.values.qualifyingLaps === 3}
+                    onClick={() => formik.setFieldValue("qualifyingLaps", 3)}
+                    type="button"
+                  >
+                    3
+                  </TabButton>
+                </TabGroup>
+              </FormControl>
+            </Flex>
 
-        {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.WILDCARD) && (
-          <Flex gap={4}>
-            <StepDot />
-            <Box flex={1}>
-              <styled.label mb={2} display="block">
-                What score formula should be used?
-              </styled.label>
-              <input type="hidden" name="scoreFormula" value={scoreFormula} />
-              <TabGroup>
-                {Object.values(ScoreFormula).map((item) => {
-                  return (
-                    <TabButton
-                      key={item}
-                      type="button"
-                      isActive={scoreFormula === item}
-                      onClick={() => setScoreFormula(item)}
-                    >
-                      {capitalCase(item)}
-                    </TabButton>
-                  );
-                })}
-              </TabGroup>
-            </Box>
-          </Flex>
+            <Flex gap={4}>
+              <StepDot />
+              <FormControl flex={1} error={formik.errors.qualifyingOrder}>
+                <Label>How should the qualifying order be run?</Label>
+                <TabGroup>
+                  {Object.values(QualifyingOrder).map((item) => {
+                    return (
+                      <TabButton
+                        key={item}
+                        type="button"
+                        isActive={formik.values.qualifyingOrder === item}
+                        onClick={() =>
+                          formik.setFieldValue("qualifyingOrder", item)
+                        }
+                      >
+                        Group by {capitalCase(item)}
+                      </TabButton>
+                    );
+                  })}
+                </TabGroup>
+              </FormControl>
+            </Flex>
+
+            <Flex gap={4}>
+              <StepDot />
+              <FormControl flex={1} error={formik.errors.scoreFormula}>
+                <Label>What score formula should be used?</Label>
+                <TabGroup>
+                  {Object.values(ScoreFormula).map((item) => {
+                    return (
+                      <TabButton
+                        key={item}
+                        type="button"
+                        isActive={formik.values.scoreFormula === item}
+                        onClick={() =>
+                          formik.setFieldValue("scoreFormula", item)
+                        }
+                      >
+                        {capitalCase(item)}
+                      </TabButton>
+                    );
+                  })}
+                </TabGroup>
+              </FormControl>
+            </Flex>
+          </>
         )}
 
         <Flex gap={4}>
           <StepDot />
-          <Box flex={1}>
-            <styled.label display="block" mb={1}>
-              Enable protesting?
-            </styled.label>
-
-            <input
-              type="hidden"
-              name="enableProtests"
-              value={enableProtests ? "true" : "false"}
-            />
+          <FormControl flex={1} error={formik.errors.enableProtests}>
+            <Label>Enable protesting?</Label>
 
             <TabGroup>
               <TabButton
                 type="button"
-                isActive={!enableProtests}
-                onClick={() => setEnableProtests(false)}
+                isActive={!formik.values.enableProtests}
+                onClick={() => formik.setFieldValue("enableProtests", false)}
               >
                 No
               </TabButton>
               <TabButton
                 type="button"
-                isActive={enableProtests}
-                onClick={() => setEnableProtests(true)}
+                isActive={formik.values.enableProtests}
+                onClick={() => formik.setFieldValue("enableProtests", true)}
               >
                 Yes
               </TabButton>
             </TabGroup>
-          </Box>
+          </FormControl>
         </Flex>
 
         {(format === TournamentsFormat.STANDARD ||
@@ -394,10 +463,8 @@ export const TournamentStartForm = ({
           format === TournamentsFormat.WILDCARD) && (
           <Flex gap={4}>
             <StepDot />
-            <Box flex={1}>
-              <styled.label display="block" mb={1}>
-                Should all drivers participate in battles?
-              </styled.label>
+            <FormControl flex={1} error={formik.errors.fullInclusion}>
+              <Label>Should all drivers participate in battles?</Label>
               <styled.span
                 mb={2}
                 color="gray.500"
@@ -409,40 +476,30 @@ export const TournamentStartForm = ({
                 necessary.
               </styled.span>
 
-              <input
-                type="hidden"
-                name="fullInclusion"
-                value={fullInclusion ? "true" : "false"}
-              />
-
               <TabGroup>
                 <TabButton
                   type="button"
-                  isActive={!fullInclusion}
-                  onClick={() => setFullInclusion(false)}
+                  isActive={!formik.values.fullInclusion}
+                  onClick={() => formik.setFieldValue("fullInclusion", false)}
                 >
                   No
                 </TabButton>
                 <TabButton
                   type="button"
-                  isActive={fullInclusion}
-                  onClick={() => setFullInclusion(true)}
+                  isActive={formik.values.fullInclusion}
+                  onClick={() => formik.setFieldValue("fullInclusion", true)}
                 >
                   Yes
                 </TabButton>
               </TabGroup>
-            </Box>
+            </FormControl>
           </Flex>
         )}
 
         <Flex gap={4}>
           <StepDot />
-          <Box flex={1}>
-            <styled.label mb={2} display="block">
-              Which region is this tournament in?
-            </styled.label>
-
-            <input type="hidden" name="region" value={region} />
+          <FormControl flex={1} error={formik.errors.region}>
+            <Label>Which region is this tournament in?</Label>
 
             <TabGroup>
               {Object.values(Regions).map((item) => {
@@ -454,68 +511,62 @@ export const TournamentStartForm = ({
                   <TabButton
                     type="button"
                     key={item}
-                    isActive={region === item}
-                    onClick={() => setRegion(item)}
+                    isActive={formik.values.region === item}
+                    onClick={() => formik.setFieldValue("region", item)}
                   >
                     {item}
                   </TabButton>
                 );
               })}
             </TabGroup>
-          </Box>
+          </FormControl>
         </Flex>
 
         <Flex gap={4}>
           <StepDot />
-          <Box flex={1}>
-            <styled.label mb={2} display="block">
-              Who are the tournament judges?
-            </styled.label>
+          <FormControl flex={1} error={formik.errors.judges}>
+            <Label>Who are the tournament judges?</Label>
 
             <PeopleForm
               users={users}
-              defaultValue={
-                tournament?.judges.map((judge) => judge.driverId) ?? []
-              }
+              value={formik.values.judges}
+              onChange={(value) => formik.setFieldValue("judges", value)}
               name="judges"
               allowPoints
             />
-          </Box>
+          </FormControl>
         </Flex>
 
         <Flex gap={4}>
           <StepDot />
-          <Box flex={1}>
-            <styled.label mb={2} display="block">
-              Who are the tournament drivers?
-            </styled.label>
+          <FormControl flex={1} error={formik.errors.drivers}>
+            <Label>Who are the tournament drivers?</Label>
 
             <PeopleForm
               allowNewDrivers
               allowRandomise
               users={users}
-              defaultValue={Array.from(
-                new Set([
-                  ...eventDrivers,
-                  ...(tournament?.drivers.map((driver) => driver.driverId) ??
-                    []),
-                ]),
-              )}
+              value={formik.values.drivers}
+              onChange={(value) => formik.setFieldValue("drivers", value)}
               name="drivers"
             />
-          </Box>
+          </FormControl>
         </Flex>
 
         <Flex gap={4}>
           <StepDot />
-          <Box flex={1} pb={24}>
-            <styled.label display="block" mb={2}>
-              Are you ready to start this tournament?
-            </styled.label>
-            <Button type="submit">I'm ready, let's go!</Button>
-          </Box>
+          <FormControl flex={1} pb={24}>
+            <Label>Are you ready to start this tournament?</Label>
+            <Button
+              type="submit"
+              isLoading={fetcher.state === "submitting"}
+              disabled={fetcher.state === "submitting"}
+            >
+              I'm ready, let's go!
+            </Button>
+          </FormControl>
         </Flex>
       </Flex>
-    </Form>
+    </form>
   );
 };

@@ -9,7 +9,7 @@ import notFoundInvariant from "~/utils/notFoundInvariant";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
-  const { id, driverId, index } = params;
+  const { id, lapId } = params;
   const { userId } = await getAuth(args);
 
   notFoundInvariant(userId, "Missing user id");
@@ -30,24 +30,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       },
-      drivers: {
-        where: {
-          id: Number(driverId),
-        },
-        include: {
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-            },
-          },
-          laps: {
-            include: {
-              scores: true,
-            },
-          },
-        },
-      },
     },
   });
 
@@ -56,19 +38,31 @@ export const loader = async (args: LoaderFunctionArgs) => {
     tournament.state === TournamentsState.QUALIFYING,
     "Tournament is not in qualifying",
   );
-  notFoundInvariant(
-    tournament.drivers.length > 0,
-    "No drivers found for tournament",
-  );
 
-  const driver = tournament.drivers[0];
-  const lap = driver.laps[Number(index)];
+  const lap = await prisma.laps.findFirst({
+    where: {
+      id: Number(lapId),
+    },
+    include: {
+      scores: true,
+      driver: {
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   notFoundInvariant(lap, "Lap not found");
 
   return {
     tournament,
-    driver,
+    driver: lap.driver,
     lap,
     totalJudges: tournament.judges.length,
   };

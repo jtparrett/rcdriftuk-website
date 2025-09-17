@@ -88,6 +88,7 @@ model Tournaments {
   rated               Boolean                  @default(false)
   scoreFormula        ScoreFormula             @default(AVERAGED)
   leaderboards        LeaderboardTournaments[]
+  qualifyingOrder     QualifyingOrder          @default(DRIVERS)
 
   @@index([state])
   @@index([archived])
@@ -307,6 +308,11 @@ model CarSetupChanges {
   @@index([type])
   @@index([createdAt])
   @@index([userId, type])
+}
+
+enum QualifyingOrder {
+  DRIVERS
+  RUNS
 }
 
 enum CarSetupChangeType {

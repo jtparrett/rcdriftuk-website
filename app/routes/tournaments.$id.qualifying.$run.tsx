@@ -76,6 +76,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
             select: {
               scores: true,
               penalty: true,
+              id: true,
             },
           },
         },
@@ -113,6 +114,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         return {
           ...driver,
           score: [best, ...lapScores][run],
+          lapId: driver.laps[run].id,
         };
       })
       .sort((a, b) => {
@@ -188,7 +190,7 @@ const Table = ({
               <styled.p fontWeight="semibold" textAlign="right">
                 {isOwner && tournament.run > 0 ? (
                   <Link
-                    to={`/tournaments/${tournament.id}/${driver.id}/${tournament.run - 1}`}
+                    to={`/tournaments/${tournament.id}/lap/${driver.lapId}`}
                   >
                     {driver.score}
                   </Link>
