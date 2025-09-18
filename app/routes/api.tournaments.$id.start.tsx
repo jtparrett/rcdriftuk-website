@@ -27,7 +27,7 @@ export const tournamentFormSchema = z.object({
         driverId: z.string(),
       }),
     )
-    .min(4, "Please add at least four drivers to the tournament"),
+    .min(2, "Please add at least two drivers to the tournament"),
   qualifyingLaps: z.coerce
     .number()
     .min(1, "Qualifying laps must be at least 1"),
@@ -157,10 +157,11 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create laps
   const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
-    data: Array.from({ length: qualifyingLaps }).flatMap(() => {
+    data: Array.from({ length: qualifyingLaps }).flatMap((_, i) => {
       return tournamentDrivers.map((driver) => {
         return {
           tournamentDriverId: driver.id,
+          round: i + 1,
         };
       });
     }),
