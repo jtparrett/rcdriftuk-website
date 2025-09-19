@@ -5,7 +5,7 @@ import {
 } from "react-router";
 import { z } from "zod";
 import { ConfirmationForm } from "~/components/ConfirmationForm";
-import { TournamentsState } from "~/utils/enums";
+import { QualifyingProcedure, TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
@@ -87,7 +87,9 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/tournaments/${id}/qualifying/0`);
+  return redirect(
+    `/tournaments/${id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`,
+  );
 };
 
 const RandomiseQualifyingPage = () => {

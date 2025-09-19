@@ -9,10 +9,11 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
 import { getAuth } from "~/utils/getAuth.server";
-import { TournamentsFormat } from "~/utils/enums";
+import { QualifyingProcedure, TournamentsFormat } from "~/utils/enums";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 import { token } from "~/styled-system/tokens";
+import { getQualifyingWaveSize } from "~/utils/tournament";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -35,6 +36,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       qualifyingLaps: true,
       userId: true,
       scoreFormula: true,
+      qualifyingProcedure: true,
       nextQualifyingLap: {
         select: {
           driver: {
@@ -96,6 +98,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     format: tournament.format,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
+    qualifyingProcedure: tournament.qualifyingProcedure,
     drivers: tournament.drivers
       .map((driver) => {
         const lapScores = driver.laps
@@ -147,7 +150,9 @@ const Table = ({
           <Fragment key={i}>
             {i + startPosition === qualifyingCutOff &&
               !tournament.fullInclusion &&
-              tournament.run === 0 && (
+              (tournament.run === 0 ||
+                tournament.qualifyingProcedure ===
+                  QualifyingProcedure.WAVES) && (
                 <Box w="full" h="1px" bgColor="brand.500" />
               )}
             <Flex
@@ -227,9 +232,13 @@ const QualifyingPage = () => {
 
   // Wildcard tournaments have one less qualifying driver
   // to leave space for the lower bracket winner (counts for two)
+  const waveSize =
+    tournament.qualifyingProcedure === QualifyingProcedure.WAVES
+      ? getQualifyingWaveSize(tournament.qualifyingLaps, tournament.run)
+      : 1;
+  const offset = tournament.format === TournamentsFormat.WILDCARD ? -1 : 0;
   const qualifyingCutOff =
-    pow2Floor(driversWithoutBuys.length) +
-    (tournament.format === TournamentsFormat.WILDCARD ? -1 : 0);
+    (pow2Floor(driversWithoutBuys.length) + offset) * waveSize;
 
   const half = Math.ceil(driversWithoutBuys.length / 2);
 
@@ -237,13 +246,15 @@ const QualifyingPage = () => {
     <>
       <HiddenEmbed>
         <TabGroup mb={4}>
-          <Tab
-            to={`/tournaments/${tournament.id}/qualifying/0`}
-            isActive={tournament.run === 0}
-            replace
-          >
-            Best
-          </Tab>
+          {tournament.qualifyingProcedure === QualifyingProcedure.BEST && (
+            <Tab
+              to={`/tournaments/${tournament.id}/qualifying/0`}
+              isActive={tournament.run === 0}
+              replace
+            >
+              Best
+            </Tab>
+          )}
           {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => {
             return (
               <Tab

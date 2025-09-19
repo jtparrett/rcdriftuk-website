@@ -89,6 +89,7 @@ model Tournaments {
   scoreFormula        ScoreFormula             @default(AVERAGED)
   leaderboards        LeaderboardTournaments[]
   qualifyingOrder     QualifyingOrder          @default(DRIVERS)
+  qualifyingProcedure QualifyingProcedure      @default(BEST)
 
   @@index([state])
   @@index([archived])
@@ -541,6 +542,11 @@ model LeaderboardDrivers {
   @@index([leaderboardId])
   @@index([driverId])
   @@index([leaderboardId, driverId])
+}
+
+enum QualifyingProcedure {
+  BEST
+  WAVES
 }
 
 enum LeaderboardType {
