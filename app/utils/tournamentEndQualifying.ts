@@ -30,8 +30,9 @@ const addByeDriverToTournament = async (
   });
 
   await prisma.laps.createMany({
-    data: Array.from(new Array(tournament.qualifyingLaps)).map(() => ({
+    data: Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => ({
       tournamentDriverId: byeTounamentDirver.id,
+      round: i + 1,
     })),
   });
 

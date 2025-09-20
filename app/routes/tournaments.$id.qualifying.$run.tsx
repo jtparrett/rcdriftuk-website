@@ -67,11 +67,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
             },
           },
           laps: {
-            where: {
-              scores: {
-                some: {},
-              },
-            },
             orderBy: {
               id: "asc",
             },
@@ -99,7 +94,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
     qualifyingProcedure: tournament.qualifyingProcedure,
+    totalDrivers: tournament.drivers.length,
     drivers: tournament.drivers
+      .filter((driver) => run === 0 || driver.laps[run - 1])
       .map((driver) => {
         const lapScores = driver.laps
           .filter((lap) => lap.scores.length === tournament._count.judges)
@@ -236,9 +233,13 @@ const QualifyingPage = () => {
     tournament.qualifyingProcedure === QualifyingProcedure.WAVES
       ? getQualifyingWaveSize(tournament.qualifyingLaps, tournament.run)
       : 1;
-  const offset = tournament.format === TournamentsFormat.WILDCARD ? -1 : 0;
+  const offset =
+    tournament.format === TournamentsFormat.WILDCARD &&
+    (tournament.run === tournament.qualifyingLaps || tournament.run === 0)
+      ? -1
+      : 0;
   const qualifyingCutOff =
-    (pow2Floor(driversWithoutBuys.length) + offset) * waveSize;
+    pow2Floor(tournament.totalDrivers) * waveSize + offset;
 
   const half = Math.ceil(driversWithoutBuys.length / 2);
 
