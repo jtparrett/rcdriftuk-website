@@ -8,6 +8,7 @@ import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { getDriverRatings } from "~/utils/getDriverRatings.server";
 import { prisma } from "~/utils/prisma.server";
 import { AppName } from "~/utils/enums";
+import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -25,20 +26,15 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const driverRatings = await getDriverRatings(Regions.UK);
   const startOfSeason = startOfYear(new Date());
 
   const qualifiedDrivers = await prisma.users.findMany({
     where: {
-      driverId: {
-        in: driverRatings
-          .map((driver) => driver.driverId)
-          .filter((id) => id !== 0),
-      },
       TournamentDrivers: {
         some: {
           tournament: {
             rated: true,
+            region: Regions.UK,
             createdAt: {
               gte: startOfSeason,
             },
@@ -46,21 +42,22 @@ export const loader = async () => {
         },
       },
     },
+    orderBy: {
+      elo_UK: "desc",
+    },
   });
 
-  const drivers = driverRatings
+  const drivers = qualifiedDrivers
     .map((driver, i) => {
       return {
         ...driver,
         position: i + 1,
+        elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
         rank: getDriverRank(driver.elo_UK, driver.totalBattles),
       };
     })
     .filter((a) => {
-      return (
-        qualifiedDrivers.find((b) => b.driverId === a.driverId) &&
-        a.rank !== RANKS.UNRANKED
-      );
+      return a.rank !== RANKS.UNRANKED;
     });
 
   return drivers;
