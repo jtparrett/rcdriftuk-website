@@ -29,6 +29,9 @@ export const loader = async () => {
 
   const qualifiedDrivers = await prisma.users.findMany({
     where: {
+      driverId: {
+        not: 0,
+      },
       TournamentDrivers: {
         some: {
           tournament: {
