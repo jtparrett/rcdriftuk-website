@@ -137,7 +137,6 @@ export const action = async (args: ActionFunctionArgs) => {
     },
     include: {
       judges: true,
-      drivers: true,
       nextQualifyingLap: {
         include: {
           scores: true,
@@ -212,8 +211,9 @@ export const action = async (args: ActionFunctionArgs) => {
       data: {
         nextQualifyingLapId: nextQualifyingLap?.id ?? null,
       },
-    }),
-      publishUpdate();
+    });
+
+    publishUpdate();
   }
 
   if (tournament.state === TournamentsState.BATTLES) {
