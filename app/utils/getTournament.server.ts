@@ -28,6 +28,7 @@ export const getTournament = (id: string, userId: string | null) => {
       fullInclusion: true,
       enableProtests: true,
       qualifyingOrder: true,
+      qualifyingProcedure: true,
       region: true,
       nextQualifyingLap: {
         include: {

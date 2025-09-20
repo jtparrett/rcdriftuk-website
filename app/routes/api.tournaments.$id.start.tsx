@@ -4,6 +4,7 @@ import {
   TournamentsState,
   ScoreFormula,
   QualifyingOrder,
+  QualifyingProcedure,
 } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
@@ -27,16 +28,18 @@ export const tournamentFormSchema = z.object({
         driverId: z.string(),
       }),
     )
-    .min(2, "Please add at least two drivers to the tournament"),
+    .min(4, "Please add at least four drivers to the tournament"),
   qualifyingLaps: z.coerce
     .number()
-    .min(1, "Qualifying laps must be at least 1"),
+    .min(1, "Qualifying laps must be at least 1")
+    .max(3, "Qualifying laps must be at most 3"),
   format: z.nativeEnum(TournamentsFormat),
   fullInclusion: z.boolean(),
   enableProtests: z.boolean(),
   region: z.nativeEnum(Regions),
   scoreFormula: z.nativeEnum(ScoreFormula),
   qualifyingOrder: z.nativeEnum(QualifyingOrder),
+  qualifyingProcedure: z.nativeEnum(QualifyingProcedure),
 });
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -65,6 +68,7 @@ export const action = async (args: ActionFunctionArgs) => {
     region,
     scoreFormula,
     qualifyingOrder,
+    qualifyingProcedure,
   } = tournamentFormSchema.parse(body);
 
   if (
@@ -182,6 +186,7 @@ export const action = async (args: ActionFunctionArgs) => {
       enableProtests,
       region,
       scoreFormula,
+      qualifyingProcedure,
     },
   });
 

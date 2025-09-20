@@ -2,6 +2,7 @@ import { useUser } from "@clerk/react-router";
 import {
   BattlesBracket,
   QualifyingOrder,
+  QualifyingProcedure,
   TicketStatus,
   TournamentsFormat,
   TournamentsState,
@@ -136,6 +137,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
     include: {
       judges: true,
+      drivers: true,
       nextQualifyingLap: {
         include: {
           scores: true,
@@ -171,7 +173,9 @@ export const action = async (args: ActionFunctionArgs) => {
   ) {
     await tournamentEndQualifying(id);
     publishUpdate();
-    return redirect(`/tournaments/${id}/qualifying/0`);
+    return redirect(
+      `/tournaments/${id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`,
+    );
   }
 
   if (tournament.state === TournamentsState.QUALIFYING) {
@@ -208,9 +212,8 @@ export const action = async (args: ActionFunctionArgs) => {
       data: {
         nextQualifyingLapId: nextQualifyingLap?.id ?? null,
       },
-    });
-
-    publishUpdate();
+    }),
+      publishUpdate();
   }
 
   if (tournament.state === TournamentsState.BATTLES) {
@@ -236,7 +239,9 @@ export const action = async (args: ActionFunctionArgs) => {
     );
   }
 
-  return redirect(`/tournaments/${id}/qualifying/0`);
+  return redirect(
+    `/tournaments/${id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`,
+  );
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -425,7 +430,7 @@ const TournamentPage = () => {
               </Tab>
               {tournament.qualifyingLaps > 0 && (
                 <Tab
-                  to={`/tournaments/${tournament.id}/qualifying/0`}
+                  to={`/tournaments/${tournament.id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`}
                   isActive={isQualifyingTab}
                   replace
                 >
