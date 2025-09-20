@@ -248,7 +248,7 @@ const computeRatingsForRegion = async (region: Regions) => {
       where: { driverId: parseInt(driverId) },
       data: {
         [eloField]: elo,
-        totalBattles,
+        ...(region === Regions.ALL && { totalBattles }),
         lastBattleDate: driverLastBattleDate[parseInt(driverId)],
       },
     });
