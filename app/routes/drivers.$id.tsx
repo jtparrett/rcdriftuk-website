@@ -442,15 +442,15 @@ const Page = () => {
       </Container>
 
       <Box bgColor="gray.950" borderTopWidth={1} borderColor="gray.900">
-        <TabsBar>
-          <Flex gap={0.5} alignItems="center" w={784} mx="auto">
+        <Box borderBottomWidth={1} borderColor="gray.900" px={2}>
+          <Flex gap={0.5} alignItems="center" py={2} maxW="784px" mx="auto">
             {Object.values(TABS).map((i) => (
               <TabButton isActive={tab === i} onClick={() => setTab(i)}>
                 {i}
               </TabButton>
             ))}
           </Flex>
-        </TabsBar>
+        </Box>
 
         <Container maxW={800} px={2} py={6}>
           {tab === TABS.history && battles.length > 0 && (
