@@ -35,8 +35,8 @@ const MenuDropdown = ({ user }: Props) => {
     <Box
       borderWidth={1}
       borderColor="gray.800"
-      w={{ base: "calc(100% + 32px)", md: "480px" }}
-      ml={{ base: -4, md: "auto" }}
+      w={{ base: "calc(100% + 16px)", md: "480px" }}
+      ml={{ base: -2, md: "auto" }}
       rounded="xl"
       bgColor="gray.900"
       shadow="xl"
