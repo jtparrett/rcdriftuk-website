@@ -133,6 +133,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                     where: {
                       type: "CHASSIS",
                     },
+                    take: 1,
+                    orderBy: {
+                      createdAt: "desc",
+                    },
                   },
                 },
               },
