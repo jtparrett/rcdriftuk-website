@@ -1,14 +1,7 @@
-export const getQualifyingWaveSize = (
-  qualifyingLaps: number,
-  index: number,
-) => {
-  if (qualifyingLaps === 1) {
-    return 1;
-  }
+export const getQualifyingWaveSize = (qualifyingLaps: number, run: number) => {
+  if (qualifyingLaps === 1) return 1;
 
-  if (qualifyingLaps === 2) {
-    return [0.75, 0.25][Math.min(index - 1, 1)];
-  }
+  const adjustedIndex = Math.min(run - 1, qualifyingLaps - 1);
 
-  return [0.5, 0.25, 0.25][Math.min(index - 1, 2)];
+  return adjustedIndex === 0 ? 1 - 0.25 * (qualifyingLaps - 1) : 0.25;
 };

@@ -56,6 +56,8 @@ import { getUser, type GetUser } from "~/utils/getUser.server";
 import { useEffect, useState } from "react";
 import pluralize from "pluralize";
 import { AppName } from "~/utils/enums";
+import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
+import notFoundInvariant from "~/utils/notFoundInvariant";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -128,20 +130,15 @@ export const action = async (args: ActionFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
 
-  invariant(userId, "User not found");
+  notFoundInvariant(userId, "User not found");
 
-  const tournament = await prisma.tournaments.findFirstOrThrow({
+  const tournament = await prisma.tournaments.findFirst({
     where: {
       id,
       userId,
     },
     include: {
-      judges: true,
-      nextQualifyingLap: {
-        include: {
-          scores: true,
-        },
-      },
+      nextQualifyingLap: true,
       nextBattle: {
         select: {
           BattleProtests: {
@@ -156,10 +153,10 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    createAbly()
-      .channels.get(tournament.id)
-      .publish("update", new Date().toISOString());
+    createAbly().channels.get(id).publish("update", new Date().toISOString());
   };
+
+  notFoundInvariant(tournament, "Tournament not found");
 
   invariant(
     (tournament.nextBattle?.BattleProtests.length ?? 0) === 0,
@@ -171,47 +168,14 @@ export const action = async (args: ActionFunctionArgs) => {
     tournament.nextQualifyingLapId === null
   ) {
     await tournamentEndQualifying(id);
+
     publishUpdate();
-    return redirect(
-      `/tournaments/${id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`,
-    );
+
+    return redirect(`/tournaments/${id}/overview`);
   }
 
   if (tournament.state === TournamentsState.QUALIFYING) {
-    invariant(
-      tournament?.judges.length ===
-        tournament?.nextQualifyingLap?.scores.length,
-      "Judging not complete for current lap",
-    );
-
-    const nextQualifyingLap = await prisma.laps.findFirst({
-      where: {
-        driver: {
-          tournamentId: id,
-        },
-        scores: {
-          none: {},
-        },
-      },
-      orderBy:
-        tournament.qualifyingOrder === QualifyingOrder.DRIVERS
-          ? [
-              {
-                tournamentDriverId: "asc",
-              },
-              { id: "asc" },
-            ]
-          : [{ id: "asc" }],
-    });
-
-    await prisma.tournaments.update({
-      where: {
-        id,
-      },
-      data: {
-        nextQualifyingLapId: nextQualifyingLap?.id ?? null,
-      },
-    });
+    await tournamentAdvanceQualifying(id);
 
     publishUpdate();
   }
@@ -220,28 +184,9 @@ export const action = async (args: ActionFunctionArgs) => {
     await tournamentNextBattle(id);
 
     publishUpdate();
-
-    const nextBattle = await prisma.tournaments.findFirst({
-      where: {
-        id,
-      },
-      select: {
-        nextBattle: {
-          select: {
-            bracket: true,
-          },
-        },
-      },
-    });
-
-    return redirect(
-      `/tournaments/${id}/battles/${nextBattle?.nextBattle?.bracket ?? BattlesBracket.UPPER}`,
-    );
   }
 
-  return redirect(
-    `/tournaments/${id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`,
-  );
+  return redirect(`/tournaments/${id}/overview`);
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -558,11 +503,20 @@ const TournamentPage = () => {
                     )}
 
                   {isOwner &&
+                    tournament.state === TournamentsState.QUALIFYING && (
+                      <LinkButton
+                        variant="outline"
+                        to={`/tournaments/${tournament.id}/randomise`}
+                      >
+                        Randomise Qualifying <RiShuffleLine />
+                      </LinkButton>
+                    )}
+
+                  {isOwner &&
                     tournament.state === TournamentsState.QUALIFYING &&
                     tournament.nextQualifyingLap &&
                     tournament.nextQualifyingLap.scores.length ===
-                      tournament.judges.length &&
-                    tournament.nextQualifyingLap && (
+                      tournament.judges.length && (
                       <Form method="post">
                         <Button
                           type="submit"
@@ -573,16 +527,6 @@ const TournamentPage = () => {
                           Start Next Run <RiFlagLine />
                         </Button>
                       </Form>
-                    )}
-
-                  {isOwner &&
-                    tournament.state === TournamentsState.QUALIFYING && (
-                      <LinkButton
-                        variant="outline"
-                        to={`/tournaments/${tournament.id}/randomise`}
-                      >
-                        Randomise Qualifying <RiShuffleLine />
-                      </LinkButton>
                     )}
 
                   {isOwner &&

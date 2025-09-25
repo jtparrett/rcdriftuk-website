@@ -39,6 +39,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       qualifyingProcedure: true,
       nextQualifyingLap: {
         select: {
+          round: true,
           driver: {
             select: {
               id: true,
@@ -74,6 +75,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
               scores: true,
               penalty: true,
               id: true,
+              round: true,
             },
           },
         },
@@ -94,9 +96,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
     qualifyingProcedure: tournament.qualifyingProcedure,
+    nextQualifyingLap: tournament.nextQualifyingLap,
     totalDrivers: tournament.drivers.length,
     drivers: tournament.drivers
-      .filter((driver) => run === 0 || driver.laps[run - 1])
+      .filter(
+        (driver) => run === 0 || driver.laps.some((lap) => lap.round === run),
+      )
       .map((driver) => {
         const lapScores = driver.laps
           .filter((lap) => lap.scores.length === tournament._count.judges)
@@ -141,7 +146,10 @@ const Table = ({
   return (
     <Box flex={1} p={{ base: 0, md: 1 }} overflow="hidden">
       {drivers.map((driver, i) => {
-        const isNext = tournament.nextQualifyingDriver?.id === driver.id;
+        const isNext =
+          tournament.nextQualifyingDriver?.id === driver.id &&
+          (tournament.run === tournament.nextQualifyingLap?.round ||
+            tournament.run === 0);
 
         return (
           <Fragment key={i}>
@@ -287,25 +295,35 @@ const QualifyingPage = () => {
           rounded="2xl"
           bg="gray.950"
         >
-          <Table
-            drivers={driversWithoutBuys.slice(0, half)}
-            qualifyingCutOff={qualifyingCutOff}
-            isOwner={tournament.isOwner}
-          />
+          {driversWithoutBuys.length <= 0 && (
+            <styled.p textAlign="center" flex={1} py={4}>
+              There are no runs here yet.
+            </styled.p>
+          )}
 
-          <Box
-            alignSelf="stretch"
-            w="1px"
-            bgColor="gray.800"
-            display={{ base: "none", md: "block" }}
-          />
+          {driversWithoutBuys.length > 0 && (
+            <>
+              <Table
+                drivers={driversWithoutBuys.slice(0, half)}
+                qualifyingCutOff={qualifyingCutOff}
+                isOwner={tournament.isOwner}
+              />
 
-          <Table
-            drivers={driversWithoutBuys.slice(half)}
-            qualifyingCutOff={qualifyingCutOff}
-            startPosition={half}
-            isOwner={tournament.isOwner}
-          />
+              <Box
+                alignSelf="stretch"
+                w="1px"
+                bgColor="gray.800"
+                display={{ base: "none", md: "block" }}
+              />
+
+              <Table
+                drivers={driversWithoutBuys.slice(half)}
+                qualifyingCutOff={qualifyingCutOff}
+                startPosition={half}
+                isOwner={tournament.isOwner}
+              />
+            </>
+          )}
         </Flex>
       </Box>
     </>

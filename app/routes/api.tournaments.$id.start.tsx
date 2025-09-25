@@ -160,8 +160,11 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   // Create laps
+  const totalLapsToCreate =
+    qualifyingProcedure === QualifyingProcedure.WAVES ? 1 : qualifyingLaps;
+
   const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
-    data: Array.from({ length: qualifyingLaps }).flatMap((_, i) => {
+    data: Array.from({ length: totalLapsToCreate }).flatMap((_, i) => {
       return tournamentDrivers.map((driver) => {
         return {
           tournamentDriverId: driver.id,

@@ -79,6 +79,20 @@ const PeopleForm = ({
         </Button>
       )}
 
+      <Button
+        type="button"
+        onClick={() => {
+          onChange(
+            users.slice(0, 21).map((user) => ({
+              driverId: user.driverId.toString(),
+              points: 100,
+            })),
+          );
+        }}
+      >
+        Add 21 Drivers
+      </Button>
+
       {value.length > 0 && (
         <Box
           bgColor="gray.900"
