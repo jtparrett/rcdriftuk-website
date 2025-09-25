@@ -129,6 +129,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 export const action = async (args: ActionFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
+  const referer =
+    args.request.headers.get("Referer") ?? `/tournaments/${id}/overview`;
 
   notFoundInvariant(userId, "User not found");
 
@@ -171,7 +173,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
     publishUpdate();
 
-    return redirect(`/tournaments/${id}/overview`);
+    return redirect(referer);
   }
 
   if (tournament.state === TournamentsState.QUALIFYING) {
@@ -186,7 +188,7 @@ export const action = async (args: ActionFunctionArgs) => {
     publishUpdate();
   }
 
-  return redirect(`/tournaments/${id}/overview`);
+  return redirect(referer);
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -518,6 +520,11 @@ const TournamentPage = () => {
                     tournament.nextQualifyingLap.scores.length ===
                       tournament.judges.length && (
                       <Form method="post">
+                        <input
+                          type="hidden"
+                          name="redirect"
+                          value={location.pathname}
+                        />
                         <Button
                           type="submit"
                           w={{ base: "full", sm: "auto" }}
@@ -533,6 +540,11 @@ const TournamentPage = () => {
                     tournament.state === TournamentsState.QUALIFYING &&
                     tournament.nextQualifyingLap === null && (
                       <Form method="post">
+                        <input
+                          type="hidden"
+                          name="redirect"
+                          value={location.pathname}
+                        />
                         <Button
                           type="submit"
                           w={{ base: "full", sm: "auto" }}
@@ -551,6 +563,11 @@ const TournamentPage = () => {
                     !hasUnresolvedProtest &&
                     secondsRemaining <= 0 && (
                       <Form method="post">
+                        <input
+                          type="hidden"
+                          name="redirect"
+                          value={location.pathname}
+                        />
                         <Button
                           type="submit"
                           w={{ base: "full", sm: "auto" }}
