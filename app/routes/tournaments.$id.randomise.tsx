@@ -5,10 +5,12 @@ import {
 } from "react-router";
 import { z } from "zod";
 import { ConfirmationForm } from "~/components/ConfirmationForm";
-import { TournamentsState } from "~/utils/enums";
+import { QualifyingProcedure, TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
+import invariant from "~/utils/invariant";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -37,21 +39,24 @@ export const action = async (args: ActionFunctionArgs) => {
       state: TournamentsState.QUALIFYING,
       userId,
     },
+    include: {
+      nextQualifyingLap: true,
+      judges: true,
+    },
   });
 
   notFoundInvariant(tournament, "Tournament not found");
+
+  invariant(
+    tournament.qualifyingProcedure === QualifyingProcedure.BEST,
+    "Qualifying procedure must be BEST",
+  );
 
   await prisma.lapScores.deleteMany({
     where: {
       judge: {
         tournamentId: id,
       },
-    },
-  });
-
-  const judges = await prisma.tournamentJudges.findMany({
-    where: {
-      tournamentId: id,
     },
   });
 
@@ -66,7 +71,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   await prisma.lapScores.createMany({
     data: drivers.flatMap((driver) => {
-      return judges.flatMap((judge) => {
+      return tournament.judges.flatMap((judge) => {
         return driver.laps.flatMap((lap) => {
           return {
             score: Math.floor(Math.random() * judge.points),
@@ -78,16 +83,9 @@ export const action = async (args: ActionFunctionArgs) => {
     }),
   });
 
-  await prisma.tournaments.update({
-    where: {
-      id,
-    },
-    data: {
-      nextQualifyingLapId: null,
-    },
-  });
+  await tournamentAdvanceQualifying(id, true);
 
-  return redirect(`/tournaments/${id}/qualifying/0`);
+  return redirect(`/tournaments/${id}/overview`);
 };
 
 const RandomiseQualifyingPage = () => {

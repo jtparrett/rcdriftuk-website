@@ -95,3 +95,10 @@ export const QualifyingOrder = {
 } as const;
 
 export type QualifyingOrder = Values<typeof QualifyingOrder>;
+
+export const QualifyingProcedure = {
+  BEST: "BEST",
+  WAVES: "WAVES",
+} as const;
+
+export type QualifyingProcedure = Values<typeof QualifyingProcedure>;

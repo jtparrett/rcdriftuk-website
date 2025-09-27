@@ -1,6 +1,7 @@
 import type { Tournaments } from "@prisma/client";
 import {
   BattlesBracket,
+  QualifyingProcedure,
   TournamentsFormat,
   TournamentsState,
 } from "~/utils/enums";
@@ -10,6 +11,7 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { pow2Floor } from "~/utils/tournament.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
+import { getQualifyingWaveSize } from "~/utils/tournament";
 
 // Helper function to round up to next power of 2, or return same if already power of 2
 const nextPowerOf2OrSame = (n: number): number => {
@@ -30,8 +32,9 @@ const addByeDriverToTournament = async (
   });
 
   await prisma.laps.createMany({
-    data: Array.from(new Array(tournament.qualifyingLaps)).map(() => ({
+    data: Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => ({
       tournamentDriverId: byeTounamentDirver.id,
+      round: i + 1,
     })),
   });
 
@@ -267,6 +270,7 @@ export const tournamentEndQualifying = async (id: string) => {
       fullInclusion: true,
       format: true,
       qualifyingLaps: true,
+      qualifyingProcedure: true,
       _count: {
         select: {
           judges: true,
@@ -295,41 +299,71 @@ export const tournamentEndQualifying = async (id: string) => {
     ? nextPowerOf2OrSame(tournament.drivers.length) - tournament.drivers.length
     : 0;
 
-  const sortedDrivers = [
+  const driversWithScores = [
     ...tournament.drivers,
     ...Array.from(new Array(totalBuysToCreate)).map(() => ({
       id: byeTounamentDriver.id,
       laps: [],
     })),
-  ]
-    .map((driver) => {
-      const lapScores = driver.laps.map((lap) =>
-        sumScores(
-          lap.scores,
-          tournament._count.judges,
-          tournament.scoreFormula,
-          lap.penalty,
-        ),
-      );
+  ].map((driver) => {
+    const lapScores = driver.laps.map((lap) =>
+      sumScores(
+        lap.scores,
+        tournament._count.judges,
+        tournament.scoreFormula,
+        lap.penalty,
+      ),
+    );
 
-      // If the driver has no scores, convert them into a BYE run
-      // only if the tournament is not full inclusion
-      if (
-        !tournament.fullInclusion &&
-        lapScores.every((score) => score === 0)
-      ) {
-        return {
-          lapScores: [],
-          id: byeTounamentDriver.id,
-        };
-      }
-
+    // If the driver has no scores, convert them into a BYE run
+    // only if the tournament is not full inclusion
+    if (!tournament.fullInclusion && lapScores.every((score) => score === 0)) {
       return {
-        lapScores,
-        id: driver.id,
+        lapScores: [],
+        id: byeTounamentDriver.id,
       };
-    })
-    .sort((a, b) => {
+    }
+
+    return {
+      lapScores,
+      id: driver.id,
+    };
+  });
+
+  let sortedDrivers: { id: number; lapScores: number[] }[];
+
+  if (tournament.qualifyingProcedure === QualifyingProcedure.WAVES) {
+    // Waves procedure: qualify drivers in waves per round
+    sortedDrivers = [];
+
+    // Process each round in order
+    for (let round = 1; round <= tournament.qualifyingLaps; round++) {
+      // Get drivers sorted by their performance in this specific round
+      const roundDrivers = driversWithScores
+        .filter((driver) => driver.lapScores[round - 1] !== undefined)
+        .sort(
+          (a, b) =>
+            b.lapScores[round - 1] - a.lapScores[round - 1] || a.id - b.id,
+        );
+
+      // Calculate wave size for this round
+      const waveSize = getQualifyingWaveSize(tournament.qualifyingLaps, round);
+      const offset =
+        tournament.format === TournamentsFormat.WILDCARD &&
+        round === tournament.qualifyingLaps
+          ? -1
+          : 0;
+      const qualifyingCutOff =
+        pow2Floor(tournament.drivers.length) * waveSize + offset;
+
+      // Take the top drivers from this round that haven't already qualified
+      const newQualifiers = roundDrivers.slice(0, qualifyingCutOff);
+
+      sortedDrivers.push(...newQualifiers);
+    }
+  } else {
+    // Best procedure: sort by best lap score across all rounds
+    sortedDrivers = driversWithScores.sort((a, b) => {
       const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
         (lapA, lapB) => lapB - lapA,
       );
@@ -341,6 +375,7 @@ export const tournamentEndQualifying = async (id: string) => {
         bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
       );
     });
+  }
 
   // Set qualifying positions (exclude bye driver)
   await prisma.$transaction(

@@ -8,6 +8,7 @@ import {
   TournamentsFormat,
   ScoreFormula,
   QualifyingOrder,
+  QualifyingProcedure,
 } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
@@ -316,6 +317,10 @@ export const TournamentStartForm = ({
         template?.qualifyingOrder ??
         tournament?.qualifyingOrder ??
         QualifyingOrder.DRIVERS,
+      qualifyingProcedure:
+        template?.qualifyingProcedure ??
+        tournament?.qualifyingProcedure ??
+        QualifyingProcedure.BEST,
     },
     onSubmit: (values) => {
       fetcher.submit(JSON.stringify(values), {
@@ -335,7 +340,7 @@ export const TournamentStartForm = ({
           <StepDot />
           <FormControl flex={1} error={formik.errors.format}>
             <Label>What format is this tournament?</Label>
-            <TabGroup>
+            <Flex gap={0.5} flexWrap="wrap">
               {Object.values(TournamentsFormat).map((item) => {
                 return (
                   <TabButton
@@ -348,7 +353,7 @@ export const TournamentStartForm = ({
                   </TabButton>
                 );
               })}
-            </TabGroup>
+            </Flex>
           </FormControl>
         </Flex>
 
@@ -422,6 +427,29 @@ export const TournamentStartForm = ({
                         isActive={formik.values.scoreFormula === item}
                         onClick={() =>
                           formik.setFieldValue("scoreFormula", item)
+                        }
+                      >
+                        {capitalCase(item)}
+                      </TabButton>
+                    );
+                  })}
+                </TabGroup>
+              </FormControl>
+            </Flex>
+
+            <Flex gap={4}>
+              <StepDot />
+              <FormControl flex={1} error={formik.errors.scoreFormula}>
+                <Label>What qualifying procedure should be used?</Label>
+                <TabGroup>
+                  {Object.values(QualifyingProcedure).map((item) => {
+                    return (
+                      <TabButton
+                        key={item}
+                        type="button"
+                        isActive={formik.values.qualifyingProcedure === item}
+                        onClick={() =>
+                          formik.setFieldValue("qualifyingProcedure", item)
                         }
                       >
                         {capitalCase(item)}
