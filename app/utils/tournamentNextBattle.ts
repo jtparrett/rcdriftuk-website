@@ -138,7 +138,8 @@ export const tournamentNextBattle = async (id: string) => {
   if (
     winnerId &&
     (tournament.format === TournamentsFormat.STANDARD ||
-      tournament.format === TournamentsFormat.WILDCARD)
+      tournament.format === TournamentsFormat.WILDCARD ||
+      tournament.format === TournamentsFormat.BATTLE_TREE)
   ) {
     await advanceSingleEliminationBattleWinner({
       tournamentId: id,

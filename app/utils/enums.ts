@@ -32,6 +32,7 @@ export type TournamentsState = Values<typeof TournamentsState>;
 export const TournamentsFormat = {
   STANDARD: "STANDARD",
   DOUBLE_ELIMINATION: "DOUBLE_ELIMINATION",
+  BATTLE_TREE: "BATTLE_TREE",
   EXHIBITION: "EXHIBITION",
   WILDCARD: "WILDCARD",
 } as const;
@@ -102,3 +103,11 @@ export const QualifyingProcedure = {
 } as const;
 
 export type QualifyingProcedure = Values<typeof QualifyingProcedure>;
+
+export const TournamentsDriverNumbers = {
+  NONE: "NONE",
+  UNIVERSAL: "UNIVERSAL",
+  TOURNAMENT: "TOURNAMENT",
+} as const;
+
+export type TournamentsDriverNumbers = Values<typeof TournamentsDriverNumbers>;

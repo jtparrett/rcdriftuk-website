@@ -488,7 +488,8 @@ export const TournamentStartForm = ({
 
         {(format === TournamentsFormat.STANDARD ||
           format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.WILDCARD) && (
+          format === TournamentsFormat.WILDCARD ||
+          format === TournamentsFormat.BATTLE_TREE) && (
           <Flex gap={4}>
             <StepDot />
             <FormControl flex={1} error={formik.errors.fullInclusion}>

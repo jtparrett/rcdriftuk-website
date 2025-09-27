@@ -12,6 +12,7 @@ import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
+import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
 
 export const tournamentFormSchema = z.object({
   judges: z
@@ -133,6 +134,7 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   const isExhibition = format === TournamentsFormat.EXHIBITION;
+  const isBattleTree = format === TournamentsFormat.BATTLE_TREE;
 
   if (isExhibition) {
     const nextBattle = await prisma.tournamentBattles.create({
@@ -153,9 +155,29 @@ export const action = async (args: ActionFunctionArgs) => {
         qualifyingLaps: 0,
         format,
         nextBattleId: nextBattle.id,
-        scoreFormula,
+        region,
+        enableProtests,
       },
     });
+
+    return redirect(`/tournaments/${id}/overview`);
+  }
+
+  if (isBattleTree) {
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        qualifyingLaps: 0,
+        format,
+        fullInclusion,
+        region,
+        enableProtests,
+      },
+    });
+
+    await tournamentEndQualifying(id);
 
     return redirect(`/tournaments/${id}/overview`);
   }

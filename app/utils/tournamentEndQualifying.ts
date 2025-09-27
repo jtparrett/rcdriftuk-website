@@ -258,7 +258,6 @@ export const tournamentEndQualifying = async (id: string) => {
   const tournament = await prisma.tournaments.update({
     where: {
       id,
-      state: TournamentsState.QUALIFYING,
     },
     data: {
       state: TournamentsState.BATTLES,
@@ -317,7 +316,11 @@ export const tournamentEndQualifying = async (id: string) => {
 
     // If the driver has no scores, convert them into a BYE run
     // only if the tournament is not full inclusion
-    if (!tournament.fullInclusion && lapScores.every((score) => score === 0)) {
+    if (
+      !tournament.fullInclusion &&
+      lapScores.every((score) => score === 0) &&
+      tournament.format !== TournamentsFormat.BATTLE_TREE
+    ) {
       return {
         lapScores: [],
         id: byeTounamentDriver.id,

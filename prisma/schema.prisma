@@ -90,6 +90,7 @@ model Tournaments {
   leaderboards        LeaderboardTournaments[]
   qualifyingOrder     QualifyingOrder          @default(DRIVERS)
   qualifyingProcedure QualifyingProcedure      @default(BEST)
+  driverNumbers       TournamentsDriverNumbers @default(NONE)
 
   @@index([state])
   @@index([archived])
@@ -575,11 +576,18 @@ enum TournamentsState {
   END
 }
 
+enum TournamentsDriverNumbers {
+  NONE
+  UNIVERSAL
+  TOURNAMENT
+}
+
 enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
   EXHIBITION
   WILDCARD
+  BATTLE_TREE
 }
 
 enum BattlesBracket {
