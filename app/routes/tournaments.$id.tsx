@@ -523,11 +523,6 @@ const TournamentPage = () => {
                     tournament.nextQualifyingLap.scores.length ===
                       tournament.judges.length && (
                       <Form method="post">
-                        <input
-                          type="hidden"
-                          name="redirect"
-                          value={location.pathname}
-                        />
                         <Button
                           type="submit"
                           w={{ base: "full", sm: "auto" }}
@@ -543,11 +538,6 @@ const TournamentPage = () => {
                     tournament.state === TournamentsState.QUALIFYING &&
                     tournament.nextQualifyingLap === null && (
                       <Form method="post">
-                        <input
-                          type="hidden"
-                          name="redirect"
-                          value={location.pathname}
-                        />
                         <Button
                           type="submit"
                           w={{ base: "full", sm: "auto" }}
@@ -566,11 +556,6 @@ const TournamentPage = () => {
                     !hasUnresolvedProtest &&
                     secondsRemaining <= 0 && (
                       <Form method="post">
-                        <input
-                          type="hidden"
-                          name="redirect"
-                          value={location.pathname}
-                        />
                         <Button
                           type="submit"
                           w={{ base: "full", sm: "auto" }}
