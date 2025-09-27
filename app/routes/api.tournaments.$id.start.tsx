@@ -5,6 +5,7 @@ import {
   ScoreFormula,
   QualifyingOrder,
   QualifyingProcedure,
+  TournamentsDriverNumbers,
 } from "~/utils/enums";
 import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
@@ -41,6 +42,7 @@ export const tournamentFormSchema = z.object({
   scoreFormula: z.nativeEnum(ScoreFormula),
   qualifyingOrder: z.nativeEnum(QualifyingOrder),
   qualifyingProcedure: z.nativeEnum(QualifyingProcedure),
+  driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
 });
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -70,6 +72,7 @@ export const action = async (args: ActionFunctionArgs) => {
     scoreFormula,
     qualifyingOrder,
     qualifyingProcedure,
+    driverNumbers,
   } = tournamentFormSchema.parse(body);
 
   if (
@@ -124,10 +127,11 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   const tournamentDrivers = await prisma.tournamentDrivers.createManyAndReturn({
-    data: allDrivers.map((driver) => {
+    data: allDrivers.map((driver, index) => {
       return {
         driverId: Number(driver.driverId),
         tournamentId: id,
+        tournamentDriverNumber: index + 1,
       };
     }),
     skipDuplicates: true,
@@ -157,6 +161,7 @@ export const action = async (args: ActionFunctionArgs) => {
         nextBattleId: nextBattle.id,
         region,
         enableProtests,
+        driverNumbers,
       },
     });
 
@@ -174,6 +179,7 @@ export const action = async (args: ActionFunctionArgs) => {
         fullInclusion,
         region,
         enableProtests,
+        driverNumbers,
       },
     });
 
@@ -213,6 +219,7 @@ export const action = async (args: ActionFunctionArgs) => {
       region,
       scoreFormula,
       qualifyingProcedure,
+      driverNumbers,
     },
   });
 

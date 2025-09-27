@@ -30,6 +30,7 @@ export const getTournament = (id: string, userId: string | null) => {
       qualifyingOrder: true,
       qualifyingProcedure: true,
       region: true,
+      driverNumbers: true,
       nextQualifyingLap: {
         include: {
           scores: true,

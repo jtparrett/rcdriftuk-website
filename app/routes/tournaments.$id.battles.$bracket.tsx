@@ -1,9 +1,13 @@
-import { BattlesBracket, TournamentsFormat } from "~/utils/enums";
+import {
+  BattlesBracket,
+  TournamentsDriverNumbers,
+  TournamentsFormat,
+} from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { z } from "zod";
-import { Box, Flex, styled } from "~/styled-system/jsx";
+import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
 import { prisma } from "~/utils/prisma.server";
 import { Glow } from "~/components/Glow";
@@ -86,9 +90,11 @@ const Spacer = () => <Box my={-6} flex={1} />;
 const Driver = ({
   driver,
   winnerId,
+  driverNo,
 }: {
   driver: Battle["driverLeft"] | Battle["driverRight"];
   winnerId: number | null;
+  driverNo: number | undefined;
 }) => {
   if (driver?.isBye) {
     return (
@@ -106,23 +112,30 @@ const Driver = ({
   }
 
   return (
-    <Flex alignItems="center" py={0.5} h={6}>
-      <styled.span
-        flex="none"
-        w={6}
-        textAlign="center"
-        fontSize="xs"
-        fontWeight="semibold"
-        color="gray.500"
-      >
-        {driver?.qualifyingPosition}
-      </styled.span>
+    <Flex alignItems="center" py={0.5} h={6} px="1px">
+      {driver?.qualifyingPosition !== undefined && (
+        <Center
+          w={5}
+          h={5}
+          flex="none"
+          bgGradient="to-b"
+          gradientFrom="brand.500"
+          gradientTo="brand.700"
+          rounded="md"
+          mb="1px"
+        >
+          <styled.span fontSize="xs" fontWeight="medium">
+            {driver.qualifyingPosition}
+          </styled.span>
+        </Center>
+      )}
       <styled.p
         fontWeight="semibold"
         fontSize="xs"
         whiteSpace="nowrap"
         textOverflow="ellipsis"
         overflow="hidden"
+        ml={2}
         color={
           winnerId === null
             ? undefined
@@ -133,7 +146,10 @@ const Driver = ({
         pr={2}
       >
         <Link to={`/drivers/${driver?.user.driverId}`}>
-          {driver?.user.firstName} {driver?.user.lastName}
+          {driver?.user.firstName} {driver?.user.lastName}{" "}
+          {driverNo !== undefined && (
+            <styled.span color="gray.600">({driverNo})</styled.span>
+          )}
         </Link>
       </styled.p>
     </Flex>
@@ -143,6 +159,18 @@ const Driver = ({
 const TournamentBattlesPage = () => {
   const { tournament, bracket } = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
+
+  const getDriverNumber = (
+    driver: Battle["driverLeft"] | Battle["driverRight"],
+  ) => {
+    if (tournament.driverNumbers === TournamentsDriverNumbers.NONE) {
+      return undefined;
+    }
+    if (tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL) {
+      return driver?.user.driverId;
+    }
+    return driver?.tournamentDriverNumber;
+  };
 
   const battlesByRound = tournament.battles.reduce<Record<string, Battle[]>>(
     (agg, battle) => {
@@ -294,10 +322,12 @@ const TournamentBattlesPage = () => {
                             <Driver
                               driver={battle.driverLeft}
                               winnerId={battle.winnerId}
+                              driverNo={getDriverNumber(battle.driverLeft)}
                             />
                             <Driver
                               driver={battle.driverRight}
                               winnerId={battle.winnerId}
+                              driverNo={getDriverNumber(battle.driverRight)}
                             />
                           </Box>
                         </Box>

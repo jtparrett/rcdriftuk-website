@@ -103,17 +103,18 @@ model Tournaments {
 }
 
 model TournamentDrivers {
-  tournamentId       String              @db.Uuid
-  qualifyingPosition Int?
-  createdAt          DateTime            @default(now())
-  id                 Int                 @id @default(autoincrement())
-  driverId           Int
-  user               Users               @relation(fields: [driverId], references: [driverId])
-  laps               Laps[]
-  tournament         Tournaments         @relation(fields: [tournamentId], references: [id])
-  leftBattles        TournamentBattles[] @relation("battleDriverLeft")
-  rightBattles       TournamentBattles[] @relation("battleDriverRight")
-  isBye              Boolean             @default(false)
+  tournamentId           String              @db.Uuid
+  qualifyingPosition     Int?
+  createdAt              DateTime            @default(now())
+  id                     Int                 @id @default(autoincrement())
+  driverId               Int
+  tournamentDriverNumber Int                 @default(0)
+  user                   Users               @relation(fields: [driverId], references: [driverId])
+  laps                   Laps[]
+  tournament             Tournaments         @relation(fields: [tournamentId], references: [id])
+  leftBattles            TournamentBattles[] @relation("battleDriverLeft")
+  rightBattles           TournamentBattles[] @relation("battleDriverRight")
+  isBye                  Boolean             @default(false)
 
   @@index([tournamentId])
   @@index([driverId])

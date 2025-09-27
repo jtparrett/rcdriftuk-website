@@ -1,4 +1,4 @@
-import { TournamentsState } from "~/utils/enums";
+import { TournamentsDriverNumbers, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
@@ -75,6 +75,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
               laps: true,
@@ -90,6 +91,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
             },
@@ -100,6 +102,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
                 select: {
                   firstName: true,
                   lastName: true,
+                  driverId: true,
                 },
               },
             },
@@ -254,6 +257,13 @@ const QualiForm = () => {
     setTimeout(formik.handleSubmit, 0);
   };
 
+  const driverNumber =
+    tournament.driverNumbers === TournamentsDriverNumbers.NONE
+      ? undefined
+      : tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL
+        ? tournament.nextQualifyingLap?.driver?.user.driverId
+        : tournament.nextQualifyingLap?.driver?.tournamentDriverNumber;
+
   if (tournament.nextQualifyingLap === null) {
     return null;
   }
@@ -262,9 +272,11 @@ const QualiForm = () => {
     <>
       <Flex mb={6}>
         <styled.p fontWeight="semibold">
-          #{tournament.nextQualifyingLap.driver.id.toString().padStart(2, "0")}{" "}
           {tournament.nextQualifyingLap.driver.user.firstName}{" "}
-          {tournament.nextQualifyingLap.driver.user.lastName}
+          {tournament.nextQualifyingLap.driver.user.lastName}{" "}
+          {driverNumber !== undefined && (
+            <styled.span color="gray.600">({driverNumber})</styled.span>
+          )}
         </styled.p>
         <Spacer />
         <styled.span color="brand.500" fontWeight="bold">
@@ -351,11 +363,24 @@ const BattleForm = () => {
   const nextBattle = tournament.nextBattle;
   const battleVote = nextBattle?.BattleVotes[0];
 
-  const leftDriverLead =
+  const leftDriverHigherQualifier =
     (nextBattle?.driverLeft?.qualifyingPosition ?? 0) <
     (nextBattle?.driverRight?.qualifyingPosition ?? 0)
       ? true
       : false;
+
+  const leftDriverNumber =
+    tournament.driverNumbers === TournamentsDriverNumbers.NONE
+      ? undefined
+      : tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL
+        ? nextBattle?.driverLeft?.user.driverId
+        : nextBattle?.driverLeft?.tournamentDriverNumber;
+  const rightDriverNumber =
+    tournament.driverNumbers === TournamentsDriverNumbers.NONE
+      ? undefined
+      : tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL
+        ? nextBattle?.driverRight?.user.driverId
+        : nextBattle?.driverRight?.tournamentDriverNumber;
 
   return (
     <>
@@ -391,10 +416,16 @@ const BattleForm = () => {
                     ? "primary"
                     : "outline"
                 }
+                gap={0.5}
               >
                 {nextBattle.driverLeft?.user.firstName}{" "}
                 {nextBattle.driverLeft?.user.lastName}{" "}
-                {leftDriverLead && "(Lead First)"}
+                {leftDriverNumber !== undefined && (
+                  <styled.span color="gray.600">
+                    ({leftDriverNumber})
+                  </styled.span>
+                )}
+                {leftDriverHigherQualifier && "(Higher Qualifier)"}
               </Button>
             )}
 
@@ -409,10 +440,16 @@ const BattleForm = () => {
                     ? "primary"
                     : "outline"
                 }
+                gap={0.5}
               >
                 {nextBattle.driverRight?.user.firstName}{" "}
                 {nextBattle.driverRight?.user.lastName}{" "}
-                {!leftDriverLead && "(Lead First)"}
+                {rightDriverNumber !== undefined && (
+                  <styled.span color="gray.600">
+                    ({rightDriverNumber})
+                  </styled.span>
+                )}
+                {!leftDriverHigherQualifier && "(Higher Qualifier)"}
               </Button>
             )}
 

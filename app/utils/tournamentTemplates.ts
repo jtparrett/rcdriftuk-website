@@ -3,6 +3,7 @@ import {
   QualifyingProcedure,
   Regions,
   ScoreFormula,
+  TournamentsDriverNumbers,
   TournamentsFormat,
 } from "./enums";
 
@@ -14,6 +15,7 @@ export const TOURNAMENT_TEMPLATES: Record<
     scoreFormula: ScoreFormula;
     qualifyingOrder: QualifyingOrder;
     qualifyingProcedure: QualifyingProcedure;
+    driverNumbers: TournamentsDriverNumbers;
   }
 > = {
   driftWars: {
@@ -22,6 +24,7 @@ export const TOURNAMENT_TEMPLATES: Record<
     scoreFormula: ScoreFormula.AVERAGED,
     qualifyingOrder: QualifyingOrder.DRIVERS,
     qualifyingProcedure: QualifyingProcedure.BEST,
+    driverNumbers: TournamentsDriverNumbers.NONE,
   },
   sdc2025: {
     region: Regions.NA,
@@ -29,5 +32,6 @@ export const TOURNAMENT_TEMPLATES: Record<
     scoreFormula: ScoreFormula.CUMULATIVE,
     qualifyingOrder: QualifyingOrder.DRIVERS,
     qualifyingProcedure: QualifyingProcedure.BEST,
+    driverNumbers: TournamentsDriverNumbers.TOURNAMENT,
   },
 };

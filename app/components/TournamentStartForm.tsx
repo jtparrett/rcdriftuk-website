@@ -9,6 +9,7 @@ import {
   ScoreFormula,
   QualifyingOrder,
   QualifyingProcedure,
+  TournamentsDriverNumbers,
 } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
@@ -321,6 +322,10 @@ export const TournamentStartForm = ({
         template?.qualifyingProcedure ??
         tournament?.qualifyingProcedure ??
         QualifyingProcedure.BEST,
+      driverNumbers:
+        template?.driverNumbers ??
+        tournament?.driverNumbers ??
+        TournamentsDriverNumbers.NONE,
     },
     onSubmit: (values) => {
       fetcher.submit(JSON.stringify(values), {
@@ -544,6 +549,28 @@ export const TournamentStartForm = ({
                     onClick={() => formik.setFieldValue("region", item)}
                   >
                     {item}
+                  </TabButton>
+                );
+              })}
+            </TabGroup>
+          </FormControl>
+        </Flex>
+
+        <Flex gap={4}>
+          <StepDot />
+          <FormControl flex={1} error={formik.errors.region}>
+            <Label>Want to display driver numbers?</Label>
+
+            <TabGroup>
+              {Object.values(TournamentsDriverNumbers).map((item) => {
+                return (
+                  <TabButton
+                    type="button"
+                    key={item}
+                    isActive={formik.values.driverNumbers === item}
+                    onClick={() => formik.setFieldValue("driverNumbers", item)}
+                  >
+                    {capitalCase(item)}
                   </TabButton>
                 );
               })}

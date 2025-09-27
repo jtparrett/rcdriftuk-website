@@ -1,4 +1,4 @@
-import { TournamentsState } from "~/utils/enums";
+import { TournamentsDriverNumbers, TournamentsState } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { capitalCase, sentenceCase } from "change-case";
@@ -472,6 +472,25 @@ const TournamentsOverviewPage = () => {
         ? tournament.nextBattle?.driverRightId
         : undefined;
 
+  type Driver =
+    | NonNullable<typeof tournament.nextQualifyingLap>["driver"]
+    | NonNullable<typeof tournament.nextBattle>["driverLeft"]
+    | NonNullable<typeof tournament.nextBattle>["driverRight"]
+    | null
+    | undefined;
+
+  const getDriverNumber = (driver: Driver) => {
+    if (!driver || tournament.driverNumbers === TournamentsDriverNumbers.NONE) {
+      return undefined;
+    }
+
+    if (tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL) {
+      return driver.user.driverId;
+    }
+
+    return driver.tournamentDriverNumber;
+  };
+
   return (
     <Flex
       p={isEmbed ? 0 : 1}
@@ -586,9 +605,9 @@ const TournamentsOverviewPage = () => {
                         " " +
                         tournament.nextQualifyingLap.driver.user.lastName
                       }
-                      driverNo={
-                        tournament.nextQualifyingLap.driver.user.driverId
-                      }
+                      driverNo={getDriverNumber(
+                        tournament.nextQualifyingLap.driver,
+                      )}
                       delay={0.1}
                     />
                   </Box>
@@ -746,7 +765,9 @@ const TournamentsOverviewPage = () => {
                         " " +
                         tournament.nextBattle.driverLeft?.user.lastName
                       }
-                      driverNo={tournament.nextBattle.driverLeft?.user.driverId}
+                      driverNo={getDriverNumber(
+                        tournament.nextBattle.driverLeft,
+                      )}
                     />
                   </Box>
                   <Flex
@@ -881,9 +902,9 @@ const TournamentsOverviewPage = () => {
                         " " +
                         tournament.nextBattle.driverRight?.user.lastName
                       }
-                      driverNo={
-                        tournament.nextBattle.driverRight?.user.driverId
-                      }
+                      driverNo={getDriverNumber(
+                        tournament.nextBattle.driverRight,
+                      )}
                     />
                   </Box>
                 </Flex>

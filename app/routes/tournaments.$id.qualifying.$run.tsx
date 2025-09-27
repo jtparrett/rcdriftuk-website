@@ -9,7 +9,11 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
 import { getAuth } from "~/utils/getAuth.server";
-import { QualifyingProcedure, TournamentsFormat } from "~/utils/enums";
+import {
+  QualifyingProcedure,
+  TournamentsDriverNumbers,
+  TournamentsFormat,
+} from "~/utils/enums";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 import { token } from "~/styled-system/tokens";
@@ -37,6 +41,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       userId: true,
       scoreFormula: true,
       qualifyingProcedure: true,
+      driverNumbers: true,
       nextQualifyingLap: {
         select: {
           round: true,
@@ -60,6 +65,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         select: {
           isBye: true,
           id: true,
+          tournamentDriverNumber: true,
           user: {
             select: {
               firstName: true,
@@ -98,6 +104,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     qualifyingProcedure: tournament.qualifyingProcedure,
     nextQualifyingLap: tournament.nextQualifyingLap,
     totalDrivers: tournament.drivers.length,
+    driverNumbers: tournament.driverNumbers,
     drivers: tournament.drivers
       .filter(
         (driver) => run === 0 || driver.laps.some((lap) => lap.round === run),
@@ -128,11 +135,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
   };
 };
 
+type Drivers = Awaited<ReturnType<typeof loader>>["drivers"];
 interface TableProps {
-  drivers: Awaited<ReturnType<typeof loader>>["drivers"];
+  drivers: Drivers;
   qualifyingCutOff: number;
   startPosition?: number;
   isOwner: boolean;
+  getDriverNumber: (driver: Drivers[number]) => number | undefined;
 }
 
 const Table = ({
@@ -140,6 +149,7 @@ const Table = ({
   qualifyingCutOff,
   startPosition = 0,
   isOwner,
+  getDriverNumber,
 }: TableProps) => {
   const tournament = useLoaderData<typeof loader>();
 
@@ -150,6 +160,8 @@ const Table = ({
           tournament.nextQualifyingDriver?.id === driver.id &&
           (tournament.run === tournament.nextQualifyingLap?.round ||
             tournament.run === 0);
+
+        const driverNumber = getDriverNumber(driver);
 
         return (
           <Fragment key={i}>
@@ -205,7 +217,12 @@ const Table = ({
                 flex={1}
               >
                 <Link to={`/drivers/${driver.user.driverId}`}>
-                  {driver.user.firstName} {driver.user.lastName}
+                  {driver.user.firstName} {driver.user.lastName}{" "}
+                  {driverNumber !== undefined && (
+                    <styled.span color="gray.600">
+                      ({getDriverNumber(driver)})
+                    </styled.span>
+                  )}
                 </Link>
               </styled.p>
 
@@ -250,6 +267,18 @@ const QualifyingPage = () => {
     pow2Floor(tournament.totalDrivers) * waveSize + offset;
 
   const half = Math.ceil(driversWithoutBuys.length / 2);
+
+  const getDriverNumber = (driver: Drivers[number]) => {
+    if (tournament.driverNumbers === TournamentsDriverNumbers.NONE) {
+      return undefined;
+    }
+
+    if (tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL) {
+      return driver.user.driverId;
+    }
+
+    return driver.tournamentDriverNumber;
+  };
 
   return (
     <>
@@ -307,6 +336,7 @@ const QualifyingPage = () => {
                 drivers={driversWithoutBuys.slice(0, half)}
                 qualifyingCutOff={qualifyingCutOff}
                 isOwner={tournament.isOwner}
+                getDriverNumber={getDriverNumber}
               />
 
               <Box
@@ -321,6 +351,7 @@ const QualifyingPage = () => {
                 qualifyingCutOff={qualifyingCutOff}
                 startPosition={half}
                 isOwner={tournament.isOwner}
+                getDriverNumber={getDriverNumber}
               />
             </>
           )}
