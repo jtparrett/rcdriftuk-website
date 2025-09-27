@@ -5,8 +5,13 @@ import {
 } from "react-router";
 import { z } from "zod";
 import { ConfirmationForm } from "~/components/ConfirmationForm";
-import { QualifyingProcedure, TournamentsState } from "~/utils/enums";
+import {
+  QualifyingOrder,
+  QualifyingProcedure,
+  TournamentsState,
+} from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
+import invariant from "~/utils/invariant";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
@@ -46,20 +51,20 @@ export const action = async (args: ActionFunctionArgs) => {
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  const isWaves = tournament.qualifyingProcedure === QualifyingProcedure.WAVES;
+  invariant(
+    tournament.qualifyingProcedure === QualifyingProcedure.BEST,
+    "Qualifying procedure must be BEST",
+  );
+  invariant(
+    tournament.qualifyingOrder === QualifyingOrder.DRIVERS,
+    "Qualifying order must be DRIVERS",
+  );
 
   await prisma.lapScores.deleteMany({
     where: {
       judge: {
         tournamentId: id,
       },
-      ...(isWaves
-        ? {
-            lap: {
-              round: tournament.nextQualifyingLap?.round,
-            },
-          }
-        : {}),
     },
   });
 
@@ -68,15 +73,7 @@ export const action = async (args: ActionFunctionArgs) => {
       tournamentId: id,
     },
     include: {
-      laps: {
-        ...(isWaves
-          ? {
-              where: {
-                round: tournament.nextQualifyingLap?.round,
-              },
-            }
-          : {}),
-      },
+      laps: true,
     },
   });
 

@@ -114,6 +114,7 @@ export const action = async (args: ActionFunctionArgs) => {
       },
     });
 
+    // FIX THE ORDER HERE FOR NEW ONES TO MATCH ORIGINAL ORDER
     allDrivers = allDrivers.concat(
       newUsers.map((user) => ({
         driverId: user.driverId.toString(),

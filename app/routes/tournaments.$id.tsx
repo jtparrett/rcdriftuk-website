@@ -505,7 +505,10 @@ const TournamentPage = () => {
                     )}
 
                   {isOwner &&
-                    tournament.state === TournamentsState.QUALIFYING && (
+                    tournament.state === TournamentsState.QUALIFYING &&
+                    tournament.qualifyingProcedure ===
+                      QualifyingProcedure.BEST &&
+                    tournament.qualifyingOrder === QualifyingOrder.DRIVERS && (
                       <LinkButton
                         variant="outline"
                         to={`/tournaments/${tournament.id}/randomise`}
