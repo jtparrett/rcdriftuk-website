@@ -5,11 +5,7 @@ import {
 } from "react-router";
 import { z } from "zod";
 import { ConfirmationForm } from "~/components/ConfirmationForm";
-import {
-  QualifyingOrder,
-  QualifyingProcedure,
-  TournamentsState,
-} from "~/utils/enums";
+import { QualifyingProcedure, TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 import invariant from "~/utils/invariant";
 import notFoundInvariant from "~/utils/notFoundInvariant";
@@ -54,10 +50,6 @@ export const action = async (args: ActionFunctionArgs) => {
   invariant(
     tournament.qualifyingProcedure === QualifyingProcedure.BEST,
     "Qualifying procedure must be BEST",
-  );
-  invariant(
-    tournament.qualifyingOrder === QualifyingOrder.DRIVERS,
-    "Qualifying order must be DRIVERS",
   );
 
   await prisma.lapScores.deleteMany({

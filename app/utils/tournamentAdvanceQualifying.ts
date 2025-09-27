@@ -116,13 +116,10 @@ export const tournamentAdvanceQualifying = async (
       return bScore - aScore || a.id - b.id;
     });
 
-    const waveSize =
-      tournament.qualifyingProcedure === QualifyingProcedure.WAVES
-        ? getQualifyingWaveSize(
-            tournament.qualifyingLaps,
-            tournament.nextQualifyingLap.round,
-          )
-        : 1;
+    const waveSize = getQualifyingWaveSize(
+      tournament.qualifyingLaps,
+      tournament.nextQualifyingLap.round,
+    );
     const offset =
       tournament.format === TournamentsFormat.WILDCARD &&
       tournament.nextQualifyingLap.round === tournament.qualifyingLaps
