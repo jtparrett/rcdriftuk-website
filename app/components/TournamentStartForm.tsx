@@ -25,6 +25,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { tournamentFormSchema } from "~/routes/api.tournaments.$id.start";
 import { Label } from "./Label";
 import { FormControl } from "./FormControl";
+import pluralize from "pluralize";
 
 interface Props {
   tournament: GetTournament;
@@ -191,6 +192,12 @@ const PeopleForm = ({
               );
             })}
           </Reorder.Group>
+
+          <Box px={2} py={1}>
+            <styled.p textAlign="right" fontSize="sm" color="gray.500">
+              {pluralize("people", value.length, true)}
+            </styled.p>
+          </Box>
         </Box>
       )}
 
@@ -597,7 +604,6 @@ export const TournamentStartForm = ({
           <StepDot />
           <FormControl flex={1} error={formik.errors.drivers}>
             <Label>Who are the tournament drivers?</Label>
-
             <PeopleForm
               allowNewDrivers
               allowRandomise
