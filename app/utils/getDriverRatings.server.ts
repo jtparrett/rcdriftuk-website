@@ -5,6 +5,9 @@ import { adjustDriverElo } from "./adjustDriverElo.server";
 export const getDriverRatings = async (region: Regions, limit?: number) => {
   const users = await prisma.users.findMany({
     where: {
+      driverId: {
+        not: 0,
+      },
       TournamentDrivers: {
         some: {
           tournament: {
@@ -15,7 +18,9 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
       },
     },
     orderBy: {
-      elo: "desc",
+      ...(region === Regions.ALL
+        ? { elo: "desc" }
+        : { [`elo_${region}`]: "desc" }),
     },
     take: limit,
     select: {
@@ -38,9 +43,8 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
   });
 
   return users
-    .map((user, rank) => ({
+    .map((user) => ({
       ...user,
-      rank: rank + 1,
       elo: adjustDriverElo(user.elo, user.lastBattleDate),
       elo_UK: adjustDriverElo(user.elo_UK, user.lastBattleDate),
       elo_EU: adjustDriverElo(user.elo_EU, user.lastBattleDate),
@@ -49,5 +53,8 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
       elo_LA: adjustDriverElo(user.elo_LA, user.lastBattleDate),
       elo_AP: adjustDriverElo(user.elo_AP, user.lastBattleDate),
     }))
-    .sort((a, b) => b.elo - a.elo);
+    .map((driver, rank) => ({
+      ...driver,
+      rank: rank + 1,
+    }));
 };

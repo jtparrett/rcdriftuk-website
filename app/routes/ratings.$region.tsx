@@ -53,8 +53,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
   // Improved search: match first name, last name, full name, and driverId (as string)
   const filteredDrivers = drivers.filter((driver) => {
-    if (driver.driverId === 0) return false;
-
     if (!query) return true;
 
     const q = query.trim().toLowerCase();
@@ -62,6 +60,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     const last = driver.lastName?.toLowerCase() ?? "";
     const full = `${first} ${last}`.trim();
     const driverIdStr = String(driver.driverId ?? "");
+
     return (
       first.includes(q) ||
       last.includes(q) ||
