@@ -4,6 +4,8 @@ import { Regions } from "~/utils/enums";
 import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
 import { prisma } from "~/utils/prisma.server";
 
+const FINAL_TOURANMENTS = ["35788ae3-9cd2-46e4-b295-1bb26cbeec25"];
+
 const computeNewRatingsForRegion = async (region: Regions) => {
   console.log(clc.green("Computing new ratings for battles without ELO..."));
 
@@ -202,7 +204,7 @@ const computeNewRatingsForRegion = async (region: Regions) => {
     const losersK = 32;
 
     // Increase K-factor for tournament finals
-    if (battle.tournament.name.includes("Final")) {
+    if (FINAL_TOURANMENTS.includes(battle.tournamentId)) {
       winnersK *= 2;
     }
 
