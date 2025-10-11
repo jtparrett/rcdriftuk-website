@@ -17,7 +17,7 @@ export const sumScores = (
   }
 
   // Default to AVERAGED (maintaining backward compatibility)
-  const total = Math.ceil(totalScore / totalJudges);
+  const total = Math.round((totalScore / totalJudges) * 100) / 100;
 
   return Math.max(0, total + penalty);
 };
