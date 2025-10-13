@@ -98,10 +98,8 @@ export const getTournamentStandings = (battles: Battle[]) => {
       if (aQualPos !== bQualPos) {
         return aQualPos - bQualPos;
       }
-      // Finally by name (ascending)
-      return `${a.lastName}${a.firstName}`.localeCompare(
-        `${b.lastName}${b.firstName}`,
-      );
+
+      return a.id - b.id;
     });
   };
 
