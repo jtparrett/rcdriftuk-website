@@ -36,6 +36,7 @@ import { TabButton, TabGroup } from "~/components/Tab";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
+import numberToWords from "number-to-words";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);
@@ -226,11 +227,6 @@ const validationSchema = toFormikValidationSchema(formSchema);
 const QualiForm = () => {
   const { tournament } = useLoaderData<typeof loader>();
   const transition = useNavigation();
-  const lapIndex =
-    tournament.nextQualifyingLap?.driver?.laps?.findIndex(
-      (lap) => lap.id === tournament.nextQualifyingLapId,
-    ) ?? 0;
-  const qualifyingRun = lapIndex + 1;
   const fetcher = useFetcher();
   const isSubmitting = transition.state !== "idle";
 
@@ -280,7 +276,8 @@ const QualiForm = () => {
         </styled.p>
         <Spacer />
         <styled.span color="brand.500" fontWeight="bold">
-          Qualifying Run {qualifyingRun}
+          {numberToWords.toOrdinal(tournament.nextQualifyingLap.round)}{" "}
+          Qualifying Run
         </styled.span>
       </Flex>
 

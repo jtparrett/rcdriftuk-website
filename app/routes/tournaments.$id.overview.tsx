@@ -451,11 +451,6 @@ const TournamentsOverviewPage = () => {
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
     tournament.judges.length;
 
-  const qualifyingRun =
-    (tournament.nextQualifyingLap?.driver?.laps?.findIndex(
-      (lap) => lap.id === tournament.nextQualifyingLapId,
-    ) ?? 0) + 1;
-
   const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
   const battleVotesLeft =
     tournament.nextBattle?.BattleVotes.filter(
@@ -626,8 +621,10 @@ const TournamentsOverviewPage = () => {
                             fontWeight="semibold"
                             fontSize={{ base: "md", md: "xl" }}
                           >
-                            {numberToWords.toOrdinal(qualifyingRun)} Qualifying
-                            Run
+                            {numberToWords.toOrdinal(
+                              tournament.nextQualifyingLap.round,
+                            )}{" "}
+                            Qualifying Run
                           </styled.p>
                         </RightInfoBox>
 
