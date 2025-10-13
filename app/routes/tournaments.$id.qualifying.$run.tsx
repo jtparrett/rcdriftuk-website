@@ -127,9 +127,23 @@ export const loader = async (args: LoaderFunctionArgs) => {
           ...driver,
           score: [best, ...lapScores][run],
           lapId: driver.laps[run - 1]?.id,
+          scores: lapScores.sort((a, b) => b - a),
         };
       })
       .sort((a, b) => {
+        if (run === 0) {
+          const [bestA = -1, secondA = -1, thirdA = -1] = [...a.scores].sort(
+            (lapA, lapB) => lapB - lapA,
+          );
+          const [bestB = -1, secondB = -1, thirdB = -1] = [...b.scores].sort(
+            (lapA, lapB) => lapB - lapA,
+          );
+
+          return (
+            bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
+          );
+        }
+
         return (b.score ?? 0) - (a.score ?? 0) || a.id - b.id;
       }),
   };
@@ -226,17 +240,41 @@ const Table = ({
                 </Link>
               </styled.p>
 
-              <styled.p fontWeight="semibold" textAlign="right">
-                {isOwner && tournament.run > 0 ? (
-                  <Link
-                    to={`/tournaments/${tournament.id}/lap/${driver.lapId}`}
-                  >
-                    {driver.score}
-                  </Link>
-                ) : (
-                  driver.score
-                )}
-              </styled.p>
+              {tournament.run <= 0 && (
+                <>
+                  {driver.scores.map((score, i) => (
+                    <styled.p
+                      fontWeight="semibold"
+                      textAlign="right"
+                      key={score}
+                      opacity={i <= 0 ? 1 : 0.5}
+                      fontFamily="mono"
+                      fontSize="sm"
+                    >
+                      {score?.toFixed(2).padStart(5, "0")}
+                    </styled.p>
+                  ))}
+                </>
+              )}
+
+              {tournament.run > 0 && (
+                <styled.p
+                  fontWeight="semibold"
+                  textAlign="right"
+                  fontFamily="mono"
+                  fontSize="sm"
+                >
+                  {isOwner && tournament.run > 0 ? (
+                    <Link
+                      to={`/tournaments/${tournament.id}/lap/${driver.lapId}`}
+                    >
+                      {driver.score?.toFixed(2).padStart(5, "0")}
+                    </Link>
+                  ) : (
+                    driver.score?.toFixed(2).padStart(5, "0")
+                  )}
+                </styled.p>
+              )}
             </Flex>
           </Fragment>
         );
