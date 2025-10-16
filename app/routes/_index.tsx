@@ -475,7 +475,7 @@ const Page = () => {
                     <styled.p textWrap="balance" mb={4}>
                       The UK's professional RC Drifting Series.
                     </styled.p>
-                    <LinkButton to="/2025" variant="secondary" mb={4}>
+                    <LinkButton to="/2025" variant="primary" mb={4}>
                       Learn More
                       <RiArrowRightLine />
                     </LinkButton>

@@ -453,6 +453,16 @@ export const TournamentStartForm = ({
               <StepDot />
               <FormControl flex={1} error={formik.errors.scoreFormula}>
                 <Label>What qualifying procedure should be used?</Label>
+                <styled.span
+                  mb={2}
+                  color="gray.500"
+                  display="block"
+                  textWrap="pretty"
+                >
+                  The qualifying procedure determines how drivers advance from
+                  qualifying into battles. Using the "Waves" format gives higher
+                  priority to drivers who complete their runs earlier.
+                </styled.span>
                 <TabGroup>
                   {Object.values(QualifyingProcedure).map((item) => {
                     return (
@@ -624,7 +634,7 @@ export const TournamentStartForm = ({
               isLoading={fetcher.state === "submitting"}
               disabled={fetcher.state === "submitting"}
             >
-              I'm ready, let's go!
+              Start Tournament
             </Button>
           </FormControl>
         </Flex>

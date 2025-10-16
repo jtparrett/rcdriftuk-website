@@ -7,7 +7,7 @@ export const Input = styled("input", {
     borderWidth: 1,
     borderColor: "gray.800",
     bgColor: "gray.800",
-    rounded: "lg",
+    rounded: "xl",
     color: "white",
     w: "full",
     minH: "40px",

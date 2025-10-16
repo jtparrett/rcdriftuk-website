@@ -6,7 +6,7 @@ const ButtonStyles = cva({
   base: {
     py: 2,
     px: 4,
-    rounded: "full",
+    rounded: "xl",
     display: "inline-flex",
     gap: 2,
     alignItems: "center",
@@ -18,7 +18,7 @@ const ButtonStyles = cva({
     color: "white !important",
     borderWidth: 1,
     position: "relative",
-    shadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.2)",
+    shadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.1)",
     _disabled: {
       opacity: 0.5,
       cursor: "not-allowed",
@@ -55,27 +55,22 @@ const ButtonStyles = cva({
     },
     variant: {
       primary: {
-        bgGradient: "to-b",
-        gradientFrom: "brand.500",
-        gradientTo: "brand.600",
+        bgColor: "brand.600",
         borderColor: "brand.600",
         _hover: {
           md: {
-            gradientFrom: "brand.600",
-            gradientTo: "brand.700",
+            bgColor: "brand.700",
             borderColor: "brand.700",
           },
         },
       },
       secondary: {
-        bgGradient: "to-b",
-        gradientFrom: "gray.800",
-        gradientTo: "gray.900",
+        bgColor: "gray.800",
         borderColor: "gray.800",
         _hover: {
           md: {
-            gradientFrom: "gray.700",
-            gradientTo: "gray.800",
+            bgColor: "gray.700",
+            borderColor: "gray.700",
           },
         },
       },

@@ -180,8 +180,8 @@ const Page = () => {
               </UL>
             </styled.li>
             <styled.li>
-              Once you've completed the setup, select{" "}
-              <B>"I'm ready, let's go!"</B> to proceed
+              Once you've completed the setup, select <B>"Start Tournament"</B>{" "}
+              to proceed
             </styled.li>
           </OL>
 
