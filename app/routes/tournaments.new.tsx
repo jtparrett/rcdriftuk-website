@@ -215,10 +215,10 @@ export const action = async (args: ActionFunctionArgs) => {
     const lowerBBattles = await prisma.tournamentBattles.createManyAndReturn({
       data: Array.from(new Array(totalLowerToCreate)).map((_, i) => {
         return {
-          round: battleRound,
+          round: battleRound + 0.5,
           tournamentId: tournament.id,
           bracket: BattlesBracket.LOWER,
-          winnerNextBattleId: nextLowerBattles[Math.floor(i / 2)]?.id,
+          winnerNextBattleId: nextLowerBattles[i]?.id,
         };
       }),
     });
@@ -234,8 +234,6 @@ export const action = async (args: ActionFunctionArgs) => {
       }),
     });
 
-    const lowerBattles = [...lowerBBattles, ...lowerABattles];
-
     const upperBattles = await prisma.tournamentBattles.createManyAndReturn({
       data: Array.from(new Array(totalUpperBattles)).map((_, i) => {
         return {
@@ -243,7 +241,7 @@ export const action = async (args: ActionFunctionArgs) => {
           tournamentId: tournament.id,
           bracket: BattlesBracket.UPPER,
           winnerNextBattleId: nextUpperBattles[Math.floor(i / 2)]?.id,
-          loserNextBattleId: lowerBattles[Math.floor(i / 2)]?.id,
+          loserNextBattleId: lowerABattles[Math.floor(i / 2)]?.id,
         };
       }),
     });
@@ -251,7 +249,7 @@ export const action = async (args: ActionFunctionArgs) => {
     nextBattleId = upperBattles[0].id;
 
     if (round < totalRounds) {
-      await makeBattles(upperBattles, lowerBattles, round + 1);
+      await makeBattles(upperBattles, lowerABattles, round + 1);
     }
   };
 

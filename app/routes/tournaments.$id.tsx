@@ -2,7 +2,6 @@ import { useUser } from "@clerk/react-router";
 import {
   BattlesBracket,
   QualifyingProcedure,
-  TicketStatus,
   TournamentsFormat,
   TournamentsState,
 } from "~/utils/enums";
@@ -32,7 +31,6 @@ import { createAbly } from "~/utils/ably.server";
 import { ably as AblyClient } from "~/utils/ably";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
-import { getUsers } from "~/utils/getUsers.server";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server";
 import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
@@ -62,7 +60,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   let user: GetUser | null = null;
-  const tournament = await getTournament(id, userId);
+  const tournament = await getTournament(id);
 
   if (!tournament) {
     throw new Response(null, {
@@ -70,8 +68,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       statusText: "Not Found",
     });
   }
-
-  const users = await getUsers();
 
   if (userId) {
     user = await getUser(userId);
@@ -87,8 +83,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   return {
     tournament,
-    users,
-    userId,
     tournamentJudge,
     isBattlingDriver,
   };
@@ -170,7 +164,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
 };
 
 const TournamentPage = () => {
-  const { tournament, users, tournamentJudge, eventDrivers, isBattlingDriver } =
+  const { tournament, tournamentJudge, isBattlingDriver } =
     useLoaderData<typeof loader>();
   const location = useLocation();
   const transition = useNavigation();

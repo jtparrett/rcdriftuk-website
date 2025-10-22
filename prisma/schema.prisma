@@ -171,7 +171,7 @@ model LapScores {
 
 model TournamentBattles {
   id            Int      @id @default(autoincrement())
-  round         Int      @default(0)
+  round         Float    @default(0)
   createdAt     DateTime @default(now())
   tournamentId  String   @db.Uuid
   driverLeftId  Int?
