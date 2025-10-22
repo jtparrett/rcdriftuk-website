@@ -1,9 +1,5 @@
 import { TournamentsFormat, TournamentsState } from "~/utils/enums";
 import invariant from "~/utils/invariant";
-import {
-  advanceDoubleEliminationBattleWinner,
-  advanceSingleEliminationBattleWinner,
-} from "~/utils/tournament.server";
 import { prisma } from "~/utils/prisma.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 
@@ -72,8 +68,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
   if (!tournament.nextBattleId || !tournament.nextBattle) {
     // End the comp!
     await advanceToNextBattle(id, tournament.format);
-    // After setting next battle, check if it's a bye run that needs auto-advancement
-    await autoAdvanceByeRuns(id);
+
     return null;
   }
 
@@ -126,6 +121,11 @@ export const tournamentAdvanceBattles = async (id: string) => {
         ? tournament.nextBattle.driverRightId
         : undefined;
 
+  const loserId =
+    tournament.nextBattle.driverLeftId === winnerId
+      ? tournament.nextBattle.driverRightId
+      : tournament.nextBattle.driverLeftId;
+
   if (!winnerId) {
     // It's OMT - Delete all votes and go again
     await prisma.tournamentBattleVotes.deleteMany({
@@ -133,59 +133,79 @@ export const tournamentAdvanceBattles = async (id: string) => {
         battleId: tournament.nextBattleId,
       },
     });
-  }
-
-  if (
-    winnerId &&
-    (tournament.format === TournamentsFormat.STANDARD ||
-      tournament.format === TournamentsFormat.WILDCARD ||
-      tournament.format === TournamentsFormat.BATTLE_TREE)
-  ) {
-    await advanceSingleEliminationBattleWinner({
-      tournamentId: id,
-      battleId: tournament.nextBattleId,
-      winnerId,
-      format: tournament.format,
-    });
-
-    await advanceToNextBattle(id, tournament.format);
-
-    // After advancing, check if the next battle is a bye run that needs auto-advancement
-    await autoAdvanceByeRuns(id);
 
     return null;
   }
 
-  if (winnerId && tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
-    await advanceDoubleEliminationBattleWinner({
-      tournamentId: id,
-      battleId: tournament.nextBattleId,
+  await prisma.tournamentBattles.update({
+    where: {
+      id: tournament.nextBattleId,
+    },
+    data: {
       winnerId,
-    });
+    },
+  });
 
-    await advanceToNextBattle(id, tournament.format);
-
-    // After advancing, check if the next battle is a bye run that needs auto-advancement
-    await autoAdvanceByeRuns(id);
-
-    return null;
-  }
-
-  if (winnerId && tournament.format === TournamentsFormat.EXHIBITION) {
-    await prisma.tournamentBattles.update({
+  if (tournament.nextBattle.winnerNextBattleId) {
+    const nextWinnerBattle = await prisma.tournamentBattles.findFirst({
       where: {
-        id: tournament.nextBattleId,
-      },
-      data: {
-        winnerId,
+        id: tournament.nextBattle.winnerNextBattleId,
       },
     });
 
-    await advanceToNextBattle(id, tournament.format);
-
-    // After advancing, check if the next battle is a bye run that needs auto-advancement
-    await autoAdvanceByeRuns(id);
-
-    return null;
+    if (nextWinnerBattle?.driverLeftId === null) {
+      await prisma.tournamentBattles.update({
+        where: {
+          id: nextWinnerBattle.id,
+        },
+        data: {
+          driverLeftId: winnerId,
+        },
+      });
+    } else if (nextWinnerBattle?.driverRightId === null) {
+      await prisma.tournamentBattles.update({
+        where: {
+          id: nextWinnerBattle.id,
+        },
+        data: {
+          driverRightId: winnerId,
+        },
+      });
+    }
   }
+
+  if (tournament.nextBattle.loserNextBattleId) {
+    const nextLoserBattle = await prisma.tournamentBattles.findFirst({
+      where: {
+        id: tournament.nextBattle.loserNextBattleId,
+      },
+    });
+
+    if (nextLoserBattle?.driverLeftId === null) {
+      await prisma.tournamentBattles.update({
+        where: {
+          id: nextLoserBattle.id,
+        },
+        data: {
+          driverLeftId: loserId,
+        },
+      });
+    } else if (nextLoserBattle?.driverRightId === null) {
+      await prisma.tournamentBattles.update({
+        where: {
+          id: nextLoserBattle.id,
+        },
+        data: {
+          driverRightId: loserId,
+        },
+      });
+    }
+  }
+
+  await advanceToNextBattle(id, tournament.format);
+
+  // After advancing, check if the next battle is a bye run that needs auto-advancement
+  await autoAdvanceByeRuns(id);
+
+  return null;
 };
