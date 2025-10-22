@@ -1,20 +1,9 @@
-import { TournamentsState } from "~/utils/enums";
 import { prisma } from "./prisma.server";
 
-export const getTournament = (id: string, userId: string | null) => {
+export const getTournament = (id: string) => {
   return prisma.tournaments.findFirst({
     where: {
       id,
-      OR: [
-        {
-          userId,
-        },
-        {
-          state: {
-            notIn: [TournamentsState.START],
-          },
-        },
-      ],
     },
     select: {
       id: true,

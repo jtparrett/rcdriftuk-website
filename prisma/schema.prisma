@@ -193,6 +193,9 @@ model TournamentBattles {
   winnerInactivityPenalty Float @default(0)
   loserInactivityPenalty  Float @default(0)
 
+  winnerNextBattleId Int?
+  loserNextBattleId  Int?
+
   tournament     Tournaments             @relation(fields: [tournamentId], references: [id])
   driverLeft     TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
   driverRight    TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])

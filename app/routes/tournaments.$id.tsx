@@ -1,7 +1,6 @@
 import { useUser } from "@clerk/react-router";
 import {
   BattlesBracket,
-  QualifyingOrder,
   QualifyingProcedure,
   TicketStatus,
   TournamentsFormat,
@@ -20,7 +19,6 @@ import { AblyProvider, ChannelProvider } from "ably/react";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { Button, LinkButton } from "~/components/Button";
-import { TournamentStartForm } from "~/components/TournamentStartForm";
 import {
   AspectRatio,
   Box,
@@ -36,8 +34,8 @@ import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { getUsers } from "~/utils/getUsers.server";
 import { prisma } from "~/utils/prisma.server";
-import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying";
-import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
+import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server";
+import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
@@ -87,41 +85,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
     (tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
       tournament.nextBattle?.driverRight?.driverId === user?.driverId);
 
-  const url = new URL(args.request.url);
-  const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
-  let eventDrivers: number[] = [];
-
-  if (eventId) {
-    const event = await prisma.events.findUnique({
-      where: {
-        id: eventId,
-      },
-      include: {
-        EventTickets: {
-          where: {
-            status: TicketStatus.CONFIRMED,
-          },
-          include: {
-            user: {
-              select: {
-                driverId: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    eventDrivers =
-      event?.EventTickets.map((ticket) => ticket.user?.driverId ?? 0) ?? [];
-  }
-
   return {
     tournament,
     users,
     userId,
     tournamentJudge,
-    eventDrivers,
     isBattlingDriver,
   };
 };
@@ -183,7 +151,7 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   if (tournament.state === TournamentsState.BATTLES) {
-    await tournamentNextBattle(id);
+    await tournamentAdvanceBattles(id);
 
     publishUpdate();
   }
@@ -230,6 +198,8 @@ const TournamentPage = () => {
 
   const isOMT =
     leftVotes.length < winThreshold && rightVotes.length < winThreshold;
+
+  const protestingEnabled = tournament.enableProtests;
   const hasProtest = (tournament.nextBattle?.BattleProtests.length ?? 0) > 0;
   const hasUnresolvedProtest =
     tournament.nextBattle?.BattleProtests.some(
@@ -354,239 +324,225 @@ const TournamentPage = () => {
         )}
       </HiddenEmbed>
 
-      {tournament.state === TournamentsState.START && (
-        <Container maxW={1100} px={4}>
-          <TournamentStartForm
-            tournament={tournament}
-            users={users}
-            eventDrivers={eventDrivers}
-          />
-        </Container>
-      )}
+      <HiddenEmbed>
+        <TabsBar>
+          <Tab
+            to={`/tournaments/${tournament.id}/overview`}
+            isActive={isOverviewTab}
+            replace
+          >
+            Overview
+          </Tab>
+          {tournament.qualifyingLaps > 0 && (
+            <Tab
+              to={`/tournaments/${tournament.id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`}
+              isActive={isQualifyingTab}
+              replace
+            >
+              Qualifying
+            </Tab>
+          )}
+          <Tab
+            to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+            isActive={isBattlesTab}
+            replace
+          >
+            Battles
+          </Tab>
+          {(tournament.state === TournamentsState.END ||
+            tournament.format === TournamentsFormat.EXHIBITION) && (
+            <Tab
+              to={`/tournaments/${tournament.id}/standings`}
+              isActive={isStandingsTab}
+              replace
+            >
+              Standings
+            </Tab>
+          )}
+        </TabsBar>
 
-      {tournament.state !== TournamentsState.START && (
-        <>
-          <HiddenEmbed>
-            <TabsBar>
-              <Tab
-                to={`/tournaments/${tournament.id}/overview`}
-                isActive={isOverviewTab}
-                replace
+        <Box py={2}>
+          <Container maxW={1100} px={2}>
+            {hasUnresolvedProtest && isOwner && (
+              <Form
+                method="post"
+                action={`/api/protest/${tournament.nextBattle?.BattleProtests[0].id}/resolve`}
               >
-                Overview
-              </Tab>
-              {tournament.qualifyingLaps > 0 && (
-                <Tab
-                  to={`/tournaments/${tournament.id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`}
-                  isActive={isQualifyingTab}
-                  replace
-                >
-                  Qualifying
-                </Tab>
-              )}
-              <Tab
-                to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-                isActive={isBattlesTab}
-                replace
-              >
-                Battles
-              </Tab>
-              {(tournament.state === TournamentsState.END ||
-                tournament.format === TournamentsFormat.EXHIBITION) && (
-                <Tab
-                  to={`/tournaments/${tournament.id}/standings`}
-                  isActive={isStandingsTab}
-                  replace
-                >
-                  Standings
-                </Tab>
-              )}
-            </TabsBar>
-
-            <Box py={2}>
-              <Container maxW={1100} px={2}>
-                {hasUnresolvedProtest && isOwner && (
-                  <Form
-                    method="post"
-                    action={`/api/protest/${tournament.nextBattle?.BattleProtests[0].id}/resolve`}
+                <Box rounded="2xl" p={1} bgColor="brand.900" mb={2}>
+                  <Flex
+                    p={4}
+                    rounded="xl"
+                    borderWidth={1}
+                    borderColor="brand.600"
+                    borderStyle="dashed"
+                    alignItems="center"
+                    gap={4}
                   >
-                    <Box rounded="2xl" p={1} bgColor="brand.900" mb={2}>
-                      <Flex
-                        p={4}
-                        rounded="xl"
-                        borderWidth={1}
-                        borderColor="brand.600"
-                        borderStyle="dashed"
-                        alignItems="center"
-                        gap={4}
-                      >
-                        <Center
-                          w={10}
-                          h={10}
-                          bgColor="brand.600"
-                          rounded="lg"
-                          flex="none"
-                        >
-                          <RiOpenArmLine size={24} />
-                        </Center>
-                        <styled.p
-                          fontWeight="medium"
-                          lineHeight="1.2"
-                          maxW="340px"
-                          flex={1}
-                        >
-                          A protest has been raised. It must be resolved before
-                          continuing.
-                        </styled.p>
+                    <Center
+                      w={10}
+                      h={10}
+                      bgColor="brand.600"
+                      rounded="lg"
+                      flex="none"
+                    >
+                      <RiOpenArmLine size={24} />
+                    </Center>
+                    <styled.p
+                      fontWeight="medium"
+                      lineHeight="1.2"
+                      maxW="340px"
+                      flex={1}
+                    >
+                      A protest has been raised. It must be resolved before
+                      continuing.
+                    </styled.p>
 
-                        <Button ml="auto" type="submit">
-                          Resolve Protest
-                        </Button>
-                      </Flex>
-                    </Box>
+                    <Button ml="auto" type="submit">
+                      Resolve Protest
+                    </Button>
+                  </Flex>
+                </Box>
+              </Form>
+            )}
+
+            <Flex
+              flexDir={{ base: "column", sm: "row" }}
+              gap={1}
+              overflow="auto"
+              flexWrap="wrap"
+            >
+              <Spacer />
+
+              {isOwner && secondsRemaining > 0 && (
+                <Box
+                  rounded="full"
+                  borderWidth={1}
+                  borderColor="gray.700"
+                  bgColor="gray.800"
+                  py={1.5}
+                  px={4}
+                >
+                  <p>
+                    Waiting for protests:{" "}
+                    {pluralize("second", secondsRemaining, true)} remaining
+                  </p>
+                </Box>
+              )}
+
+              {isOwner &&
+                tournament.state === TournamentsState.BATTLES &&
+                tournament.format === TournamentsFormat.EXHIBITION &&
+                judgingCompleteForNextBattle &&
+                !isOMT &&
+                !hasUnresolvedProtest && (
+                  <>
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/battles/create`}
+                    >
+                      Create Next Battle <RiFlagLine />
+                    </LinkButton>
+                    <LinkButton
+                      to={`/tournaments/${tournament.id}/end`}
+                      variant="outline"
+                    >
+                      End Tournament
+                    </LinkButton>
+                  </>
+                )}
+
+              {isBattlingDriver &&
+                protestingEnabled &&
+                judgingCompleteForNextBattle &&
+                !location.pathname.includes("/protest") &&
+                !hasProtest && (
+                  <LinkButton
+                    to={`/tournaments/${tournament.id}/protest`}
+                    w={{ base: "full", sm: "auto" }}
+                  >
+                    Protest Decision <RiOpenArmLine />
+                  </LinkButton>
+                )}
+
+              {isOwner &&
+                tournament.state === TournamentsState.QUALIFYING &&
+                tournament.qualifyingProcedure === QualifyingProcedure.BEST && (
+                  <LinkButton
+                    variant="outline"
+                    to={`/tournaments/${tournament.id}/randomise`}
+                  >
+                    Randomise Qualifying <RiShuffleLine />
+                  </LinkButton>
+                )}
+
+              {isOwner &&
+                tournament.state === TournamentsState.QUALIFYING &&
+                tournament.nextQualifyingLap &&
+                tournament.nextQualifyingLap.scores.length ===
+                  tournament.judges.length && (
+                  <Form method="post">
+                    <Button
+                      type="submit"
+                      w={{ base: "full", sm: "auto" }}
+                      disabled={isLoading || isSubmitting}
+                      isLoading={isSubmitting}
+                    >
+                      Start Next Run <RiFlagLine />
+                    </Button>
                   </Form>
                 )}
 
-                <Flex
-                  flexDir={{ base: "column", sm: "row" }}
-                  gap={1}
-                  overflow="auto"
-                  flexWrap="wrap"
+              {isOwner &&
+                tournament.state === TournamentsState.QUALIFYING &&
+                tournament.nextQualifyingLap === null && (
+                  <Form method="post">
+                    <Button
+                      type="submit"
+                      w={{ base: "full", sm: "auto" }}
+                      disabled={isLoading || isSubmitting}
+                      isLoading={isSubmitting}
+                    >
+                      End Qualifying
+                    </Button>
+                  </Form>
+                )}
+
+              {isOwner &&
+                tournament.state === TournamentsState.BATTLES &&
+                judgingCompleteForNextBattle &&
+                tournament.format !== TournamentsFormat.EXHIBITION &&
+                !hasUnresolvedProtest &&
+                secondsRemaining <= 0 && (
+                  <Form method="post">
+                    <Button
+                      type="submit"
+                      w={{ base: "full", sm: "auto" }}
+                      disabled={isLoading || isSubmitting}
+                      isLoading={isSubmitting}
+                    >
+                      Start Next Battle <RiFlagLine />
+                    </Button>
+                  </Form>
+                )}
+
+              {tournamentJudge && (
+                <LinkButton
+                  to={`/judge/${tournamentJudge.id}`}
+                  variant="outline"
                 >
-                  <Spacer />
+                  Open Judges Remote <RiRemoteControlLine />
+                </LinkButton>
+              )}
+            </Flex>
+          </Container>
+        </Box>
+      </HiddenEmbed>
 
-                  {isOwner && secondsRemaining > 0 && (
-                    <Box
-                      rounded="full"
-                      borderWidth={1}
-                      borderColor="gray.700"
-                      bgColor="gray.800"
-                      py={1.5}
-                      px={4}
-                    >
-                      <p>
-                        Waiting for protests:{" "}
-                        {pluralize("second", secondsRemaining, true)} remaining
-                      </p>
-                    </Box>
-                  )}
-
-                  {isOwner &&
-                    tournament.state === TournamentsState.BATTLES &&
-                    tournament.format === TournamentsFormat.EXHIBITION &&
-                    judgingCompleteForNextBattle &&
-                    !isOMT &&
-                    !hasUnresolvedProtest && (
-                      <>
-                        <LinkButton
-                          to={`/tournaments/${tournament.id}/battles/create`}
-                        >
-                          Create Next Battle <RiFlagLine />
-                        </LinkButton>
-                        <LinkButton
-                          to={`/tournaments/${tournament.id}/end`}
-                          variant="outline"
-                        >
-                          End Tournament
-                        </LinkButton>
-                      </>
-                    )}
-
-                  {isBattlingDriver &&
-                    judgingCompleteForNextBattle &&
-                    !location.pathname.includes("/protest") &&
-                    !hasProtest && (
-                      <LinkButton
-                        to={`/tournaments/${tournament.id}/protest`}
-                        w={{ base: "full", sm: "auto" }}
-                      >
-                        Protest Decision <RiOpenArmLine />
-                      </LinkButton>
-                    )}
-
-                  {isOwner &&
-                    tournament.state === TournamentsState.QUALIFYING &&
-                    tournament.qualifyingProcedure ===
-                      QualifyingProcedure.BEST && (
-                      <LinkButton
-                        variant="outline"
-                        to={`/tournaments/${tournament.id}/randomise`}
-                      >
-                        Randomise Qualifying <RiShuffleLine />
-                      </LinkButton>
-                    )}
-
-                  {isOwner &&
-                    tournament.state === TournamentsState.QUALIFYING &&
-                    tournament.nextQualifyingLap &&
-                    tournament.nextQualifyingLap.scores.length ===
-                      tournament.judges.length && (
-                      <Form method="post">
-                        <Button
-                          type="submit"
-                          w={{ base: "full", sm: "auto" }}
-                          disabled={isLoading || isSubmitting}
-                          isLoading={isSubmitting}
-                        >
-                          Start Next Run <RiFlagLine />
-                        </Button>
-                      </Form>
-                    )}
-
-                  {isOwner &&
-                    tournament.state === TournamentsState.QUALIFYING &&
-                    tournament.nextQualifyingLap === null && (
-                      <Form method="post">
-                        <Button
-                          type="submit"
-                          w={{ base: "full", sm: "auto" }}
-                          disabled={isLoading || isSubmitting}
-                          isLoading={isSubmitting}
-                        >
-                          End Qualifying
-                        </Button>
-                      </Form>
-                    )}
-
-                  {isOwner &&
-                    tournament.state === TournamentsState.BATTLES &&
-                    judgingCompleteForNextBattle &&
-                    tournament.format !== TournamentsFormat.EXHIBITION &&
-                    !hasUnresolvedProtest &&
-                    secondsRemaining <= 0 && (
-                      <Form method="post">
-                        <Button
-                          type="submit"
-                          w={{ base: "full", sm: "auto" }}
-                          disabled={isLoading || isSubmitting}
-                          isLoading={isSubmitting}
-                        >
-                          Start Next Battle <RiFlagLine />
-                        </Button>
-                      </Form>
-                    )}
-
-                  {tournamentJudge && (
-                    <LinkButton
-                      to={`/judge/${tournamentJudge.id}`}
-                      variant="outline"
-                    >
-                      Open Judges Remote <RiRemoteControlLine />
-                    </LinkButton>
-                  )}
-                </Flex>
-              </Container>
-            </Box>
-          </HiddenEmbed>
-
-          {isEmbed ? (
-            <Outlet />
-          ) : (
-            <Container pb={12} px={2} maxW={1100}>
-              <Outlet />
-            </Container>
-          )}
-        </>
+      {isEmbed ? (
+        <Outlet />
+      ) : (
+        <Container pb={12} px={2} maxW={1100}>
+          <Outlet />
+        </Container>
       )}
     </>
   );

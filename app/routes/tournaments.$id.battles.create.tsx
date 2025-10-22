@@ -16,7 +16,7 @@ import { Box, styled, VStack } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUsers, type GetUsers } from "~/utils/getUsers.server";
 import { prisma } from "~/utils/prisma.server";
-import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
+import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -138,7 +138,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  await tournamentNextBattle(id);
+  await tournamentAdvanceBattles(id);
 
   return redirect(`/tournaments/${id}/overview`);
 };

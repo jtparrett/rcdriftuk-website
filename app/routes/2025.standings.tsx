@@ -8,6 +8,7 @@ import { getDriverRank, RANKS } from "~/utils/getDriverRank";
 import { prisma } from "~/utils/prisma.server";
 import { AppName } from "~/utils/enums";
 import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
+import { MAIN_EVENT_ID } from "./2025.schedule";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -46,6 +47,13 @@ export const loader = async () => {
     },
     orderBy: {
       elo_UK: "desc",
+    },
+    include: {
+      EventTickets: {
+        where: {
+          eventId: MAIN_EVENT_ID,
+        },
+      },
     },
   });
 
@@ -94,7 +102,8 @@ const StandingsPage = () => {
                 <tr
                   key={driver.id}
                   style={{
-                    opacity: i >= 64 ? 0.5 : 1,
+                    // opacity: i >= 64 ? 0.5 : 1,
+                    opacity: driver.EventTickets.length === 0 ? 0.3 : 1,
                     borderTop: i === 64 ? "1px solid red" : undefined,
                   }}
                 >
@@ -126,6 +135,9 @@ const StandingsPage = () => {
                       src={`/badges/${driver.rank}.png`}
                       alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                     />
+                  </styled.td>
+                  <styled.td textAlign="right">
+                    {driver.EventTickets.length > 0 ? "Yes" : "No"}
                   </styled.td>
                 </tr>
               ))}

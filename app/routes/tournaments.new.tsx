@@ -1,154 +1,284 @@
 import { getAuth } from "~/utils/getAuth.server";
-import type { ActionFunctionArgs } from "react-router";
-import { Form, redirect, useFetcher, useSearchParams } from "react-router";
-import invariant from "~/utils/invariant";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect, useLoaderData } from "react-router";
 import { z } from "zod";
-import { Button } from "~/components/Button";
-import { Glow } from "~/components/Glow";
-import { Input } from "~/components/Input";
-import { Label } from "~/components/Label";
-import { styled, Box, Flex, Center } from "~/styled-system/jsx";
+import { styled, Container } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import { useFormik } from "formik";
-import { toFormikValidationSchema } from "zod-formik-adapter";
-import { FormControl } from "~/components/FormControl";
-import { Select } from "~/components/Select";
-import { TOURNAMENT_TEMPLATES } from "~/utils/tournamentTemplates";
-import { capitalCase } from "change-case";
+import { CreateTournamentForm } from "~/components/CreateTournamentForm";
+import {
+  BattlesBracket,
+  QualifyingProcedure,
+  TicketStatus,
+  TournamentsFormat,
+  TournamentsState,
+} from "~/utils/enums";
+import notFoundInvariant from "~/utils/notFoundInvariant";
+import { getUsers } from "~/utils/getUsers.server";
+import { tournamentFormSchema } from "~/components/CreateTournamentForm";
+import { pow2Ceil, pow2Floor } from "~/utils/powFns";
+import type { TournamentBattles } from "@prisma/client";
+
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "User not found");
+
+  const users = await getUsers();
+
+  const url = new URL(args.request.url);
+  const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
+  let eventDrivers: number[] = [];
+
+  if (eventId) {
+    const event = await prisma.events.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        EventTickets: {
+          where: {
+            status: TicketStatus.CONFIRMED,
+          },
+          include: {
+            user: {
+              select: {
+                driverId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    eventDrivers =
+      event?.EventTickets.map((ticket) => ticket.user?.driverId ?? 0) ?? [];
+  }
+
+  return { users, eventDrivers };
+};
 
 export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  invariant(userId, "User not found");
+  notFoundInvariant(userId, "User not not found");
 
-  const formData = await args.request.formData();
-  const eventId = z
-    .string()
-    .optional()
-    .nullable()
-    .parse(formData.get("eventId"));
-  const template = z
-    .string()
-    .optional()
-    .nullable()
-    .parse(formData.get("template"));
-  const name = z.string().min(1).parse(formData.get("name"));
+  const body = await args.request.json();
 
+  const {
+    name,
+    judges,
+    drivers,
+    qualifyingLaps,
+    format,
+    fullInclusion,
+    enableProtests,
+    region,
+    scoreFormula,
+    qualifyingOrder,
+    qualifyingProcedure,
+    driverNumbers,
+  } = tournamentFormSchema.parse(body);
+
+  if (
+    fullInclusion || format === TournamentsFormat.EXHIBITION
+      ? drivers.length < 2
+      : drivers.length < 4
+  ) {
+    throw new Error(
+      `Please add at least ${fullInclusion ? 2 : 4} drivers to the tournament`,
+    );
+  }
+
+  // Create tournament
   const tournament = await prisma.tournaments.create({
     data: {
       userId,
       name,
+      qualifyingLaps,
+      format,
+      fullInclusion,
+      enableProtests,
+      region,
+      scoreFormula,
+      qualifyingOrder,
+      qualifyingProcedure,
+      driverNumbers,
     },
   });
 
-  const searchParams = new URLSearchParams();
+  // Create judges
+  await prisma.tournamentJudges.createMany({
+    data: judges.map((judge) => {
+      return {
+        driverId: Number(judge.driverId),
+        tournamentId: tournament.id,
+        points: judge.points,
+      };
+    }),
+    skipDuplicates: true,
+  });
 
-  if (eventId) {
-    searchParams.set("eventId", eventId);
+  const driversWithIndex = drivers.map((driver, index) => ({
+    ...driver,
+    index,
+  }));
+  const newDrivers = driversWithIndex.filter(
+    (driver) => !/^\d+$/.test(driver.driverId),
+  );
+  let allDrivers = driversWithIndex.filter(
+    (driver) => !newDrivers.some((d) => d.driverId === driver.driverId),
+  );
+
+  // Create new users (not previously registered)
+  if (newDrivers.length > 0) {
+    const newUsers = await prisma.users.createManyAndReturn({
+      data: newDrivers.map((driver) => {
+        const [firstName, lastName] = driver.driverId.split(" ");
+
+        return {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        };
+      }),
+      select: {
+        driverId: true,
+      },
+      skipDuplicates: true,
+    });
+
+    allDrivers = allDrivers
+      .concat(
+        newDrivers.map((driver, i) => ({
+          driverId: newUsers[i].driverId.toString(),
+          index: driver.index,
+        })),
+      )
+      .sort((a, b) => a.index - b.index);
   }
 
-  if (template) {
-    searchParams.set("template", template);
+  // Create tournament drivers
+  const tournamentDrivers = await prisma.tournamentDrivers.createManyAndReturn({
+    data: allDrivers.map((driver) => {
+      return {
+        driverId: Number(driver.driverId),
+        tournamentId: tournament.id,
+        tournamentDriverNumber: driver.index + 1,
+      };
+    }),
+  });
+
+  // Create qualifying laps
+  let nextQualifyingLapId: number | null = null;
+  const hasQualifying =
+    format !== TournamentsFormat.EXHIBITION &&
+    format !== TournamentsFormat.BATTLE_TREE;
+
+  if (hasQualifying) {
+    const totalLapsToCreate =
+      qualifyingProcedure === QualifyingProcedure.WAVES ? 1 : qualifyingLaps;
+
+    const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
+      data: Array.from({ length: totalLapsToCreate }).flatMap((_, i) => {
+        return tournamentDrivers.map((driver) => {
+          return {
+            tournamentDriverId: driver.id,
+            round: i + 1,
+          };
+        });
+      }),
+    });
+
+    nextQualifyingLapId = nextQualifyingLap?.id ?? null;
   }
 
-  return redirect(`/tournaments/${tournament.id}?${searchParams.toString()}`);
+  // Create battles
+  let nextBattleId: number | null = null;
+  const totalDrivers = fullInclusion
+    ? pow2Ceil(drivers.length)
+    : pow2Floor(drivers.length);
+  const totalRounds = Math.ceil(Math.log2(totalDrivers));
+
+  const makeBattles = async (
+    nextUpperBattles: TournamentBattles[],
+    nextLowerBattles: TournamentBattles[],
+    round: number,
+  ) => {
+    const totalToUpperCreate = nextUpperBattles.length * 2;
+    const totalLowerToCreate =
+      tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
+        ? Math.ceil(totalToUpperCreate * 1.5)
+        : 0;
+
+    let lowerBattles: TournamentBattles[] = [];
+
+    if (totalLowerToCreate > 0) {
+      lowerBattles = await prisma.tournamentBattles.createManyAndReturn({
+        data: Array.from(new Array(totalLowerToCreate)).map((_, i) => {
+          return {
+            round,
+            tournamentId: tournament.id,
+            bracket: BattlesBracket.LOWER,
+          };
+        }),
+      });
+    }
+
+    const battles = await prisma.tournamentBattles.createManyAndReturn({
+      data: Array.from(new Array(totalToUpperCreate)).map((_, i) => {
+        return {
+          round,
+          tournamentId: tournament.id,
+          bracket: BattlesBracket.UPPER,
+          winnerNextBattleId: nextUpperBattles[Math.floor(i / 2)].id,
+          loserNextBattleId: lowerBattles[i].id,
+        };
+      }),
+    });
+
+    nextBattleId = battles[battles.length - 1].id;
+
+    if (round < totalRounds) {
+      await makeBattles(battles, lowerBattles, round + 1);
+    }
+  };
+
+  const final = await prisma.tournamentBattles.create({
+    data: {
+      tournamentId: tournament.id,
+      round: 1000,
+      bracket: BattlesBracket.UPPER,
+    },
+  });
+
+  await makeBattles([final], [], 1);
+
+  // Update tournament
+  await prisma.tournaments.update({
+    where: {
+      id: tournament.id,
+    },
+    data: {
+      state: nextQualifyingLapId
+        ? TournamentsState.QUALIFYING
+        : TournamentsState.BATTLES,
+      nextQualifyingLapId,
+      nextBattleId,
+    },
+  });
+
+  return redirect(`/tournaments/${tournament.id}/overview`);
 };
 
-const formSchema = z.object({
-  name: z.string().min(1),
-  template: z.string().optional(),
-});
-
-const validationSchema = toFormikValidationSchema(formSchema);
-
 const Page = () => {
-  const fetcher = useFetcher();
-  const [searchParams] = useSearchParams();
-  const eventId = searchParams.get("eventId");
-
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      template: "",
-    },
-    validationSchema,
-    async onSubmit(values) {
-      const formData = new FormData();
-
-      formData.append("name", values.name);
-
-      if (eventId) {
-        formData.append("eventId", eventId);
-      }
-
-      if (values.template) {
-        formData.append("template", values.template);
-      }
-
-      await fetcher.submit(formData, {
-        method: "POST",
-      });
-    },
-  });
+  const { users, eventDrivers } = useLoaderData<typeof loader>();
 
   return (
-    <Center minH="70dvh">
-      <Box
-        w={400}
-        maxW="full"
-        p={1}
-        rounded="xl"
-        borderWidth="1px"
-        borderColor="brand.500"
-        pos="relative"
-        zIndex={1}
-      >
-        <Glow />
-        <Box p={4} borderWidth="1px" borderColor="gray.800" rounded="lg">
-          <styled.h1 fontWeight="extrabold" fontSize="2xl" mb={4}>
-            New Tournament
-          </styled.h1>
-
-          <form onSubmit={formik.handleSubmit}>
-            <Flex gap={2} flexDir="column">
-              <FormControl error={formik.errors.name}>
-                <Label>Tournament Name</Label>
-                <Input
-                  name="name"
-                  placeholder="e.g. Round 5 | The Final Showdown"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                />
-              </FormControl>
-
-              <FormControl>
-                <Label>Template (Optional)</Label>
-
-                <Select
-                  name="template"
-                  value={formik.values.template}
-                  onChange={formik.handleChange}
-                >
-                  <option>Select a template...</option>
-                  {Object.entries(TOURNAMENT_TEMPLATES).map(([key]) => (
-                    <option value={key}>{capitalCase(key)}</option>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <Button
-                type="submit"
-                isLoading={formik.isSubmitting}
-                disabled={formik.isSubmitting}
-                mt={2}
-              >
-                Create Tournament
-              </Button>
-            </Flex>
-          </form>
-        </Box>
-      </Box>
-    </Center>
+    <Container maxW={1100} px={4} py={8}>
+      <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
+        New Tournament
+      </styled.h1>
+      <CreateTournamentForm users={users} eventDrivers={eventDrivers} />
+    </Container>
   );
 };
 

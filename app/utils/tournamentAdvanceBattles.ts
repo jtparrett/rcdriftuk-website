@@ -5,7 +5,7 @@ import {
   advanceSingleEliminationBattleWinner,
 } from "~/utils/tournament.server";
 import { prisma } from "~/utils/prisma.server";
-import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
+import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 
 const advanceToNextBattle = async (
   tournamentId: string,
@@ -55,7 +55,7 @@ const advanceToNextBattle = async (
   return null;
 };
 
-export const tournamentNextBattle = async (id: string) => {
+export const tournamentAdvanceBattles = async (id: string) => {
   const tournament = await prisma.tournaments.findFirst({
     where: {
       id,

@@ -9,16 +9,9 @@ import invariant from "~/utils/invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
-import { pow2Floor } from "~/utils/tournament.server";
-import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns";
+import { pow2Ceil, pow2Floor } from "~/utils/powFns";
+import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 import { getQualifyingWaveSize } from "~/utils/tournament";
-
-// Helper function to round up to next power of 2, or return same if already power of 2
-const nextPowerOf2OrSame = (n: number): number => {
-  if (n <= 0) return 1;
-  if (pow2Floor(n) === n) return n; // Already a power of 2
-  return pow2Floor(n * 2); // Same logic as pow2Ceil
-};
 
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
@@ -295,7 +288,7 @@ export const tournamentEndQualifying = async (id: string) => {
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
 
   const totalBuysToCreate = tournament.fullInclusion
-    ? nextPowerOf2OrSame(tournament.drivers.length) - tournament.drivers.length
+    ? pow2Ceil(tournament.drivers.length) - tournament.drivers.length
     : 0;
 
   const driversWithScores = [
