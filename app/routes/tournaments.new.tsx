@@ -204,38 +204,37 @@ export const action = async (args: ActionFunctionArgs) => {
     round: number,
   ) => {
     const totalToUpperCreate = nextUpperBattles.length * 2;
+    const multiplier = round <= 1 ? 0.5 : 0.75;
     const totalLowerToCreate =
       tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
-        ? Math.ceil(totalToUpperCreate * 1.5)
+        ? Math.ceil(totalToUpperCreate * multiplier)
         : 0;
+    const battleRound = totalRounds + 1 - round;
 
-    let lowerBattles: TournamentBattles[] = [];
-
-    if (totalLowerToCreate > 0) {
-      lowerBattles = await prisma.tournamentBattles.createManyAndReturn({
-        data: Array.from(new Array(totalLowerToCreate)).map((_, i) => {
-          return {
-            round,
-            tournamentId: tournament.id,
-            bracket: BattlesBracket.LOWER,
-          };
-        }),
-      });
-    }
-
-    const battles = await prisma.tournamentBattles.createManyAndReturn({
-      data: Array.from(new Array(totalToUpperCreate)).map((_, i) => {
+    const lowerBattles = await prisma.tournamentBattles.createManyAndReturn({
+      data: Array.from(new Array(totalLowerToCreate)).map((_, i) => {
         return {
-          round,
+          round: battleRound,
           tournamentId: tournament.id,
-          bracket: BattlesBracket.UPPER,
-          winnerNextBattleId: nextUpperBattles[Math.floor(i / 2)].id,
-          loserNextBattleId: lowerBattles[i].id,
+          bracket: BattlesBracket.LOWER,
+          // winnerNextBattleId: nextLowerBattles[Math.floor(i / 2)]?.id,
         };
       }),
     });
 
-    nextBattleId = battles[battles.length - 1].id;
+    const battles = await prisma.tournamentBattles.createManyAndReturn({
+      data: Array.from(new Array(totalToUpperCreate)).map((_, i) => {
+        return {
+          round: battleRound,
+          tournamentId: tournament.id,
+          bracket: BattlesBracket.UPPER,
+          winnerNextBattleId: nextUpperBattles[Math.floor(i / 2)]?.id,
+          loserNextBattleId: lowerBattles[Math.floor(i / 2)]?.id,
+        };
+      }),
+    });
+
+    nextBattleId = battles[0].id;
 
     if (round < totalRounds) {
       await makeBattles(battles, lowerBattles, round + 1);
