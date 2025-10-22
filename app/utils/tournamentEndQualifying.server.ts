@@ -183,9 +183,37 @@ export const tournamentEndQualifying = async (id: string) => {
       round: 1,
       bracket: BattlesBracket.UPPER,
     },
+    orderBy: {
+      id: "asc",
+    },
   });
 
-  // TO DO ASSIGN DRIVERS
+  const totalDriversWithBuys = pow2Floor(sortedDrivers.length);
+  const initialBattleDrivers = sortByInnerOuter(
+    Array.from(new Array(totalDriversWithBuys / 2)).map((_, i) => {
+      let { id: driverLeftId } = sortedDrivers[totalDriversWithBuys - i - 1];
+      let { id: driverRightId } = sortedDrivers[i];
+
+      return {
+        driverLeftId,
+        driverRightId,
+      };
+    }),
+  );
+
+  await prisma.$transaction(
+    initialBattles.map((battle, i) => {
+      return prisma.tournamentBattles.update({
+        where: {
+          id: battle.id,
+        },
+        data: {
+          driverLeftId: initialBattleDrivers[i].driverLeftId,
+          driverRightId: initialBattleDrivers[i].driverRightId,
+        },
+      });
+    }),
+  );
 
   // After setting up battles, check if the first battle is a bye run and auto-advance if needed
   await autoAdvanceByeRuns(id);

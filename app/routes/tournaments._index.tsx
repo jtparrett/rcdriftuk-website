@@ -63,6 +63,7 @@ const Page = () => {
           Tournaments
         </styled.h1>
         <Spacer />
+
         <LinkButton to="/tournaments/user-guide" variant="outline" size="sm">
           Guide <RiBookOpenFill />
         </LinkButton>

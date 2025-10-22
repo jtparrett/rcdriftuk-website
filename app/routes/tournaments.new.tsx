@@ -118,6 +118,7 @@ export const action = async (args: ActionFunctionArgs) => {
     skipDuplicates: true,
   });
 
+  // Create new users (not previously registered)
   const driversWithIndex = drivers.map((driver, index) => ({
     ...driver,
     index,
@@ -129,7 +130,6 @@ export const action = async (args: ActionFunctionArgs) => {
     (driver) => !newDrivers.some((d) => d.driverId === driver.driverId),
   );
 
-  // Create new users (not previously registered)
   if (newDrivers.length > 0) {
     const newUsers = await prisma.users.createManyAndReturn({
       data: newDrivers.map((driver) => {
@@ -196,14 +196,15 @@ export const action = async (args: ActionFunctionArgs) => {
   const totalDrivers = fullInclusion
     ? pow2Ceil(drivers.length)
     : pow2Floor(drivers.length);
-  const totalRounds = Math.ceil(Math.log2(totalDrivers));
+
+  const totalRounds = Math.ceil(Math.log2(totalDrivers)) - 1;
 
   const makeBattles = async (
     nextUpperBattles: TournamentBattles[],
     nextLowerBattles: TournamentBattles[],
     round: number,
   ) => {
-    const totalToUpperCreate = nextUpperBattles.length * 2;
+    const totalUpperBattles = nextUpperBattles.length * 2;
     const multiplier = round <= 1 ? 0 : 0.5;
     const totalLowerToCreate =
       tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
@@ -235,8 +236,8 @@ export const action = async (args: ActionFunctionArgs) => {
 
     const lowerBattles = [...lowerBBattles, ...lowerABattles];
 
-    const battles = await prisma.tournamentBattles.createManyAndReturn({
-      data: Array.from(new Array(totalToUpperCreate)).map((_, i) => {
+    const upperBattles = await prisma.tournamentBattles.createManyAndReturn({
+      data: Array.from(new Array(totalUpperBattles)).map((_, i) => {
         return {
           round: battleRound,
           tournamentId: tournament.id,
@@ -247,10 +248,10 @@ export const action = async (args: ActionFunctionArgs) => {
       }),
     });
 
-    nextBattleId = battles[0].id;
+    nextBattleId = upperBattles[0].id;
 
     if (round < totalRounds) {
-      await makeBattles(battles, lowerBattles, round + 1);
+      await makeBattles(upperBattles, lowerBattles, round + 1);
     }
   };
 
