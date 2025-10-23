@@ -332,8 +332,8 @@ const DriverNameBoxLeft = ({
         transform="skewX(16deg)"
         whiteSpace="nowrap"
         w="fit-content"
-        shadow="0 -4px 8px rgba(0, 0, 0, 0.2)"
-        borderTopRightRadius="xl"
+        shadow="4px 0 8px rgba(0, 0, 0, 0.2)"
+        borderTopRightRadius="lg"
       >
         <Flex transform="skewX(-16deg)">
           <Box
@@ -354,8 +354,7 @@ const DriverNameBoxLeft = ({
             </styled.p>
           </Box>
           <styled.p
-            fontWeight="semibold"
-            textTransform="uppercase"
+            fontWeight="bold"
             px={3}
             py={{ base: 1, md: 2 }}
             fontSize={{ base: "sm", md: "lg" }}
@@ -403,13 +402,12 @@ const DriverNameBoxRight = ({
         transform="skewX(16deg)"
         whiteSpace="nowrap"
         w="fit-content"
-        shadow="0 4px 8px rgba(0, 0, 0, 0.2)"
-        borderBottomLeftRadius="xl"
+        shadow="-4px 0 8px rgba(0, 0, 0, 0.2)"
+        borderBottomLeftRadius="lg"
       >
         <Flex transform="skewX(-16deg)">
           <styled.p
-            fontWeight="semibold"
-            textTransform="uppercase"
+            fontWeight="bold"
             px={3}
             py={{ base: 1, md: 2 }}
             fontSize={{ base: "sm", md: "lg" }}
@@ -512,11 +510,11 @@ const TournamentsOverviewPage = () => {
         px={2}
       >
         <Box
-          bgColor="black"
+          bgColor="gray.900"
           p={1}
           borderWidth={1}
           rounded="2xl"
-          borderColor="brand.500"
+          borderColor="gray.800"
           minW={260}
           mb={4}
           maxW="full"
@@ -525,41 +523,16 @@ const TournamentsOverviewPage = () => {
           zIndex={1}
         >
           <Glow />
-          <Box
-            borderRadius="xl"
-            borderWidth={1}
-            borderColor="brand.700"
-            overflow="hidden"
-            textAlign="center"
-          >
-            <Box
-              bgGradient="to-b"
-              gradientFrom="brand.500"
-              gradientTo="brand.700"
-              px={4}
-              py={{ base: 2, md: 3 }}
-              borderTopRadius="11px"
-              boxShadow="inset 0 1px rgba(255, 255, 255, 0.3)"
-            >
-              <styled.p
-                fontSize={{ base: "md", md: "xl" }}
-                fontWeight="semibold"
-                lineHeight={1.1}
-              >
-                {tournament.name} |{" "}
-                {capitalCase(
-                  tournament.state === TournamentsState.END
-                    ? "Final Result"
-                    : tournament.state,
-                )}{" "}
-              </styled.p>
-            </Box>
-
+          <Box borderRadius="xl" overflow="hidden" textAlign="center">
             {tournament.state === TournamentsState.END && <FinalResults />}
 
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
-                <Flex w={600} maxW="full" key={tournament.nextQualifyingLapId}>
+                <Flex
+                  w={isEmbed ? 800 : 600}
+                  maxW="full"
+                  key={tournament.nextQualifyingLapId}
+                >
                   <Box
                     pos="relative"
                     _after={{
@@ -771,8 +744,24 @@ const TournamentsOverviewPage = () => {
                     flex={1.2}
                     justifyContent="center"
                     flexDir="column"
+                    pos="relative"
+                    zIndex={2}
                     pb={8}
                   >
+                    {!battleJudgingComplete && (
+                      <styled.p
+                        pos="absolute"
+                        top="50%"
+                        left="50%"
+                        transform="translate(-50%, -50%)"
+                        bg="gray.950"
+                        zIndex={1}
+                        color="gray.500"
+                        fontSize="lg"
+                      >
+                        vs
+                      </styled.p>
+                    )}
                     {battleJudgingComplete && (
                       <>
                         {tournament.nextBattle.BattleVotes.map((vote, i) => {
@@ -803,14 +792,8 @@ const TournamentsOverviewPage = () => {
                               }}
                             >
                               <Box
-                                bgGradient="to-b"
-                                gradientFrom="brand.500"
-                                gradientTo="brand.700"
                                 w="fit-content"
                                 mx="auto"
-                                py={2}
-                                px={1}
-                                rounded="md"
                                 textAlign="center"
                                 mb={0.5}
                               >
@@ -821,7 +804,6 @@ const TournamentsOverviewPage = () => {
                                   whiteSpace="nowrap"
                                   textOverflow="ellipsis"
                                   overflow="hidden"
-                                  color="brand.100"
                                   display={{
                                     base: "none",
                                     md: "block",
