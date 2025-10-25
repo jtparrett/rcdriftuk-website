@@ -157,6 +157,8 @@ export default defineConfig({
       minH: "100dvh",
       overflowScrolling: "touch",
       userSelect: "none",
+      fontSmooth: "antialiased",
+      textRendering: "optimizeLegibility",
     },
   },
 });
