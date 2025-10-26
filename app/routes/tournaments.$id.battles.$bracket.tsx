@@ -235,6 +235,7 @@ const TournamentBattlesPage = () => {
         bg="gray.900"
         borderWidth={isEmbed ? 0 : 1}
         borderColor="gray.800"
+        className="bg"
       >
         <Flex
           overflow="auto"
@@ -243,6 +244,7 @@ const TournamentBattlesPage = () => {
           borderWidth={isEmbed ? 0 : 1}
           borderColor="gray.800"
           rounded="2xl"
+          className="main"
           bg="black"
           bgImage={isEmbed ? undefined : "url(/dot-bg.svg)"}
           bgRepeat="repeat"
