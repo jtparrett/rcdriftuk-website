@@ -183,29 +183,31 @@ const TournamentBattlesPage = () => {
   );
 
   const battlesInRound = Object.values(battlesByRound).reduce<Battle[][]>(
-    (agg, round) => {
+    (agg, battles) => {
       if (tournament.format === TournamentsFormat.EXHIBITION) {
-        return [round];
+        return [battles];
       }
 
-      const n = Math.log2(round.length);
+      const n = Math.log2(battles.length);
       const isOddRound = n - Math.floor(n) !== 0;
 
-      const battlesInFirstChunk = Math.floor(round.length / 1.5);
+      const battlesInFirstChunk = Math.floor((battles.length / 3) * 2);
       const firstChunk = isOddRound
-        ? round.slice(0, battlesInFirstChunk)
-        : round;
+        ? battles.slice(0, battlesInFirstChunk)
+        : battles;
 
       const secondChunk = isOddRound
-        ? round.slice(battlesInFirstChunk, round.length)
+        ? battles.slice(battlesInFirstChunk, battles.length)
         : [];
 
-      return [...agg, firstChunk, secondChunk].filter(
-        (item) => item.length > 0,
-      );
+      return [...agg, firstChunk, secondChunk]
+        .filter((item) => item.length > 0)
+        .sort((a, b) => a[0].round - b[0].round);
     },
     [],
   );
+
+  console.log(battlesInRound);
 
   return (
     <>
