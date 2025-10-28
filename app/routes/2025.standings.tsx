@@ -1,4 +1,4 @@
-import { Regions } from "~/utils/enums";
+import { Regions, TicketStatus } from "~/utils/enums";
 import type { Route } from "./+types/2025";
 import { useLoaderData } from "react-router";
 import { startOfYear } from "date-fns";
@@ -52,6 +52,7 @@ export const loader = async () => {
       EventTickets: {
         where: {
           eventId: MAIN_EVENT_ID,
+          status: TicketStatus.CONFIRMED,
         },
       },
     },

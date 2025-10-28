@@ -191,7 +191,7 @@ const TournamentBattlesPage = () => {
       const n = Math.log2(battles.length);
       const isOddRound = n - Math.floor(n) !== 0;
 
-      const battlesInFirstChunk = Math.floor((battles.length / 3) * 2);
+      const battlesInFirstChunk = Math.floor(battles.length / 1.5);
       const firstChunk = isOddRound
         ? battles.slice(0, battlesInFirstChunk)
         : battles;
@@ -200,14 +200,12 @@ const TournamentBattlesPage = () => {
         ? battles.slice(battlesInFirstChunk, battles.length)
         : [];
 
-      return [...agg, firstChunk, secondChunk]
-        .filter((item) => item.length > 0)
-        .sort((a, b) => a[0].round - b[0].round);
+      return [...agg, firstChunk, secondChunk].filter(
+        (item) => item.length > 0,
+      );
     },
     [],
   );
-
-  console.log(battlesInRound);
 
   return (
     <>

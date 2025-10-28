@@ -221,8 +221,6 @@ export const action = async (args: ActionFunctionArgs) => {
             round: battleRound,
             tournamentId: tournament.id,
             bracket: BattlesBracket.LOWER,
-            // winnerNextBattleId:
-            //   lowerConsolidationBattles[Math.floor(i / 2)]?.id, // update after instead
           };
         }),
       });
@@ -265,7 +263,7 @@ export const action = async (args: ActionFunctionArgs) => {
       data: Array.from(new Array(totalUpperBattles)).map((_, i) => {
         const loserNextBattleId = isFirstRound
           ? lowerConsolidationBattles[Math.floor(i / 2)]?.id
-          : lowerDropInBattles[i]?.id;
+          : lowerDropInBattles[totalUpperBattles - 1 - i]?.id;
 
         return {
           round: battleRound,
