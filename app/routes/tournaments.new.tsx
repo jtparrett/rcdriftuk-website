@@ -244,6 +244,8 @@ export const action = async (args: ActionFunctionArgs) => {
         ),
       });
 
+    // I don't like this update
+    // But it's needed so the running order is correct
     await prisma.$transaction(
       lowerDropInBattles.map((battle, i) => {
         return prisma.tournamentBattles.update({
@@ -282,15 +284,39 @@ export const action = async (args: ActionFunctionArgs) => {
     }
   };
 
-  const final = await prisma.tournamentBattles.create({
+  let grandFinal: TournamentBattles | null = null;
+  let lowerFinal: TournamentBattles | null = null;
+
+  if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+    grandFinal = await prisma.tournamentBattles.create({
+      data: {
+        tournamentId: tournament.id,
+        round: 1002,
+        bracket: BattlesBracket.UPPER,
+      },
+    });
+
+    lowerFinal = await prisma.tournamentBattles.create({
+      data: {
+        tournamentId: tournament.id,
+        round: 1001,
+        bracket: BattlesBracket.LOWER,
+        winnerNextBattleId: grandFinal?.id,
+      },
+    });
+  }
+
+  const upperFinal = await prisma.tournamentBattles.create({
     data: {
       tournamentId: tournament.id,
       round: 1000,
       bracket: BattlesBracket.UPPER,
+      winnerNextBattleId: grandFinal?.id,
+      loserNextBattleId: lowerFinal?.id,
     },
   });
 
-  await makeBattles([final], [], 1);
+  await makeBattles([upperFinal], lowerFinal ? [lowerFinal] : [], 1);
 
   // Update tournament
   await prisma.tournaments.update({
