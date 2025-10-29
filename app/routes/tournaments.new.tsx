@@ -17,6 +17,15 @@ import { getUsers } from "~/utils/getUsers.server";
 import { tournamentFormSchema } from "~/components/CreateTournamentForm";
 import { pow2Ceil, pow2Floor } from "~/utils/powFns";
 import type { TournamentBattles } from "@prisma/client";
+import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server";
+
+export const tournamentHasQualifying = (format: TournamentsFormat) => {
+  return (
+    format === TournamentsFormat.STANDARD ||
+    format === TournamentsFormat.DOUBLE_ELIMINATION ||
+    format === TournamentsFormat.WILDCARD
+  );
+};
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -169,9 +178,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create qualifying laps
   let nextQualifyingLapId: number | null = null;
-  const hasQualifying =
-    format !== TournamentsFormat.EXHIBITION &&
-    format !== TournamentsFormat.BATTLE_TREE;
+  const hasQualifying = tournamentHasQualifying(tournament.format);
 
   if (hasQualifying) {
     const totalLapsToCreate =
@@ -347,6 +354,10 @@ export const action = async (args: ActionFunctionArgs) => {
       nextBattleId,
     },
   });
+
+  if (tournament.format === TournamentsFormat.BATTLE_TREE) {
+    await tournamentEndQualifying(tournament.id);
+  }
 
   return redirect(`/tournaments/${tournament.id}/overview`);
 };

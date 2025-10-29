@@ -54,6 +54,7 @@ import pluralize from "pluralize";
 import { AppName } from "~/utils/enums";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 import notFoundInvariant from "~/utils/notFoundInvariant";
+import { tournamentHasQualifying } from "./tournaments.new";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -327,7 +328,7 @@ const TournamentPage = () => {
           >
             Overview
           </Tab>
-          {tournament.qualifyingLaps > 0 && (
+          {tournamentHasQualifying(tournament.format) && (
             <Tab
               to={`/tournaments/${tournament.id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`}
               isActive={isQualifyingTab}
