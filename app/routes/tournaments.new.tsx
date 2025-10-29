@@ -199,6 +199,50 @@ export const action = async (args: ActionFunctionArgs) => {
 
   const totalRounds = Math.ceil(Math.log2(totalDrivers)) - 1;
 
+  let grandFinal: TournamentBattles | null = null;
+  let lowerFinal: TournamentBattles | null = null;
+
+  if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+    grandFinal = await prisma.tournamentBattles.create({
+      data: {
+        tournamentId: tournament.id,
+        round: 1002,
+        bracket: BattlesBracket.UPPER,
+      },
+    });
+
+    lowerFinal = await prisma.tournamentBattles.create({
+      data: {
+        tournamentId: tournament.id,
+        round: 1001,
+        bracket: BattlesBracket.LOWER,
+        winnerNextBattleId: grandFinal?.id,
+      },
+    });
+  }
+
+  // Create the playoff battle
+  let playoffBattle: TournamentBattles | null = null;
+  if (tournament.format !== TournamentsFormat.DOUBLE_ELIMINATION) {
+    playoffBattle = await prisma.tournamentBattles.create({
+      data: {
+        tournamentId: tournament.id,
+        round: totalRounds + 1,
+        bracket: BattlesBracket.UPPER,
+      },
+    });
+  }
+
+  const upperFinal = await prisma.tournamentBattles.create({
+    data: {
+      tournamentId: tournament.id,
+      round: 1000,
+      bracket: BattlesBracket.UPPER,
+      winnerNextBattleId: grandFinal?.id,
+      loserNextBattleId: lowerFinal?.id,
+    },
+  });
+
   const makeBattles = async (
     nextUpperBattles: TournamentBattles[],
     nextLowerBattles: TournamentBattles[],
@@ -263,9 +307,13 @@ export const action = async (args: ActionFunctionArgs) => {
     // Upper battles
     const upperBattles = await prisma.tournamentBattles.createManyAndReturn({
       data: Array.from(new Array(totalUpperBattles)).map((_, i) => {
-        const loserNextBattleId = isFirstRound
+        let loserNextBattleId = isFirstRound
           ? lowerConsolidationBattles[Math.floor(i / 2)]?.id
           : lowerDropInBattles[totalUpperBattles - 1 - i]?.id;
+
+        if (playoffBattle && round === 1) {
+          loserNextBattleId = playoffBattle?.id;
+        }
 
         return {
           round: battleRound,
@@ -283,38 +331,6 @@ export const action = async (args: ActionFunctionArgs) => {
       await makeBattles(upperBattles, lowerDropInBattles, round + 1);
     }
   };
-
-  let grandFinal: TournamentBattles | null = null;
-  let lowerFinal: TournamentBattles | null = null;
-
-  if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
-    grandFinal = await prisma.tournamentBattles.create({
-      data: {
-        tournamentId: tournament.id,
-        round: 1002,
-        bracket: BattlesBracket.UPPER,
-      },
-    });
-
-    lowerFinal = await prisma.tournamentBattles.create({
-      data: {
-        tournamentId: tournament.id,
-        round: 1001,
-        bracket: BattlesBracket.LOWER,
-        winnerNextBattleId: grandFinal?.id,
-      },
-    });
-  }
-
-  const upperFinal = await prisma.tournamentBattles.create({
-    data: {
-      tournamentId: tournament.id,
-      round: 1000,
-      bracket: BattlesBracket.UPPER,
-      winnerNextBattleId: grandFinal?.id,
-      loserNextBattleId: lowerFinal?.id,
-    },
-  });
 
   await makeBattles([upperFinal], lowerFinal ? [lowerFinal] : [], 1);
 
