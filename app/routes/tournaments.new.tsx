@@ -230,7 +230,11 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create the playoff battle
   let playoffBattle: TournamentBattles | null = null;
-  if (tournament.format !== TournamentsFormat.DOUBLE_ELIMINATION) {
+  if (
+    tournament.format === TournamentsFormat.STANDARD ||
+    tournament.format === TournamentsFormat.WILDCARD ||
+    tournament.format === TournamentsFormat.BATTLE_TREE
+  ) {
     playoffBattle = await prisma.tournamentBattles.create({
       data: {
         tournamentId: tournament.id,
@@ -247,8 +251,17 @@ export const action = async (args: ActionFunctionArgs) => {
       bracket: BattlesBracket.UPPER,
       winnerNextBattleId: grandFinal?.id,
       loserNextBattleId: lowerFinal?.id,
+
+      ...(tournament.format === TournamentsFormat.EXHIBITION
+        ? {
+            driverLeftId: tournamentDrivers[0]?.id,
+            driverRightId: tournamentDrivers[1]?.id,
+          }
+        : {}),
     },
   });
+
+  nextBattleId = upperFinal.id;
 
   const makeBattles = async (
     nextUpperBattles: TournamentBattles[],
@@ -339,7 +352,9 @@ export const action = async (args: ActionFunctionArgs) => {
     }
   };
 
-  await makeBattles([upperFinal], lowerFinal ? [lowerFinal] : [], 1);
+  if (tournament.format !== TournamentsFormat.EXHIBITION) {
+    await makeBattles([upperFinal], lowerFinal ? [lowerFinal] : [], 1);
+  }
 
   // Update tournament
   await prisma.tournaments.update({

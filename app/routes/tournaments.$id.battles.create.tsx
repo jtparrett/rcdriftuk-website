@@ -134,7 +134,7 @@ export const action = async (args: ActionFunctionArgs) => {
       tournamentId: id,
       driverLeftId: driverLeft.id,
       driverRightId: driverRight.id,
-      round: 1,
+      round: 1000,
     },
   });
 

@@ -113,22 +113,23 @@ const Driver = ({
 
   return (
     <Flex alignItems="center" py={0.5} h={6} px="1px">
-      {driver?.qualifyingPosition !== undefined && (
-        <Center
-          w={5}
-          h={5}
-          flex="none"
-          bgGradient="to-b"
-          gradientFrom="brand.500"
-          gradientTo="brand.700"
-          rounded="md"
-          mb="1px"
-        >
-          <styled.span fontSize="xs" fontWeight="medium">
-            {driver.qualifyingPosition}
-          </styled.span>
-        </Center>
-      )}
+      {driver?.qualifyingPosition !== null &&
+        driver?.qualifyingPosition !== undefined && (
+          <Center
+            w={5}
+            h={5}
+            flex="none"
+            bgGradient="to-b"
+            gradientFrom="brand.500"
+            gradientTo="brand.700"
+            rounded="md"
+            mb="1px"
+          >
+            <styled.span fontSize="xs" fontWeight="medium">
+              {driver.qualifyingPosition}
+            </styled.span>
+          </Center>
+        )}
       <styled.p
         fontWeight="semibold"
         fontSize="xs"
@@ -284,7 +285,7 @@ const TournamentBattlesPage = () => {
                   flexDir="column"
                   style={{
                     height:
-                      Math.ceil(battlesByRound[1]?.length ?? 0) * 54 + "px",
+                      Math.ceil(battlesInRound[0]?.length ?? 0) * 54 + "px",
                   }}
                 >
                   <Spacer />
