@@ -1,21 +1,17 @@
-import { TournamentsFormat, TournamentsState } from "~/utils/enums";
+import { TournamentsState } from "~/utils/enums";
 import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 
-const advanceToNextBattle = async (
-  tournamentId: string,
-  format: TournamentsFormat,
-) => {
+const advanceToNextBattle = async (tournamentId: string) => {
   const nextBattle = await prisma.tournamentBattles.findFirst({
     where: {
       tournamentId,
       winnerId: null,
     },
     orderBy: [
-      ...(format === TournamentsFormat.WILDCARD
-        ? ([{ bracket: "desc" }, { round: "asc" }] as const)
-        : ([{ round: "asc" }, { bracket: "asc" }] as const)),
+      { round: "asc" },
+      { bracket: "asc" },
       {
         id: "asc",
       },
@@ -67,7 +63,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
 
   if (!tournament.nextBattleId || !tournament.nextBattle) {
     // End the comp!
-    await advanceToNextBattle(id, tournament.format);
+    await advanceToNextBattle(id);
 
     return null;
   }
@@ -202,7 +198,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
     }
   }
 
-  await advanceToNextBattle(id, tournament.format);
+  await advanceToNextBattle(id);
 
   // After advancing, check if the next battle is a bye run that needs auto-advancement
   await autoAdvanceByeRuns(id);

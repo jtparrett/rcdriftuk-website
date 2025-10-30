@@ -117,7 +117,13 @@ export const getTournamentStandings = (battles: Battle[]) => {
   };
 
   // Find final battle (round 1000) and determine 1st and 2nd place
-  const finalBattleIndex = battles.findIndex((battle) => battle.round === 1000);
+  const finalBattleIndex = battles.findIndex((battle) => {
+    if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+      return battle.round === 1002;
+    }
+
+    return battle.round === 1000;
+  });
   const finalBattle = battles[finalBattleIndex];
 
   // Confirm it's a single tournament and not a leaderboard

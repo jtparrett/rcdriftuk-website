@@ -26,6 +26,7 @@ import { Label } from "./Label";
 import { FormControl } from "./FormControl";
 import pluralize from "pluralize";
 import { z } from "zod";
+import { tournamentHasQualifying } from "~/routes/tournaments.new";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
@@ -393,9 +394,7 @@ export const CreateTournamentForm = ({ users, eventDrivers }: Props) => {
           </FormControl>
         </Flex>
 
-        {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.WILDCARD) && (
+        {tournamentHasQualifying(format) && (
           <>
             <Flex gap={4}>
               <StepDot />
@@ -534,7 +533,6 @@ export const CreateTournamentForm = ({ users, eventDrivers }: Props) => {
 
         {(format === TournamentsFormat.STANDARD ||
           format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.WILDCARD ||
           format === TournamentsFormat.BATTLE_TREE) && (
           <Flex gap={4}>
             <StepDot />

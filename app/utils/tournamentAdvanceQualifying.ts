@@ -120,14 +120,9 @@ export const tournamentAdvanceQualifying = async (
       tournament.qualifyingLaps,
       tournament.nextQualifyingLap.round,
     );
-    const offset =
-      tournament.format === TournamentsFormat.WILDCARD &&
-      tournament.nextQualifyingLap.round === tournament.qualifyingLaps
-        ? -1
-        : 0;
 
     const remainingDrivers = [...sortedDrivers].slice(
-      pow2Floor(tournament.drivers.length) * waveSize + offset,
+      pow2Floor(tournament.drivers.length) * waveSize,
     );
 
     const nextRound = tournament.nextQualifyingLap.round + 1;

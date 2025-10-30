@@ -22,8 +22,7 @@ import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server"
 export const tournamentHasQualifying = (format: TournamentsFormat) => {
   return (
     format === TournamentsFormat.STANDARD ||
-    format === TournamentsFormat.DOUBLE_ELIMINATION ||
-    format === TournamentsFormat.WILDCARD
+    format === TournamentsFormat.DOUBLE_ELIMINATION
   );
 };
 
@@ -232,7 +231,6 @@ export const action = async (args: ActionFunctionArgs) => {
   let playoffBattle: TournamentBattles | null = null;
   if (
     tournament.format === TournamentsFormat.STANDARD ||
-    tournament.format === TournamentsFormat.WILDCARD ||
     tournament.format === TournamentsFormat.BATTLE_TREE
   ) {
     playoffBattle = await prisma.tournamentBattles.create({
@@ -347,7 +345,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
     nextBattleId = upperBattles[0].id;
 
-    if (!isFirstRound) {
+    if (!isFirstRound && round !== totalRounds * 2) {
       await makeBattles(upperBattles, lowerDropInBattles, round + 1);
     }
   };

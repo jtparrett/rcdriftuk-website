@@ -132,13 +132,7 @@ export const tournamentEndQualifying = async (id: string) => {
 
       // Calculate wave size for this round
       const waveSize = getQualifyingWaveSize(tournament.qualifyingLaps, round);
-      const offset =
-        tournament.format === TournamentsFormat.WILDCARD &&
-        round === tournament.qualifyingLaps
-          ? -1
-          : 0;
-      const qualifyingCutOff =
-        pow2Floor(tournament.drivers.length) * waveSize + offset;
+      const qualifyingCutOff = pow2Floor(tournament.drivers.length) * waveSize;
 
       // Take the top drivers from this round that haven't already qualified
       const newQualifiers = roundDrivers.slice(0, qualifyingCutOff);
