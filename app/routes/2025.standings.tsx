@@ -103,8 +103,8 @@ const StandingsPage = () => {
                 <tr
                   key={driver.id}
                   style={{
-                    // opacity: i >= 64 ? 0.5 : 1,
-                    opacity: driver.EventTickets.length === 0 ? 0.3 : 1,
+                    opacity: i >= 64 ? 0.5 : 1,
+                    // opacity: driver.EventTickets.length === 0 ? 0.3 : 1,
                     borderTop: i === 64 ? "1px solid red" : undefined,
                   }}
                 >
@@ -136,9 +136,6 @@ const StandingsPage = () => {
                       src={`/badges/${driver.rank}.png`}
                       alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                     />
-                  </styled.td>
-                  <styled.td textAlign="right">
-                    {driver.EventTickets.length > 0 ? "Yes" : "No"}
                   </styled.td>
                 </tr>
               ))}
