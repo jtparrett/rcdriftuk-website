@@ -322,20 +322,14 @@ export const CreateTournamentForm = ({ users, eventDrivers }: Props) => {
     enableReinitialize: true,
     initialValues: {
       name: "",
-      judges: [{ driverId: "103", points: 100 }],
-      // drivers: Array.from(
-      //   Array.from(
-      //     new Set(eventDrivers.map((driver) => driver.toString())),
-      //   ).map((driver) => ({
-      //     driverId: driver,
-      //   })),
-      // ),
-      drivers: [
-        103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
-        117, 118, 119, 120,
-      ].map((driver) => ({
-        driverId: driver.toString(),
-      })),
+      judges: [],
+      drivers: Array.from(
+        Array.from(
+          new Set(eventDrivers.map((driver) => driver.toString())),
+        ).map((driver) => ({
+          driverId: driver,
+        })),
+      ),
       fullInclusion: false,
       enableProtests: false,
       qualifyingLaps: 1,
