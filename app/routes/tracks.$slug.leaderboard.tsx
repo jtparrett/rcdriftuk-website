@@ -109,6 +109,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       track.leaderboard?.tournaments.flatMap(
         (tournament) => tournament.tournament.battles,
       ),
+      true,
     );
 
     return {

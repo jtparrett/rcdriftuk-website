@@ -120,6 +120,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       leaderboard.tournaments.flatMap(
         (tournament) => tournament.tournament.battles,
       ),
+      true,
     );
 
     return {

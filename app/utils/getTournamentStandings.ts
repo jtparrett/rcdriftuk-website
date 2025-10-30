@@ -34,7 +34,10 @@ type DriverStats = {
   image: string | null;
 };
 
-export const getTournamentStandings = (battles: Battle[]) => {
+export const getTournamentStandings = (
+  battles: Battle[],
+  isLeaderboard?: boolean,
+) => {
   if (battles.length === 0) {
     return [];
   }
@@ -116,20 +119,9 @@ export const getTournamentStandings = (battles: Battle[]) => {
     return true;
   };
 
-  // Find final battle (round 1000) and determine 1st and 2nd place
-  const finalBattleIndex = battles.findIndex((battle) => {
-    if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
-      return battle.round === 1002 || battle.round === 1000;
-    }
+  const finalBattle = battles[battles.length - 1];
 
-    return battle.round === 1000;
-  });
-
-  const finalBattle = battles[finalBattleIndex];
-
-  // Confirm it's a single tournament and not a leaderboard
-  // Note: leaderboards should not include rounds on battles
-  if (finalBattleIndex !== -1) {
+  if (!isLeaderboard) {
     if (finalBattle?.winnerId) {
       // 1st place: winner of final battle
       moveDriverToStandings(finalBattle.winnerId);
@@ -168,7 +160,7 @@ export const getTournamentStandings = (battles: Battle[]) => {
       }
     } else {
       // For standard format, use second-to-last battle for 3rd place
-      const semiFinalBattle = battles[finalBattleIndex - 1];
+      const semiFinalBattle = battles[battles.length - 2];
 
       if (semiFinalBattle?.winnerId) {
         moveDriverToStandings(semiFinalBattle.winnerId);
