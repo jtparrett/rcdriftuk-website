@@ -30,7 +30,7 @@ const canProtest = async (args: LoaderFunctionArgs) => {
     });
   }
 
-  const tournament = await getTournament(id, userId);
+  const tournament = await getTournament(id);
 
   if (!tournament || !tournament.nextBattle) {
     throw new Response(null, {

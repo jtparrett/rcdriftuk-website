@@ -61,7 +61,9 @@ export const autoAdvanceByeRuns = async (
     })),
   });
 
-  // Import the tournamentNextBattle function and call it to process the bye run
-  const { tournamentNextBattle } = await import("~/utils/tournamentNextBattle");
-  await tournamentNextBattle(tournamentId);
+  // Import the tournamentAdvanceBattles function and call it to process the bye run
+  const { tournamentAdvanceBattles } = await import(
+    "~/utils/tournamentAdvanceBattles"
+  );
+  await tournamentAdvanceBattles(tournamentId);
 };

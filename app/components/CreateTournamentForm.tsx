@@ -22,16 +22,42 @@ import { Reorder } from "motion/react";
 import { TOURNAMENT_TEMPLATES } from "~/utils/tournamentTemplates";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { tournamentFormSchema } from "~/routes/api.tournaments.$id.start";
 import { Label } from "./Label";
 import { FormControl } from "./FormControl";
 import pluralize from "pluralize";
+import { z } from "zod";
+import { tournamentHasQualifying } from "~/routes/tournaments.new";
 
-interface Props {
-  tournament: GetTournament;
-  users: GetUsers;
-  eventDrivers: number[];
-}
+export const tournamentFormSchema = z.object({
+  name: z.string().min(1, "Tournament name is required"),
+  judges: z
+    .array(
+      z.object({
+        driverId: z.string(),
+        points: z.coerce.number(),
+      }),
+    )
+    .min(1, "Please add at least one judge to the tournament"),
+  drivers: z
+    .array(
+      z.object({
+        driverId: z.string(),
+      }),
+    )
+    .min(4, "Please add at least four drivers to the tournament"),
+  qualifyingLaps: z.coerce
+    .number()
+    .min(1, "Qualifying laps must be at least 1")
+    .max(3, "Qualifying laps must be at most 3"),
+  format: z.nativeEnum(TournamentsFormat),
+  fullInclusion: z.boolean(),
+  enableProtests: z.boolean(),
+  region: z.nativeEnum(Regions),
+  scoreFormula: z.nativeEnum(ScoreFormula),
+  qualifyingOrder: z.nativeEnum(QualifyingOrder),
+  qualifyingProcedure: z.nativeEnum(QualifyingProcedure),
+  driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
+});
 
 interface PeopleFormProps {
   users: GetUsers;
@@ -277,11 +303,12 @@ const PeopleForm = ({
 
 const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
-export const TournamentStartForm = ({
-  tournament,
-  users,
-  eventDrivers,
-}: Props) => {
+interface Props {
+  users: GetUsers;
+  eventDrivers: number[];
+}
+
+export const CreateTournamentForm = ({ users, eventDrivers }: Props) => {
   const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get("template");
@@ -294,50 +321,29 @@ export const TournamentStartForm = ({
     validationSchema,
     enableReinitialize: true,
     initialValues: {
-      judges:
-        tournament?.judges.map((judge) => ({
-          driverId: judge.driverId.toString(),
-          points: judge.points,
-        })) ?? [],
+      name: "",
+      judges: [],
       drivers: Array.from(
         Array.from(
-          new Set([
-            ...eventDrivers.map((driver) => driver.toString()),
-            ...(tournament?.drivers.map((driver) =>
-              driver.driverId.toString(),
-            ) ?? []),
-          ]),
+          new Set(eventDrivers.map((driver) => driver.toString())),
         ).map((driver) => ({
           driverId: driver,
         })),
       ),
       fullInclusion: false,
       enableProtests: false,
-      qualifyingLaps: tournament?.qualifyingLaps ?? 1,
-      region: template?.region ?? tournament?.region ?? Regions.UK,
-      format:
-        template?.format ?? tournament?.format ?? TournamentsFormat.STANDARD,
-      scoreFormula:
-        template?.scoreFormula ??
-        tournament?.scoreFormula ??
-        ScoreFormula.CUMULATIVE,
-      qualifyingOrder:
-        template?.qualifyingOrder ??
-        tournament?.qualifyingOrder ??
-        QualifyingOrder.DRIVERS,
+      qualifyingLaps: 1,
+      region: template?.region ?? Regions.UK,
+      format: template?.format ?? TournamentsFormat.STANDARD,
+      scoreFormula: template?.scoreFormula ?? ScoreFormula.CUMULATIVE,
+      qualifyingOrder: template?.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       qualifyingProcedure:
-        template?.qualifyingProcedure ??
-        tournament?.qualifyingProcedure ??
-        QualifyingProcedure.BEST,
-      driverNumbers:
-        template?.driverNumbers ??
-        tournament?.driverNumbers ??
-        TournamentsDriverNumbers.NONE,
+        template?.qualifyingProcedure ?? QualifyingProcedure.BEST,
+      driverNumbers: template?.driverNumbers ?? TournamentsDriverNumbers.NONE,
     },
     onSubmit: (values) => {
       fetcher.submit(JSON.stringify(values), {
         method: "post",
-        action: `/api/tournaments/${tournament?.id}/start`,
         encType: "application/json",
       });
     },
@@ -348,7 +354,20 @@ export const TournamentStartForm = ({
   return (
     <form onSubmit={formik.handleSubmit}>
       <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
-        <Flex gap={4} pt={8}>
+        <Flex gap={4}>
+          <StepDot />
+          <FormControl flex={1} error={formik.errors.name}>
+            <Label>What is the name of this tournament?</Label>
+            <Input
+              name="name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              placeholder="e.g. 2026 Championship Round 1"
+            />
+          </FormControl>
+        </Flex>
+
+        <Flex gap={4}>
           <StepDot />
           <FormControl flex={1} error={formik.errors.format}>
             <Label>What format is this tournament?</Label>
@@ -369,9 +388,7 @@ export const TournamentStartForm = ({
           </FormControl>
         </Flex>
 
-        {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.WILDCARD) && (
+        {tournamentHasQualifying(format) && (
           <>
             <Flex gap={4}>
               <StepDot />
@@ -510,7 +527,6 @@ export const TournamentStartForm = ({
 
         {(format === TournamentsFormat.STANDARD ||
           format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.WILDCARD ||
           format === TournamentsFormat.BATTLE_TREE) && (
           <Flex gap={4}>
             <StepDot />

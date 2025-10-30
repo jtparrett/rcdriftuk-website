@@ -9,6 +9,14 @@ export const getBracketName = (
     return "Final";
   }
 
+  if (round === 1001) {
+    return "Semi Final";
+  }
+
+  if (round === 1002) {
+    return "Grand Final";
+  }
+
   if (totalBattles === 1 && bracket === BattlesBracket.UPPER) {
     return "Playoff";
   }

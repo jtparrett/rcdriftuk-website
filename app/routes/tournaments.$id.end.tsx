@@ -11,7 +11,7 @@ import { Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
-import { tournamentNextBattle } from "~/utils/tournamentNextBattle";
+import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -52,7 +52,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  await tournamentNextBattle(tournament.id);
+  await tournamentAdvanceBattles(tournament.id);
 
   return redirect(`/tournaments/${id}/overview`);
 };

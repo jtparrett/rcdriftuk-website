@@ -171,7 +171,7 @@ model LapScores {
 
 model TournamentBattles {
   id            Int      @id @default(autoincrement())
-  round         Int      @default(0)
+  round         Float    @default(0)
   createdAt     DateTime @default(now())
   tournamentId  String   @db.Uuid
   driverLeftId  Int?
@@ -192,6 +192,9 @@ model TournamentBattles {
 
   winnerInactivityPenalty Float @default(0)
   loserInactivityPenalty  Float @default(0)
+
+  winnerNextBattleId Int?
+  loserNextBattleId  Int?
 
   tournament     Tournaments             @relation(fields: [tournamentId], references: [id])
   driverLeft     TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
@@ -587,7 +590,6 @@ enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
   EXHIBITION
-  WILDCARD
   BATTLE_TREE
 }
 

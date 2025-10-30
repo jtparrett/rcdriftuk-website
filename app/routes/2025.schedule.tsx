@@ -24,7 +24,7 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-const MAIN_EVENT_ID = "760859d8-2693-4cca-a38c-3af6be4885d7";
+export const MAIN_EVENT_ID = "760859d8-2693-4cca-a38c-3af6be4885d7";
 
 export const loader = async () => {
   const events = await prisma.events.findMany({

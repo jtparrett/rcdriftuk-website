@@ -290,19 +290,11 @@ const QualifyingPage = () => {
     (driver) => !driver.isBye,
   );
 
-  // Wildcard tournaments have one less qualifying driver
-  // to leave space for the lower bracket winner (counts for two)
   const waveSize =
     tournament.qualifyingProcedure === QualifyingProcedure.WAVES
       ? getQualifyingWaveSize(tournament.qualifyingLaps, tournament.run)
       : 1;
-  const offset =
-    tournament.format === TournamentsFormat.WILDCARD &&
-    (tournament.run === tournament.qualifyingLaps || tournament.run === 0)
-      ? -1
-      : 0;
-  const qualifyingCutOff =
-    pow2Floor(tournament.totalDrivers) * waveSize + offset;
+  const qualifyingCutOff = pow2Floor(tournament.totalDrivers) * waveSize;
 
   const half = Math.ceil(driversWithoutBuys.length / 2);
 

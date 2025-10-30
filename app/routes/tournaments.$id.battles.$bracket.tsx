@@ -113,22 +113,23 @@ const Driver = ({
 
   return (
     <Flex alignItems="center" py={0.5} h={6} px="1px">
-      {driver?.qualifyingPosition !== undefined && (
-        <Center
-          w={5}
-          h={5}
-          flex="none"
-          bgGradient="to-b"
-          gradientFrom="brand.500"
-          gradientTo="brand.700"
-          rounded="md"
-          mb="1px"
-        >
-          <styled.span fontSize="xs" fontWeight="medium">
-            {driver.qualifyingPosition}
-          </styled.span>
-        </Center>
-      )}
+      {driver?.qualifyingPosition !== null &&
+        driver?.qualifyingPosition !== undefined && (
+          <Center
+            w={5}
+            h={5}
+            flex="none"
+            bgGradient="to-b"
+            gradientFrom="brand.500"
+            gradientTo="brand.700"
+            rounded="md"
+            mb="1px"
+          >
+            <styled.span fontSize="xs" fontWeight="medium">
+              {driver.qualifyingPosition}
+            </styled.span>
+          </Center>
+        )}
       <styled.p
         fontWeight="semibold"
         fontSize="xs"
@@ -183,21 +184,21 @@ const TournamentBattlesPage = () => {
   );
 
   const battlesInRound = Object.values(battlesByRound).reduce<Battle[][]>(
-    (agg, round) => {
+    (agg, battles) => {
       if (tournament.format === TournamentsFormat.EXHIBITION) {
-        return [round];
+        return [battles];
       }
 
-      const n = Math.log2(round.length);
+      const n = Math.log2(battles.length);
       const isOddRound = n - Math.floor(n) !== 0;
 
-      const battlesInFirstChunk = Math.floor(round.length / 1.5);
+      const battlesInFirstChunk = Math.floor(battles.length / 1.5);
       const firstChunk = isOddRound
-        ? round.slice(0, battlesInFirstChunk)
-        : round;
+        ? battles.slice(0, battlesInFirstChunk)
+        : battles;
 
       const secondChunk = isOddRound
-        ? round.slice(battlesInFirstChunk, round.length)
+        ? battles.slice(battlesInFirstChunk, battles.length)
         : [];
 
       return [...agg, firstChunk, secondChunk].filter(
@@ -210,8 +211,7 @@ const TournamentBattlesPage = () => {
   return (
     <>
       <HiddenEmbed>
-        {(tournament.format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          tournament.format === TournamentsFormat.WILDCARD) && (
+        {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
           <TabGroup mb={4}>
             {Object.values(BattlesBracket).map((sub) => {
               return (
@@ -235,6 +235,7 @@ const TournamentBattlesPage = () => {
         bg="gray.900"
         borderWidth={isEmbed ? 0 : 1}
         borderColor="gray.800"
+        className="bg"
       >
         <Flex
           overflow="auto"
@@ -243,6 +244,7 @@ const TournamentBattlesPage = () => {
           borderWidth={isEmbed ? 0 : 1}
           borderColor="gray.800"
           rounded="2xl"
+          className="main"
           bg="black"
           bgImage={isEmbed ? undefined : "url(/dot-bg.svg)"}
           bgRepeat="repeat"
@@ -282,7 +284,7 @@ const TournamentBattlesPage = () => {
                   flexDir="column"
                   style={{
                     height:
-                      Math.ceil(battlesByRound[1]?.length ?? 0) * 54 + "px",
+                      Math.ceil(battlesInRound[0]?.length ?? 0) * 54 + "px",
                   }}
                 >
                   <Spacer />
