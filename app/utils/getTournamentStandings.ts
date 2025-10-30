@@ -32,6 +32,8 @@ type DriverStats = {
   winCount: number;
   qualifyingPosition: number | null;
   image: string | null;
+  eliminationRound?: number;
+  eliminationBracket?: string;
 };
 
 export const getTournamentStandings = (
@@ -46,7 +48,7 @@ export const getTournamentStandings = (
   const driverMap = new Map<number, DriverStats>();
 
   // Helper function to process a driver
-  const processDriver = (driver: Driver, isWinner: boolean) => {
+  const processDriver = (driver: Driver, isWinner: boolean, battle: Battle) => {
     if (driver.isBye) return;
 
     const driverId = driver.user.driverId;
@@ -55,6 +57,15 @@ export const getTournamentStandings = (
     if (existing) {
       existing.battleCount++;
       if (isWinner) existing.winCount++;
+      // Track elimination round and bracket for double elimination (when driver loses)
+      if (
+        !isWinner &&
+        battle.round &&
+        tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
+      ) {
+        existing.eliminationRound = battle.round;
+        existing.eliminationBracket = battle.bracket;
+      }
     } else {
       driverMap.set(driverId, {
         id: driver.id,
@@ -65,6 +76,18 @@ export const getTournamentStandings = (
         winCount: isWinner ? 1 : 0,
         qualifyingPosition: driver.qualifyingPosition,
         image: driver.user.image,
+        eliminationRound:
+          !isWinner &&
+          battle.round &&
+          tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
+            ? battle.round
+            : undefined,
+        eliminationBracket:
+          !isWinner &&
+          battle.bracket &&
+          tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
+            ? battle.bracket
+            : undefined,
       });
     }
   };
@@ -75,12 +98,14 @@ export const getTournamentStandings = (
       processDriver(
         battle.driverLeft,
         battle.winnerId === battle.driverLeft.id,
+        battle,
       );
     }
     if (battle.driverRight) {
       processDriver(
         battle.driverRight,
         battle.winnerId === battle.driverRight.id,
+        battle,
       );
     }
   });
@@ -90,6 +115,30 @@ export const getTournamentStandings = (
   // Helper function for standard driver sorting
   const sortDrivers = (drivers: DriverStats[]) => {
     return drivers.sort((a, b) => {
+      // For double elimination (not leaderboard), prioritize elimination round (higher round = eliminated later = better placement)
+      if (
+        !isLeaderboard &&
+        tournament.format === TournamentsFormat.DOUBLE_ELIMINATION
+      ) {
+        const aElimRound = a.eliminationRound ?? 0;
+        const bElimRound = b.eliminationRound ?? 0;
+
+        // First compare by elimination round
+        if (aElimRound !== bElimRound) {
+          return bElimRound - aElimRound;
+        }
+
+        // If same round, prioritize upper bracket over lower bracket
+        if (aElimRound > 0 && bElimRound > 0) {
+          const aIsUpper = a.eliminationBracket === BattlesBracket.UPPER;
+          const bIsUpper = b.eliminationBracket === BattlesBracket.UPPER;
+
+          if (aIsUpper !== bIsUpper) {
+            return aIsUpper ? -1 : 1; // Upper bracket ranks higher
+          }
+        }
+      }
+
       // Then by win count (descending)
       if (b.winCount !== a.winCount) {
         return b.winCount - a.winCount;
