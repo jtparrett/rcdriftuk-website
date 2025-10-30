@@ -119,11 +119,12 @@ export const getTournamentStandings = (battles: Battle[]) => {
   // Find final battle (round 1000) and determine 1st and 2nd place
   const finalBattleIndex = battles.findIndex((battle) => {
     if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
-      return battle.round === 1002;
+      return battle.round === 1002 || battle.round === 1000;
     }
 
     return battle.round === 1000;
   });
+
   const finalBattle = battles[finalBattleIndex];
 
   // Confirm it's a single tournament and not a leaderboard
@@ -144,19 +145,15 @@ export const getTournamentStandings = (battles: Battle[]) => {
 
     // Handle 3rd and 4th place based on tournament format
     if (tournament.format === TournamentsFormat.DOUBLE_ELIMINATION) {
-      // Find final lower bracket battle for 3rd/4th place
       const lowerBracketBattles = battles.filter(
-        (battle) =>
-          battle.bracket === BattlesBracket.LOWER && battle.winnerId !== null,
+        (battle) => battle.bracket === BattlesBracket.LOWER,
       );
 
       if (lowerBracketBattles.length > 0) {
-        const finalLowerBattle = lowerBracketBattles.reduce(
-          (latest, current) =>
-            (current.round || 0) > (latest.round || 0) ? current : latest,
-        );
+        const finalLowerBattle =
+          lowerBracketBattles[lowerBracketBattles.length - 1];
 
-        if (finalLowerBattle.winnerId) {
+        if (finalLowerBattle?.winnerId) {
           // 3rd place: winner of final lower bracket battle
           moveDriverToStandings(finalLowerBattle.winnerId);
 
