@@ -1,12 +1,10 @@
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
-import { BattlesBracket, TournamentsState } from "~/utils/enums";
+import { TournamentsState } from "~/utils/enums";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { useReloader } from "~/utils/useReloader";
-import { getBracketName } from "~/utils/getBracketName";
-import { sentenceCase } from "change-case";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
@@ -44,24 +42,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  const totalBattlesForRound = await prisma.tournamentBattles.count({
-    where: {
-      tournamentId: tournament.id,
-      round: tournament.nextBattle?.round,
-    },
-  });
-
-  const bracket = getBracketName(
-    tournament.nextBattle?.round ?? 0,
-    tournament.nextBattle?.bracket ?? BattlesBracket.UPPER,
-    totalBattlesForRound,
-  );
-
-  return { tournament, bracket };
+  return { tournament };
 };
 
 const TournamentsSummaryPage = () => {
-  const { tournament, bracket } = useLoaderData<typeof loader>();
+  const { tournament } = useLoaderData<typeof loader>();
 
   useReloader();
 
@@ -129,10 +114,15 @@ const TournamentsSummaryPage = () => {
               transform="skewX(-16deg)"
             >
               {tournament.nextBattle?.driverLeft?.user?.firstName}{" "}
-              {tournament.nextBattle?.driverLeft?.user?.lastName} vs{" "}
-              {tournament.nextBattle?.driverRight?.user?.firstName}{" "}
-              {tournament.nextBattle?.driverRight?.user?.lastName} in{" "}
-              {tournament.nextBattle?.bracket?.toLowerCase()} {bracket}
+              {tournament.nextBattle?.driverLeft?.user?.lastName}{" "}
+              <styled.span fontSize="sm" fontFamily="mono" color="brand.500">
+                (#{tournament.nextBattle?.driverLeft?.user?.driverId})
+              </styled.span>{" "}
+              vs {tournament.nextBattle?.driverRight?.user?.firstName}{" "}
+              {tournament.nextBattle?.driverRight?.user?.lastName}
+              <styled.span fontSize="sm" fontFamily="mono" color="brand.500">
+                (#{tournament.nextBattle?.driverRight?.user?.driverId})
+              </styled.span>
             </styled.p>
           </Box>
         </Flex>

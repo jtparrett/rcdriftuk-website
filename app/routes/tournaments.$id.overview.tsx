@@ -350,7 +350,7 @@ const DriverNameBoxLeft = ({
               transform="skewX(-16deg)"
               fontSize={{ base: "sm", md: "lg" }}
             >
-              {driverNo}
+              #{driverNo}
             </styled.p>
           </Box>
           <styled.p
@@ -428,7 +428,7 @@ const DriverNameBoxRight = ({
               transform="skewX(-16deg)"
               fontSize={{ base: "sm", md: "lg" }}
             >
-              {driverNo}
+              #{driverNo}
             </styled.p>
           </Box>
         </Flex>

@@ -5,7 +5,7 @@ import {
 } from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useSearchParams } from "react-router";
 import { z } from "zod";
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
@@ -87,7 +87,7 @@ type Battle = Awaited<
 
 const Spacer = () => <Box my={-6} flex={1} />;
 
-const Driver = ({
+export const Driver = ({
   driver,
   winnerId,
   driverNo,
@@ -160,6 +160,9 @@ const Driver = ({
 const TournamentBattlesPage = () => {
   const { tournament, bracket } = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
+  const [searchParams] = useSearchParams();
+  const maxBattlesToShow =
+    z.coerce.number().nullable().parse(searchParams.get("max")) ?? undefined;
 
   const getDriverNumber = (
     driver: Battle["driverLeft"] | Battle["driverRight"],
@@ -201,9 +204,11 @@ const TournamentBattlesPage = () => {
         ? battles.slice(battlesInFirstChunk, battles.length)
         : [];
 
-      return [...agg, firstChunk, secondChunk].filter(
-        (item) => item.length > 0,
-      );
+      return [...agg, firstChunk, secondChunk]
+        .filter((item) => item.length > 0)
+        .filter((battles) =>
+          maxBattlesToShow ? battles.length < maxBattlesToShow : true,
+        );
     },
     [],
   );
@@ -264,7 +269,7 @@ const TournamentBattlesPage = () => {
 
           {battlesInRound.map((battles, i) => {
             return (
-              <Box key={i} w={240} flex="none">
+              <Box key={i} w={220} flex="none">
                 {tournament.format !== TournamentsFormat.EXHIBITION && (
                   <styled.p
                     fontSize="sm"
@@ -307,7 +312,7 @@ const TournamentBattlesPage = () => {
                             />
                           )}
                           <Box
-                            mx={4}
+                            mx={3}
                             h={12}
                             rounded="lg"
                             borderWidth={1}
