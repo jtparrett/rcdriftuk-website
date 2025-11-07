@@ -22,6 +22,9 @@ export const meta: Route.MetaFunction = () => {
 
 export const loader = async () => {
   const tracks = await prisma.tracks.findMany({
+    where: {
+      status: TrackStatus.ACTIVE,
+    },
     include: {
       events: {
         where: {
@@ -41,8 +44,6 @@ export const loader = async () => {
     .sort((a, b) => {
       if (a.slug === "rcdio") return 1;
       if (b.slug === "rcdio") return -1;
-      if (a.slug === "drift-essex") return 1;
-      if (b.slug === "drift-essex") return -1;
       return a.name.localeCompare(b.name);
     })
     .map((track) => {
