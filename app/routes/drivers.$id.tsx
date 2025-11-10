@@ -120,124 +120,62 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       },
-      TournamentDrivers: {
-        where: {
-          tournament: {
-            rated: true,
-          },
-        },
-        orderBy: [
-          {
-            tournament: {
-              createdAt: "asc",
-            },
-          },
-        ],
-        select: {
-          leftBattles: {
-            select: {
-              id: true,
-              createdAt: true,
-              winnerInactivityPenalty: true,
-              loserInactivityPenalty: true,
-              driverLeft: {
-                select: {
-                  id: true,
-                  driverId: true,
-                  user: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      image: true,
-                      driverId: true,
-                    },
-                  },
-                },
-              },
-              driverRight: {
-                select: {
-                  id: true,
-                  driverId: true,
-                  user: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      image: true,
-                      driverId: true,
-                    },
-                  },
-                },
-              },
-              winnerId: true,
-              winnerElo: true,
-              loserElo: true,
-              winnerStartingElo: true,
-              loserStartingElo: true,
-              tournament: {
-                select: {
-                  name: true,
-                  createdAt: true,
-                  id: true,
-                },
-              },
-            },
-          },
-          rightBattles: {
-            select: {
-              id: true,
-              createdAt: true,
-              winnerInactivityPenalty: true,
-              loserInactivityPenalty: true,
-              driverLeft: {
-                select: {
-                  id: true,
-                  driverId: true,
-                  user: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      image: true,
-                      driverId: true,
-                    },
-                  },
-                },
-              },
-              driverRight: {
-                select: {
-                  id: true,
-                  driverId: true,
-                  user: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      image: true,
-                      driverId: true,
-                    },
-                  },
-                },
-              },
-              winnerId: true,
-              winnerElo: true,
-              loserElo: true,
-              winnerStartingElo: true,
-              loserStartingElo: true,
-              tournament: {
-                select: {
-                  name: true,
-                  createdAt: true,
-                  id: true,
-                },
-              },
-            },
-          },
-        },
-      },
     },
   });
 
   notFoundInvariant(driver, "Driver not found");
 
+  const battles = await prisma.tournamentBattles.findMany({
+    where: {
+      OR: [
+        {
+          driverLeft: {
+            driverId,
+          },
+        },
+        {
+          driverRight: {
+            driverId,
+          },
+        },
+      ],
+      tournament: {
+        rated: true,
+      },
+    },
+    orderBy: [
+      {
+        tournament: {
+          createdAt: "asc",
+        },
+      },
+      { round: "asc" },
+      { bracket: "asc" },
+      { id: "asc" },
+    ],
+    include: {
+      tournament: {
+        select: {
+          id: true,
+          createdAt: true,
+          name: true,
+        },
+      },
+      driverLeft: {
+        include: {
+          user: true,
+        },
+      },
+      driverRight: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
   return {
+    battles,
     driver: {
       ...driver,
       elo: adjustDriverElo(driver.elo, driver.lastBattleDate),
@@ -278,14 +216,7 @@ const TABS = {
 };
 
 const Page = () => {
-  const { driver, user } = useLoaderData<typeof loader>();
-  const battles = driver.TournamentDrivers.flatMap((item) => {
-    return [...item.leftBattles, ...item.rightBattles];
-  }).sort(
-    (a, b) =>
-      new Date(a.tournament.createdAt).getTime() -
-        new Date(b.tournament.createdAt).getTime() || b.id - a.id,
-  );
+  const { driver, user, battles } = useLoaderData<typeof loader>();
 
   const rank = driver
     ? getDriverRank(driver.elo, driver.totalBattles)
@@ -455,7 +386,7 @@ const Page = () => {
         <Container maxW={800} px={2} py={6}>
           {tab === TABS.history && battles.length > 0 && (
             <VStack gap={4}>
-              {battles.reverse().map((battle) => {
+              {[...battles].reverse().map((battle) => {
                 const isLeftDriver =
                   battle.driverLeft?.driverId === driver.driverId;
                 const isWinner = isLeftDriver
