@@ -284,7 +284,7 @@ const Page = () => {
   }).sort(
     (a, b) =>
       new Date(a.tournament.createdAt).getTime() -
-        new Date(b.tournament.createdAt).getTime() || a.id - b.id,
+        new Date(b.tournament.createdAt).getTime() || b.id - a.id,
   );
 
   const rank = driver
@@ -455,7 +455,7 @@ const Page = () => {
         <Container maxW={800} px={2} py={6}>
           {tab === TABS.history && battles.length > 0 && (
             <VStack gap={4}>
-              {battles.reverse().map((battle, i) => {
+              {battles.reverse().map((battle) => {
                 const isLeftDriver =
                   battle.driverLeft?.driverId === driver.driverId;
                 const isWinner = isLeftDriver

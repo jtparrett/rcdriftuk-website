@@ -11,7 +11,18 @@ const computeRatingsForRegion = async (region: Regions) => {
 
   // Get all battles ordered by creation date
   const battles = await prisma.tournamentBattles.findMany({
-    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    orderBy: [
+      {
+        tournament: {
+          createdAt: "asc",
+        },
+      },
+      { round: "asc" },
+      { bracket: "asc" },
+      {
+        id: "asc",
+      },
+    ],
     where: {
       tournament: {
         rated: true,
