@@ -192,7 +192,9 @@ export const getTournamentStandings = (
 
       if (lowerBracketBattles.length > 0) {
         const finalLowerBattle =
-          lowerBracketBattles[lowerBracketBattles.length - 1];
+          lowerBracketBattles[lowerBracketBattles.length - 2];
+
+        console.log(finalLowerBattle);
 
         if (finalLowerBattle?.winnerId) {
           // 3rd place: winner of final lower bracket battle
