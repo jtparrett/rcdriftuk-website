@@ -1,4 +1,26 @@
+import {
+  RiArrowLeftDoubleLine,
+  RiArrowRightDoubleLine,
+  RiCalendar2Fill,
+  RiMapPin2Fill,
+} from "react-icons/ri";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+
+const Arrow = styled("div", {
+  base: {
+    w: 6,
+    h: 6,
+    borderWidth: 1,
+    borderColor: "transparent",
+    borderTopColor: "gray.800",
+    borderLeftColor: "gray.800",
+    pos: "absolute",
+    bottom: 0,
+    left: "50%",
+    transform: "translate(-50%, 50%) rotate(45deg)",
+    bgColor: "black",
+  },
+});
 
 const Page = () => {
   return (
@@ -59,16 +81,42 @@ const Page = () => {
         </Box>
       </Container>
 
-      <Container maxW={1100} px={4} py={8}>
+      <Container maxW={1100} px={4}>
+        <Flex
+          mb={4}
+          justifyContent="center"
+          alignItems="center"
+          gap={2}
+          rounded="full"
+          borderWidth={1}
+          borderColor="gray.800"
+          w="fit-content"
+          mx="auto"
+          px={3}
+          py={2}
+        >
+          <RiArrowLeftDoubleLine />
+          <styled.span
+            textTransform="uppercase"
+            letterSpacing="4px"
+            fontSize="xs"
+            fontWeight="bold"
+          >
+            Scroll & Tap for more info
+          </styled.span>
+          <RiArrowRightDoubleLine />
+        </Flex>
+
         <Flex gap={4}>
-          <Box flex={1}>
+          <Box flex={1} pos="relative" pb={6}>
             <styled.img
               w="full"
               src="/2026/2026-spring-major.webp"
               alt="2026 Spring Major"
             />
+            <Arrow />
           </Box>
-          <Box flex={1}>
+          <Box flex={1} pos="relative" pb={6}>
             <styled.img
               w="full"
               src="/2026/2026-autumn-major.webp"
@@ -77,6 +125,52 @@ const Page = () => {
           </Box>
         </Flex>
       </Container>
+
+      <Box borderTopWidth={1} borderColor="gray.800">
+        <Container maxW={1100} px={4} py={8}>
+          <Box maxW="680px" mx="auto">
+            <styled.h2
+              fontWeight="extrabold"
+              fontSize="3xl"
+              mb={4}
+              textTransform="uppercase"
+            >
+              2026 Spring Major
+            </styled.h2>
+
+            <styled.p
+              color="brand.500"
+              display="flex"
+              alignItems="center"
+              gap={2}
+            >
+              <RiCalendar2Fill />
+              Saturday, April 25th - Sunday, April 26th, 2026
+            </styled.p>
+
+            <styled.p
+              color="brand.500"
+              display="flex"
+              alignItems="center"
+              gap={2}
+            >
+              <RiMapPin2Fill /> Model World Live, Birmingham, B40 1NT
+            </styled.p>
+
+            <styled.p mt={6} mb={4}>
+              The Spring Major will take place at Model World Live at the NEC in
+              Birmingham on April 25-26.
+            </styled.p>
+
+            <styled.p>
+              The event begins with a bottom 32 single-elimination bracket,
+              leading into a top 16 double-elimination bracket. One standout
+              driver from the opening stage will advance as a wildcard to
+              complete the top bracket.
+            </styled.p>
+          </Box>
+        </Container>
+      </Box>
     </styled.main>
   );
 };
