@@ -291,10 +291,10 @@ const Page = () => {
 
               <Box maxW={400} mx="auto" mt={6}>
                 <LinkButton
-                  to={`/events/760859d8-2693-4cca-a38c-3af6be4885d7`}
+                  to={`/tournaments/319ea746-1c5f-4361-a9b5-a0aebacb2405/overview`}
                   w="full"
                 >
-                  Buy Ticket <RiTicketFill />
+                  View Results
                 </LinkButton>
               </Box>
             </Box>

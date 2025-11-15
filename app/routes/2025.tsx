@@ -24,13 +24,6 @@ const Page = () => {
           Schedule
         </Tab>
         <Tab
-          to="/2025/standings"
-          isActive={location.pathname.startsWith("/2025/standings")}
-          replace
-        >
-          Standings
-        </Tab>
-        <Tab
           to="/2025/rules"
           isActive={location.pathname.startsWith("/2025/rules")}
           replace
