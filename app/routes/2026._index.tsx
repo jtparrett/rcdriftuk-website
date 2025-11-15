@@ -4,6 +4,7 @@ import {
   RiCalendar2Fill,
   RiMapPin2Fill,
 } from "react-icons/ri";
+import { DashedLine } from "~/components/DashedLine";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
 const Arrow = styled("div", {
@@ -81,7 +82,7 @@ const Page = () => {
         </Box>
       </Container>
 
-      <Container maxW={1100} px={4}>
+      <Container maxW={1100} px={0}>
         <Flex
           mb={4}
           justifyContent="center"
@@ -107,37 +108,56 @@ const Page = () => {
           <RiArrowRightDoubleLine />
         </Flex>
 
-        <Flex gap={4}>
-          <Box flex={1} pos="relative" pb={6}>
-            <styled.img
-              w="full"
-              src="/2026/2026-spring-major.webp"
-              alt="2026 Spring Major"
-            />
-            <Arrow />
-          </Box>
-          <Box flex={1} pos="relative" pb={6}>
-            <styled.img
-              w="full"
-              src="/2026/2026-autumn-major.webp"
-              alt="2026 Autumn Makjor"
-            />
-          </Box>
-        </Flex>
+        <Box
+          overflow="auto"
+          px={4}
+          scrollbar="hidden"
+          pos="relative"
+          mb="-1px"
+          zIndex={2}
+        >
+          <Flex gap={4}>
+            <Box flex={1} pos="relative" pb={6} minW="320px" overflow="hidden">
+              <styled.img
+                w="full"
+                src="/2026/2026-spring-major.webp"
+                alt="2026 Spring Major"
+              />
+              <Arrow />
+            </Box>
+            <Box flex={1} pos="relative" pb={6} minW="320px" overflow="hidden">
+              <styled.img
+                w="full"
+                src="/2026/2026-autumn-major.webp"
+                alt="2026 Autumn Makjor"
+              />
+            </Box>
+          </Flex>
+        </Box>
       </Container>
 
-      <Box borderTopWidth={1} borderColor="gray.800">
-        <Container maxW={1100} px={4} py={8}>
-          <Box maxW="680px" mx="auto">
+      <Box borderTopWidth={1} borderColor="gray.800" px={2}>
+        <Container
+          maxW={1100}
+          px={0}
+          borderLeftWidth={1}
+          borderRightWidth={1}
+          borderColor="gray.800"
+        >
+          <Box>
             <styled.h2
               fontWeight="extrabold"
-              fontSize="3xl"
-              mb={4}
+              fontSize="lg"
+              py={3}
+              px={4}
               textTransform="uppercase"
             >
               2026 Spring Major
             </styled.h2>
+            <DashedLine />
+          </Box>
 
+          <Box p={4}>
             <styled.p
               color="brand.500"
               display="flex"
