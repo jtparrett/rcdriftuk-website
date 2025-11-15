@@ -1,4 +1,4 @@
-import { Box, Container, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
 const Page = () => {
   return (
@@ -59,7 +59,24 @@ const Page = () => {
         </Box>
       </Container>
 
-      <Box bgColor="black"></Box>
+      <Container maxW={1100} px={4} py={8}>
+        <Flex gap={4}>
+          <Box flex={1}>
+            <styled.img
+              w="full"
+              src="/2026/2026-spring-major.webp"
+              alt="2026 Spring Major"
+            />
+          </Box>
+          <Box flex={1}>
+            <styled.img
+              w="full"
+              src="/2026/2026-autumn-major.webp"
+              alt="2026 Autumn Makjor"
+            />
+          </Box>
+        </Flex>
+      </Container>
     </styled.main>
   );
 };
