@@ -5,6 +5,7 @@ import {
   RiMapPin2Fill,
 } from "react-icons/ri";
 import { DashedLine } from "~/components/DashedLine";
+import { ImageContainer } from "~/components/ImageContainer";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
 const Arrow = styled("div", {
@@ -188,6 +189,30 @@ const Page = () => {
               driver from the opening stage will advance as a wildcard to
               complete the top bracket.
             </styled.p>
+
+            <ImageContainer>
+              <styled.img
+                src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
+                alt="Model world live"
+                w="full"
+              />
+            </ImageContainer>
+
+            <ImageContainer>
+              <styled.img
+                src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
+                alt="Model world live"
+                w="full"
+              />
+            </ImageContainer>
+
+            <ImageContainer>
+              <styled.img
+                src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
+                alt="Model world live"
+                w="full"
+              />
+            </ImageContainer>
           </Box>
         </Container>
       </Box>

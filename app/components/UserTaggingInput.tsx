@@ -106,7 +106,7 @@ export const UserTaggingInput = ({
       if (textareaRef.current) {
         setCursorPosition(textareaRef.current.selectionStart || 0);
       }
-    }, 0);
+    }, 300);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -146,7 +146,7 @@ export const UserTaggingInput = ({
         textareaRef.current.focus();
         setCursorPosition(newPosition);
       }
-    }, 0);
+    }, 300);
   };
 
   // Show dropdown when we have a current mention with a query

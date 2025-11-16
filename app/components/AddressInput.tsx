@@ -43,7 +43,7 @@ export const AddressInput = ({ address, lat, lng, onChange }: Props) => {
             if (!listbox?.contains(active)) {
               setFocused(false);
             }
-          }, 0);
+          }, 300);
         }}
         onChange={(e) => {
           onChange?.(e.target.value, lat, lng);

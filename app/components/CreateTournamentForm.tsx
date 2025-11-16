@@ -237,7 +237,7 @@ const PeopleForm = ({
               if (!listbox?.contains(active)) {
                 setFocused(false);
               }
-            }, 0);
+            }, 300);
           }}
           onFocus={() => setFocused(true)}
           onChange={(e) => setSearch(e.target.value)}
