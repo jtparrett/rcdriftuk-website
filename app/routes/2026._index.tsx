@@ -1,3 +1,4 @@
+import { useState, type CSSProperties } from "react";
 import {
   RiArrowLeftDoubleLine,
   RiArrowRightDoubleLine,
@@ -12,19 +13,18 @@ const Arrow = styled("div", {
   base: {
     w: 6,
     h: 6,
-    borderWidth: 1,
-    borderColor: "transparent",
-    borderTopColor: "gray.800",
-    borderLeftColor: "gray.800",
     pos: "absolute",
-    bottom: 0,
+    top: 0,
     left: "50%",
-    transform: "translate(-50%, 50%) rotate(45deg)",
-    bgColor: "black",
+    transform: "translate(-50%, -50%) rotate(45deg)",
+    bgColor: "gray.900",
+    borderTopLeftRadius: "lg",
   },
 });
 
 const Page = () => {
+  const [index, setIndex] = useState(0);
+
   return (
     <styled.main>
       <Box
@@ -104,118 +104,164 @@ const Page = () => {
             fontSize="xs"
             fontWeight="bold"
           >
-            Scroll & Tap for more info
+            Swipe for more info
           </styled.span>
           <RiArrowRightDoubleLine />
         </Flex>
-
-        <Box
-          overflow="auto"
-          px={4}
-          scrollbar="hidden"
-          pos="relative"
-          mb="-1px"
-          zIndex={2}
-        >
-          <Flex gap={4}>
-            <Box flex={1} pos="relative" pb={6} minW="320px" overflow="hidden">
-              <styled.img
-                w="full"
-                src="/2026/2026-spring-major.webp"
-                alt="2026 Spring Major"
-              />
-              <Arrow />
-            </Box>
-            <Box flex={1} pos="relative" pb={6} minW="320px" overflow="hidden">
-              <styled.img
-                w="full"
-                src="/2026/2026-autumn-major.webp"
-                alt="2026 Autumn Makjor"
-              />
-            </Box>
-          </Flex>
-        </Box>
       </Container>
 
-      <Box borderTopWidth={1} borderColor="gray.800" px={2}>
-        <Container
-          maxW={1100}
-          px={0}
-          borderLeftWidth={1}
-          borderRightWidth={1}
-          borderColor="gray.800"
+      <Box w="full" overflow="hidden">
+        <Flex
+          w="720px"
+          maxW="calc(100% - 100px)"
+          mx="auto"
+          transform="translateX(var(--index))"
+          transition="transform 0.2s ease-in-out"
+          style={
+            {
+              "--index": `-${index * 100}%`,
+            } as CSSProperties
+          }
         >
-          <Box>
-            <styled.h2
-              fontWeight="extrabold"
-              fontSize="lg"
-              py={3}
-              px={4}
-              textTransform="uppercase"
-            >
-              2026 Spring Major
-            </styled.h2>
-            <DashedLine />
+          <Box flex="none" w="full" onClick={() => setIndex(0)}>
+            <styled.img
+              w="full"
+              src="/2026/2026-spring-major.webp"
+              alt="2026 Spring Major"
+            />
           </Box>
-
-          <Box p={4}>
-            <styled.p
-              color="brand.500"
-              display="flex"
-              alignItems="center"
-              gap={2}
-            >
-              <RiCalendar2Fill />
-              Saturday, April 25th - Sunday, April 26th, 2026
-            </styled.p>
-
-            <styled.p
-              color="brand.500"
-              display="flex"
-              alignItems="center"
-              gap={2}
-            >
-              <RiMapPin2Fill /> Model World Live, Birmingham, B40 1NT
-            </styled.p>
-
-            <styled.p mt={6} mb={4}>
-              The Spring Major will take place at Model World Live at the NEC in
-              Birmingham on April 25-26.
-            </styled.p>
-
-            <styled.p>
-              The event begins with a bottom 32 single-elimination bracket,
-              leading into a top 16 double-elimination bracket. One standout
-              driver from the opening stage will advance as a wildcard to
-              complete the top bracket.
-            </styled.p>
-
-            <ImageContainer>
-              <styled.img
-                src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
-                alt="Model world live"
-                w="full"
-              />
-            </ImageContainer>
-
-            <ImageContainer>
-              <styled.img
-                src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
-                alt="Model world live"
-                w="full"
-              />
-            </ImageContainer>
-
-            <ImageContainer>
-              <styled.img
-                src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
-                alt="Model world live"
-                w="full"
-              />
-            </ImageContainer>
+          <Box flex="none" w="full" onClick={() => setIndex(1)}>
+            <styled.img
+              w="full"
+              src="/2026/2026-autumn-major.webp"
+              alt="2026 Autumn Makjor"
+            />
           </Box>
-        </Container>
+        </Flex>
       </Box>
+
+      <Container
+        maxW={720}
+        px={0}
+        bgColor="gray.900"
+        pos="relative"
+        mt={8}
+        rounded="2xl"
+      >
+        <Arrow />
+        <Box>
+          <styled.h2
+            fontWeight="extrabold"
+            fontSize="lg"
+            py={3}
+            px={4}
+            textTransform="uppercase"
+          >
+            2026 Spring Major
+          </styled.h2>
+          <DashedLine />
+        </Box>
+
+        <Box p={4}>
+          <styled.p
+            color="brand.500"
+            display="flex"
+            alignItems="center"
+            gap={2}
+          >
+            <RiCalendar2Fill />
+            Saturday, April 25th - Sunday, April 26th, 2026
+          </styled.p>
+
+          <styled.p
+            color="brand.500"
+            display="flex"
+            alignItems="center"
+            gap={2}
+          >
+            <RiMapPin2Fill /> Model World Live, Birmingham, B40 1NT
+          </styled.p>
+
+          <styled.p mt={6} mb={4}>
+            The Spring Major will take place at Model World Live at the NEC in
+            Birmingham on April 25-26.
+          </styled.p>
+
+          <styled.p mb={4}>
+            The event begins with a bottom 32 single-elimination bracket,
+            leading into a top 16 double-elimination bracket. One standout
+            driver from the opening stage will advance as a wildcard to complete
+            the top bracket.
+          </styled.p>
+
+          <styled.img
+            src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg"
+            alt="Format Diagram"
+          />
+
+          <styled.p>
+            Model World LIVE 2026 will featured over 190 stands bringing
+            together the very best in modelling including brand-new features for
+            the third year of this premiere modelling exhibition. Highlights
+            included:
+          </styled.p>
+
+          <styled.ul>
+            <styled.li>
+              Top quality hand-picked working model railways from across the UK
+            </styled.li>
+            <styled.li>
+              Featured layout from the pages of Hornby Magazine on show
+            </styled.li>
+            <styled.li>
+              The latest layout builds from Key Model World on show
+            </styled.li>
+            <styled.li>
+              Airfix Model World contributors displaying their latest model
+              builds
+            </styled.li>
+            <styled.li>
+              Stunning scale modelling displays from the best model makers
+            </styled.li>
+            <styled.li>
+              Fully working radio control vehicles in dedicated arenas
+            </styled.li>
+            <styled.li>
+              Manufacturer stands from across the modelling hobby
+            </styled.li>
+            <styled.li>
+              Quality trade stands offering products for all areas of modelling
+            </styled.li>
+            <styled.li>
+              Interactive stands, expert modelling demonstrations and much more!
+            </styled.li>
+          </styled.ul>
+
+          <ImageContainer>
+            <styled.img
+              src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
+              alt="Model world live"
+              w="full"
+            />
+          </ImageContainer>
+
+          <ImageContainer>
+            <styled.img
+              src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
+              alt="Model world live"
+              w="full"
+            />
+          </ImageContainer>
+
+          <ImageContainer>
+            <styled.img
+              src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
+              alt="Model world live"
+              w="full"
+            />
+          </ImageContainer>
+        </Box>
+      </Container>
     </styled.main>
   );
 };
