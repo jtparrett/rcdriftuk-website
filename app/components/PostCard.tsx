@@ -152,9 +152,7 @@ export const PostCard = ({
                 flex="none"
                 maxH="800px"
                 pointerEvents="none"
-                style={{
-                  width: `${100 / post.images.length}%`,
-                }}
+                w="full"
               >
                 <styled.img
                   src={image}

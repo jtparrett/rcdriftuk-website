@@ -6,7 +6,7 @@ import {
   RiMapPin2Fill,
 } from "react-icons/ri";
 import { DashedLine } from "~/components/DashedLine";
-import { ImageContainer } from "~/components/ImageContainer";
+import { useSwipeable } from "react-swipeable";
 import { Markdown } from "~/components/Markdown";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
@@ -29,6 +29,16 @@ const Arrow = styled("div", {
 
 const Page = () => {
   const [index, setIndex] = useState(0);
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setIndex(Math.min(1, index + 1)),
+    onSwipedRight: () => setIndex(Math.max(0, index - 1)),
+    trackMouse: true,
+    preventScrollOnSwipe: true,
+    onTap: () => {
+      setIndex(index === 0 ? 1 : 0);
+    },
+  });
 
   return (
     <styled.main>
@@ -116,7 +126,12 @@ const Page = () => {
         </Flex>
       </Container>
 
-      <Box w="full" overflow="hidden">
+      <Box
+        w="full"
+        overflow="hidden"
+        {...handlers}
+        style={{ touchAction: "pan-y", cursor: "grab" }}
+      >
         <Box ml={-4}>
           <Flex
             w="calc(720px + var(--spacing-4))"
@@ -130,18 +145,20 @@ const Page = () => {
               } as CSSProperties
             }
           >
-            <Box flex="none" w="full" onClick={() => setIndex(0)} pl={4}>
+            <Box flex="none" w="full" pl={4}>
               <styled.img
                 w="full"
                 src="/2026/2026-spring-major.webp"
                 alt="2026 Spring Major"
+                style={{ pointerEvents: "none" }}
               />
             </Box>
-            <Box flex="none" w="full" onClick={() => setIndex(1)} pl={4}>
+            <Box flex="none" w="full" pl={4}>
               <styled.img
                 w="full"
                 src="/2026/2026-autumn-major.webp"
                 alt="2026 Autumn Makjor"
+                style={{ pointerEvents: "none" }}
               />
             </Box>
           </Flex>

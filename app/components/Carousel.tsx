@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import React, { useState } from "react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
+import { useSwipeable } from "react-swipeable";
 import { Box, Flex, styled } from "~/styled-system/jsx";
-import { motion } from "motion/react";
-import { css } from "~/styled-system/css";
 
 interface Props {
   children: ReactNode[];
@@ -36,41 +35,34 @@ export const Carousel = ({ children }: Props) => {
     );
   };
 
-  const handleDragEnd = (event: any, info: any) => {
-    const swipeThreshold = 50;
-    const swipeVelocityThreshold = 500;
-
-    if (
-      Math.abs(info.offset.x) > swipeThreshold ||
-      Math.abs(info.velocity.x) > swipeVelocityThreshold
-    ) {
-      if (info.offset.x > 0) {
-        // Swiped right, go to previous
-        previous();
-      } else {
-        // Swiped left, go to next
-        next();
-      }
-    }
-  };
+  const handlers = useSwipeable({
+    onSwipedLeft: () => next(),
+    onSwipedRight: () => previous(),
+    trackMouse: true,
+    preventScrollOnSwipe: true,
+  });
 
   return (
     <Box pos="relative" w="full">
-      <Box w="full" overflow="hidden">
-        <motion.div
-          className={css({
-            display: "flex",
-          })}
-          onDragEnd={handleDragEnd}
-          drag={arrayChildren.length > 1 ? "x" : false}
-          dragElastic={0}
-          animate={{ x: (-100 / arrayChildren.length) * currentIndex + "%" }}
-          style={{
-            width: `${arrayChildren.length * 100}%`,
-          }}
+      <Box
+        w="full"
+        overflow="hidden"
+        {...handlers}
+        style={{ touchAction: "pan-y", cursor: "grab" }}
+      >
+        <Flex
+          transform="var(--transform)"
+          w="full"
+          overflow="visible"
+          transition="transform 0.2s ease-in-out"
+          style={
+            {
+              "--transform": `translateX(-${currentIndex * 100}%)`,
+            } as CSSProperties
+          }
         >
           {children}
-        </motion.div>
+        </Flex>
       </Box>
       {arrayChildren.length > 1 && (
         <Flex
@@ -88,7 +80,7 @@ export const Carousel = ({ children }: Props) => {
           <ArrowButton type="button" onClick={previous}>
             <RiArrowLeftSLine />
           </ArrowButton>
-          <styled.p fontSize="sm" color="gray.500">
+          <styled.p fontSize="sm" color="gray.500" fontFamily="mono">
             {currentIndex + 1}/{arrayChildren.length}
           </styled.p>
           <ArrowButton type="button" onClick={next}>
