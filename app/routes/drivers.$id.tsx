@@ -240,6 +240,7 @@ const Page = () => {
     <Box
       pos="relative"
       zIndex={1}
+      overflow="hidden"
       _after={{
         content: '""',
         pos: "absolute",

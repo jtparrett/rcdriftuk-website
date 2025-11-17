@@ -7,6 +7,7 @@ import {
 } from "react-icons/ri";
 import { DashedLine } from "~/components/DashedLine";
 import { ImageContainer } from "~/components/ImageContainer";
+import { Markdown } from "~/components/Markdown";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 
 const Arrow = styled("div", {
@@ -18,7 +19,11 @@ const Arrow = styled("div", {
     left: "50%",
     transform: "translate(-50%, -50%) rotate(45deg)",
     bgColor: "gray.900",
-    borderTopLeftRadius: "lg",
+    borderTopLeftRadius: "md",
+    borderWidth: 1,
+    borderColor: "transparent",
+    borderTopColor: "gray.800",
+    borderLeftColor: "gray.800",
   },
 });
 
@@ -40,6 +45,7 @@ const Page = () => {
           inset: 0,
           bgGradient: "to-b",
           gradientFrom: "transparent",
+          gradientVia: "transparent",
           gradientTo: "black",
           zIndex: -1,
         }}
@@ -111,157 +117,109 @@ const Page = () => {
       </Container>
 
       <Box w="full" overflow="hidden">
-        <Flex
-          w="720px"
-          maxW="calc(100% - 100px)"
-          mx="auto"
-          transform="translateX(var(--index))"
-          transition="transform 0.2s ease-in-out"
-          style={
-            {
-              "--index": `-${index * 100}%`,
-            } as CSSProperties
-          }
-        >
-          <Box flex="none" w="full" onClick={() => setIndex(0)}>
-            <styled.img
-              w="full"
-              src="/2026/2026-spring-major.webp"
-              alt="2026 Spring Major"
-            />
-          </Box>
-          <Box flex="none" w="full" onClick={() => setIndex(1)}>
-            <styled.img
-              w="full"
-              src="/2026/2026-autumn-major.webp"
-              alt="2026 Autumn Makjor"
-            />
-          </Box>
-        </Flex>
+        <Box ml={-4}>
+          <Flex
+            w="calc(720px + var(--spacing-4))"
+            maxW="calc(100% - 160px)"
+            mx="auto"
+            transform="translateX(var(--index))"
+            transition="transform 0.2s ease-in-out"
+            style={
+              {
+                "--index": `-${index * 100}%`,
+              } as CSSProperties
+            }
+          >
+            <Box flex="none" w="full" onClick={() => setIndex(0)} pl={4}>
+              <styled.img
+                w="full"
+                src="/2026/2026-spring-major.webp"
+                alt="2026 Spring Major"
+              />
+            </Box>
+            <Box flex="none" w="full" onClick={() => setIndex(1)} pl={4}>
+              <styled.img
+                w="full"
+                src="/2026/2026-autumn-major.webp"
+                alt="2026 Autumn Makjor"
+              />
+            </Box>
+          </Flex>
+        </Box>
       </Box>
 
-      <Container
-        maxW={720}
-        px={0}
-        bgColor="gray.900"
-        pos="relative"
-        mt={8}
-        rounded="2xl"
-      >
-        <Arrow />
-        <Box>
-          <styled.h2
-            fontWeight="extrabold"
-            fontSize="lg"
-            py={3}
-            px={4}
-            textTransform="uppercase"
-          >
-            2026 Spring Major
-          </styled.h2>
-          <DashedLine />
-        </Box>
+      <Box p={4}>
+        <Container
+          maxW={720}
+          px={0}
+          bgColor="gray.900"
+          pos="relative"
+          rounded="2xl"
+          borderWidth={1}
+          borderColor="gray.800"
+        >
+          <Arrow />
+          <Box>
+            <styled.h2
+              fontWeight="extrabold"
+              fontSize="lg"
+              py={4}
+              px={6}
+              textTransform="uppercase"
+            >
+              2026 Spring Major
+            </styled.h2>
+            <DashedLine />
+          </Box>
 
-        <Box p={4}>
-          <styled.p
-            color="brand.500"
-            display="flex"
-            alignItems="center"
-            gap={2}
-          >
-            <RiCalendar2Fill />
-            Saturday, April 25th - Sunday, April 26th, 2026
-          </styled.p>
+          <Box p={6}>
+            <styled.p
+              color="brand.500"
+              display="flex"
+              alignItems="center"
+              gap={2}
+            >
+              <RiCalendar2Fill />
+              Saturday, April 25th - Sunday, April 26th, 2026
+            </styled.p>
 
-          <styled.p
-            color="brand.500"
-            display="flex"
-            alignItems="center"
-            gap={2}
-          >
-            <RiMapPin2Fill /> Model World Live, Birmingham, B40 1NT
-          </styled.p>
+            <styled.p
+              color="brand.500"
+              display="flex"
+              alignItems="center"
+              gap={2}
+              mb={4}
+            >
+              <RiMapPin2Fill /> Model World Live, Birmingham, B40 1NT
+            </styled.p>
 
-          <styled.p mt={6} mb={4}>
-            The Spring Major will take place at Model World Live at the NEC in
-            Birmingham on April 25-26.
-          </styled.p>
+            <Markdown>{`
+The Spring Major will take place at Model World Live at the NEC in Birmingham on April 25-26.
 
-          <styled.p mb={4}>
-            The event begins with a bottom 32 single-elimination bracket,
-            leading into a top 16 double-elimination bracket. One standout
-            driver from the opening stage will advance as a wildcard to complete
-            the top bracket.
-          </styled.p>
+The event begins with a bottom 32 single-elimination bracket, leading into a top 16 double-elimination bracket. One standout driver from the opening bracket will advance as a wildcard to complete the top bracket.
 
-          <styled.img
-            src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg"
-            alt="Format Diagram"
-          />
+![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg)
 
-          <styled.p>
-            Model World LIVE 2026 will featured over 190 stands bringing
-            together the very best in modelling including brand-new features for
-            the third year of this premiere modelling exhibition. Highlights
-            included:
-          </styled.p>
+Model World LIVE 2026 will featured over 190 stands bringing together the very best in modelling including brand-new features for the third year of this premiere modelling exhibition, including:
+- Top quality hand-picked working model railways from across the UK
+- Featured layout from the pages of Hornby Magazine on show
+- The latest layout builds from Key Model World on show
+- Airfix Model World contributors displaying their latest model builds
+- Stunning scale modelling displays from the best model makers
+- Fully working radio control vehicles in dedicated arenas
+- Manufacturer stands from across the modelling hobby
+- Quality trade stands offering products for all areas of modelling
+- Interactive stands, expert modelling demonstrations and much more!
 
-          <styled.ul>
-            <styled.li>
-              Top quality hand-picked working model railways from across the UK
-            </styled.li>
-            <styled.li>
-              Featured layout from the pages of Hornby Magazine on show
-            </styled.li>
-            <styled.li>
-              The latest layout builds from Key Model World on show
-            </styled.li>
-            <styled.li>
-              Airfix Model World contributors displaying their latest model
-              builds
-            </styled.li>
-            <styled.li>
-              Stunning scale modelling displays from the best model makers
-            </styled.li>
-            <styled.li>
-              Fully working radio control vehicles in dedicated arenas
-            </styled.li>
-            <styled.li>
-              Manufacturer stands from across the modelling hobby
-            </styled.li>
-            <styled.li>
-              Quality trade stands offering products for all areas of modelling
-            </styled.li>
-            <styled.li>
-              Interactive stands, expert modelling demonstrations and much more!
-            </styled.li>
-          </styled.ul>
+![model world live](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp)
 
-          <ImageContainer>
-            <styled.img
-              src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
-              alt="Model world live"
-              w="full"
-            />
-          </ImageContainer>
+![model world live](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp)
 
-          <ImageContainer>
-            <styled.img
-              src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
-              alt="Model world live"
-              w="full"
-            />
-          </ImageContainer>
-
-          <ImageContainer>
-            <styled.img
-              src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
-              alt="Model world live"
-              w="full"
-            />
-          </ImageContainer>
-        </Box>
-      </Container>
+![model world live](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp)
+`}</Markdown>
+          </Box>
+        </Container>
+      </Box>
     </styled.main>
   );
 };
