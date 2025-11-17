@@ -4,11 +4,14 @@ import {
   RiArrowRightDoubleLine,
   RiCalendar2Fill,
   RiMapPin2Fill,
+  RiTicketFill,
 } from "react-icons/ri";
 import { DashedLine } from "~/components/DashedLine";
 import { useSwipeable } from "react-swipeable";
 import { Markdown } from "~/components/Markdown";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
+import { Button } from "~/components/Button";
+import { Carousel } from "~/components/Carousel";
 
 const Arrow = styled("div", {
   base: {
@@ -184,7 +187,7 @@ const Page = () => {
               px={6}
               textTransform="uppercase"
             >
-              2026 Spring Major
+              <styled.span color="gray.500">[01]</styled.span> Spring Major
             </styled.h2>
             <DashedLine />
           </Box>
@@ -211,12 +214,42 @@ const Page = () => {
             </styled.p>
 
             <Markdown>{`
-The Spring Major will take place at Model World Live at the NEC in Birmingham on April 25-26.
+The Spring Major is two day competition taking place at Model World Live at the NEC in Birmingham.
 
-The event begins with a bottom 32 single-elimination bracket, leading into a top 16 double-elimination bracket. One standout driver from the opening bracket will advance as a wildcard to complete the top bracket.
+This global showdown will bring together top drivers from across Europe and beyond for two days of high-skill RC Drifting.
+
+The event will house one large competition track alongside generous pitting space.
+
+## Competition Format
+The event opens with a bottom-32 single-elimination bracket, which feeds into a top-16 double-elimination stage.
+The standout driver from the initial bracket advances as a wildcard to complete the top-16 field.
+The winners of the top-16 upper and lower brackets then meet in a Grand Final to decide the overall champion.
 
 ![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg)
 
+## Day 1 Agenda
+- Cycled Practice
+- Best Bodyshell Comeptition
+- Public Engagement and Demonstration
+- Bottom 32 Single-elimination bracket
+- Online real-time results
+
+## Day 2 Agenda
+- Cycled Practice
+- Top 16 double-elimination bracket
+- Live stream production
+- Awards Ceremony
+- Open Driving
+
+## Prize Pool
+TBA
+
+## Ticket Information
+Tickets will be released in order of driver ranks, with a percentage of tickets reserved for unranked drivers.
+
+Spectator tickets are available for purchase via the Model World Live website.
+
+## About Model World LIVE
 Model World LIVE 2026 will featured over 190 stands bringing together the very best in modelling including brand-new features for the third year of this premiere modelling exhibition, including:
 - Top quality hand-picked working model railways from across the UK
 - Featured layout from the pages of Hornby Magazine on show
@@ -227,13 +260,31 @@ Model World LIVE 2026 will featured over 190 stands bringing together the very b
 - Manufacturer stands from across the modelling hobby
 - Quality trade stands offering products for all areas of modelling
 - Interactive stands, expert modelling demonstrations and much more!
-
-![model world live](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp)
-
-![model world live](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp)
-
-![model world live](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp)
 `}</Markdown>
+
+            <Box mt={4}>
+              <Carousel>
+                <styled.img
+                  src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
+                  pointerEvents="none"
+                  alt="Model World Live"
+                />
+                <styled.img
+                  src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
+                  pointerEvents="none"
+                  alt="Model World Live"
+                />
+                <styled.img
+                  src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
+                  pointerEvents="none"
+                  alt="Model World Live"
+                />
+              </Carousel>
+            </Box>
+
+            <Button w="full" mt={4}>
+              Buy Ticket <RiTicketFill />
+            </Button>
           </Box>
         </Container>
       </Box>

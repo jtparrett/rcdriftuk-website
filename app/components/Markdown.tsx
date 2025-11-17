@@ -43,6 +43,9 @@ export const Markdown = ({ children }: Props) => {
           "img",
         ]}
         components={{
+          img({ src, alt }) {
+            return <styled.img src={src} alt={alt} rounded="lg" />;
+          },
           p({ children }) {
             return (
               <styled.p color="gray.300" whiteSpace="pre-line">
@@ -76,28 +79,34 @@ export const Markdown = ({ children }: Props) => {
           },
           h1({ children }) {
             return (
-              <styled.h1 fontSize="2xl" fontWeight="bold" mt={8}>
+              <styled.h1 fontSize="2xl" fontWeight="bold" mt={4}>
                 {children}
               </styled.h1>
             );
           },
           h2({ children }) {
             return (
-              <styled.h2 fontSize="xl" fontWeight="bold" mt={8}>
+              <styled.h2 fontSize="xl" fontWeight="bold" mt={4}>
                 {children}
               </styled.h2>
             );
           },
           h3({ children }) {
             return (
-              <styled.h3 fontSize="lg" fontWeight="bold" mt={8}>
+              <styled.h3 fontSize="lg" fontWeight="bold" mt={4}>
                 {children}
               </styled.h3>
             );
           },
           ul({ children }) {
             return (
-              <styled.ul color="gray.300" whiteSpace="pre-line" lineHeight={1}>
+              <styled.ul
+                color="gray.300"
+                whiteSpace="pre-line"
+                lineHeight={1}
+                display="flex"
+                flexDirection="column"
+              >
                 {children}
               </styled.ul>
             );
