@@ -247,6 +247,8 @@ TBA
 ## Ticket Information
 Tickets will be released in order of driver ranks, with a percentage of tickets reserved for unranked drivers.
 
+One set of competition tyres will be provided to each driver.
+
 Spectator tickets are available for purchase via the Model World Live website.
 
 ## About Model World LIVE
