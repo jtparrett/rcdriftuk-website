@@ -102,9 +102,9 @@ const Page = () => {
         </Box>
       </Container>
 
-      <Container maxW={1100} px={0}>
+      <Flex alignItems="center" gap={4} mb={4}>
+        <Box flex={1} h="1px" bgColor="gray.800" />
         <Flex
-          mb={4}
           justifyContent="center"
           alignItems="center"
           gap={2}
@@ -127,7 +127,8 @@ const Page = () => {
           </styled.span>
           <RiArrowRightDoubleLine />
         </Flex>
-      </Container>
+        <Box flex={1} h="1px" bgColor="gray.800" />
+      </Flex>
 
       <Box
         w="full"
@@ -148,7 +149,13 @@ const Page = () => {
               } as CSSProperties
             }
           >
-            <Box flex="none" w="full" pl={4}>
+            <Box
+              flex="none"
+              w="full"
+              pl={4}
+              transition="opacity 0.2s ease-in-out"
+              style={{ opacity: index === 0 ? 1 : 0.4 }}
+            >
               <styled.img
                 w="full"
                 src="/2026/2026-spring-major.webp"
@@ -156,7 +163,13 @@ const Page = () => {
                 style={{ pointerEvents: "none" }}
               />
             </Box>
-            <Box flex="none" w="full" pl={4}>
+            <Box
+              flex="none"
+              w="full"
+              pl={4}
+              transition="opacity 0.2s ease-in-out"
+              style={{ opacity: index === 1 ? 1 : 0.4 }}
+            >
               <styled.img
                 w="full"
                 src="/2026/2026-autumn-major.webp"
@@ -187,7 +200,8 @@ const Page = () => {
               px={6}
               textTransform="uppercase"
             >
-              <styled.span color="gray.500">[01]</styled.span> Spring Major
+              <styled.span color="gray.500">[0{index + 1}]</styled.span>{" "}
+              {index === 0 ? "Spring" : "Autumn"} Major
             </styled.h2>
             <DashedLine />
           </Box>
@@ -264,7 +278,7 @@ Model World LIVE 2026 will featured over 190 stands bringing together the very b
 - Interactive stands, expert modelling demonstrations and much more!
 `}</Markdown>
 
-            <Box mt={4}>
+            <Box mt={4} overflow="hidden" rounded="lg">
               <Carousel>
                 <styled.img
                   src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
