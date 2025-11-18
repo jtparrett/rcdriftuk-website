@@ -25,6 +25,73 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
+const CONTENT = [
+  `The Spring Major is two day competition taking place at Model World Live at the NEC in Birmingham.
+
+This global showdown will bring together top drivers from across Europe and beyond for two days of high-skill RC Drifting.
+
+The event will house one large competition track alongside generous pitting space.
+
+## Competition Format
+The event opens with a bottom-32 single-elimination bracket, which feeds into a top-16 double-elimination stage.
+The standout driver from the initial bracket advances as a wildcard to complete the top-16 field.
+The winners of the top-16 upper and lower brackets then meet in a Grand Final to decide the overall champion.
+
+![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg)
+
+## Day 1 Agenda
+- Cycled Practice
+- Best Bodyshell Comeptition
+- Public Engagement and Demonstration
+- Bottom 32 Single-elimination bracket
+- Online real-time results
+
+## Day 2 Agenda
+- Cycled Practice
+- Top 16 double-elimination bracket
+- Live stream production
+- Awards Ceremony
+- Open Driving
+
+## Prize Pool
+TBA
+
+## Ticket Information
+Tickets will be released in order of driver ranks, with a percentage of tickets reserved for unranked drivers.
+
+One set of competition tyres will be provided to each driver.
+
+Spectator tickets are available for purchase via the Model World Live website.
+
+## About Model World LIVE
+Model World LIVE 2026 will featured over 190 stands bringing together the very best in modelling including brand-new features for the third year of this premiere modelling exhibition, including:
+- Top quality hand-picked working model railways from across the UK
+- Featured layout from the pages of Hornby Magazine on show
+- The latest layout builds from Key Model World on show
+- Airfix Model World contributors displaying their latest model builds
+- Stunning scale modelling displays from the best model makers
+- Fully working radio control vehicles in dedicated arenas
+- Manufacturer stands from across the modelling hobby
+- Quality trade stands offering products for all areas of modelling
+- Interactive stands, expert modelling demonstrations and much more!`,
+
+  // --------------------------- //
+
+  `
+  The Autumn Major is a two day competition taking place at The Meguiar's HQ in Daventry.
+
+This global showdown will bring together top drivers from across Europe and beyond for two days of high-skill RC Drifting.
+
+The event will house one large competition track, and one practice/casual track alongside generous pitting space.
+
+## Competition Format
+The event opens with a bottom-32 single-elimination bracket, which feeds into a top-32 double-elimination stage.
+The standout driver from the initial bracket advances as a wildcard to complete the top-32 field.
+The winners of the top-32 upper and lower brackets then meet in a Grand Final to decide the overall champion.
+
+![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg)`,
+];
+
 const Arrow = styled("div", {
   base: {
     w: 6,
@@ -226,7 +293,9 @@ const Page = () => {
               gap={2}
             >
               <RiCalendar2Fill />
-              Saturday, April 25th - Sunday, April 26th, 2026
+              {index === 0
+                ? "Saturday, April 25th - Sunday, April 26th, 2026"
+                : "Saturday, October 24th - Sunday, October 25th, 2026"}
             </styled.p>
 
             <styled.p
@@ -236,78 +305,43 @@ const Page = () => {
               gap={2}
               mb={4}
             >
-              <RiMapPin2Fill /> Model World Live, Birmingham, B40 1NT
+              <RiMapPin2Fill />{" "}
+              {index === 0
+                ? "Model World Live, NEC, Birmingham, B40 1NT"
+                : "Meguiar's, Daventry, Northampton, NN11 8UF"}
             </styled.p>
 
-            <Markdown>{`
-The Spring Major is two day competition taking place at Model World Live at the NEC in Birmingham.
-
-This global showdown will bring together top drivers from across Europe and beyond for two days of high-skill RC Drifting.
-
-The event will house one large competition track alongside generous pitting space.
-
-## Competition Format
-The event opens with a bottom-32 single-elimination bracket, which feeds into a top-16 double-elimination stage.
-The standout driver from the initial bracket advances as a wildcard to complete the top-16 field.
-The winners of the top-16 upper and lower brackets then meet in a Grand Final to decide the overall champion.
-
-![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg)
-
-## Day 1 Agenda
-- Cycled Practice
-- Best Bodyshell Comeptition
-- Public Engagement and Demonstration
-- Bottom 32 Single-elimination bracket
-- Online real-time results
-
-## Day 2 Agenda
-- Cycled Practice
-- Top 16 double-elimination bracket
-- Live stream production
-- Awards Ceremony
-- Open Driving
-
-## Prize Pool
-TBA
-
-## Ticket Information
-Tickets will be released in order of driver ranks, with a percentage of tickets reserved for unranked drivers.
-
-One set of competition tyres will be provided to each driver.
-
-Spectator tickets are available for purchase via the Model World Live website.
-
-## About Model World LIVE
-Model World LIVE 2026 will featured over 190 stands bringing together the very best in modelling including brand-new features for the third year of this premiere modelling exhibition, including:
-- Top quality hand-picked working model railways from across the UK
-- Featured layout from the pages of Hornby Magazine on show
-- The latest layout builds from Key Model World on show
-- Airfix Model World contributors displaying their latest model builds
-- Stunning scale modelling displays from the best model makers
-- Fully working radio control vehicles in dedicated arenas
-- Manufacturer stands from across the modelling hobby
-- Quality trade stands offering products for all areas of modelling
-- Interactive stands, expert modelling demonstrations and much more!
-`}</Markdown>
+            <Markdown>{CONTENT[index]}</Markdown>
 
             <Box mt={4} overflow="hidden" rounded="lg">
-              <Carousel>
-                <styled.img
-                  src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
-                  pointerEvents="none"
-                  alt="Model World Live"
-                />
-                <styled.img
-                  src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
-                  pointerEvents="none"
-                  alt="Model World Live"
-                />
-                <styled.img
-                  src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
-                  pointerEvents="none"
-                  alt="Model World Live"
-                />
-              </Carousel>
+              {index === 0 && (
+                <Carousel>
+                  <styled.img
+                    src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_002.webp"
+                    pointerEvents="none"
+                    alt="Model World Live"
+                  />
+                  <styled.img
+                    src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_049.webp"
+                    pointerEvents="none"
+                    alt="Model World Live"
+                  />
+                  <styled.img
+                    src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/700p-MWL25-Event-Photos_084.webp"
+                    pointerEvents="none"
+                    alt="Model World Live"
+                  />
+                </Carousel>
+              )}
+              {index === 1 && (
+                <>
+                  <styled.img
+                    src="https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/Gemini_Generated_Image_7fdglg7fdglg7fdg.jpg"
+                    pointerEvents="none"
+                    alt="Meguiar's"
+                  />
+                </>
+              )}
             </Box>
 
             <Button w="full" mt={4}>
