@@ -24,6 +24,7 @@ import { TimePicker } from "~/components/TimePicker";
 import { styled, Box, Flex, Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
+import { TabButton, TabGroup } from "~/components/Tab";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -71,6 +72,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const ticketReleaseDate = body.get("ticketReleaseDate");
   const earlyAccessCode = body.get("earlyAccessCode");
   const ticketPrice = body.get("ticketPrice");
+  const rated = body.get("rated");
 
   const data = z
     .object({
@@ -85,6 +87,7 @@ export const action = async (args: ActionFunctionArgs) => {
       ticketReleaseDate: z.coerce.date().nullable(),
       earlyAccessCode: z.string().nullable(),
       ticketPrice: z.coerce.number().nullable(),
+      rated: z.string().optional(),
     })
     .parse({
       name,
@@ -98,6 +101,7 @@ export const action = async (args: ActionFunctionArgs) => {
       ticketReleaseDate,
       earlyAccessCode,
       ticketPrice,
+      rated,
     });
 
   const startDateNoZone = parseISO(data.startDate);
@@ -138,6 +142,7 @@ export const action = async (args: ActionFunctionArgs) => {
           : null,
         earlyAccessCode: data.earlyAccessCode,
         ticketPrice: data.ticketPrice,
+        rated: data.rated === "true",
       };
     }),
   });
@@ -154,6 +159,7 @@ const CalendarNewPage = () => {
   );
   const [enableTicketing, setEnableTicketing] = useState(false);
   const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
+  const [rated, setRated] = useState(false);
 
   return (
     <Container maxW={1100} px={4} py={8}>
@@ -210,47 +216,69 @@ const CalendarNewPage = () => {
           </Box>
 
           <Box>
-            <Label>Event Name</Label>
+            <Label>Name</Label>
             <Input name="name" required />
           </Box>
 
           <Box>
-            <Label>Event Link (https://)</Label>
+            <Label>Link (https://)</Label>
             <Input name="link" />
           </Box>
 
           <Box>
-            <Label>Event Description</Label>
+            <Label>Description</Label>
             <Textarea name="description" />
           </Box>
 
           <Box>
-            <Label>Enable Ticketing</Label>
+            <Label>Is this a rated tournament?</Label>
+            <input
+              type="hidden"
+              name="rated"
+              value={rated ? "true" : "false"}
+            />
+            <TabGroup>
+              <TabButton
+                type="button"
+                isActive={!rated}
+                onClick={() => setRated(false)}
+              >
+                No
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={rated}
+                onClick={() => setRated(true)}
+              >
+                Yes
+              </TabButton>
+            </TabGroup>
+          </Box>
+
+          <Box>
+            <Label>Enable ticketing</Label>
             <input
               type="hidden"
               name="enableTicketing"
               value={enableTicketing ? "true" : "false"}
             />
-            <Flex overflow="hidden" rounded="full">
-              <Button
-                rounded="none"
-                variant={enableTicketing ? "secondary" : "primary"}
-                flex={1}
+
+            <TabGroup>
+              <TabButton
                 type="button"
+                isActive={!enableTicketing}
                 onClick={() => setEnableTicketing(false)}
               >
-                Disable
-              </Button>
-              <Button
-                rounded="none"
-                variant={enableTicketing ? "primary" : "secondary"}
-                flex={1}
+                No
+              </TabButton>
+              <TabButton
                 type="button"
+                isActive={enableTicketing}
                 onClick={() => setEnableTicketing(true)}
               >
-                Enable
-              </Button>
-            </Flex>
+                Yes
+              </TabButton>
+            </TabGroup>
           </Box>
 
           {enableTicketing && (
@@ -300,7 +328,7 @@ const CalendarNewPage = () => {
             </>
           )}
 
-          <Button type="submit">List Event</Button>
+          <Button type="submit">Create Event</Button>
         </Flex>
       </Form>
     </Container>

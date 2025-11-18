@@ -12,6 +12,18 @@ import { Markdown } from "~/components/Markdown";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { Button } from "~/components/Button";
 import { Carousel } from "~/components/Carousel";
+import { AppName } from "~/utils/enums";
+import type { Route } from "./+types/2026";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: `${AppName} | 2026` },
+    {
+      name: "description",
+      content: "2026",
+    },
+  ];
+};
 
 const Arrow = styled("div", {
   base: {

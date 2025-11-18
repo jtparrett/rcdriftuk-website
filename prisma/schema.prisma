@@ -27,6 +27,7 @@ model Events {
   ticketReleaseDate DateTime?
   earlyAccessCode   String?
   ticketPrice       Float?
+  rated             Boolean          @default(false)
 
   @@index([startDate])
   @@index([endDate])
