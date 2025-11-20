@@ -162,7 +162,7 @@ const Page = () => {
         >
           <Box w="fit-content" mx="auto">
             <Box pos="relative" mx="auto" w="fit-content" rounded="full">
-              <Link to="/2025">
+              <Link to="/2026">
                 <styled.span
                   borderWidth={1}
                   borderColor="brand.800"
@@ -178,7 +178,7 @@ const Page = () => {
                   shadow="0 6px 24px rgba(242, 12, 78, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.2)"
                 >
                   <RiTrophyLine />
-                  2025 Season
+                  2026 Season
                   <RiArrowRightLine />
                 </styled.span>
               </Link>
@@ -425,7 +425,7 @@ const Page = () => {
             <Container maxW={1100} px={0}>
               <Intro number="02" title="For the Professionals" />
               <Box
-                bgImage="url(/main-event-bg.jpg)"
+                bgImage="url(/2026-bg.webp)"
                 bgSize="cover"
                 bgPosition="center"
                 bgRepeat="no-repeat"
@@ -470,12 +470,12 @@ const Page = () => {
                       letterSpacing="tight"
                       lineHeight={1.1}
                     >
-                      2025 Season
+                      2026 Season
                     </styled.h1>
                     <styled.p textWrap="balance" mb={4}>
                       The UK's professional RC Drifting Series.
                     </styled.p>
-                    <LinkButton to="/2025" variant="primary" mb={4}>
+                    <LinkButton to="/2026" variant="primary" mb={4}>
                       Learn More
                       <RiArrowRightLine />
                     </LinkButton>

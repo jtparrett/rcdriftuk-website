@@ -79,7 +79,7 @@ const LeaderboardsNewPage = () => {
                 <Label>Leaderboard Name</Label>
                 <Input
                   name="name"
-                  placeholder="e.g. 2025 Championship"
+                  placeholder="e.g. 2026 Championship"
                   value={formik.values.name}
                   onChange={formik.handleChange}
                 />

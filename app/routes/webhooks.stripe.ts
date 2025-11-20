@@ -106,7 +106,7 @@ export async function action(args: ActionFunctionArgs) {
               By purchasing this ticket and attending this event, you expressly acknowledge and agree to comply with all event rules and regulations. Failure to adhere to these rules may result in removal from the event and forfeit of your ticket without refund.
             </p>
             <p style="color: #666; font-size: 14px; line-height: 1.5; margin-top: 12px;">
-              Please review our complete rules and regulations at <a href="https://rcdrift.io/2025/rules" style="color: #0066cc; text-decoration: none;">https://rcdrift.io/2025/rules</a>
+              Please review our complete rules and regulations at <a href="https://rcdrift.io/2026/rules" style="color: #0066cc; text-decoration: none;">https://rcdrift.io/2026/rules</a>
             </p>
           </div>
 

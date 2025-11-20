@@ -16,7 +16,7 @@ const Page = () => {
         Competitions
       </styled.h1>
       <Flex flexWrap="wrap" mr={-4}>
-        {["2025", "2024"].map((year) => (
+        {["2026", "2025", "2024"].map((year) => (
           <Box w={{ base: "full", md: "50%" }} pr={4} pb={4} key={year}>
             <styled.article
               pos="relative"

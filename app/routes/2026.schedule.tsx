@@ -1,5 +1,5 @@
 import { TicketStatus } from "~/utils/enums";
-import type { Route } from "./+types/2025";
+import type { Route } from "./+types/2026.schedule";
 import { useLoaderData } from "react-router";
 import { EventTicketStatus } from "~/components/EventTicketStatus";
 import { LinkOverlay } from "~/components/LinkOverlay";
@@ -119,7 +119,7 @@ const Page = () => {
                       >
                         <AspectRatio ratio={1.6}>
                           <styled.img
-                            src={event.cover ?? "/2025-cover.jpg"}
+                            src={event.cover ?? ""}
                             alt={event.name}
                             w="full"
                           />

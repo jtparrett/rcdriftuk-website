@@ -44,14 +44,16 @@ The winners of the top-16 upper and lower brackets then meet in a Grand Final to
 
 ## Day 1 Agenda
 - Cycled Practice
-- Best Bodyshell Comeptition
+- Best Bodyshell Competition
 - Public Engagement and Demonstration
 - Bottom 32 Single-elimination bracket
 - Online real-time results
+- Live stream production
 
 ## Day 2 Agenda
 - Cycled Practice
 - Top 16 double-elimination bracket
+- Online real-time results
 - Live stream production
 - Awards Ceremony
 - Open Driving
@@ -64,7 +66,10 @@ Tickets will be released in order of driver ranking, with a percentage of ticket
 
 One set of competition tyres will be provided to each driver.
 
-Spectator tickets are available for purchase via the Model World Live website.
+Spectator tickets are available for purchase via the [Model World LIVE website](https://www.keymodelworld.com/modelworldlive)
+
+## Hotels
+[View nearby hotels here](https://www.google.com/maps/search/Hotels/@52.4514997,-1.7280488,2856m/data=!3m2!1e3!4b1!4m8!2m7!3m6!1sHotels!2sThe+NEC+Birmingham,+Pendigo+Way,+Marston+Green,+Birmingham+B40+1PP!3s0x4870b12335ec4abf:0x335a06e693b3e55d!4m2!1d-1.7154531!2d52.4515003?entry=ttu&g_ep=EgoyMDI1MTExNy4wIKXMDSoASAFQAw%3D%3D)
 
 ## About Model World LIVE
 Model World LIVE 2026 will featured over 190 stands bringing together the very best in modelling including brand-new features for the third year of this premiere modelling exhibition, including:
@@ -98,13 +103,15 @@ The winners of the top-32 upper and lower brackets then meet in a Grand Final to
 
 ## Day 1 Agenda
 - Cycled Practice
-- Best Bodyshell Comeptition
+- Best Bodyshell Competition
 - Bottom 32 Single-elimination bracket
 - Online real-time results
+- Live stream production
 
 ## Day 2 Agenda
 - Cycled Practice
 - Top 32 double-elimination bracket
+- Online real-time results
 - Live stream production
 - Awards Ceremony
 - Open Driving
@@ -116,6 +123,9 @@ TBA
 Tickets will be released in order of driver ranking, with a percentage of tickets reserved for unranked drivers.
 
 One set of competition tyres will be provided to each driver.
+
+## Hotels
+[View nearby hotels here](https://www.google.com/maps/search/Hotels/@52.2641724,-1.2251449,11472m/data=!3m2!1e3!4b1?entry=ttu&g_ep=EgoyMDI1MTExNy4wIKXMDSoASAFQAw%3D%3D)
 
 ## Meguiar's HQ
 Meguiar's have recently revamped their Daventry warehouse into a brand new media and event space.
