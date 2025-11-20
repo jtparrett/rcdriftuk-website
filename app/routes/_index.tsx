@@ -473,7 +473,7 @@ const Page = () => {
                       2026 Season
                     </styled.h1>
                     <styled.p textWrap="balance" mb={4}>
-                      The UK's professional RC Drifting Series.
+                      The RC Drifting Series for professionals.
                     </styled.p>
                     <LinkButton to="/2026" variant="primary" mb={4}>
                       Learn More
