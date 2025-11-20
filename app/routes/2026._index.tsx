@@ -3,6 +3,7 @@ import {
   RiArrowLeftDoubleLine,
   RiArrowRightDoubleLine,
   RiCalendar2Fill,
+  RiCalendar2Line,
   RiMapPin2Fill,
   RiTicketFill,
 } from "react-icons/ri";
@@ -10,7 +11,7 @@ import { DashedLine } from "~/components/DashedLine";
 import { useSwipeable } from "react-swipeable";
 import { Markdown } from "~/components/Markdown";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
-import { Button } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { Carousel } from "~/components/Carousel";
 import { AppName } from "~/utils/enums";
 import type { Route } from "./+types/2026";
@@ -33,6 +34,8 @@ This global showdown will bring together top drivers from across Europe and beyo
 The event will house one large competition track alongside generous pitting space.
 
 ## Competition Format
+Qualification standings will be determined by drivers highest regional rating.
+
 The event opens with a bottom-32 single-elimination bracket, which feeds into a top-16 double-elimination stage.
 The standout driver from the initial bracket advances as a wildcard to complete the top-16 field.
 The winners of the top-16 upper and lower brackets then meet in a Grand Final to decide the overall champion.
@@ -57,7 +60,7 @@ The winners of the top-16 upper and lower brackets then meet in a Grand Final to
 TBA
 
 ## Ticket Information
-Tickets will be released in order of driver ranks, with a percentage of tickets reserved for unranked drivers.
+Tickets will be released in order of driver ranking, with a percentage of tickets reserved for unranked drivers.
 
 One set of competition tyres will be provided to each driver.
 
@@ -78,18 +81,48 @@ Model World LIVE 2026 will featured over 190 stands bringing together the very b
   // --------------------------- //
 
   `
-  The Autumn Major is a two day competition taking place at The Meguiar's HQ in Daventry.
+  The Autumn Major is a two day competition taking place at The Meguiar's UK HQ in Daventry.
 
 This global showdown will bring together top drivers from across Europe and beyond for two days of high-skill RC Drifting.
 
-The event will house one large competition track, and one practice/casual track alongside generous pitting space.
+The event will house one large competition track and one practice/casual track alongside generous pitting space.
 
 ## Competition Format
+Qualification standings will be determined by drivers highest regional rating.
+
 The event opens with a bottom-32 single-elimination bracket, which feeds into a top-32 double-elimination stage.
 The standout driver from the initial bracket advances as a wildcard to complete the top-32 field.
 The winners of the top-32 upper and lower brackets then meet in a Grand Final to decide the overall champion.
 
-![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram.svg)`,
+![format diagram](https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/rcdriftio-2026-format-diagram-autumn.svg)
+
+## Day 1 Agenda
+- Cycled Practice
+- Best Bodyshell Comeptition
+- Bottom 32 Single-elimination bracket
+- Online real-time results
+
+## Day 2 Agenda
+- Cycled Practice
+- Top 32 double-elimination bracket
+- Live stream production
+- Awards Ceremony
+- Open Driving
+
+## Prize Pool
+TBA
+
+## Ticket Information
+Tickets will be released in order of driver ranking, with a percentage of tickets reserved for unranked drivers.
+
+One set of competition tyres will be provided to each driver.
+
+## Meguiar's HQ
+Meguiar's have recently revamped their Redditch warehouse into a brand new media and event space.
+
+We're delighted to be taking over the space for the weekend to host the 2026 Autumn Major.
+
+The space has been decked out with Meguiar's iconic branding, and houses some of the cleanest modified cars in the country.`,
 ];
 
 const Arrow = styled("div", {
@@ -344,9 +377,14 @@ const Page = () => {
               )}
             </Box>
 
-            <Button w="full" mt={4}>
-              Buy Ticket <RiTicketFill />
-            </Button>
+            <LinkButton
+              w="full"
+              mt={4}
+              to={`/events/${index === 0 ? "79d79e2f-784d-4a62-ba82-43e0bf8df3bf" : "5b1fb9d5-68e6-4d3f-a5d1-3745382af9f3"}`}
+            >
+              {/* Buy Ticket <RiTicketFill /> */}
+              View Event <RiCalendar2Line />
+            </LinkButton>
           </Box>
         </Container>
       </Box>
