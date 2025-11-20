@@ -118,7 +118,7 @@ Tickets will be released in order of driver ranking, with a percentage of ticket
 One set of competition tyres will be provided to each driver.
 
 ## Meguiar's HQ
-Meguiar's have recently revamped their Redditch warehouse into a brand new media and event space.
+Meguiar's have recently revamped their Daventry warehouse into a brand new media and event space.
 
 We're delighted to be taking over the space for the weekend to host the 2026 Autumn Major.
 
