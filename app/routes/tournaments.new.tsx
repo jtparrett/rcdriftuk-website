@@ -35,6 +35,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const url = new URL(args.request.url);
   const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
+  const tournamentId = z
+    .string()
+    .nullable()
+    .parse(url.searchParams.get("tournamentId"));
   let eventDrivers: number[] = [];
 
   if (eventId) {
@@ -60,6 +64,22 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
     eventDrivers =
       event?.EventTickets.map((ticket) => ticket.user?.driverId ?? 0) ?? [];
+  }
+
+  if (tournamentId) {
+    const tournament = await prisma.tournamentDrivers.findMany({
+      where: {
+        tournamentId,
+      },
+      select: {
+        driverId: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    eventDrivers = tournament.map((driver) => driver.driverId);
   }
 
   return { users, eventDrivers };
@@ -115,16 +135,23 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   // Create judges
-  await prisma.tournamentJudges.createMany({
-    data: judges.map((judge) => {
-      return {
-        driverId: Number(judge.driverId),
+  await prisma.$transaction([
+    prisma.tournamentJudges.deleteMany({
+      where: {
         tournamentId: tournament.id,
-        points: judge.points,
-      };
+      },
     }),
-    skipDuplicates: true,
-  });
+    prisma.tournamentJudges.createMany({
+      data: judges.map((judge) => {
+        return {
+          driverId: Number(judge.driverId),
+          tournamentId: tournament.id,
+          points: judge.points,
+        };
+      }),
+      skipDuplicates: true,
+    }),
+  ]);
 
   // Create new users (not previously registered)
   const driversWithIndex = drivers.map((driver, index) => ({
@@ -165,15 +192,22 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   // Create tournament drivers
-  const tournamentDrivers = await prisma.tournamentDrivers.createManyAndReturn({
-    data: allDrivers.map((driver) => {
-      return {
-        driverId: Number(driver.driverId),
+  const [_, tournamentDrivers] = await prisma.$transaction([
+    prisma.tournamentDrivers.deleteMany({
+      where: {
         tournamentId: tournament.id,
-        tournamentDriverNumber: driver.index + 1,
-      };
+      },
     }),
-  });
+    prisma.tournamentDrivers.createManyAndReturn({
+      data: allDrivers.map((driver) => {
+        return {
+          driverId: Number(driver.driverId),
+          tournamentId: tournament.id,
+          tournamentDriverNumber: driver.index + 1,
+        };
+      }),
+    }),
+  ]);
 
   // Create qualifying laps
   let nextQualifyingLapId: number | null = null;
@@ -183,21 +217,36 @@ export const action = async (args: ActionFunctionArgs) => {
     const totalLapsToCreate =
       qualifyingProcedure === QualifyingProcedure.WAVES ? 1 : qualifyingLaps;
 
-    const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
-      data: Array.from({ length: totalLapsToCreate }).flatMap((_, i) => {
-        return tournamentDrivers.map((driver) => {
-          return {
-            tournamentDriverId: driver.id,
-            round: i + 1,
-          };
-        });
+    const [_, [nextQualifyingLap]] = await prisma.$transaction([
+      prisma.laps.deleteMany({
+        where: {
+          tournament: {
+            id: tournament.id,
+          },
+        },
       }),
-    });
+      prisma.laps.createManyAndReturn({
+        data: Array.from({ length: totalLapsToCreate }).flatMap((_, i) => {
+          return tournamentDrivers.map((driver) => {
+            return {
+              tournamentDriverId: driver.id,
+              round: i + 1,
+            };
+          });
+        }),
+      }),
+    ]);
 
     nextQualifyingLapId = nextQualifyingLap?.id ?? null;
   }
 
   // Create battles
+  await prisma.tournamentBattles.deleteMany({
+    where: {
+      tournamentId: tournament.id,
+    },
+  });
+
   let nextBattleId: number | null = null;
   const totalDrivers = fullInclusion
     ? pow2Ceil(drivers.length)
