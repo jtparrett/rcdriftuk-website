@@ -62,6 +62,8 @@ The winners of the top-16 upper and lower brackets then meet in a Grand Final to
 TBA
 
 ## Ticket Information
+Spaces are limited.
+
 Tickets will be released in order of driver ranking, with a percentage of tickets reserved for unranked drivers.
 
 One set of competition tyres will be provided to each driver.
@@ -120,6 +122,8 @@ The winners of the top-32 upper and lower brackets then meet in a Grand Final to
 TBA
 
 ## Ticket Information
+Spaces are limited.
+
 Tickets will be released in order of driver ranking, with a percentage of tickets reserved for unranked drivers.
 
 One set of competition tyres will be provided to each driver.
