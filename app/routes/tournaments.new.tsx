@@ -39,7 +39,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
     .string()
     .nullable()
     .parse(url.searchParams.get("tournamentId"));
-  let eventDrivers: number[] = [];
+
+  let drivers: number[] = [];
 
   if (eventId) {
     const event = await prisma.events.findUnique({
@@ -62,27 +63,49 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    eventDrivers =
+    drivers =
       event?.EventTickets.map((ticket) => ticket.user?.driverId ?? 0) ?? [];
   }
 
+  let judges: { driverId: string; points?: number }[] = [];
+
   if (tournamentId) {
-    const tournament = await prisma.tournamentDrivers.findMany({
+    const tournament = await prisma.tournaments.findUnique({
       where: {
-        tournamentId,
+        id: tournamentId,
       },
-      select: {
-        driverId: true,
-      },
-      orderBy: {
-        id: "asc",
+      include: {
+        judges: {
+          select: {
+            driverId: true,
+            points: true,
+          },
+        },
+        drivers: {
+          where: {
+            driverId: {
+              not: 0,
+            },
+          },
+          select: {
+            driverId: true,
+          },
+          orderBy: {
+            id: "asc",
+          },
+        },
       },
     });
 
-    eventDrivers = tournament.map((driver) => driver.driverId);
+    drivers = tournament?.drivers.map((driver) => driver.driverId) ?? [];
+    judges =
+      tournament?.judges.map((judge) => ({
+        driverId: judge.driverId.toString(),
+        points: judge.points,
+      })) ?? [];
   }
 
-  return { users, eventDrivers };
+  return { users, drivers, judges };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -425,14 +448,14 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { users, eventDrivers } = useLoaderData<typeof loader>();
+  const { users, drivers, judges } = useLoaderData<typeof loader>();
 
   return (
     <Container maxW={1100} px={4} py={8}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
         New Tournament
       </styled.h1>
-      <CreateTournamentForm users={users} eventDrivers={eventDrivers} />
+      <CreateTournamentForm users={users} drivers={drivers} judges={judges} />
     </Container>
   );
 };

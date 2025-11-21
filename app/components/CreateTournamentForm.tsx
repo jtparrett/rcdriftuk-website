@@ -305,10 +305,11 @@ const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 interface Props {
   users: GetUsers;
-  eventDrivers: number[];
+  drivers: number[];
+  judges: { driverId: string; points?: number }[];
 }
 
-export const CreateTournamentForm = ({ users, eventDrivers }: Props) => {
+export const CreateTournamentForm = ({ users, drivers, judges }: Props) => {
   const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get("template");
@@ -322,13 +323,13 @@ export const CreateTournamentForm = ({ users, eventDrivers }: Props) => {
     enableReinitialize: true,
     initialValues: {
       name: "",
-      judges: [],
+      judges,
       drivers: Array.from(
-        Array.from(
-          new Set(eventDrivers.map((driver) => driver.toString())),
-        ).map((driver) => ({
-          driverId: driver,
-        })),
+        Array.from(new Set(drivers.map((driver) => driver.toString()))).map(
+          (driver) => ({
+            driverId: driver,
+          }),
+        ),
       ),
       fullInclusion: false,
       enableProtests: false,

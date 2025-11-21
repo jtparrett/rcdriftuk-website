@@ -2,7 +2,12 @@ import { getAuth } from "~/utils/getAuth.server";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { format } from "date-fns";
-import { RiAddFill, RiBookOpenFill, RiDeleteBinFill } from "react-icons/ri";
+import {
+  RiAddFill,
+  RiBookOpenFill,
+  RiCheckboxMultipleBlankFill,
+  RiDeleteBinFill,
+} from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
@@ -112,14 +117,24 @@ const Page = () => {
                 </Box>
                 <Spacer />
                 {tournament.userId === userId && (
-                  <LinkButton
-                    variant="ghost"
-                    pos="relative"
-                    zIndex={3}
-                    to={`/tournaments-archive/${tournament.id}`}
-                  >
-                    <RiDeleteBinFill />
-                  </LinkButton>
+                  <>
+                    <LinkButton
+                      variant="ghost"
+                      pos="relative"
+                      zIndex={3}
+                      to={`/tournaments/new?tournamentId=${tournament.id}`}
+                    >
+                      <RiCheckboxMultipleBlankFill />
+                    </LinkButton>
+                    <LinkButton
+                      variant="ghost"
+                      pos="relative"
+                      zIndex={3}
+                      to={`/tournaments-archive/${tournament.id}`}
+                    >
+                      <RiDeleteBinFill />
+                    </LinkButton>
+                  </>
                 )}
               </Flex>
             </Box>
