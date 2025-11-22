@@ -40,34 +40,26 @@ export const loader = async (args: LoaderFunctionArgs) => {
     .nullable()
     .parse(url.searchParams.get("tournamentId"));
 
-  let drivers: number[] = [];
-
   if (eventId) {
-    const event = await prisma.events.findUnique({
+    const eventDrivers = await prisma.eventTickets.findMany({
       where: {
-        id: eventId,
+        eventId,
       },
-      include: {
-        EventTickets: {
-          where: {
-            status: TicketStatus.CONFIRMED,
-          },
-          include: {
-            user: {
-              select: {
-                driverId: true,
-              },
-            },
+      select: {
+        user: {
+          select: {
+            driverId: true,
           },
         },
       },
     });
 
-    drivers =
-      event?.EventTickets.map((ticket) => ticket.user?.driverId ?? 0) ?? [];
-  }
+    const drivers = eventDrivers.map((driver) => ({
+      driverId: driver.user?.driverId?.toString() ?? "",
+    }));
 
-  let judges: { driverId: string; points?: number }[] = [];
+    return { users, drivers };
+  }
 
   if (tournamentId) {
     const tournament = await prisma.tournaments.findUnique({
@@ -97,15 +89,15 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    drivers = tournament?.drivers.map((driver) => driver.driverId) ?? [];
-    judges =
-      tournament?.judges.map((judge) => ({
-        driverId: judge.driverId.toString(),
-        points: judge.points,
+    const drivers =
+      tournament?.drivers.map((driver) => ({
+        driverId: driver.driverId.toString(),
       })) ?? [];
+
+    return { users, drivers, tournament };
   }
 
-  return { users, drivers, judges };
+  return { users };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -448,14 +440,33 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { users, drivers, judges } = useLoaderData<typeof loader>();
+  const { users, drivers, tournament } = useLoaderData<typeof loader>();
 
   return (
     <Container maxW={1100} px={4} py={8}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
         New Tournament
       </styled.h1>
-      <CreateTournamentForm users={users} drivers={drivers} judges={judges} />
+      <CreateTournamentForm
+        users={users}
+        initialValues={{
+          drivers,
+          name: tournament?.name,
+          judges: tournament?.judges.map((judge) => ({
+            driverId: judge.driverId.toString(),
+            points: judge.points,
+          })),
+          format: tournament?.format,
+          fullInclusion: tournament?.fullInclusion,
+          enableProtests: tournament?.enableProtests,
+          qualifyingLaps: tournament?.qualifyingLaps,
+          region: tournament?.region ?? undefined,
+          scoreFormula: tournament?.scoreFormula,
+          qualifyingOrder: tournament?.qualifyingOrder,
+          qualifyingProcedure: tournament?.qualifyingProcedure,
+          driverNumbers: tournament?.driverNumbers,
+        }}
+      />
     </Container>
   );
 };

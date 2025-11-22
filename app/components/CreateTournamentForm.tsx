@@ -19,7 +19,6 @@ import { StepDot } from "./StepDot";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
 import { Reorder } from "motion/react";
-import { TOURNAMENT_TEMPLATES } from "~/utils/tournamentTemplates";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Label } from "./Label";
@@ -305,42 +304,30 @@ const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 interface Props {
   users: GetUsers;
-  drivers: number[];
-  judges: { driverId: string; points?: number }[];
+  initialValues: Partial<z.infer<typeof tournamentFormSchema>>;
 }
 
-export const CreateTournamentForm = ({ users, drivers, judges }: Props) => {
+export const CreateTournamentForm = ({ users, initialValues }: Props) => {
   const fetcher = useFetcher();
-  const [searchParams] = useSearchParams();
-  const templateId = searchParams.get("template");
-  const template =
-    templateId && templateId in TOURNAMENT_TEMPLATES
-      ? TOURNAMENT_TEMPLATES[templateId]
-      : null;
 
   const formik = useFormik({
     validationSchema,
     enableReinitialize: true,
     initialValues: {
-      name: "",
-      judges,
-      drivers: Array.from(
-        Array.from(new Set(drivers.map((driver) => driver.toString()))).map(
-          (driver) => ({
-            driverId: driver,
-          }),
-        ),
-      ),
-      fullInclusion: false,
-      enableProtests: false,
-      qualifyingLaps: 1,
-      region: template?.region ?? Regions.UK,
-      format: template?.format ?? TournamentsFormat.STANDARD,
-      scoreFormula: template?.scoreFormula ?? ScoreFormula.CUMULATIVE,
-      qualifyingOrder: template?.qualifyingOrder ?? QualifyingOrder.DRIVERS,
+      name: initialValues.name ?? "",
+      judges: initialValues.judges ?? [],
+      drivers: initialValues.drivers ?? [],
+      fullInclusion: initialValues.fullInclusion ?? false,
+      enableProtests: initialValues.enableProtests ?? false,
+      qualifyingLaps: initialValues.qualifyingLaps ?? 1,
+      region: initialValues.region ?? Regions.UK,
+      format: initialValues.format ?? TournamentsFormat.STANDARD,
+      scoreFormula: initialValues.scoreFormula ?? ScoreFormula.CUMULATIVE,
+      qualifyingOrder: initialValues.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       qualifyingProcedure:
-        template?.qualifyingProcedure ?? QualifyingProcedure.BEST,
-      driverNumbers: template?.driverNumbers ?? TournamentsDriverNumbers.NONE,
+        initialValues.qualifyingProcedure ?? QualifyingProcedure.BEST,
+      driverNumbers:
+        initialValues.driverNumbers ?? TournamentsDriverNumbers.NONE,
     },
     onSubmit: (values) => {
       fetcher.submit(JSON.stringify(values), {
