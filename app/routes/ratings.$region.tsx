@@ -358,20 +358,20 @@ const RatingsPage = () => {
 
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Flex maxW={1100} mx="auto">
+          <Center pl={4} color="gray.500">
+            <RiSearchLine />
+          </Center>
           <styled.input
             value={searchValue}
             onChange={handleSearchChange}
             bgColor="inherit"
-            px={4}
+            px={2}
             py={3}
             w="full"
             placeholder={`Search ${region === Regions.ALL ? "" : `${region} `}driver ratings...`}
             color="inherit"
             outline="none"
           />
-          <Center pr={4} color="gray.500">
-            <RiSearchLine />
-          </Center>
         </Flex>
       </Box>
 

@@ -1,14 +1,27 @@
 import { SignedIn } from "@clerk/react-router";
 import { TrackStatus } from "~/utils/enums";
-import { useLoaderData } from "react-router";
-import { RiAddCircleFill } from "react-icons/ri";
+import {
+  useLoaderData,
+  useSearchParams,
+  type LoaderFunctionArgs,
+} from "react-router";
+import { RiAddCircleFill, RiSearchLine } from "react-icons/ri";
 import { LinkButton } from "~/components/Button";
 import { LinkOverlay } from "~/components/LinkOverlay";
-import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Spacer,
+  styled,
+} from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/tracks._index";
 import { AppName } from "~/utils/enums";
 import ProgressiveBlur from "~/components/ProgressiveBlur";
+import { useCallback, useState } from "react";
+import { z } from "zod";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -25,13 +38,24 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export const loader = async () => {
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { request } = args;
+  const url = new URL(request.url);
+  const query =
+    z.string().nullable().parse(url.searchParams.get("query")) ?? "";
+
   const tracks = await prisma.tracks.findMany({
     orderBy: {
       name: "asc",
     },
     where: {
       status: TrackStatus.ACTIVE,
+      ...(query !== null && {
+        name: {
+          contains: query,
+          mode: "insensitive",
+        },
+      }),
     },
   });
 
@@ -40,6 +64,36 @@ export const loader = async () => {
 
 const TracksPage = () => {
   const tracks = useLoaderData<typeof loader>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") ?? "";
+  const [searchValue, setSearchValue] = useState(query);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (value: string) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          const newSearchParams = new URLSearchParams(searchParams);
+          if (value.trim()) {
+            newSearchParams.set("query", value.trim());
+          } else {
+            newSearchParams.delete("query");
+          }
+          setSearchParams(newSearchParams);
+        }, 300); // 300ms debounce
+      };
+    })(),
+    [searchParams, setSearchParams],
+  );
+
+  // Handle input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    debouncedSearch(value);
+  };
 
   return (
     <styled.main overflow="hidden">
@@ -73,6 +127,25 @@ const TracksPage = () => {
             </SignedIn>
           </Flex>
         </Container>
+      </Box>
+
+      <Box borderBottomWidth={1} borderColor="gray.900">
+        <Flex maxW={1100} mx="auto">
+          <Center pl={4} color="gray.500">
+            <RiSearchLine />
+          </Center>
+          <styled.input
+            value={searchValue}
+            onChange={handleSearchChange}
+            bgColor="inherit"
+            px={2}
+            py={3}
+            w="full"
+            placeholder="Search tracks..."
+            color="inherit"
+            outline="none"
+          />
+        </Flex>
       </Box>
 
       <Container px={4} py={8} maxW={1100}>
