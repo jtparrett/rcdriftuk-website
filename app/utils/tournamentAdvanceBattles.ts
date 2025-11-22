@@ -142,6 +142,10 @@ export const tournamentAdvanceBattles = async (id: string) => {
     },
   });
 
+  const isUpdate =
+    tournament.nextBattle.winnerId !== null &&
+    winnerId !== tournament.nextBattle.winnerId;
+
   if (tournament.nextBattle.winnerNextBattleId) {
     const nextWinnerBattle = await prisma.tournamentBattles.findFirst({
       where: {
@@ -149,7 +153,32 @@ export const tournamentAdvanceBattles = async (id: string) => {
       },
     });
 
-    if (nextWinnerBattle?.driverLeftId === null) {
+    if (isUpdate && nextWinnerBattle) {
+      // This means it's an update, and the winner has changed
+      // loserId is the previous winner, by assumption
+      if (nextWinnerBattle.driverLeftId === loserId) {
+        await prisma.tournamentBattles.update({
+          where: {
+            id: nextWinnerBattle.id,
+          },
+          data: {
+            driverLeftId: winnerId,
+          },
+        });
+      } else if (nextWinnerBattle.driverRightId === loserId) {
+        await prisma.tournamentBattles.update({
+          where: {
+            id: nextWinnerBattle.id,
+          },
+          data: {
+            driverRightId: winnerId,
+          },
+        });
+      }
+    }
+
+    // This is the regular flow (non update)
+    if (nextWinnerBattle?.driverLeftId === null && !isUpdate) {
       await prisma.tournamentBattles.update({
         where: {
           id: nextWinnerBattle.id,
@@ -158,7 +187,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
           driverLeftId: winnerId,
         },
       });
-    } else if (nextWinnerBattle?.driverRightId === null) {
+    } else if (nextWinnerBattle?.driverRightId === null && !isUpdate) {
       await prisma.tournamentBattles.update({
         where: {
           id: nextWinnerBattle.id,
@@ -177,7 +206,32 @@ export const tournamentAdvanceBattles = async (id: string) => {
       },
     });
 
-    if (nextLoserBattle?.driverLeftId === null) {
+    if (isUpdate && nextLoserBattle) {
+      // This means it's an update, and the winner has changed
+      // winnerId is the previous loser, by assumption
+      if (nextLoserBattle.driverLeftId === winnerId) {
+        await prisma.tournamentBattles.update({
+          where: {
+            id: nextLoserBattle.id,
+          },
+          data: {
+            driverLeftId: loserId,
+          },
+        });
+      } else if (nextLoserBattle.driverRightId === winnerId) {
+        await prisma.tournamentBattles.update({
+          where: {
+            id: nextLoserBattle.id,
+          },
+          data: {
+            driverRightId: loserId,
+          },
+        });
+      }
+    }
+
+    // This is the regular flow (non update)
+    if (nextLoserBattle?.driverLeftId === null && !isUpdate) {
       await prisma.tournamentBattles.update({
         where: {
           id: nextLoserBattle.id,
@@ -186,7 +240,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
           driverLeftId: loserId,
         },
       });
-    } else if (nextLoserBattle?.driverRightId === null) {
+    } else if (nextLoserBattle?.driverRightId === null && !isUpdate) {
       await prisma.tournamentBattles.update({
         where: {
           id: nextLoserBattle.id,

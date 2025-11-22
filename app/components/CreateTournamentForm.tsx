@@ -322,7 +322,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
       qualifyingLaps: initialValues.qualifyingLaps ?? 1,
       region: initialValues.region ?? Regions.UK,
       format: initialValues.format ?? TournamentsFormat.STANDARD,
-      scoreFormula: initialValues.scoreFormula ?? ScoreFormula.CUMULATIVE,
+      scoreFormula: initialValues.scoreFormula ?? ScoreFormula.AVERAGED,
       qualifyingOrder: initialValues.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       qualifyingProcedure:
         initialValues.qualifyingProcedure ?? QualifyingProcedure.BEST,

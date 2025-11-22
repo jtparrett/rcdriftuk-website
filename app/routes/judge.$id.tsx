@@ -381,13 +381,7 @@ const BattleForm = () => {
 
   return (
     <>
-      {nextBattle?.winnerId !== null && (
-        <styled.h2 fontSize="xl" textAlign="center" py={20}>
-          Waiting for next battle...
-        </styled.h2>
-      )}
-
-      {nextBattle !== null && nextBattle.winnerId === null && (
+      {nextBattle !== null && (
         <Form method="post">
           <Flex flexDir="column" gap={4}>
             {(nextBattle.driverLeft?.isBye ||

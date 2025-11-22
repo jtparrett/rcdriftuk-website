@@ -14,9 +14,13 @@ import { Glow } from "~/components/Glow";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
+import { getAuth } from "@clerk/react-router/ssr.server";
+import { css } from "~/styled-system/css";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { params } = args;
   const id = z.string().parse(params.id);
+  const { userId } = await getAuth(args);
   const bracket = z
     .nativeEnum(BattlesBracket)
     .parse(params.bracket?.toUpperCase());
@@ -75,7 +79,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
+  const isOwner = tournament?.userId === userId;
+
   return {
+    isOwner,
     tournament,
     bracket,
   };
@@ -158,7 +165,7 @@ export const Driver = ({
 };
 
 const TournamentBattlesPage = () => {
-  const { tournament, bracket } = useLoaderData<typeof loader>();
+  const { tournament, bracket, isOwner } = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
   const [searchParams] = useSearchParams();
   const maxBattlesToShow =
@@ -336,6 +343,26 @@ const TournamentBattlesPage = () => {
                               winnerId={battle.winnerId}
                               driverNo={getDriverNumber(battle.driverRight)}
                             />
+                            {isOwner &&
+                              battle.driverRightId &&
+                              battle.driverLeftId && (
+                                <Link
+                                  className={css({
+                                    pos: "absolute",
+                                    inset: 0,
+                                    zIndex: 5,
+                                    borderWidth: 1,
+                                    borderRadius: "inherit",
+                                    borderColor: "transparent",
+                                    _hover: {
+                                      borderColor: "brand.500",
+                                    },
+                                  })}
+                                  to={`/tournaments/${tournament.id}/activate-battle/${battle.id}`}
+                                >
+                                  <styled.span srOnly>Activate</styled.span>
+                                </Link>
+                              )}
                           </Box>
                         </Box>
 
