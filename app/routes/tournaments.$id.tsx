@@ -37,6 +37,7 @@ import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
+  RiExchangeLine,
   RiFlagLine,
   RiFullscreenFill,
   RiOpenArmLine,
@@ -468,6 +469,37 @@ const TournamentPage = () => {
                     Randomise Qualifying <RiShuffleLine />
                   </LinkButton>
                 )}
+
+              {isOwner &&
+                tournament.state === TournamentsState.END &&
+                tournament.rated === false &&
+                !tournament.ratingRequestedAt && (
+                  <LinkButton
+                    to={`/tournaments/${tournament.id}/request-rating`}
+                  >
+                    Request Rating <RiExchangeLine />
+                  </LinkButton>
+                )}
+
+              {!tournament.rated && tournament.ratingRequestedAt && (
+                <Flex
+                  alignSelf="center"
+                  color="brand.500"
+                  py={1.5}
+                  pl={4}
+                  pr={2.5}
+                  borderWidth={1}
+                  borderColor="brand.500"
+                  rounded="full"
+                  gap={2}
+                  alignItems="center"
+                >
+                  <styled.p fontWeight="medium" fontSize="sm">
+                    Rating Pending
+                  </styled.p>
+                  <RiExchangeLine />
+                </Flex>
+              )}
 
               {isOwner &&
                 tournament.state === TournamentsState.QUALIFYING &&

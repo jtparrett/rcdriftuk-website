@@ -26,7 +26,12 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
           {title}
         </styled.h1>
         {disclaimer && (
-          <styled.p color="brand.500" fontWeight="medium" mb={2}>
+          <styled.p
+            color="brand.500"
+            fontWeight="medium"
+            mb={2}
+            whiteSpace="pre-line"
+          >
             {disclaimer}
           </styled.p>
         )}

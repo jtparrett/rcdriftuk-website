@@ -87,6 +87,7 @@ model Tournaments {
   enableProtests      Boolean                  @default(false)
   region              Regions?
   rated               Boolean                  @default(false)
+  ratingRequestedAt   DateTime?
   scoreFormula        ScoreFormula             @default(AVERAGED)
   leaderboards        LeaderboardTournaments[]
   qualifyingOrder     QualifyingOrder          @default(DRIVERS)
