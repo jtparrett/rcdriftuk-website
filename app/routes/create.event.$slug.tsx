@@ -121,7 +121,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const diff = differenceInWeeks(endOfYear(startDateNoZone), startDateNoZone);
   const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
 
-  await prisma.events.createMany({
+  const [firstEvent] = await prisma.events.createManyAndReturn({
     data: Array.from({ length: arrayLength }).map((_, i) => {
       const repeatStartDate = add(startDateNoZone, {
         weeks: i * data.repeatWeeks,
@@ -147,7 +147,7 @@ export const action = async (args: ActionFunctionArgs) => {
     }),
   });
 
-  return redirect("/calendar/success");
+  return redirect(`/events/${firstEvent.id}`);
 };
 
 const CalendarNewPage = () => {
