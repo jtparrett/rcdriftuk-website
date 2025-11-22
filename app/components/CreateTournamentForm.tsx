@@ -163,8 +163,8 @@ const PeopleForm = ({
                       py={1}
                     >
                       {user
-                        ? `${user.firstName} ${user.lastName}`
-                        : person.driverId}
+                        ? `${user.firstName} ${user.lastName} (#${person.driverId})`
+                        : person.driverId + " (new)"}
                     </styled.p>
 
                     {allowPoints && (
@@ -244,12 +244,6 @@ const PeopleForm = ({
         />
         {focused && search.length > 0 && (
           <Dropdown role="listbox">
-            {filteredUsers.length === 0 && (
-              <styled.p px={2} py={1} fontWeight="semibold">
-                No results found
-              </styled.p>
-            )}
-
             {filteredUsers.map((user) => {
               return (
                 <Option
@@ -266,13 +260,19 @@ const PeopleForm = ({
                     setSearch("");
                   }}
                 >
-                  {user.firstName} {user.lastName}
+                  {user.firstName} {user.lastName} (#{user.driverId})
                 </Option>
               );
             })}
 
+            {!allowNewDrivers && filteredUsers.length === 0 && (
+              <styled.p px={2} py={1} fontWeight="semibold">
+                No results found
+              </styled.p>
+            )}
+
             {allowNewDrivers &&
-              search.trim().split(" ").length >= 2 &&
+              filteredUsers.length === 0 &&
               search
                 .trim()
                 .split(" ")
