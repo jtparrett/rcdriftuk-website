@@ -150,7 +150,7 @@ export const AppHeader = () => {
             )}
           </AnimatePresence>
 
-          <Link to="/app">
+          <Link to="/app" replace>
             <img
               className={css({
                 w: 140,

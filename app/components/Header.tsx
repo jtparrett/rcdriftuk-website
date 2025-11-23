@@ -117,7 +117,7 @@ export const Header = ({ user }: Props) => {
     >
       <Container maxW={1100} w="full" px={2} h="64px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={1}>
-          <Link to="/" viewTransition>
+          <Link to="/">
             <styled.img w={140} src="/rcdriftio.svg" alt={AppName} />
           </Link>
 

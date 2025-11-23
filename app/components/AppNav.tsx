@@ -98,10 +98,10 @@ export const AppNav = () => {
               >
                 <Tab
                   to="/app"
+                  replace
                   isActive={
                     location.pathname === "/feed" || location.pathname === "/"
                   }
-                  viewTransition
                 >
                   {location.pathname === "/feed" ||
                   location.pathname === "/" ? (
@@ -112,15 +112,15 @@ export const AppNav = () => {
                 </Tab>
                 <Tab
                   to="/ratings"
+                  replace
                   isActive={location.pathname.startsWith("/ratings")}
-                  viewTransition
                 >
                   <RiListOrdered2 size={24} />
                 </Tab>
                 <Tab
                   to="/tournaments"
+                  replace
                   isActive={location.pathname.startsWith("/tournaments")}
-                  viewTransition
                 >
                   {location.pathname.startsWith("/tournaments") ? (
                     <RiVipCrown2Fill size={24} />
@@ -130,8 +130,8 @@ export const AppNav = () => {
                 </Tab>
                 <Tab
                   to="/map"
+                  replace
                   isActive={location.pathname.startsWith("/map")}
-                  viewTransition
                 >
                   {location.pathname.startsWith("/map") ? (
                     <RiMapPin2Fill size={24} />
@@ -141,8 +141,8 @@ export const AppNav = () => {
                 </Tab>
                 <Tab
                   to="/calendar"
+                  replace
                   isActive={location.pathname.startsWith("/calendar")}
-                  viewTransition
                 >
                   {location.pathname.startsWith("/calendar") ? (
                     <RiCalendarFill size={24} />
@@ -152,8 +152,8 @@ export const AppNav = () => {
                 </Tab>
                 <Tab
                   to="/marketplace"
+                  replace
                   isActive={location.pathname.startsWith("/marketplace")}
-                  viewTransition
                 >
                   {location.pathname.startsWith("/marketplace") ? (
                     <RiShoppingBagFill size={24} />
@@ -163,8 +163,8 @@ export const AppNav = () => {
                 </Tab>
                 <Tab
                   to="/user-menu"
+                  replace
                   isActive={location.pathname.startsWith("/user-menu")}
-                  viewTransition
                 >
                   {location.pathname.startsWith("/user-menu") ? (
                     <RiAccountCircleFill size={24} />

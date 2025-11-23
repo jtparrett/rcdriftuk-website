@@ -155,7 +155,7 @@ const Row = ({
           zIndex: -1,
         }}
       >
-        <LinkOverlay to={`/drivers/${driver.driverId}`} viewTransition />
+        <LinkOverlay to={`/drivers/${driver.driverId}`} />
         <Flex gap={2} alignItems="center">
           <Box w={7} flex="none" textAlign="center">
             <styled.span fontFamily="mono">{driver.rank}</styled.span>
