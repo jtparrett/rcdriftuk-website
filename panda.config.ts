@@ -142,6 +142,14 @@ export default defineConfig({
             opacity: 0,
           },
         },
+        progressBar: {
+          "0%": {
+            width: "0%",
+          },
+          "100%": {
+            width: "100%",
+          },
+        },
       },
     },
   },

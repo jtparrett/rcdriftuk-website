@@ -8,36 +8,38 @@ const Page = () => {
 
   return (
     <styled.main>
-      <TabsBar>
-        <Tab
-          to="/2025"
-          isActive={location.pathname.replaceAll(/\//g, "") === "2025"}
-          replace
-        >
-          Overview
-        </Tab>
-        <Tab
-          to="/2025/schedule"
-          isActive={location.pathname.startsWith("/2025/schedule")}
-          replace
-        >
-          Schedule
-        </Tab>
-        <Tab
-          to="/2025/rules"
-          isActive={location.pathname.startsWith("/2025/rules")}
-          replace
-        >
-          Rules & Regs
-        </Tab>
-        <Tab
-          to="/2025/judging-criteria"
-          isActive={location.pathname.startsWith("/2025/judging-criteria")}
-          replace
-        >
-          Judging Criteria
-        </Tab>
-      </TabsBar>
+      {!location.pathname.includes("wrapped") && (
+        <TabsBar>
+          <Tab
+            to="/2025"
+            isActive={location.pathname.replaceAll(/\//g, "") === "2025"}
+            replace
+          >
+            Overview
+          </Tab>
+          <Tab
+            to="/2025/schedule"
+            isActive={location.pathname.startsWith("/2025/schedule")}
+            replace
+          >
+            Schedule
+          </Tab>
+          <Tab
+            to="/2025/rules"
+            isActive={location.pathname.startsWith("/2025/rules")}
+            replace
+          >
+            Rules & Regs
+          </Tab>
+          <Tab
+            to="/2025/judging-criteria"
+            isActive={location.pathname.startsWith("/2025/judging-criteria")}
+            replace
+          >
+            Judging Criteria
+          </Tab>
+        </TabsBar>
+      )}
       <Outlet />
     </styled.main>
   );
