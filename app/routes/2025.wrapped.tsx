@@ -1,7 +1,14 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect, useLoaderData } from "react-router";
 import { useState, useEffect, useRef } from "react";
-import { Box, Container, Flex, styled, VStack } from "~/styled-system/jsx";
+import {
+  Box,
+  Container,
+  Flex,
+  Grid,
+  styled,
+  VStack,
+} from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUser } from "~/utils/getUser.server";
 import { prisma } from "~/utils/prisma.server";
@@ -377,8 +384,132 @@ const Page = () => {
       title: "2025 Complete",
       subtitle: "See you in 2026!",
       content: (
-        <VStack gap={4} pos="relative" zIndex={10}>
-          <styled.p fontSize="lg" color="gray.400" textAlign="center">
+        <VStack gap={6} pos="relative" zIndex={10} w="full">
+          <Grid columns={2} gap={3} w="full" maxW="md">
+            {/* Total Tournaments */}
+            <Box
+              bg="gray.900/50"
+              p={3}
+              rounded="lg"
+              borderWidth={1}
+              borderColor="gray.800"
+            >
+              <styled.p fontSize="xs" color="gray.500" mb={1}>
+                Tournaments
+              </styled.p>
+              <styled.p fontSize="2xl" fontWeight="bold">
+                {stats.totalTournaments}
+              </styled.p>
+            </Box>
+
+            {/* Total Battles */}
+            <Box
+              bg="gray.900/50"
+              p={3}
+              rounded="lg"
+              borderWidth={1}
+              borderColor="gray.800"
+            >
+              <styled.p fontSize="xs" color="gray.500" mb={1}>
+                Battles
+              </styled.p>
+              <styled.p fontSize="2xl" fontWeight="bold">
+                {stats.totalBattles}
+              </styled.p>
+            </Box>
+
+            {/* Biggest Win */}
+            {stats.biggestWin && (
+              <Box
+                bg="gray.900/50"
+                p={3}
+                rounded="lg"
+                borderWidth={1}
+                borderColor="gray.800"
+              >
+                <styled.p fontSize="xs" color="gray.500" mb={1}>
+                  Biggest Win
+                </styled.p>
+                <styled.p fontSize="lg" fontWeight="bold" color="green.400">
+                  +{stats.biggestWin.points.toFixed(1)}
+                </styled.p>
+              </Box>
+            )}
+
+            {/* Biggest Loss */}
+            {stats.biggestLoss && (
+              <Box
+                bg="gray.900/50"
+                p={3}
+                rounded="lg"
+                borderWidth={1}
+                borderColor="gray.800"
+              >
+                <styled.p fontSize="xs" color="gray.500" mb={1}>
+                  Biggest Loss
+                </styled.p>
+                <styled.p fontSize="lg" fontWeight="bold" color="red.400">
+                  {stats.biggestLoss.points.toFixed(1)}
+                </styled.p>
+              </Box>
+            )}
+
+            {/* #1 Enemy */}
+            {stats.enemy && (
+              <Box
+                bg="gray.900/50"
+                p={3}
+                rounded="lg"
+                borderWidth={1}
+                borderColor="gray.800"
+                gridColumn="1 / -1"
+              >
+                <styled.p fontSize="xs" color="gray.500" mb={1}>
+                  #1 Enemy
+                </styled.p>
+                <styled.p fontSize="sm" fontWeight="semibold">
+                  {stats.enemy.name}
+                </styled.p>
+                <styled.p fontSize="xs" color="gray.600">
+                  {stats.enemy.count} battles
+                </styled.p>
+              </Box>
+            )}
+
+            {/* Final Rating */}
+            <Box
+              bg="gray.900/50"
+              p={3}
+              rounded="lg"
+              borderWidth={1}
+              borderColor="gray.800"
+              gridColumn="1 / -1"
+            >
+              <styled.p fontSize="xs" color="gray.500" mb={2}>
+                Final Rating
+              </styled.p>
+              <Flex alignItems="center" gap={3}>
+                <Box w={12} h={12} perspective="200px" flexShrink={0}>
+                  <styled.img
+                    src={`/badges/${stats.rank}.png`}
+                    w="full"
+                    alt={stats.rank}
+                    animation="badge 4s linear infinite"
+                  />
+                </Box>
+                <Box>
+                  <styled.p fontSize="2xl" fontWeight="bold">
+                    {stats.finalRating.toFixed(3)}
+                  </styled.p>
+                  <styled.p fontSize="xs" color="gray.600">
+                    {stats.rank.charAt(0).toUpperCase() + stats.rank.slice(1)}
+                  </styled.p>
+                </Box>
+              </Flex>
+            </Box>
+          </Grid>
+
+          <styled.p fontSize="sm" color="gray.500" textAlign="center">
             Thanks for being part of the RC Drift community
           </styled.p>
           <LinkButton to={`/2026`}>
