@@ -33,7 +33,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const driver = await prisma.users.findFirst({
     where: {
-      id: userId,
+      // id: userId,
+      id: "user_2cm5E7zlTQxg2b98zh6O3Px0c6n",
     },
     select: {
       lastBattleDate: true,
@@ -77,6 +78,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
           id: true,
           name: true,
           createdAt: true,
+          region: true,
         },
       },
       driverLeft: {
@@ -99,11 +101,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   let biggestWin = { points: 0, opponent: "", tournament: "" };
   let biggestLoss = { points: 0, opponent: "", tournament: "" };
+  let totalPointsChange = 0;
   const opponentCounts: Record<string, { name: string; count: number }> = {};
   const tournamentStats: Record<
     string,
     { name: string; wins: number; losses: number }
   > = {};
+  const regionTournaments: Record<string, Set<string>> = {};
 
   battles.forEach((battle) => {
     const isLeftDriver = battle.driverLeft?.driverId === driver.driverId;
@@ -119,12 +123,24 @@ export const loader = async (args: LoaderFunctionArgs) => {
       : battle?.loserElo ?? 1000;
     const pointsChange = endingElo - startingElo;
 
+    // Track total points change
+    totalPointsChange += pointsChange;
+
     const opponent = isLeftDriver
       ? battle.driverRight?.user
       : battle.driverLeft?.user;
     const opponentName = opponent
       ? `${opponent.firstName} ${opponent.lastName}`
       : "Unknown";
+
+    // Track region frequency (unique tournaments per region)
+    if (battle.tournament.region) {
+      const region = battle.tournament.region;
+      if (!regionTournaments[region]) {
+        regionTournaments[region] = new Set();
+      }
+      regionTournaments[region].add(battle.tournamentId);
+    }
 
     // Track biggest win and loss
     if (pointsChange > biggestWin.points) {
@@ -177,6 +193,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
     (a, b) => b.wins - a.wins || a.losses - b.losses,
   )[0];
 
+  // Find most active region (by tournament count)
+  const mostActiveRegion = Object.entries(regionTournaments)
+    .map(([region, tournamentSet]) => [region, tournamentSet.size] as const)
+    .sort((a, b) => b[1] - a[1])[0];
+
   const finalRating = adjustDriverElo(driver.elo, driver.lastBattleDate);
   const rank = getDriverRank(finalRating, driver.totalBattles);
 
@@ -188,10 +209,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
     stats: {
       totalTournaments,
       totalBattles,
+      totalPointsChange,
       biggestWin: totalBattles > 0 ? biggestWin : null,
       biggestLoss: totalBattles > 0 ? biggestLoss : null,
       enemy: enemy || null,
       mostSuccessful: mostSuccessful || null,
+      mostActiveRegion: mostActiveRegion
+        ? { name: mostActiveRegion[0], count: mostActiveRegion[1] }
+        : null,
       finalRating,
       rank,
     },
@@ -295,6 +320,25 @@ const Page = () => {
         </styled.p>
       ),
     },
+    {
+      title: "Total Rating Change",
+      subtitle:
+        stats.totalPointsChange >= 0
+          ? `+${stats.totalPointsChange.toFixed(3)}`
+          : stats.totalPointsChange.toFixed(3),
+      content: (
+        <styled.p
+          fontSize="lg"
+          color={stats.totalPointsChange >= 0 ? "green.400" : "red.400"}
+          textAlign="center"
+          maxW={250}
+        >
+          {stats.totalPointsChange >= 0
+            ? "You gained rating points across all your battles!"
+            : "You lost rating points across all your battles"}
+        </styled.p>
+      ),
+    },
     ...(stats.biggestWin
       ? [
           {
@@ -361,6 +405,20 @@ const Page = () => {
           },
         ]
       : []),
+    ...(stats.mostActiveRegion
+      ? [
+          {
+            title: "Most Active Region",
+            subtitle: stats.mostActiveRegion.name,
+            content: (
+              <styled.p fontSize="lg" color="gray.400" textAlign="center">
+                {stats.mostActiveRegion.count} tournament
+                {stats.mostActiveRegion.count === 1 ? "" : "s"} in this region
+              </styled.p>
+            ),
+          },
+        ]
+      : []),
     {
       title: "Final Rating",
       subtitle: stats.finalRating.toFixed(3),
@@ -418,6 +476,28 @@ const Page = () => {
               </styled.p>
             </Box>
 
+            {/* Total Rating Change */}
+            <Box
+              bg="gray.900/50"
+              p={3}
+              rounded="lg"
+              borderWidth={1}
+              borderColor="gray.800"
+              gridColumn="1 / -1"
+            >
+              <styled.p fontSize="xs" color="gray.500" mb={1}>
+                Total Rating Change
+              </styled.p>
+              <styled.p
+                fontSize="2xl"
+                fontWeight="bold"
+                color={stats.totalPointsChange >= 0 ? "green.400" : "red.400"}
+              >
+                {stats.totalPointsChange >= 0 ? "+" : ""}
+                {stats.totalPointsChange.toFixed(3)}
+              </styled.p>
+            </Box>
+
             {/* Biggest Win */}
             {stats.biggestWin && (
               <Box
@@ -472,6 +552,29 @@ const Page = () => {
                 </styled.p>
                 <styled.p fontSize="xs" color="gray.600">
                   {stats.enemy.count} battles
+                </styled.p>
+              </Box>
+            )}
+
+            {/* Most Active Region */}
+            {stats.mostActiveRegion && (
+              <Box
+                bg="gray.900/50"
+                p={3}
+                rounded="lg"
+                borderWidth={1}
+                borderColor="gray.800"
+                gridColumn="1 / -1"
+              >
+                <styled.p fontSize="xs" color="gray.500" mb={1}>
+                  Most Active Region
+                </styled.p>
+                <styled.p fontSize="sm" fontWeight="semibold">
+                  {stats.mostActiveRegion.name}
+                </styled.p>
+                <styled.p fontSize="xs" color="gray.600">
+                  {stats.mostActiveRegion.count} tournament
+                  {stats.mostActiveRegion.count === 1 ? "" : "s"}
                 </styled.p>
               </Box>
             )}
@@ -665,7 +768,7 @@ const Page = () => {
             <styled.h3 fontSize="lg" color="gray.500" fontWeight="medium">
               {currentStoryData.title}
             </styled.h3>
-            <styled.h2 fontSize="5xl" fontWeight="extrabold" lineHeight={1}>
+            <styled.h2 fontSize="4xl" fontWeight="extrabold" lineHeight={1}>
               {currentStoryData.subtitle}
             </styled.h2>
           </VStack>
