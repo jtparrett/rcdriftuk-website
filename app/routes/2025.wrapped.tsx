@@ -33,8 +33,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const driver = await prisma.users.findFirst({
     where: {
-      // id: userId,
-      id: "user_2cm5E7zlTQxg2b98zh6O3Px0c6n",
+      id: userId,
+      // id: "user_2cm5E7zlTQxg2b98zh6O3Px0c6n",
     },
     select: {
       lastBattleDate: true,
