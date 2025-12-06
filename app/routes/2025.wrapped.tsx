@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { redirect, useLoaderData } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import { Box, Container, Flex, styled, VStack } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
@@ -17,7 +17,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    throw new Response("Unauthorized", { status: 401 });
+    throw redirect("/sign-in?redirectUrl=/2025/wrapped");
   }
 
   const user = await getUser(userId);
