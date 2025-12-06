@@ -334,8 +334,8 @@ const Page = () => {
           maxW={250}
         >
           {stats.totalPointsChange >= 0
-            ? "You gained rating points across all your battles!"
-            : "You lost rating points across all your battles"}
+            ? "Overall you gained rating points!"
+            : "Overall you lost rating points"}
         </styled.p>
       ),
     },
