@@ -57,7 +57,7 @@ export const Markdown = ({ children }: Props) => {
             // Check if this is an internal link (starts with /)
 
             if (href?.startsWith("https://rcdrift.io")) {
-              const [_, path] = href.split("https://rcdrift.io/");
+              const [_, path] = href.split("https://rcdrift.io");
               return (
                 <Link
                   to={path}
