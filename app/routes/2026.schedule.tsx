@@ -119,7 +119,7 @@ const Page = () => {
                       >
                         <AspectRatio ratio={1.6}>
                           <styled.img
-                            src={event.cover ?? ""}
+                            src={event.cover ?? event.eventTrack?.image ?? ""}
                             alt={event.name}
                             w="full"
                           />
