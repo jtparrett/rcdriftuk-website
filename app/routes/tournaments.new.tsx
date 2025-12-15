@@ -8,7 +8,6 @@ import { CreateTournamentForm } from "~/components/CreateTournamentForm";
 import {
   BattlesBracket,
   QualifyingProcedure,
-  TicketStatus,
   TournamentsFormat,
   TournamentsState,
 } from "~/utils/enums";
@@ -113,7 +112,7 @@ export const action = async (args: ActionFunctionArgs) => {
     drivers,
     qualifyingLaps,
     format,
-    fullInclusion,
+    bracketSize,
     enableProtests,
     region,
     scoreFormula,
@@ -122,14 +121,8 @@ export const action = async (args: ActionFunctionArgs) => {
     driverNumbers,
   } = tournamentFormSchema.parse(body);
 
-  if (
-    fullInclusion || format === TournamentsFormat.EXHIBITION
-      ? drivers.length < 2
-      : drivers.length < 4
-  ) {
-    throw new Error(
-      `Please add at least ${fullInclusion ? 2 : 4} drivers to the tournament`,
-    );
+  if (drivers.length < 2) {
+    throw new Error(`Please add at least 2 drivers to the tournament`);
   }
 
   // Create tournament
@@ -139,7 +132,7 @@ export const action = async (args: ActionFunctionArgs) => {
       name,
       qualifyingLaps,
       format,
-      fullInclusion,
+      bracketSize,
       enableProtests,
       region,
       scoreFormula,
@@ -457,7 +450,7 @@ const Page = () => {
             points: judge.points,
           })),
           format: tournament?.format,
-          fullInclusion: tournament?.fullInclusion,
+          bracketSize: tournament?.bracketSize,
           enableProtests: tournament?.enableProtests,
           qualifyingLaps: tournament?.qualifyingLaps,
           region: tournament?.region ?? undefined,

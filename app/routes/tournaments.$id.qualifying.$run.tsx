@@ -9,11 +9,7 @@ import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
 import { getAuth } from "~/utils/getAuth.server";
-import {
-  QualifyingProcedure,
-  TournamentsDriverNumbers,
-  TournamentsFormat,
-} from "~/utils/enums";
+import { QualifyingProcedure, TournamentsDriverNumbers } from "~/utils/enums";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 import { token } from "~/styled-system/tokens";
@@ -35,7 +31,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
       },
       id: true,
-      fullInclusion: true,
       format: true,
       qualifyingLaps: true,
       userId: true,
@@ -97,7 +92,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     run,
     isOwner,
     id: tournament.id,
-    fullInclusion: tournament.fullInclusion,
     format: tournament.format,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
@@ -180,7 +174,6 @@ const Table = ({
         return (
           <Fragment key={i}>
             {i + startPosition === qualifyingCutOff &&
-              !tournament.fullInclusion &&
               (tournament.run === 0 ||
                 tournament.qualifyingProcedure ===
                   QualifyingProcedure.WAVES) && (

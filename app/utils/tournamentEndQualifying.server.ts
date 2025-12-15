@@ -47,7 +47,6 @@ export const tournamentEndQualifying = async (id: string) => {
     select: {
       id: true,
       scoreFormula: true,
-      fullInclusion: true,
       format: true,
       qualifyingLaps: true,
       qualifyingProcedure: true,
@@ -75,9 +74,8 @@ export const tournamentEndQualifying = async (id: string) => {
 
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
 
-  const totalBuysToCreate = tournament.fullInclusion
-    ? pow2Ceil(tournament.drivers.length) - tournament.drivers.length
-    : 0;
+  const totalBuysToCreate =
+    pow2Ceil(tournament.drivers.length) - tournament.drivers.length;
 
   const driversWithScores = [
     ...tournament.drivers,
@@ -96,12 +94,7 @@ export const tournamentEndQualifying = async (id: string) => {
     );
 
     // If the driver has no scores, convert them into a BYE run
-    // only if the tournament is not full inclusion
-    if (
-      !tournament.fullInclusion &&
-      lapScores.every((score) => score === 0) &&
-      tournament.format !== TournamentsFormat.BATTLE_TREE
-    ) {
+    if (lapScores.every((score) => score === 0)) {
       return {
         lapScores: [],
         id: byeTounamentDriver.id,

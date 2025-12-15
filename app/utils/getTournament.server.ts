@@ -14,7 +14,7 @@ export const getTournament = (id: string) => {
       userId: true,
       liveUrl: true,
       scoreFormula: true,
-      fullInclusion: true,
+      bracketSize: true,
       enableProtests: true,
       qualifyingOrder: true,
       qualifyingProcedure: true,

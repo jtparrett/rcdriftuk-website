@@ -84,6 +84,7 @@ model Tournaments {
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?       @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
   fullInclusion       Boolean                  @default(false)
+  bracketSize         Int                      @default(4)
   enableProtests      Boolean                  @default(false)
   region              Regions?
   rated               Boolean                  @default(false)

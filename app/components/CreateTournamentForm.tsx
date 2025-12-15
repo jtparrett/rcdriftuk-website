@@ -49,7 +49,14 @@ export const tournamentFormSchema = z.object({
     .min(1, "Qualifying laps must be at least 1")
     .max(3, "Qualifying laps must be at most 3"),
   format: z.nativeEnum(TournamentsFormat),
-  fullInclusion: z.boolean(),
+  bracketSize: z.union([
+    z.literal(4),
+    z.literal(8),
+    z.literal(16),
+    z.literal(32),
+    z.literal(64),
+    z.literal(128),
+  ]),
   enableProtests: z.boolean(),
   region: z.nativeEnum(Regions),
   scoreFormula: z.nativeEnum(ScoreFormula),
@@ -317,7 +324,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
       name: initialValues.name ?? "",
       judges: initialValues.judges ?? [],
       drivers: initialValues.drivers ?? [],
-      fullInclusion: initialValues.fullInclusion ?? false,
+      bracketSize: initialValues.bracketSize ?? 4,
       enableProtests: initialValues.enableProtests ?? false,
       qualifyingLaps: initialValues.qualifyingLaps ?? 1,
       region: initialValues.region ?? Regions.UK,
@@ -513,43 +520,26 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
           </FormControl>
         </Flex>
 
-        {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.BATTLE_TREE) && (
-          <Flex gap={4}>
-            <StepDot />
-            <FormControl flex={1} error={formik.errors.fullInclusion}>
-              <Label>Should all drivers participate in battles?</Label>
-              <styled.span
-                mb={2}
-                color="gray.500"
-                display="block"
-                textWrap="pretty"
-              >
-                Enabling this option will ensure the bracket is fully populated,
-                granting Bye-runs to the highest-qualified drivers where
-                necessary.
-              </styled.span>
-
-              <TabGroup>
-                <TabButton
-                  type="button"
-                  isActive={!formik.values.fullInclusion}
-                  onClick={() => formik.setFieldValue("fullInclusion", false)}
-                >
-                  No
-                </TabButton>
-                <TabButton
-                  type="button"
-                  isActive={formik.values.fullInclusion}
-                  onClick={() => formik.setFieldValue("fullInclusion", true)}
-                >
-                  Yes
-                </TabButton>
-              </TabGroup>
-            </FormControl>
-          </Flex>
-        )}
+        <Flex gap={4}>
+          <StepDot />
+          <FormControl flex={1} error={formik.errors.bracketSize}>
+            <Label>What size is the battle bracket?</Label>
+            <TabGroup>
+              {[4, 8, 16, 32, 64, 128].map((item) => {
+                return (
+                  <TabButton
+                    key={item}
+                    type="button"
+                    isActive={formik.values.bracketSize === item}
+                    onClick={() => formik.setFieldValue("bracketSize", item)}
+                  >
+                    {item}
+                  </TabButton>
+                );
+              })}
+            </TabGroup>
+          </FormControl>
+        </Flex>
 
         <Flex gap={4}>
           <StepDot />
