@@ -319,7 +319,7 @@ const Page = () => {
             </Flex>
 
             {event.enableTicketing &&
-              isBefore(new Date(), new Date(event.startDate)) && (
+              isBefore(new Date(), new Date(event.endDate)) && (
                 <>
                   <Divider mt={4} borderColor="gray.800" />
                   <Box pt={4}>
