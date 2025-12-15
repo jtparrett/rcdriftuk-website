@@ -29,7 +29,9 @@ export const tournamentHasQualifying = (format: TournamentsFormat) => {
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId, "User not found");
+  if (!userId) {
+    return redirect("/sign-in");
+  }
 
   const users = await getUsers();
 
