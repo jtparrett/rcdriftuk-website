@@ -188,8 +188,8 @@ export const action = async (args: ActionFunctionArgs) => {
         const [firstName, lastName] = driver.driverId.split(" ");
 
         return {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
+          firstName: firstName?.trim() ?? "",
+          lastName: lastName?.trim() ?? "",
         };
       }),
       select: {
