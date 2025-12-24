@@ -116,25 +116,23 @@ const Page = () => {
                   </Flex>
                 </Box>
                 <Spacer />
+                <LinkButton
+                  variant="ghost"
+                  pos="relative"
+                  zIndex={3}
+                  to={`/tournaments/new?tournamentId=${tournament.id}`}
+                >
+                  <RiCheckboxMultipleBlankFill />
+                </LinkButton>
                 {tournament.userId === userId && (
-                  <>
-                    <LinkButton
-                      variant="ghost"
-                      pos="relative"
-                      zIndex={3}
-                      to={`/tournaments/new?tournamentId=${tournament.id}`}
-                    >
-                      <RiCheckboxMultipleBlankFill />
-                    </LinkButton>
-                    <LinkButton
-                      variant="ghost"
-                      pos="relative"
-                      zIndex={3}
-                      to={`/tournaments-archive/${tournament.id}`}
-                    >
-                      <RiDeleteBinFill />
-                    </LinkButton>
-                  </>
+                  <LinkButton
+                    variant="ghost"
+                    pos="relative"
+                    zIndex={3}
+                    to={`/tournaments-archive/${tournament.id}`}
+                  >
+                    <RiDeleteBinFill />
+                  </LinkButton>
                 )}
               </Flex>
             </Box>
