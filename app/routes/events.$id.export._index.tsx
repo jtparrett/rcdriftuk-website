@@ -26,7 +26,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
       EventTickets: {
         orderBy: {
-          createdAt: "desc",
+          updatedAt: "desc",
         },
         where: {
           status: TicketStatus.CONFIRMED,
@@ -53,20 +53,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   const csvRows = [
-    [
-      "Driver ID",
-      "First Name",
-      "Last Name",
-      "Ticket Status",
-      "Purchase Date",
-    ].join(","),
+    ["Driver ID", "First Name", "Last Name", "Purchase Date"].join(","),
     ...event.EventTickets.map((ticket) =>
       [
-        ticket.user?.driverId ?? "",
+        String(ticket.user?.driverId ?? 0),
         ticket.user?.firstName ?? "",
         ticket.user?.lastName ?? "",
-        ticket.status,
-        new Date(ticket.createdAt).toLocaleDateString(),
+        new Date(ticket.updatedAt).toLocaleDateString(),
       ].join(","),
     ),
   ];
