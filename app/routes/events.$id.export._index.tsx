@@ -66,10 +66,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const csv = csvRows.join("\n");
 
+  // Sanitize filename to ensure only ASCII characters (HTTP headers requirement)
+  const sanitizedEventName = event.name
+    .replace(/[–—]/g, "-") // Replace en dash and em dash with regular hyphen
+    .replace(/[^\x00-\x7F]/g, "") // Remove any remaining non-ASCII characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^\w-]/g, ""); // Keep only word characters and hyphens
+
   return new Response(csv, {
     headers: {
       "Content-Type": "text/csv",
-      "Content-Disposition": `attachment; filename="${event.name}-tickets-${format(
+      "Content-Disposition": `attachment; filename="${sanitizedEventName}-tickets-${format(
         new Date(),
         "dd-MM-yyyy",
       )}.csv"`,
