@@ -1,24 +1,12 @@
-import { Box, Center, Spacer, styled } from "~/styled-system/jsx";
-import { useDelayedLoader } from "./Header";
-import { Link, useLocation, useNavigate } from "react-router";
-import {
-  RiArrowLeftSLine,
-  RiChat3Line,
-  RiNotificationLine,
-} from "react-icons/ri";
-import {
-  useScroll,
-  motion,
-  useTransform,
-  AnimatePresence,
-  useMotionValueEvent,
-} from "motion/react";
+import { Box, Spacer, styled } from "~/styled-system/jsx";
+import { Link } from "react-router";
+import { RiNotificationLine } from "react-icons/ri";
+import { useScroll, motion, useMotionValueEvent } from "motion/react";
 import { css } from "~/styled-system/css";
-import { LogoLoader } from "./LogoLoader";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { SignedIn } from "@clerk/react-router";
 import { AppName } from "~/utils/enums";
-import { useMemo, useState, useRef } from "react";
+import { useState, useRef } from "react";
 
 export const APP_TAB_ROUTES = [
   "/",
@@ -48,9 +36,6 @@ const IconButton = styled(Link, {
 });
 
 export const AppHeader = () => {
-  const isNavigating = useDelayedLoader();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { scrollY } = useScroll();
 
   const [isVisible, setIsVisible] = useState(true);
@@ -67,16 +52,6 @@ export const AppHeader = () => {
     }
     lastScrollY.current = latest;
   });
-
-  // Use animate prop for smooth transitions
-
-  const showBackButton = useMemo(() => {
-    return !APP_TAB_ROUTES.some((route) =>
-      route.endsWith("*")
-        ? location.pathname.toLowerCase().startsWith(route.slice(0, -1))
-        : location.pathname.toLowerCase() === route,
-    );
-  }, [location.pathname]);
 
   return (
     <>
@@ -120,37 +95,16 @@ export const AppHeader = () => {
             ease: "easeInOut",
           }}
         >
-          <AnimatePresence mode="wait">
-            {showBackButton && (
-              <motion.div
-                key="back-button"
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "auto", opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                transition={{
-                  duration: 0.3,
-                  ease: "easeInOut",
-                  opacity: { duration: 0.2 },
-                }}
-                style={{ overflow: "hidden" }}
-              >
-                <styled.button
-                  onClick={() => navigate(-1)}
-                  type="button"
-                  cursor="pointer"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  minW="32px"
-                  h="32px"
-                >
-                  <RiArrowLeftSLine size={24} />
-                </styled.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <Link to="/app" replace>
+          <Link
+            to="/app"
+            replace
+            className={css({
+              pos: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            })}
+          >
             <img
               className={css({
                 w: 140,
@@ -178,12 +132,6 @@ export const AppHeader = () => {
       </motion.div>
 
       <Box h="calc(64px + env(safe-area-inset-top))" w="full" />
-
-      {isNavigating && (
-        <Center pos="fixed" inset={0} bgColor="black" zIndex={14}>
-          <LogoLoader />
-        </Center>
-      )}
     </>
   );
 };

@@ -26,7 +26,6 @@ import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { EmbedProvider } from "./utils/EmbedContext";
 import { AppProvider } from "./utils/AppContext";
-import { AppNav } from "./components/AppNav";
 import { AppHeader } from "./components/AppHeader";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
@@ -159,7 +158,8 @@ function App({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { hideBanner, isEmbed, isApp, posthog, user } = loaderData || {};
+  const { hideBanner, isEmbed, posthog, user } = loaderData || {};
+  const isApp = true;
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
 
@@ -259,7 +259,6 @@ function App({
 
               <Outlet />
 
-              {isApp && <AppNav />}
               {!isMap && !isEmbed && !isApp && <Footer />}
             </EmbedProvider>
           </AppProvider>
