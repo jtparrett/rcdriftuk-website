@@ -119,7 +119,9 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    createAbly().channels.get(id).publish("update", new Date().toISOString());
+    createAbly(process.env.ABLY_API_KEY!)
+      .channels.get(id)
+      .publish("update", new Date().toISOString());
   };
 
   notFoundInvariant(tournament, "Tournament not found");

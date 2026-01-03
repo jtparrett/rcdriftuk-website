@@ -140,7 +140,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    createAbly()
+    createAbly(process.env.ABLY_API_KEY!)
       .channels.get(judge.tournament.id)
       .publish("update", new Date().toISOString());
   };
