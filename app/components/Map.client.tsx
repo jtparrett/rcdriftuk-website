@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { Box, Container, Flex } from "~/styled-system/jsx";
-import { Outlet, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import type { Tracks } from "@prisma/client";
 import { Regions } from "~/utils/enums";
 import { oneOf } from "~/utils/oneOf";
@@ -105,7 +105,7 @@ export const Map = ({ tracks }: Props) => {
 
       // Add click handler
       el.addEventListener("click", () => {
-        navigate(`./${track.slug}`);
+        navigate(`/tracks/${track.slug}`);
       });
 
       markers.current.push(marker);
@@ -184,7 +184,6 @@ export const Map = ({ tracks }: Props) => {
 
       <Box h="100%" position="relative" overflow="hidden" zIndex={1} flex={1}>
         <Box ref={mapContainer} h="100%" overflow="hidden" />
-        <Outlet />
       </Box>
     </>
   );
