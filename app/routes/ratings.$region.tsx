@@ -348,6 +348,7 @@ const RatingsPage = () => {
                 query ? `?query=${query}` : ""
               }`}
               isActive={option === region}
+              data-replace="true"
               replace
             >
               {option}

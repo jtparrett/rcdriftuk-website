@@ -558,6 +558,7 @@ const JudgePage = () => {
                   className={css({
                     fontSize: "sm",
                   })}
+                  data-replace="true"
                   replace
                 >
                   {tournament.name}

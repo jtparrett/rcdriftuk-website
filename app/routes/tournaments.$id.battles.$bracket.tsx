@@ -224,6 +224,7 @@ const TournamentBattlesPage = () => {
                   key={sub}
                   to={`/tournaments/${tournament.id}/battles/${sub}`}
                   isActive={sub === bracket}
+                  data-replace="true"
                   replace
                 >
                   {sentenceCase(sub)} Bracket
