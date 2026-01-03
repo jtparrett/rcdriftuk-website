@@ -1,7 +1,5 @@
 import Ably from "ably";
-import invariant from "~/utils/invariant";
 
 export const createAbly = () => {
-  invariant(process.env.ABLY_API_KEY, "ABLY_API_KEY is not set");
-  return new Ably.Realtime(process.env.ABLY_API_KEY);
+  return new Ably.Realtime(process.env.ABLY_API_KEY!);
 };
