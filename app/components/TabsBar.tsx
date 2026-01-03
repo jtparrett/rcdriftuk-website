@@ -1,8 +1,5 @@
-import { motion, useScroll, useMotionValueEvent } from "motion/react";
-import { css } from "~/styled-system/css";
 import { Box, Container, Flex } from "~/styled-system/jsx";
 import { useIsApp } from "~/utils/AppContext";
-import { useState, useRef } from "react";
 import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const TabsBar = ({ children }: { children: React.ReactNode }) => {
@@ -14,10 +11,7 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
       pos="sticky"
       style={
         {
-          "--top":
-            isApp || isEmbed
-              ? "env(safe-area-inset-top)"
-              : "calc(64px + env(safe-area-inset-top))",
+          "--top": isApp || isEmbed ? "0px" : "64px",
         } as React.CSSProperties
       }
       top="var(--top)"

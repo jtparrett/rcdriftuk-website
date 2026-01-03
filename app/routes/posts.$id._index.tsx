@@ -61,7 +61,6 @@ const PostPage = () => {
           zIndex={1}
           borderTopWidth={1}
           borderColor="gray.900"
-          pb="env(safe-area-inset-bottom)"
         >
           <Container maxW={680} py={2} px={3}>
             <PostCommentForm post={post} user={user} />

@@ -242,10 +242,7 @@ const Page = () => {
   if (stats.totalBattles === 0) {
     return (
       <Box
-        minH={{
-          base: "calc(100dvh - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 128px)",
-          md: "calc(100dvh - 100px)",
-        }}
+        minH="calc(100dvh - 78px)"
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -659,10 +656,7 @@ const Page = () => {
 
   return (
     <Box
-      minH={{
-        base: "calc(100dvh - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 128px)",
-        md: "calc(100dvh - 100px)",
-      }}
+      minH="calc(100dvh - 78px)"
       display="flex"
       alignItems="center"
       justifyContent="center"
