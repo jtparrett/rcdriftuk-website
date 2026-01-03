@@ -119,7 +119,7 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    createAbly(process.env.ABLY_API_KEY!)
+    createAbly(process.env.VITE_ABLY_API_KEY!)
       .channels.get(id)
       .publish("update", new Date().toISOString());
   };
