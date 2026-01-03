@@ -71,15 +71,15 @@ const CalendarPage = () => {
 
   const getDate = () => {
     if (increment === "day") {
-      return format(date, "EEEE do MMMM, yyyy");
+      return format(date, "EEEE | MMM do | yyyy");
     }
 
     if (increment === "week") {
-      return `${format(startWeekDate, "do")}-${format(endWeekDate, "do MMMM, yyyy")}`;
+      return `${format(startWeekDate, "do")}-${format(endWeekDate, "do MMM | yyyy")}`;
     }
 
     if (increment === "month") {
-      return format(date, "MMMM, yyyy");
+      return format(date, "MMMM | yyyy");
     }
   };
 
