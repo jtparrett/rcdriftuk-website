@@ -26,7 +26,6 @@ import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { EmbedProvider } from "./utils/EmbedContext";
 import { AppProvider } from "./utils/AppContext";
-import { AppHeader } from "./components/AppHeader";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
@@ -246,7 +245,6 @@ function App({
           <AppProvider value={isApp}>
             <EmbedProvider value={isEmbed}>
               <ExpoPushToken />
-              {isApp && <AppHeader />}
 
               {!isEmbed && (
                 <>
