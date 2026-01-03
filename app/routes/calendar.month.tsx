@@ -29,6 +29,8 @@ const CalendarMonthsPage = () => {
           to={`/calendar/month/${format(date, "dd-MM-yy")}`}
           size="sm"
           variant={isListView ? "outline" : "primary"}
+          data-replace="true"
+          replace
         >
           <RiCalendarFill />
         </LinkButton>
@@ -37,6 +39,8 @@ const CalendarMonthsPage = () => {
           to={`/calendar/month/list/${format(date, "dd-MM-yy")}`}
           size="sm"
           variant={isListView ? "primary" : "outline"}
+          data-replace="true"
+          replace
         >
           <RiListUnordered />
         </LinkButton>
@@ -45,6 +49,8 @@ const CalendarMonthsPage = () => {
           size="sm"
           variant="outline"
           to={`${basePath}/${format(sub(date, { months: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowLeftSLine />
         </LinkButton>
@@ -52,6 +58,8 @@ const CalendarMonthsPage = () => {
           size="sm"
           variant="outline"
           to={`${basePath}/${format(new Date(), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           Today
         </LinkButton>
@@ -59,6 +67,8 @@ const CalendarMonthsPage = () => {
           size="sm"
           variant="outline"
           to={`${basePath}/${format(add(date, { months: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowRightSLine />
         </LinkButton>

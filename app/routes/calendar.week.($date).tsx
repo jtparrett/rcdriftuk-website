@@ -77,6 +77,8 @@ const CalendarWeeksPage = () => {
           size="sm"
           variant="outline"
           to={`/calendar/week/${format(sub(date, { weeks: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowLeftSLine />
         </LinkButton>
@@ -84,6 +86,8 @@ const CalendarWeeksPage = () => {
           size="sm"
           variant="outline"
           to={`/calendar/week/${format(new Date(), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           Today
         </LinkButton>
@@ -91,6 +95,8 @@ const CalendarWeeksPage = () => {
           size="sm"
           variant="outline"
           to={`/calendar/week/${format(add(date, { weeks: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowRightSLine />
         </LinkButton>

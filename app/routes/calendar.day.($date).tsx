@@ -59,6 +59,8 @@ const CalendarDaysPage = () => {
           size="sm"
           variant="outline"
           to={`/calendar/day/${format(sub(date, { days: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowLeftSLine />
         </LinkButton>
@@ -66,6 +68,8 @@ const CalendarDaysPage = () => {
           size="sm"
           variant="outline"
           to={`/calendar/day/${format(new Date(), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           Today
         </LinkButton>
@@ -73,6 +77,8 @@ const CalendarDaysPage = () => {
           size="sm"
           variant="outline"
           to={`/calendar/day/${format(add(date, { days: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowRightSLine />
         </LinkButton>
