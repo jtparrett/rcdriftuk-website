@@ -78,24 +78,6 @@ const UserMenuPage = () => {
 
       <Box h={4} />
 
-      <Box
-        bgColor="brand.500"
-        rounded="lg"
-        pos="relative"
-        overflow="hidden"
-        p={4}
-        mb={4}
-      >
-        <LinkOverlay to="/2025/wrapped">
-          <Flex alignItems="center" gap={2}>
-            <styled.p fontWeight="semibold" fontSize="sm">
-              View your 2025 Wrapped
-            </styled.p>
-            <RiArrowRightLine />
-          </Flex>
-        </LinkOverlay>
-      </Box>
-
       <MenuLink to="/getting-started">
         <MenuIcon>
           <RiRocketLine />

@@ -22,7 +22,6 @@ import { Button, LinkButton } from "./components/Button";
 import { RiHome2Line, RiRefreshLine } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
-import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { EmbedProvider } from "./utils/EmbedContext";
 import { AppProvider } from "./utils/AppContext";
@@ -248,7 +247,6 @@ function App({
 
               {!isEmbed && (
                 <>
-                  {!isApp && <AnnouncementBanner />}
                   {!hideBanner && !isApp && <CookieBanner />}
                   {!isApp && <Header user={user} />}
                 </>
