@@ -1,20 +1,20 @@
-import type { UserNotifications } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect } from "react";
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { TabsBar } from "~/components/TabsBar";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getNotificationContent } from "~/utils/getNotificationContent";
-import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId, "User not found");
+  if (!userId) {
+    return redirect("/sign-in?redirect=/notifications");
+  }
 
   await prisma.users.update({
     where: {
