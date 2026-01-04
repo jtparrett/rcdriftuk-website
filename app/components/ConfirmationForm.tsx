@@ -1,6 +1,7 @@
 import { Form, useNavigate } from "react-router";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
+import { appGoBack } from "~/utils/appGoBack";
 
 interface Props {
   title: string;
@@ -44,7 +45,12 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
           <Button
             variant="secondary"
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              const wentBack = appGoBack();
+              if (!wentBack) {
+                navigate(-1);
+              }
+            }}
           >
             Cancel
           </Button>
