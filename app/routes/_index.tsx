@@ -387,7 +387,7 @@ const Page = () => {
                             fontSize="3xl"
                             mb={1}
                           >
-                            Beskpoke Software
+                            Bespoke Software
                           </styled.h1>
                           <styled.p color="gray.400" textWrap="balance">
                             Host your own RC Drift tournaments with our free
