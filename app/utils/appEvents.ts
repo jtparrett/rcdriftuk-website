@@ -9,3 +9,7 @@ const postMessageToApp = (message: string) => {
 export const appGoBack = () => {
   return postMessageToApp("GO_BACK");
 };
+
+export const appNavigate = (path: string) => {
+  return postMessageToApp(path);
+};

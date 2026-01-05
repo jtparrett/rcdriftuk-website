@@ -6,6 +6,7 @@ import type { Tracks } from "@prisma/client";
 import { Regions } from "~/utils/enums";
 import { oneOf } from "~/utils/oneOf";
 import { Tab } from "./Tab";
+import { appNavigate } from "~/utils/appEvents";
 
 export type Values<T> = T[keyof T];
 
@@ -105,7 +106,13 @@ export const Map = ({ tracks }: Props) => {
 
       // Add click handler
       el.addEventListener("click", () => {
-        navigate(`/tracks/${track.slug}`);
+        const didNavigate = appNavigate(
+          `https://${window.location.host}/tracks/${track.slug}`,
+        );
+
+        if (!didNavigate) {
+          navigate(`/tracks/${track.slug}`);
+        }
       });
 
       markers.current.push(marker);
