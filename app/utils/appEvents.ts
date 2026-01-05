@@ -9,7 +9,3 @@ const postMessageToApp = (message: string) => {
 export const appGoBack = () => {
   return postMessageToApp("GO_BACK");
 };
-
-export const appAuthStateChanged = () => {
-  return postMessageToApp("AUTHENTICATED");
-};

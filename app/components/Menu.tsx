@@ -195,16 +195,6 @@ export const Menu = () => {
         </MenuIcon>
         Insights Blog
       </MenuLink>
-
-      <MenuLink
-        to="/merch"
-        active={location.pathname.startsWith("/merch") ? "active" : "inactive"}
-      >
-        <MenuIcon>
-          <RiTShirtLine />
-        </MenuIcon>
-        Merch
-      </MenuLink>
     </>
   );
 };

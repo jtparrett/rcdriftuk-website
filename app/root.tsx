@@ -32,8 +32,6 @@ import { useEffect, useRef } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { AppName } from "./utils/enums";
-import { useAuth } from "@clerk/react-router";
-import { appAuthStateChanged } from "./utils/appEvents";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -153,32 +151,6 @@ const ExpoPushToken = () => {
   return null;
 };
 
-const AuthStateSync = () => {
-  const { isSignedIn, isLoaded } = useAuth();
-  // Use null to distinguish "not yet initialized" from actual boolean states
-  const prevSignedInRef = useRef<boolean | null>(null);
-
-  useEffect(() => {
-    // Wait until Clerk is fully loaded before tracking auth state
-    if (!isLoaded) return;
-
-    // On first load after Clerk is ready, just store the initial state without firing
-    if (prevSignedInRef.current === null) {
-      prevSignedInRef.current = isSignedIn ?? false;
-      return;
-    }
-
-    // Only notify on actual auth state changes after initialization
-    const currentSignedIn = isSignedIn ?? false;
-    if (prevSignedInRef.current !== currentSignedIn) {
-      appAuthStateChanged();
-      prevSignedInRef.current = currentSignedIn;
-    }
-  }, [isSignedIn, isLoaded]);
-
-  return null;
-};
-
 function App({
   loaderData,
 }: {
@@ -272,7 +244,6 @@ function App({
           <AppProvider value={isApp}>
             <EmbedProvider value={isEmbed}>
               <ExpoPushToken />
-              <AuthStateSync />
 
               {!isEmbed && (
                 <>
