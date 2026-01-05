@@ -135,11 +135,7 @@ const NotificationsPage = () => {
                       addSuffix: true,
                     })}
                   </styled.p>
-                  <LinkOverlay
-                    to={`/posts/${content.postId}`}
-                    data-replace="true"
-                    replace
-                  >
+                  <LinkOverlay to={`/posts/${content.postId}`}>
                     <styled.p>{content.text}</styled.p>
                   </LinkOverlay>
                 </Box>
