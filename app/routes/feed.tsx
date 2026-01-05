@@ -1,4 +1,4 @@
-import { RiInformationFill } from "react-icons/ri";
+import { RiArrowRightLine, RiInformationFill } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { LinkOverlay } from "~/components/LinkOverlay";
@@ -154,6 +154,41 @@ const FeedPage = () => {
         )}
 
         <Flex flexDir="column" gap={2} py={2}>
+          <Box
+            bgImage="url(/2026-bg.webp)"
+            bgSize="cover"
+            bgPosition="center"
+            bgRepeat="no-repeat"
+            rounded="xl"
+            pos="relative"
+            zIndex={1}
+            borderWidth={1}
+            borderColor="gray.800"
+            overflow="hidden"
+            _after={{
+              content: '""',
+              pos: "absolute",
+              inset: 0,
+              bgGradient: "to-br",
+              gradientFrom: "rgba(0, 0, 0, 0.6)",
+              gradientTo: "rgba(0, 0, 0, 0.9)",
+              zIndex: -1,
+            }}
+          >
+            <Flex justifyContent="center" alignItems="center" gap={2} py={8}>
+              <LinkOverlay to="/2026">
+                <styled.p
+                  fontSize="2xl"
+                  fontWeight="bold"
+                  textShadow="0 4px 8px black"
+                >
+                  Join the 2026 Season
+                </styled.p>
+              </LinkOverlay>
+              <RiArrowRightLine />
+            </Flex>
+          </Box>
+
           {allPosts.map((post) => (
             <PostCard key={post.id} post={post} user={user} />
           ))}
