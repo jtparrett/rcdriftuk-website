@@ -263,15 +263,7 @@ export const UserMenu = () => {
         Account Settings
       </MenuLink>
 
-      <MenuLink
-        to="/"
-        onClick={(e) => {
-          e.preventDefault();
-          signOut({
-            redirectUrl: "/sign-in",
-          });
-        }}
-      >
+      <MenuLink to="/sign-out" replace data-replace="true">
         <MenuIcon>
           <RiLogoutBoxRLine />
         </MenuIcon>
