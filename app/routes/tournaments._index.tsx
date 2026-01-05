@@ -3,7 +3,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { format } from "date-fns";
 import {
-  RiAddFill,
+  RiAddCircleFill,
   RiBookOpenFill,
   RiCheckboxMultipleBlankFill,
   RiDeleteBinFill,
@@ -14,9 +14,12 @@ import { prisma } from "~/utils/prisma.server";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { sentenceCase } from "change-case";
 import { TabsBar } from "~/components/TabsBar";
+import { Tab } from "~/components/Tab";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
+  const url = new URL(args.request.url);
+  const isMyTournaments = url.searchParams.get("my") === "true";
 
   const tournaments = await prisma.tournaments.findMany({
     where: {
@@ -44,9 +47,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
               },
             ]
           : []),
-        {
-          rated: true,
-        },
+
+        ...(isMyTournaments
+          ? []
+          : [
+              {
+                rated: true,
+              },
+            ]),
       ],
       archived: false,
     },
@@ -55,29 +63,39 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return { tournaments, userId };
+  return { tournaments, userId, isMyTournaments };
 };
 
 const Page = () => {
-  const { tournaments, userId } = useLoaderData<typeof loader>();
+  const { tournaments, userId, isMyTournaments } =
+    useLoaderData<typeof loader>();
 
   return (
     <>
       <TabsBar>
-        <styled.h1 fontSize="lg" fontWeight="extrabold">
-          Tournaments
-        </styled.h1>
+        <Tab to="/tournaments" isActive={!isMyTournaments}>
+          All Tournaments
+        </Tab>
+        <Tab to="/tournaments?my=true" isActive={isMyTournaments}>
+          My Tournaments
+        </Tab>
         <Spacer />
-
         <LinkButton to="/tournaments/user-guide" variant="outline" size="sm">
           Guide <RiBookOpenFill />
         </LinkButton>
-
-        <LinkButton to={userId ? "/tournaments/new" : "/sign-in"} size="sm">
-          Create New <RiAddFill />
-        </LinkButton>
       </TabsBar>
       <Container maxW={1100} px={2} py={4}>
+        <styled.h1 srOnly>Tournaments</styled.h1>
+
+        <LinkButton
+          to={userId ? "/tournaments/new" : "/sign-in"}
+          size="sm"
+          w="full"
+          mb={4}
+        >
+          Create a Tournament <RiAddCircleFill />
+        </LinkButton>
+
         <Flex flexDir="column" gap={2}>
           {tournaments.map((tournament) => (
             <Box

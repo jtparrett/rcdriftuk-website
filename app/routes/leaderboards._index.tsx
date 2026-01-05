@@ -1,4 +1,4 @@
-import { RiAddFill } from "react-icons/ri";
+import { RiAddCircleFill } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkButton } from "~/components/Button";
 import { LinkOverlay } from "~/components/LinkOverlay";
@@ -62,7 +62,7 @@ const LeaderboardsPage = () => {
         <Spacer />
 
         <LinkButton to={userId ? "/leaderboards/new" : "/sign-in"} size="sm">
-          Create New <RiAddFill />
+          Create a Leaderboard <RiAddCircleFill />
         </LinkButton>
       </TabsBar>
       <Container maxW={1100} px={2} py={4}>
