@@ -18,7 +18,9 @@ const CalendarMonthsPage = () => {
 
   const date = parse(params.date, "dd-MM-yy", new Date());
   const isListView = location.pathname.includes("/list");
-  const basePath = isListView ? "/calendar/month/list" : "/calendar/month";
+  const basePath = isListView
+    ? `/calendar/${params.region}/month/list`
+    : `/calendar/${params.region}/month`;
 
   return (
     <>
@@ -26,7 +28,7 @@ const CalendarMonthsPage = () => {
         <Spacer />
 
         <LinkButton
-          to={`/calendar/month/${format(date, "dd-MM-yy")}`}
+          to={`/calendar/${params.region}/month/${format(date, "dd-MM-yy")}`}
           size="sm"
           variant={isListView ? "outline" : "primary"}
           data-replace="true"
@@ -36,7 +38,7 @@ const CalendarMonthsPage = () => {
         </LinkButton>
 
         <LinkButton
-          to={`/calendar/month/list/${format(date, "dd-MM-yy")}`}
+          to={`/calendar/${params.region}/month/list/${format(date, "dd-MM-yy")}`}
           size="sm"
           variant={isListView ? "primary" : "outline"}
           data-replace="true"

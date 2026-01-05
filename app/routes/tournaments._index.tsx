@@ -73,10 +73,20 @@ const Page = () => {
   return (
     <>
       <TabsBar>
-        <Tab to="/tournaments" isActive={!isMyTournaments}>
+        <Tab
+          to="/tournaments"
+          isActive={!isMyTournaments}
+          replace
+          data-replace="true"
+        >
           All Tournaments
         </Tab>
-        <Tab to="/tournaments?my=true" isActive={isMyTournaments}>
+        <Tab
+          to="/tournaments?my=true"
+          isActive={isMyTournaments}
+          replace
+          data-replace="true"
+        >
           My Tournaments
         </Tab>
         <Spacer />
@@ -97,6 +107,12 @@ const Page = () => {
         </LinkButton>
 
         <Flex flexDir="column" gap={2}>
+          {tournaments.length === 0 && (
+            <styled.p textAlign="center" color="gray.500">
+              Looks like you don't have any tournaments yet.
+            </styled.p>
+          )}
+
           {tournaments.map((tournament) => (
             <Box
               key={tournament.id}

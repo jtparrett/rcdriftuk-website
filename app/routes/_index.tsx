@@ -551,7 +551,7 @@ const Page = () => {
                     })}
 
                     <LinkButton
-                      to={`/calendar/week/${today}`}
+                      to={`/calendar/${Regions.ALL}/week/${today}`}
                       variant="secondary"
                     >
                       See All Events

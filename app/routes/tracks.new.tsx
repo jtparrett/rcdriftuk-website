@@ -8,7 +8,7 @@ import { prisma } from "~/utils/prisma.server";
 import { uploadFile } from "~/utils/uploadFile.server";
 import slugify from "slugify";
 import type { Route } from "./+types/tracks.new";
-import { AppName } from "~/utils/enums";
+import { AppName, Regions } from "~/utils/enums";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `${AppName} | Create a Track` }];
@@ -41,19 +41,12 @@ export const action = async (args: ActionFunctionArgs) => {
       url: z.string(),
       image: z.instanceof(File),
       cover: z.instanceof(File).optional(),
-      lat: z.number(),
-      lng: z.number(),
+      lat: z.coerce.number(),
+      lng: z.coerce.number(),
       address: z.string(),
+      region: z.nativeEnum(Regions),
     })
-    .parse({
-      name: formData.get("name"),
-      description: formData.get("description"),
-      url: formData.get("url"),
-      image: formData.get("image"),
-      lat: parseFloat(formData.get("lat") as string),
-      lng: parseFloat(formData.get("lng") as string),
-      address: formData.get("address"),
-    });
+    .parse(formData.entries());
 
   const imageUrl = await uploadFile(data.image);
   let coverUrl = null;

@@ -1,4 +1,4 @@
-import { TrackStatus } from "~/utils/enums";
+import { Regions, TrackStatus } from "~/utils/enums";
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { Link, useLoaderData } from "react-router";
@@ -17,6 +17,7 @@ import {
 import { styled, Box, Flex, Center } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { toZonedTime } from "date-fns-tz";
+import { z } from "zod";
 
 const LinkOverlay = styled(Link, {
   base: {
@@ -29,15 +30,19 @@ const LinkOverlay = styled(Link, {
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
     const today = format(new Date(), "dd-MM-yy");
-    throw redirect(`/calendar/month/${today}`);
+    throw redirect(`/calendar/${params.region}/month/${today}`);
   }
 
+  const region = z.nativeEnum(Regions).safeParse(params.region?.toUpperCase());
   const date = parse(params.date, "dd-MM-yy", new Date());
 
   const events = await prisma.events.findMany({
     where: {
       eventTrack: {
         status: TrackStatus.ACTIVE,
+        ...(region.success && region.data !== Regions.ALL
+          ? { region: region.data }
+          : {}),
       },
       AND: [
         {
@@ -57,11 +62,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return { events, date };
+  return { events, date, region: region.data };
 };
 
 const Page = () => {
-  const { events, date } = useLoaderData<typeof loader>();
+  const { events, date, region } = useLoaderData<typeof loader>();
   const monthStartDate = startOfMonth(date);
 
   return (
@@ -120,7 +125,9 @@ const Page = () => {
                 </styled.h3>
               </Box>
 
-              <LinkOverlay to={`/calendar/day/${format(day, "dd-MM-yy")}`} />
+              <LinkOverlay
+                to={`/calendar/${region}/day/${format(day, "dd-MM-yy")}`}
+              />
 
               <Center aspectRatio={1}>
                 {dayEvents.length > 0 && (

@@ -3,10 +3,11 @@ import { redirect, useLoaderData } from "react-router";
 import { Outlet, useLocation, useParams } from "react-router";
 import { endOfWeek, format, isThisWeek, parse, startOfWeek } from "date-fns";
 import { Tab } from "~/components/Tab";
-import { Container, Spacer, styled } from "~/styled-system/jsx";
-import type { Route } from "./+types/calendar";
+import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import type { Route } from "./+types/calendar.$region";
 import { TabsBar } from "~/components/TabsBar";
-import { AppName } from "~/utils/enums";
+import { AppName, Regions } from "~/utils/enums";
+import { z } from "zod";
 
 export const meta: Route.MetaFunction = ({ params }) => {
   const today = format(new Date(), "dd-MM-yy");
@@ -33,8 +34,9 @@ export const meta: Route.MetaFunction = ({ params }) => {
 };
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  const { request } = args;
+  const { request, params } = args;
   const url = new URL(request.url);
+  const region = z.nativeEnum(Regions).safeParse(params.region?.toUpperCase());
 
   if (
     url.pathname === "/calendar" ||
@@ -42,16 +44,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
     !args.params.date
   ) {
     const today = format(new Date(), "dd-MM-yy");
-    throw redirect(`/calendar/week/${today}`);
+    throw redirect(`/calendar/${params.region}/week/${today}`);
   }
 
   const date = parse(args.params.date, "dd-MM-yy", new Date());
 
-  return { date };
+  return { date, region: region.data };
 };
 
 const CalendarPage = () => {
-  const { date } = useLoaderData<typeof loader>();
+  const { date, region } = useLoaderData<typeof loader>();
   const location = useLocation();
   const params = useParams();
   const today = format(new Date(), "dd-MM-yy");
@@ -86,33 +88,65 @@ const CalendarPage = () => {
   return (
     <>
       <TabsBar>
-        <styled.span>{getDate()}</styled.span>
-        <Spacer />
-        <Tab
-          isActive={location.pathname.includes("/calendar/day")}
-          to={`/calendar/day/${dateParam}`}
-          data-replace="true"
-          replace
-        >
-          Day
-        </Tab>
-        <Tab
-          isActive={location.pathname.includes("/calendar/week")}
-          to={`/calendar/week/${dateParam}`}
-          data-replace="true"
-          replace
-        >
-          Week
-        </Tab>
-        <Tab
-          isActive={location.pathname.includes("/calendar/month")}
-          to={`/calendar/month/${dateParam}`}
-          data-replace="true"
-          replace
-        >
-          Month
-        </Tab>
+        {Object.values(Regions).map((option) => {
+          return (
+            <Tab
+              key={option}
+              to={`/calendar/${option.toLowerCase()}/${increment}/${dateParam}`}
+              isActive={option === region}
+              data-replace="true"
+              replace
+            >
+              {option}
+            </Tab>
+          );
+        })}
       </TabsBar>
+
+      <Box borderBottomWidth={1} borderColor="gray.900">
+        <Container px={2} maxW={1100}>
+          <Flex gap={2} py={2} alignItems="center">
+            <styled.span
+              flex={1}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
+              {getDate()}
+            </styled.span>
+            <Tab
+              isActive={location.pathname.includes(
+                `/calendar/${params.region}/day`,
+              )}
+              to={`/calendar/${params.region}/day/${dateParam}`}
+              data-replace="true"
+              replace
+            >
+              Day
+            </Tab>
+            <Tab
+              isActive={location.pathname.includes(
+                `/calendar/${params.region}/week`,
+              )}
+              to={`/calendar/${params.region}/week/${dateParam}`}
+              data-replace="true"
+              replace
+            >
+              Week
+            </Tab>
+            <Tab
+              isActive={location.pathname.includes(
+                `/calendar/${params.region}/month`,
+              )}
+              to={`/calendar/${params.region}/month/${dateParam}`}
+              data-replace="true"
+              replace
+            >
+              Month
+            </Tab>
+          </Flex>
+        </Container>
+      </Box>
 
       <Container px={2} maxW={1100} py={2}>
         <Outlet />
