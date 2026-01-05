@@ -19,6 +19,7 @@ import { useEffect, useRef } from "react";
 import { useInView } from "motion/react";
 import { TabsBar } from "~/components/TabsBar";
 import { AppName } from "~/utils/enums";
+import { getFeedPosts } from "~/utils/getFeedPosts.server";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -42,11 +43,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
     user = await getUser(userId);
   }
 
-  return { user };
+  const { posts } = await getFeedPosts({ userId: userId || undefined });
+
+  return { user, posts };
 };
 
 const FeedPage = () => {
-  const { user } = useLoaderData<typeof loader>();
+  const { user, posts } = useLoaderData<typeof loader>();
   const canPost = userIsVerified(user);
   const loadMoreRef = useRef(null);
   const isInView = useInView(loadMoreRef);
@@ -57,26 +60,13 @@ const FeedPage = () => {
     }
   }, [isInView]);
 
-  // Helper function to calculate cursor values from a post
-  const getCursorFromPost = (post: any) => {
-    const cursor = {
-      cursorScore: (post as any)._score,
-      cursorId: post.id,
-    };
-
-    return cursor;
-  };
-
   const { data, fetchNextPage } = useInfiniteQuery({
     queryKey: ["feed-posts"],
     queryFn: async ({ pageParam }) => {
-      // All pages - fetch from API
       const searchParams = new URLSearchParams();
 
       if (pageParam) {
-        searchParams.set("cursorScore", pageParam.cursorScore.toString());
-        searchParams.set("cursorId", pageParam.cursorId.toString());
-        searchParams.set("timestamp", pageParam.timestamp);
+        searchParams.set("cursor", pageParam.toString());
       }
 
       const response = await fetch(`/api/feed/posts?${searchParams}`);
@@ -87,15 +77,16 @@ const FeedPage = () => {
 
       return response.json();
     },
+    initialData: {
+      pages: [{ posts }],
+      pageParams: [null],
+    },
     refetchOnMount: false,
-    initialPageParam: null as any,
+    initialPageParam: null as number | null,
     getNextPageParam: (lastPage) => {
       if (!lastPage.posts.length) return undefined;
       const lastPost = lastPage.posts[lastPage.posts.length - 1];
-      return {
-        ...getCursorFromPost(lastPost),
-        timestamp: lastPage.timestamp,
-      };
+      return lastPost.id;
     },
   });
 

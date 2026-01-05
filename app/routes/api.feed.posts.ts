@@ -7,19 +7,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { request } = args;
   const url = new URL(request.url);
 
-  const cursorScore = url.searchParams.get("cursorScore");
-  const cursorId = url.searchParams.get("cursorId");
-  const timestamp = url.searchParams.get("timestamp");
+  const cursor = url.searchParams.get("cursor");
 
   const result = await getFeedPosts({
-    cursorScore: cursorScore ? parseFloat(cursorScore) : undefined,
-    cursorId: cursorId ? parseInt(cursorId) : undefined,
+    cursor: cursor ? parseInt(cursor) : undefined,
     userId: userId || undefined,
-    timestamp: timestamp ? new Date(timestamp) : undefined,
   });
 
   return Response.json({
     posts: result.posts,
-    timestamp: result.timestamp.toISOString(),
   });
 };
