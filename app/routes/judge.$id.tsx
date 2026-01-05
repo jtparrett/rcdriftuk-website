@@ -37,7 +37,7 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import numberToWords from "number-to-words";
-import { appGoBack } from "~/utils/appGoBack";
+import { appGoBack } from "~/utils/appEvents";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);

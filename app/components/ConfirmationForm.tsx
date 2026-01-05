@@ -1,7 +1,7 @@
 import { Form, useNavigate } from "react-router";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "./Button";
-import { appGoBack } from "~/utils/appGoBack";
+import { appGoBack } from "~/utils/appEvents";
 
 interface Props {
   title: string;

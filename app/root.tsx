@@ -28,10 +28,12 @@ import { AppProvider } from "./utils/AppContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { AppName } from "./utils/enums";
+import { useAuth } from "@clerk/react-router";
+import { appAuthStateChanged } from "./utils/appEvents";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -151,6 +153,24 @@ const ExpoPushToken = () => {
   return null;
 };
 
+const AuthStateSync = () => {
+  const { isSignedIn } = useAuth();
+  const prevSignedInRef = useRef<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    // Only notify on actual auth state changes, not initial mount
+    if (
+      prevSignedInRef.current !== undefined &&
+      prevSignedInRef.current !== isSignedIn
+    ) {
+      appAuthStateChanged();
+    }
+    prevSignedInRef.current = isSignedIn;
+  }, [isSignedIn]);
+
+  return null;
+};
+
 function App({
   loaderData,
 }: {
@@ -244,6 +264,7 @@ function App({
           <AppProvider value={isApp}>
             <EmbedProvider value={isEmbed}>
               <ExpoPushToken />
+              <AuthStateSync />
 
               {!isEmbed && (
                 <>

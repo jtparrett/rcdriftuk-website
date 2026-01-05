@@ -20,7 +20,7 @@ import { Dropdown, Option } from "~/components/Dropdown";
 import { ImageInput } from "~/components/ImageInput";
 import { UserTaggingInput } from "~/components/UserTaggingInput";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
-import { appGoBack } from "~/utils/appGoBack";
+import { appGoBack } from "~/utils/appEvents";
 import { extractFirstUrl } from "~/utils/extractFirstUrl";
 import { fetchAndUploadOgImage } from "~/utils/fetchAndUploadOgImage.server";
 import { getAuth } from "~/utils/getAuth.server";
