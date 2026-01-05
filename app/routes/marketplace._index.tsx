@@ -168,6 +168,8 @@ const Page = () => {
             <LinkButton
               to={`/marketplace?query=${query}&page=${page - 1}`}
               variant="secondary"
+              replace
+              data-replace="true"
             >
               <RiArrowLeftSLine /> Previous
             </LinkButton>
@@ -179,6 +181,8 @@ const Page = () => {
             <LinkButton
               to={`/marketplace?query=${query}&page=${page + 1}`}
               variant="secondary"
+              replace
+              data-replace="true"
             >
               Next <RiArrowRightSLine />
             </LinkButton>
