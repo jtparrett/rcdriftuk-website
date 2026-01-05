@@ -154,19 +154,27 @@ const ExpoPushToken = () => {
 };
 
 const AuthStateSync = () => {
-  const { isSignedIn } = useAuth();
-  const prevSignedInRef = useRef<boolean | undefined>(undefined);
+  const { isSignedIn, isLoaded } = useAuth();
+  // Use null to distinguish "not yet initialized" from actual boolean states
+  const prevSignedInRef = useRef<boolean | null>(null);
 
   useEffect(() => {
-    // Only notify on actual auth state changes, not initial mount
-    if (
-      prevSignedInRef.current !== undefined &&
-      prevSignedInRef.current !== isSignedIn
-    ) {
-      appAuthStateChanged();
+    // Wait until Clerk is fully loaded before tracking auth state
+    if (!isLoaded) return;
+
+    // On first load after Clerk is ready, just store the initial state without firing
+    if (prevSignedInRef.current === null) {
+      prevSignedInRef.current = isSignedIn ?? false;
+      return;
     }
-    prevSignedInRef.current = isSignedIn;
-  }, [isSignedIn]);
+
+    // Only notify on actual auth state changes after initialization
+    const currentSignedIn = isSignedIn ?? false;
+    if (prevSignedInRef.current !== currentSignedIn) {
+      appAuthStateChanged();
+      prevSignedInRef.current = currentSignedIn;
+    }
+  }, [isSignedIn, isLoaded]);
 
   return null;
 };
