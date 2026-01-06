@@ -15,14 +15,23 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { sentenceCase } from "change-case";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
+import { Regions } from "@prisma/client";
+import { z } from "zod";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
   const url = new URL(args.request.url);
+  const region = z
+    .nativeEnum(Regions)
+    .nullable()
+    .default(Regions.ALL)
+    .parse(url.searchParams.get("region")?.toUpperCase());
+
   const isMyTournaments = url.searchParams.get("my") === "true";
 
   const tournaments = await prisma.tournaments.findMany({
     where: {
+      ...(region !== Regions.ALL ? { region } : {}),
       OR: [
         ...(userId
           ? [
@@ -63,52 +72,78 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return { tournaments, userId, isMyTournaments };
+  return { tournaments, userId, isMyTournaments, region };
 };
 
 const Page = () => {
-  const { tournaments, userId, isMyTournaments } =
+  const { tournaments, userId, isMyTournaments, region } =
     useLoaderData<typeof loader>();
 
   return (
     <>
       <TabsBar>
-        <Tab
-          to="/tournaments"
-          isActive={!isMyTournaments}
-          replace
-          data-replace="true"
-        >
-          All Tournaments
-        </Tab>
-        <Tab
-          to="/tournaments?my=true"
-          isActive={isMyTournaments}
-          replace
-          data-replace="true"
-        >
-          My Tournaments
-        </Tab>
-        <Spacer />
-        <LinkButton to="/tournaments/user-guide" variant="outline" size="sm">
-          Guide <RiBookOpenFill />
-        </LinkButton>
+        {Object.values(Regions).map((option) => {
+          return (
+            <Tab
+              key={option}
+              to={`/tournaments?region=${option.toLowerCase()}${isMyTournaments ? "&my=true" : ""}`}
+              isActive={option === region}
+              data-replace="true"
+              replace
+            >
+              {option}
+            </Tab>
+          );
+        })}
       </TabsBar>
-      <Container maxW={1100} px={2} py={4}>
+
+      <Box borderBottomWidth={1} borderColor="gray.900">
+        <Container px={2} maxW={1100}>
+          <Flex gap={0.5} py={2}>
+            <Tab
+              to={`/tournaments${region !== Regions.ALL ? `?region=${region}` : ""}`}
+              isActive={!isMyTournaments}
+              replace
+              data-replace="true"
+            >
+              All Tournaments
+            </Tab>
+            <Tab
+              to={`/tournaments?my=true${region !== Regions.ALL ? `&region=${region}` : ""}`}
+              isActive={isMyTournaments}
+              replace
+              data-replace="true"
+            >
+              My Tournaments
+            </Tab>
+          </Flex>
+        </Container>
+      </Box>
+
+      <Container maxW={1100} px={2} py={2}>
         <styled.h1 srOnly>Tournaments</styled.h1>
 
-        <LinkButton
-          to={userId ? "/tournaments/new" : "/sign-in"}
-          size="sm"
-          w="full"
-          mb={4}
-        >
-          Create a Tournament <RiAddCircleFill />
-        </LinkButton>
+        <Flex gap={2} mb={2}>
+          <LinkButton
+            to={userId ? "/tournaments/new" : "/sign-in"}
+            size="sm"
+            flex={1}
+          >
+            Create New <RiAddCircleFill />
+          </LinkButton>
+          <LinkButton
+            to="/tournaments/user-guide"
+            variant="outline"
+            size="sm"
+            flex={1}
+          >
+            Guide <RiBookOpenFill />
+          </LinkButton>
+        </Flex>
 
         <Flex flexDir="column" gap={2}>
           {tournaments.length === 0 && (
-            <styled.p textAlign="center" color="gray.500">
+            <styled.p textAlign="center" color="gray.500" py={4}>
               Looks like you don't have any tournaments yet.
             </styled.p>
           )}
