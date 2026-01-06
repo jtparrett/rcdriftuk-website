@@ -24,7 +24,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    throw redirect("/sign-in?redirectUrl=/2025/wrapped");
+    throw redirect("/sign-in?redirect_url=/2025/wrapped");
   }
 
   const user = await getUser(userId);

@@ -11,7 +11,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    return redirect("/sign-in?redirect=/leaderboards");
+    return redirect("/sign-in?redirect_url=/leaderboards");
   }
 
   const leaderboards = await prisma.leaderboards.findMany({
