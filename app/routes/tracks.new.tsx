@@ -46,7 +46,7 @@ export const action = async (args: ActionFunctionArgs) => {
       address: z.string(),
       region: z.nativeEnum(Regions),
     })
-    .parse(formData.entries());
+    .parse(Object.fromEntries(formData.entries()));
 
   const imageUrl = await uploadFile(data.image);
   let coverUrl = null;
