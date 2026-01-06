@@ -7,7 +7,7 @@ const TabStyle = cva({
     px: 3,
     py: 2,
     flex: "none",
-    rounded: "lg",
+    rounded: "xl",
     fontWeight: "semibold",
     fontSize: "sm",
     transition: "background-color .3s",
@@ -30,7 +30,7 @@ export const TabGroup = styled("div", {
   base: {
     display: "inline-flex",
     bgColor: "gray.900",
-    rounded: "xl",
+    rounded: "2xl",
     p: 1,
   },
 });

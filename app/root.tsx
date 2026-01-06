@@ -22,16 +22,13 @@ import { Button, LinkButton } from "./components/Button";
 import { RiHome2Line, RiRefreshLine } from "react-icons/ri";
 import { getUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
-import { AnnouncementBanner } from "./components/AnnouncementBanner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { EmbedProvider } from "./utils/EmbedContext";
 import { AppProvider } from "./utils/AppContext";
-import { AppNav } from "./components/AppNav";
-import { AppHeader } from "./components/AppHeader";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { AppName } from "./utils/enums";
@@ -247,11 +244,9 @@ function App({
           <AppProvider value={isApp}>
             <EmbedProvider value={isEmbed}>
               <ExpoPushToken />
-              {isApp && <AppHeader />}
 
               {!isEmbed && (
                 <>
-                  {!isApp && <AnnouncementBanner />}
                   {!hideBanner && !isApp && <CookieBanner />}
                   {!isApp && <Header user={user} />}
                 </>
@@ -259,7 +254,6 @@ function App({
 
               <Outlet />
 
-              {isApp && <AppNav />}
               {!isMap && !isEmbed && !isApp && <Footer />}
             </EmbedProvider>
           </AppProvider>

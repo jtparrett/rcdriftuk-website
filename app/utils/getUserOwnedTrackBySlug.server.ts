@@ -27,6 +27,7 @@ export const getUserOwnedTrackBySlug = async (slug: string, userId: string) => {
       lat: true,
       lng: true,
       leaderboardId: true,
+      region: true,
     },
   });
 

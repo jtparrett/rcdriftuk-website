@@ -20,6 +20,8 @@ import { Button } from "~/components/Button";
 import { CarSetupSummary } from "~/components/CarSetupSummary";
 import { Input } from "~/components/Input";
 import { AppName } from "~/utils/enums";
+import { Label } from "~/components/Label";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `${AppName} | Setup Changes` }];
@@ -98,123 +100,128 @@ const SetupPage = () => {
   });
 
   return (
-    <Container maxW={600} px={4} py={6}>
-      <styled.h1 mb={2} fontWeight="extrabold" fontSize="2xl">
-        Setup Changes
-      </styled.h1>
+    <>
+      <TabsBar>
+        <styled.h1 fontSize="lg" fontWeight="extrabold">
+          Setup Changes
+        </styled.h1>
+      </TabsBar>
 
-      {setupChanges.length === 0 && (
-        <>
-          <styled.p mb={1}>Track your car setup changes over time.</styled.p>
-          <styled.p mb={4}>
-            Begin by logging your current setup, and keep it updated as you make
-            changes. Your setup will be visible on your driver profile.
-          </styled.p>
-        </>
-      )}
-
-      <Flex flexDir="column" gap={2}>
-        <Box
-          bgColor="gray.900"
-          p={4}
-          rounded="lg"
-          borderWidth={1}
-          borderColor="gray.800"
-        >
-          <form onSubmit={formik.handleSubmit}>
-            <Select
-              name="type"
-              value={formik.values.type ?? ""}
-              onChange={formik.handleChange}
-            >
-              <option>Select an option...</option>
-              {Object.values(CAR_SETUP_CHANGE_TYPES).map((type) => (
-                <option key={type} value={type}>
-                  {capitalCase(type)}
-                </option>
-              ))}
-            </Select>
-
-            {formik.values.type && (
-              <Select
-                name="value"
-                value={formik.values.value ?? ""}
-                onChange={formik.handleChange}
-                mt={2}
-              >
-                <option>Select an option...</option>
-                {Object.values(getCarSetupValues(formik.values.type)).map(
-                  (value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ),
-                )}
-              </Select>
-            )}
-
-            {formik.values.type === CAR_SETUP_CHANGE_TYPES.CHASSIS &&
-              formik.values.value === "Other" && (
-                <Input
-                  name="chassis"
-                  value={formik.values.chassis ?? ""}
-                  onChange={formik.handleChange}
-                  mt={2}
-                  placeholder="Enter your chassis..."
-                />
-              )}
-
-            {formik.isValid && (
-              <Button
-                type="submit"
-                mt={2}
-                w="full"
-                isLoading={formik.isSubmitting}
-                disabled={formik.isSubmitting}
-              >
-                Submit Change
-              </Button>
-            )}
-          </form>
-        </Box>
-
-        {setupChanges.length > 0 && (
+      <Container maxW={600} px={2} py={4}>
+        {setupChanges.length === 0 && (
           <>
-            <styled.h2 fontWeight="medium" fontSize="lg" mt={4}>
-              Current Setup
-            </styled.h2>
-
-            <CarSetupSummary history={setupChanges} />
-
-            <styled.h2 fontWeight="medium" fontSize="lg" mt={4}>
-              Setup History
-            </styled.h2>
-
-            {setupChanges.map((change) => (
-              <Box
-                key={change.id}
-                bgColor="gray.900"
-                p={4}
-                rounded="lg"
-                borderWidth={1}
-                borderColor="gray.800"
-              >
-                <styled.p color="gray.400">
-                  <styled.span fontWeight="medium" color="brand.500">
-                    {capitalCase(change.type)}
-                  </styled.span>{" "}
-                  set to{" "}
-                  <styled.span fontWeight="medium" color="brand.500">
-                    {change.value}
-                  </styled.span>{" "}
-                  {formatDistanceToNow(change.createdAt, { addSuffix: true })}
-                </styled.p>
-              </Box>
-            ))}
+            <styled.p mb={1}>Track your car setup changes over time.</styled.p>
+            <styled.p mb={4}>
+              Begin by logging your current setup, and keep it updated as you
+              make changes. Your setup will be visible on your driver profile.
+            </styled.p>
           </>
         )}
-      </Flex>
-    </Container>
+
+        <Flex flexDir="column" gap={2}>
+          <Box
+            bgColor="gray.900"
+            p={4}
+            rounded="lg"
+            borderWidth={1}
+            borderColor="gray.800"
+          >
+            <Label>Add a setup change:</Label>
+            <form onSubmit={formik.handleSubmit}>
+              <Select
+                name="type"
+                value={formik.values.type ?? ""}
+                onChange={formik.handleChange}
+              >
+                <option>Select an option...</option>
+                {Object.values(CAR_SETUP_CHANGE_TYPES).map((type) => (
+                  <option key={type} value={type}>
+                    {capitalCase(type)}
+                  </option>
+                ))}
+              </Select>
+
+              {formik.values.type && (
+                <Select
+                  name="value"
+                  value={formik.values.value ?? ""}
+                  onChange={formik.handleChange}
+                  mt={2}
+                >
+                  <option>Select an option...</option>
+                  {Object.values(getCarSetupValues(formik.values.type)).map(
+                    (value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ),
+                  )}
+                </Select>
+              )}
+
+              {formik.values.type === CAR_SETUP_CHANGE_TYPES.CHASSIS &&
+                formik.values.value === "Other" && (
+                  <Input
+                    name="chassis"
+                    value={formik.values.chassis ?? ""}
+                    onChange={formik.handleChange}
+                    mt={2}
+                    placeholder="Enter your chassis..."
+                  />
+                )}
+
+              {formik.isValid && (
+                <Button
+                  type="submit"
+                  mt={2}
+                  w="full"
+                  isLoading={formik.isSubmitting}
+                  disabled={formik.isSubmitting}
+                >
+                  Submit Change
+                </Button>
+              )}
+            </form>
+          </Box>
+
+          {setupChanges.length > 0 && (
+            <>
+              <styled.h2 fontWeight="medium" fontSize="lg" mt={4}>
+                Current Setup
+              </styled.h2>
+
+              <CarSetupSummary history={setupChanges} />
+
+              <styled.h2 fontWeight="medium" fontSize="lg" mt={4}>
+                Setup History
+              </styled.h2>
+
+              {setupChanges.map((change) => (
+                <Box
+                  key={change.id}
+                  bgColor="gray.900"
+                  p={4}
+                  rounded="lg"
+                  borderWidth={1}
+                  borderColor="gray.800"
+                >
+                  <styled.p color="gray.400">
+                    <styled.span fontWeight="medium" color="brand.500">
+                      {capitalCase(change.type)}
+                    </styled.span>{" "}
+                    set to{" "}
+                    <styled.span fontWeight="medium" color="brand.500">
+                      {change.value}
+                    </styled.span>{" "}
+                    {formatDistanceToNow(change.createdAt, { addSuffix: true })}
+                  </styled.p>
+                </Box>
+              ))}
+            </>
+          )}
+        </Flex>
+      </Container>
+    </>
   );
 };
 

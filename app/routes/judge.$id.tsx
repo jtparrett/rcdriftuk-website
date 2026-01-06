@@ -37,6 +37,7 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import numberToWords from "number-to-words";
+import { appGoBack } from "~/utils/appEvents";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const judgeId = z.coerce.string().parse(params.id);
@@ -140,7 +141,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   });
 
   const publishUpdate = () => {
-    createAbly()
+    createAbly(process.env.VITE_ABLY_API_KEY!)
       .channels.get(judge.tournament.id)
       .publish("update", new Date().toISOString());
   };
@@ -521,6 +522,12 @@ const JudgePage = () => {
             bgColor="black"
             py={1.5}
             pr={4}
+            onClick={(e) => {
+              const wentBack = appGoBack();
+              if (wentBack) {
+                e.preventDefault();
+              }
+            }}
           >
             <RiArrowLeftLine />
             Back
@@ -558,6 +565,7 @@ const JudgePage = () => {
                   className={css({
                     fontSize: "sm",
                   })}
+                  data-replace="true"
                   replace
                 >
                   {tournament.name}

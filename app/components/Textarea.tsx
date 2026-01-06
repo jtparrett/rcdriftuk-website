@@ -8,7 +8,7 @@ export const Textarea = styled(TextareaAutosize, {
     borderWidth: 1,
     borderColor: "gray.800",
     bgColor: "gray.800",
-    rounded: "lg",
+    rounded: "xl",
     color: "white",
     w: "full",
     outline: "none",

@@ -21,6 +21,7 @@ import { ImageInput } from "~/components/ImageInput";
 import { uploadFile } from "~/utils/uploadFile.server";
 import { resizeImage } from "~/utils/resizeImage";
 import { AppName } from "~/utils/enums";
+import { TabsBar } from "~/components/TabsBar";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `${AppName} | Edit Profile` }];
@@ -132,74 +133,80 @@ const UserProfilePage = () => {
   });
 
   return (
-    <Container maxW={1100} px={2} py={10}>
-      <Box maxW="580px" mx="auto">
-        <styled.h2>Account Details</styled.h2>
-        <Box
-          p={6}
-          mt={2}
-          bgColor="gray.900"
-          rounded="2xl"
-          borderWidth={1}
-          borderColor="gray.800"
-        >
-          <form onSubmit={formik.handleSubmit}>
-            <VStack gap={4} alignItems="stretch">
-              <FormControl error={formik.errors.avatar}>
-                <Label>Avatar</Label>
-                <ImageInput
-                  name="avatar"
-                  value={formik.values.avatar ?? null}
-                  onChange={(file) => {
-                    formik.setFieldValue("avatar", file);
-                  }}
-                />
-              </FormControl>
+    <>
+      <TabsBar>
+        <styled.h1 fontSize="lg" fontWeight="extrabold">
+          Account Details
+        </styled.h1>
+      </TabsBar>
 
-              <Flex gap={4}>
-                <FormControl flex={1} error={formik.errors.firstName}>
-                  <Label>First Name</Label>
+      <Container maxW={1100} px={2} py={4}>
+        <Box maxW="580px" mx="auto">
+          <Box
+            p={6}
+            bgColor="gray.900"
+            rounded="2xl"
+            borderWidth={1}
+            borderColor="gray.800"
+          >
+            <form onSubmit={formik.handleSubmit}>
+              <VStack gap={4} alignItems="stretch">
+                <FormControl error={formik.errors.avatar}>
+                  <Label>Avatar</Label>
+                  <ImageInput
+                    name="avatar"
+                    value={formik.values.avatar ?? null}
+                    onChange={(file) => {
+                      formik.setFieldValue("avatar", file);
+                    }}
+                  />
+                </FormControl>
+
+                <Flex gap={4}>
+                  <FormControl flex={1} error={formik.errors.firstName}>
+                    <Label>First Name</Label>
+                    <Input
+                      name="firstName"
+                      value={formik.values.firstName}
+                      onChange={formik.handleChange}
+                    />
+                  </FormControl>
+                  <FormControl flex={1} error={formik.errors.lastName}>
+                    <Label>Last Name</Label>
+                    <Input
+                      name="lastName"
+                      value={formik.values.lastName}
+                      onChange={formik.handleChange}
+                    />
+                  </FormControl>
+                </Flex>
+
+                <FormControl error={formik.errors.team}>
+                  <Label>Team(s)</Label>
                   <Input
-                    name="firstName"
-                    value={formik.values.firstName}
+                    name="team"
+                    value={formik.values.team ?? ""}
                     onChange={formik.handleChange}
                   />
                 </FormControl>
-                <FormControl flex={1} error={formik.errors.lastName}>
-                  <Label>Last Name</Label>
-                  <Input
-                    name="lastName"
-                    value={formik.values.lastName}
-                    onChange={formik.handleChange}
-                  />
-                </FormControl>
-              </Flex>
 
-              <FormControl error={formik.errors.team}>
-                <Label>Team(s)</Label>
-                <Input
-                  name="team"
-                  value={formik.values.team ?? ""}
-                  onChange={formik.handleChange}
-                />
-              </FormControl>
+                <Button
+                  type="submit"
+                  disabled={formik.isSubmitting || !formik.isValid}
+                  isLoading={formik.isSubmitting}
+                >
+                  Save Changes
+                </Button>
+              </VStack>
+            </form>
+          </Box>
 
-              <Button
-                type="submit"
-                disabled={formik.isSubmitting || !formik.isValid}
-                isLoading={formik.isSubmitting}
-              >
-                Save Changes
-              </Button>
-            </VStack>
-          </form>
+          <LinkButton to="/user/delete" variant="outline" w="full" mt={6}>
+            Delete My Account
+          </LinkButton>
         </Box>
-
-        <LinkButton to="/user/delete" variant="outline" w="full" mt={6}>
-          Delete My Account
-        </LinkButton>
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 };
 

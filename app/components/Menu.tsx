@@ -160,7 +160,7 @@ export const Menu = () => {
         <MenuIcon>
           <RiFlagLine />
         </MenuIcon>
-        Tracks
+        Find Tracks
       </MenuLink>
       <MenuLink
         to={`/calendar`}
@@ -194,16 +194,6 @@ export const Menu = () => {
           <RiBook2Line />
         </MenuIcon>
         Insights Blog
-      </MenuLink>
-
-      <MenuLink
-        to="/merch"
-        active={location.pathname.startsWith("/merch") ? "active" : "inactive"}
-      >
-        <MenuIcon>
-          <RiTShirtLine />
-        </MenuIcon>
-        Merch
       </MenuLink>
     </>
   );
@@ -263,15 +253,7 @@ export const UserMenu = () => {
         Account Settings
       </MenuLink>
 
-      <MenuLink
-        to="/"
-        onClick={(e) => {
-          e.preventDefault();
-          signOut({
-            redirectUrl: "/sign-in",
-          });
-        }}
-      >
+      <MenuLink to="/sign-out" replace data-replace="true">
         <MenuIcon>
           <RiLogoutBoxRLine />
         </MenuIcon>

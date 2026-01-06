@@ -1,11 +1,10 @@
-import {
-  QualifyingProcedure,
-  TournamentsFormat,
-  TournamentsState,
-} from "@prisma/client";
 import { prisma } from "./prisma.server";
 import invariant from "./invariant";
-import { QualifyingOrder } from "./enums";
+import {
+  QualifyingOrder,
+  QualifyingProcedure,
+  TournamentsState,
+} from "./enums";
 import { sumScores } from "./sumScores";
 import { getQualifyingWaveSize } from "./tournament";
 import { pow2Floor } from "./powFns";

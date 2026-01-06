@@ -46,6 +46,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     const eventDrivers = await prisma.eventTickets.findMany({
       where: {
         eventId,
+        status: TicketStatus.CONFIRMED,
       },
       select: {
         user: {

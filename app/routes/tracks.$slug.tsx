@@ -191,6 +191,7 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/events`}
               isActive={tab === "events"}
+              data-replace="true"
               replace
             >
               Events
@@ -198,6 +199,7 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/posts`}
               isActive={tab === "posts"}
+              data-replace="true"
               replace
             >
               Posts
@@ -206,6 +208,7 @@ const TrackPage = () => {
               <Tab
                 to={`/tracks/${track?.slug}/products`}
                 isActive={tab === "products"}
+                data-replace="true"
                 replace
               >
                 Products
@@ -214,6 +217,7 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/leaderboard`}
               isActive={tab === "leaderboard"}
+              data-replace="true"
               replace
             >
               Leaderboard

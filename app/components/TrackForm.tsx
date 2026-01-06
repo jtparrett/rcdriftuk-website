@@ -17,6 +17,8 @@ import { useFetcher } from "react-router";
 import { resizeImage } from "~/utils/resizeImage";
 import type { Leaderboards } from "@prisma/client";
 import { Select } from "./Select";
+import { Regions } from "~/utils/enums";
+import { TabButton, TabGroup } from "./Tab";
 
 interface Props {
   track?: GetUserOwnedTrackBySlug;
@@ -33,6 +35,7 @@ const formSchema = z.object({
   image: z.union([z.instanceof(File), z.string()]),
   cover: z.union([z.instanceof(File), z.string()]).optional(),
   leaderboardId: z.string().optional(),
+  region: z.nativeEnum(Regions),
 });
 
 const validationSchema = toFormikValidationSchema(formSchema);
@@ -54,6 +57,7 @@ export const TrackForm = ({ track, leaderboards }: Props) => {
       image: track?.image ?? "",
       cover: track?.cover ?? "",
       leaderboardId: track?.leaderboardId ?? "",
+      region: track?.region ?? Regions.UK,
     },
     onSubmit: async (values) => {
       const formData = new FormData();
@@ -79,6 +83,7 @@ export const TrackForm = ({ track, leaderboards }: Props) => {
       formData.append("lat", values.lat.toString());
       formData.append("lng", values.lng.toString());
       formData.append("leaderboardId", values.leaderboardId ?? "");
+      formData.append("region", values.region);
 
       await fetcher.submit(formData, {
         method: "POST",
@@ -196,6 +201,28 @@ export const TrackForm = ({ track, leaderboards }: Props) => {
         )}
 
         <Divider borderColor="gray.800" />
+
+        <FormControl error={formik.errors.region}>
+          <Label>Region</Label>
+          <TabGroup p={0}>
+            {Object.values(Regions).map((item) => {
+              if (item === Regions.ALL) {
+                return null;
+              }
+
+              return (
+                <TabButton
+                  type="button"
+                  key={item}
+                  isActive={formik.values.region === item}
+                  onClick={() => formik.setFieldValue("region", item)}
+                >
+                  {item}
+                </TabButton>
+              );
+            })}
+          </TabGroup>
+        </FormControl>
 
         <FormControl error={formik.errors.address}>
           <Label>Address</Label>

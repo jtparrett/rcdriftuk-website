@@ -1,5 +1,5 @@
-import { RiAddFill } from "react-icons/ri";
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { RiAddCircleFill } from "react-icons/ri";
+import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkButton } from "~/components/Button";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { TabsBar } from "~/components/TabsBar";
@@ -10,17 +10,21 @@ import { prisma } from "~/utils/prisma.server";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
+  if (!userId) {
+    return redirect("/sign-in?redirect_url=/leaderboards");
+  }
+
   const leaderboards = await prisma.leaderboards.findMany({
     where: {
       OR: [
         {
-          userId: userId!,
+          userId: userId,
         },
         {
           drivers: {
             some: {
               driver: {
-                id: userId!,
+                id: userId,
               },
             },
           },
@@ -62,7 +66,7 @@ const LeaderboardsPage = () => {
         <Spacer />
 
         <LinkButton to={userId ? "/leaderboards/new" : "/sign-in"} size="sm">
-          Create New <RiAddFill />
+          Create a Leaderboard <RiAddCircleFill />
         </LinkButton>
       </TabsBar>
       <Container maxW={1100} px={2} py={4}>

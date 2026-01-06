@@ -7,20 +7,25 @@ import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import { TrackStatus } from "~/utils/enums";
+import { Regions, TrackStatus } from "~/utils/enums";
+import { z } from "zod";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
     const today = format(new Date(), "dd-MM-yy");
-    throw redirect(`/calendar/day/${today}`);
+    throw redirect(`/calendar/${params.region}/day/${today}`);
   }
 
+  const region = z.nativeEnum(Regions).safeParse(params.region?.toUpperCase());
   const date = parse(params.date, "dd-MM-yy", new Date());
 
   const events = await prisma.events.findMany({
     where: {
       eventTrack: {
         status: TrackStatus.ACTIVE,
+        ...(region.success && region.data !== Regions.ALL
+          ? { region: region.data }
+          : {}),
       },
       AND: [
         {
@@ -45,11 +50,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     ],
   });
 
-  return { events, date };
+  return { events, date, region: region.data };
 };
 
 const CalendarDaysPage = () => {
-  const { events, date } = useLoaderData<typeof loader>();
+  const { events, date, region } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -58,21 +63,27 @@ const CalendarDaysPage = () => {
         <LinkButton
           size="sm"
           variant="outline"
-          to={`/calendar/day/${format(sub(date, { days: 1 }), "dd-MM-yy")}`}
+          to={`/calendar/${region}/day/${format(sub(date, { days: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
           variant="outline"
-          to={`/calendar/day/${format(new Date(), "dd-MM-yy")}`}
+          to={`/calendar/${region}/day/${format(new Date(), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           Today
         </LinkButton>
         <LinkButton
           size="sm"
           variant="outline"
-          to={`/calendar/day/${format(add(date, { days: 1 }), "dd-MM-yy")}`}
+          to={`/calendar/${region}/day/${format(add(date, { days: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowRightSLine />
         </LinkButton>

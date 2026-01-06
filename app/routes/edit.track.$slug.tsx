@@ -1,4 +1,4 @@
-import { TournamentsState } from "~/utils/enums";
+import { Regions, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { useLoaderData } from "react-router";
@@ -71,6 +71,7 @@ export const action = async (args: ActionFunctionArgs) => {
       lat: z.coerce.number(),
       lng: z.coerce.number(),
       leaderboardId: z.string().optional(),
+      region: z.nativeEnum(Regions),
     })
     .parse(Object.fromEntries(formData.entries()));
 

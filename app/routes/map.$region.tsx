@@ -8,6 +8,8 @@ import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/map.$region";
 import { startOfDay } from "date-fns";
 import { AppName } from "~/utils/enums";
+import { useIsApp } from "~/utils/AppContext";
+import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -56,13 +58,12 @@ export const loader = async () => {
 
 const Page = () => {
   const tracks = useLoaderData<typeof loader>();
+  const isApp = useIsApp();
+  const isEmbed = useIsEmbed();
 
   return (
     <Flex
-      h={{
-        base: "calc(100dvh - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 128px)",
-        md: "calc(100dvh - 100px)",
-      }}
+      h={isApp || isEmbed ? "100dvh" : "calc(100dvh - 78px)"}
       overflow="hidden"
       flexDir="column"
     >

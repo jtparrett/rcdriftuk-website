@@ -226,6 +226,7 @@ model TournamentBattleVotes {
 }
 
 model Tracks {
+  region        Regions       @default(UK)
   createdAt     DateTime      @default(now())
   id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String

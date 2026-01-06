@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { Box, Container, Flex } from "~/styled-system/jsx";
-import { Outlet, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import type { Tracks } from "@prisma/client";
 import { Regions } from "~/utils/enums";
 import { oneOf } from "~/utils/oneOf";
 import { Tab } from "./Tab";
+import { appNavigate } from "~/utils/appEvents";
 
 export type Values<T> = T[keyof T];
 
@@ -105,7 +106,13 @@ export const Map = ({ tracks }: Props) => {
 
       // Add click handler
       el.addEventListener("click", () => {
-        navigate(`./${track.slug}`);
+        const didNavigate = appNavigate(
+          `https://${window.location.host}/tracks/${track.slug}`,
+        );
+
+        if (!didNavigate) {
+          navigate(`/tracks/${track.slug}`);
+        }
       });
 
       markers.current.push(marker);
@@ -166,12 +173,13 @@ export const Map = ({ tracks }: Props) => {
     <>
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} w="full" maxW={1100} overflowX="auto">
-          <Flex gap={1} py={2}>
+          <Flex gap={0.5} py={2}>
             {Object.values(Regions).map((item) => (
               <Tab
                 key={item}
                 isActive={item === region}
                 to={`/map/${item}`}
+                data-replace="true"
                 replace
               >
                 {item}
@@ -183,7 +191,6 @@ export const Map = ({ tracks }: Props) => {
 
       <Box h="100%" position="relative" overflow="hidden" zIndex={1} flex={1}>
         <Box ref={mapContainer} h="100%" overflow="hidden" />
-        <Outlet />
       </Box>
     </>
   );

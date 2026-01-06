@@ -164,7 +164,6 @@ export default defineConfig({
       fontFamily: "body",
       minH: "100dvh",
       overflowScrolling: "touch",
-      userSelect: "none",
       fontSmooth: "antialiased",
       textRendering: "optimizeLegibility",
     },

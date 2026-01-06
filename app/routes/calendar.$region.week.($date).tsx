@@ -17,14 +17,17 @@ import { LinkButton } from "~/components/Button";
 import { EventCard } from "~/components/EventCard";
 import { styled, Flex, Spacer, Box } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
-import { TrackStatus } from "~/utils/enums";
+import { Regions, TrackStatus } from "~/utils/enums";
 import { toZonedTime } from "date-fns-tz";
+import { z } from "zod";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (!params.date) {
     const today = format(new Date(), "dd-MM-yy");
-    throw redirect(`/calendar/week/${today}`);
+    throw redirect(`/calendar/${params.region}/week/${today}`);
   }
+
+  const region = z.nativeEnum(Regions).safeParse(params.region?.toUpperCase());
 
   const date = parse(params.date, "dd-MM-yy", new Date());
 
@@ -32,6 +35,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     where: {
       eventTrack: {
         status: TrackStatus.ACTIVE,
+        ...(region.success && region.data !== Regions.ALL
+          ? { region: region.data }
+          : {}),
       },
       AND: [
         {
@@ -58,11 +64,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return { events, date };
+  return { events, date, region: region.data };
 };
 
 const CalendarWeeksPage = () => {
-  const { events, date } = useLoaderData<typeof loader>();
+  const { events, date, region } = useLoaderData<typeof loader>();
 
   const startWeekDate = startOfWeek(date, {
     weekStartsOn: 1,
@@ -76,21 +82,27 @@ const CalendarWeeksPage = () => {
         <LinkButton
           size="sm"
           variant="outline"
-          to={`/calendar/week/${format(sub(date, { weeks: 1 }), "dd-MM-yy")}`}
+          to={`/calendar/${region}/week/${format(sub(date, { weeks: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowLeftSLine />
         </LinkButton>
         <LinkButton
           size="sm"
           variant="outline"
-          to={`/calendar/week/${format(new Date(), "dd-MM-yy")}`}
+          to={`/calendar/${region}/week/${format(new Date(), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           Today
         </LinkButton>
         <LinkButton
           size="sm"
           variant="outline"
-          to={`/calendar/week/${format(add(date, { weeks: 1 }), "dd-MM-yy")}`}
+          to={`/calendar/${region}/week/${format(add(date, { weeks: 1 }), "dd-MM-yy")}`}
+          data-replace="true"
+          replace
         >
           <RiArrowRightSLine />
         </LinkButton>
