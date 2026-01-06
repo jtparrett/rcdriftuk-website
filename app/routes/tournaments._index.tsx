@@ -1,22 +1,33 @@
 import { getAuth } from "~/utils/getAuth.server";
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useSearchParams } from "react-router";
 import { format } from "date-fns";
 import {
   RiAddCircleFill,
-  RiBookOpenFill,
+  RiCheckboxCircleFill,
   RiCheckboxMultipleBlankFill,
+  RiCircleLine,
   RiDeleteBinFill,
+  RiSearchLine,
 } from "react-icons/ri";
-import { LinkButton } from "~/components/Button";
-import { styled, Container, Box, Flex, Spacer } from "~/styled-system/jsx";
+import { Button, LinkButton } from "~/components/Button";
+import {
+  styled,
+  Container,
+  Box,
+  Flex,
+  Spacer,
+  Center,
+} from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { sentenceCase } from "change-case";
 import { TabsBar } from "~/components/TabsBar";
-import { Tab } from "~/components/Tab";
+import { TabButton } from "~/components/Tab";
 import { z } from "zod";
 import { Regions } from "~/utils/enums";
+import { token } from "~/styled-system/tokens";
+import { useCallback, useState } from "react";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -28,10 +39,19 @@ export const loader = async (args: LoaderFunctionArgs) => {
     .parse(url.searchParams.get("region")?.toUpperCase());
 
   const isMyTournaments = url.searchParams.get("my") === "true";
+  const query = url.searchParams.get("query") ?? "";
 
   const tournaments = await prisma.tournaments.findMany({
     where: {
       ...(region !== Regions.ALL ? { region } : {}),
+      ...(query
+        ? {
+            name: {
+              contains: query,
+              mode: "insensitive",
+            },
+          }
+        : {}),
       OR: [
         ...(userId
           ? [
@@ -78,66 +98,105 @@ export const loader = async (args: LoaderFunctionArgs) => {
 const Page = () => {
   const { tournaments, userId, isMyTournaments, region } =
     useLoaderData<typeof loader>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") ?? "";
+  const [searchValue, setSearchValue] = useState(query);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (value: string) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          const newSearchParams = new URLSearchParams(searchParams);
+          if (value.trim()) {
+            newSearchParams.set("query", value.trim());
+          } else {
+            newSearchParams.delete("query");
+          }
+          setSearchParams(newSearchParams);
+        }, 300); // 300ms debounce
+      };
+    })(),
+    [searchParams, setSearchParams],
+  );
+
+  // Handle input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    debouncedSearch(value);
+  };
+
+  const toggleMyTournaments = () => {
+    setSearchParams((prev) => {
+      prev.set("my", isMyTournaments ? "false" : "true");
+      return prev;
+    });
+  };
+
+  const changeRegion = (region: Regions) => {
+    setSearchParams((prev) => {
+      prev.set("region", region.toLowerCase());
+      return prev;
+    });
+  };
 
   return (
     <>
       <TabsBar>
         {Object.values(Regions).map((option) => {
           return (
-            <Tab
+            <TabButton
               key={option}
-              to={`/tournaments?region=${option.toLowerCase()}${isMyTournaments ? "&my=true" : ""}`}
+              onClick={() => changeRegion(option)}
               isActive={option === region}
-              data-replace="true"
-              replace
             >
               {option}
-            </Tab>
+            </TabButton>
           );
         })}
       </TabsBar>
 
       <Box borderBottomWidth={1} borderColor="gray.900">
-        <Container px={2} maxW={1100}>
-          <Flex gap={0.5} py={2}>
-            <Tab
-              to={`/tournaments${region !== Regions.ALL ? `?region=${region}` : ""}`}
-              isActive={!isMyTournaments}
-              replace
-              data-replace="true"
-            >
-              All Tournaments
-            </Tab>
-            <Tab
-              to={`/tournaments?my=true${region !== Regions.ALL ? `&region=${region}` : ""}`}
-              isActive={isMyTournaments}
-              replace
-              data-replace="true"
-            >
-              My Tournaments
-            </Tab>
-          </Flex>
-        </Container>
+        <Flex maxW={1100} mx="auto">
+          <Center pl={4} color="gray.500">
+            <RiSearchLine />
+          </Center>
+          <styled.input
+            value={searchValue}
+            onChange={handleSearchChange}
+            bgColor="inherit"
+            px={2}
+            py={3}
+            w="full"
+            placeholder={`Search ${region === Regions.ALL ? "" : `${region} `}tournaments...`}
+            color="inherit"
+            outline="none"
+          />
+        </Flex>
       </Box>
 
       <Container maxW={1100} px={2} py={2}>
         <styled.h1 srOnly>Tournaments</styled.h1>
 
         <Flex gap={2} mb={2}>
-          <LinkButton
-            to={userId ? "/tournaments/new" : "/sign-in"}
-            size="sm"
-            flex={1}
-          >
-            Create New <RiAddCircleFill />
-          </LinkButton>
-          <LinkButton
-            to="/tournaments/user-guide"
-            variant="outline"
-            size="sm"
-            flex={1}
-          >
-            Guide <RiBookOpenFill />
+          <Spacer />
+          <Button variant="outline" onClick={toggleMyTournaments}>
+            <styled.span
+              style={{
+                color: isMyTournaments
+                  ? token("colors.brand.500")
+                  : token("colors.white"),
+              }}
+            >
+              {isMyTournaments ? <RiCheckboxCircleFill /> : <RiCircleLine />}
+            </styled.span>
+            My Tournaments
+          </Button>
+          <LinkButton to="/tournaments/new" size="sm">
+            Create <RiAddCircleFill />
           </LinkButton>
         </Flex>
 
