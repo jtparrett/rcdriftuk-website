@@ -15,8 +15,8 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { sentenceCase } from "change-case";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
-import { Regions } from "@prisma/client";
 import { z } from "zod";
+import { Regions } from "~/utils/enums";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
