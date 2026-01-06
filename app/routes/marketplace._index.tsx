@@ -16,11 +16,13 @@ import {
   Center,
   Grid,
   Container,
+  Box,
 } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import type { Route } from "./+types/marketplace._index";
+import { AppName, Regions } from "~/utils/enums";
 import { TabsBar } from "~/components/TabsBar";
-import { AppName } from "~/utils/enums";
+import { Tab, TabButton } from "~/components/Tab";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -47,6 +49,11 @@ export const loader = async (params: LoaderFunctionArgs) => {
     1,
   );
 
+  const region = z
+    .nativeEnum(Regions)
+    .default(Regions.ALL)
+    .parse(url.searchParams.get("region")?.toUpperCase());
+
   const search =
     query
       ?.toLowerCase()
@@ -56,9 +63,12 @@ export const loader = async (params: LoaderFunctionArgs) => {
       .replace(/yd2|yd-2/g, "yd 2")
       .split(" ") ?? [];
 
-  return prisma.products.findMany({
+  const products = await prisma.products.findMany({
     ...(query !== null && {
       where: {
+        Tracks: {
+          ...(region !== Regions.ALL ? { region } : {}),
+        },
         AND:
           search.length > 0
             ? search.map((phrase) => {
@@ -83,10 +93,12 @@ export const loader = async (params: LoaderFunctionArgs) => {
       Tracks: true,
     },
   });
+
+  return { products, region };
 };
 
 const Page = () => {
-  const products = useLoaderData<typeof loader>();
+  const { products, region } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") ?? "";
   const [searchValue, setSearchValue] = useState(query);
@@ -124,28 +136,49 @@ const Page = () => {
     debouncedSearch(value);
   };
 
+  const changeRegion = (region: Regions) => {
+    setSearchParams((prev) => {
+      prev.set("region", region.toLowerCase());
+      return prev;
+    });
+  };
+
   return (
     <>
       <styled.h1 srOnly>Marketplace</styled.h1>
 
       <TabsBar>
-        <Flex w="full">
+        {Object.values(Regions).map((option) => {
+          return (
+            <TabButton
+              key={option}
+              onClick={() => changeRegion(option)}
+              isActive={option === region}
+            >
+              {option}
+            </TabButton>
+          );
+        })}
+      </TabsBar>
+
+      <Box borderBottomWidth={1} borderColor="gray.900">
+        <Flex maxW={1100} mx="auto">
+          <Center pl={4} color="gray.500">
+            <RiSearchLine />
+          </Center>
           <styled.input
             value={searchValue}
             onChange={handleSearchChange}
             bgColor="inherit"
-            px={4}
-            py={2}
+            px={2}
+            py={3}
             w="full"
-            placeholder="What are you looking for?"
+            placeholder="Search marketplace..."
             color="inherit"
             outline="none"
           />
-          <Center pr={4} color="gray.500">
-            <RiSearchLine />
-          </Center>
         </Flex>
-      </TabsBar>
+      </Box>
 
       <Container maxW={1100} px={2} py={4}>
         {products.length <= 0 && (
