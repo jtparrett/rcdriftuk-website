@@ -160,7 +160,7 @@ export const Menu = () => {
         <MenuIcon>
           <RiFlagLine />
         </MenuIcon>
-        Tracks
+        Find Tracks
       </MenuLink>
       <MenuLink
         to={`/calendar`}

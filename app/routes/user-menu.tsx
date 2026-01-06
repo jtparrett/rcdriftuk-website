@@ -2,6 +2,7 @@ import {
   RiArrowRightLine,
   RiAwardLine,
   RiCameraLensLine,
+  RiFlagLine,
   RiGamepadLine,
   RiRocketLine,
   RiTrophyLine,
@@ -83,6 +84,13 @@ const UserMenuPage = () => {
           <RiRocketLine />
         </MenuIcon>
         Getting Started
+      </MenuLink>
+
+      <MenuLink to="/tracks">
+        <MenuIcon>
+          <RiFlagLine />
+        </MenuIcon>
+        Find Tracks
       </MenuLink>
 
       <MenuLink to="/competitions">
