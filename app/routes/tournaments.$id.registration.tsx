@@ -142,9 +142,11 @@ const Page = () => {
 
   return (
     <Flex flexDir="column" gap={4}>
-      <Box>
-        <Label mb={2}>Drivers</Label>
-        <Card overflow="visible" p={6}>
+      <Card overflow="visible">
+        <Box py={2} px={4} borderBottomWidth={1} borderColor="gray.800">
+          <Label>Drivers</Label>
+        </Box>
+        <Box p={4}>
           <PeopleForm
             users={users}
             name="drivers"
@@ -153,12 +155,14 @@ const Page = () => {
             allowRandomise
             allowNewDrivers
           />
-        </Card>
-      </Box>
+        </Box>
+      </Card>
 
-      <Box>
-        <Label mb={2}>Share invite link</Label>
-        <Card p={6}>
+      <Card>
+        <Box py={2} px={4} borderBottomWidth={1} borderColor="gray.800">
+          <Label>Share invite link</Label>
+        </Box>
+        <Box p={4}>
           <Flex bgColor="gray.800" rounded="xl">
             <Input readOnly value={inviteLink} color="gray.400" />
             <Button
@@ -168,8 +172,8 @@ const Page = () => {
               {isCopied ? <RiCheckboxCircleLine /> : <RiFileCopyLine />}
             </Button>
           </Flex>
-        </Card>
-      </Box>
+        </Box>
+      </Card>
     </Flex>
   );
 };
