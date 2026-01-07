@@ -13,14 +13,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     where: {
       tournamentId: id,
       tournament: {
-        OR: [
-          {
-            state: TournamentsState.END,
-          },
-          {
-            format: TournamentsFormat.EXHIBITION,
-          },
-        ],
+        state: TournamentsState.END,
       },
     },
     orderBy: [

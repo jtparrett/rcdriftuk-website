@@ -13,7 +13,7 @@ import {
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
-import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
+import { RiDeleteBinFill, RiDraggable, RiRocketLine } from "react-icons/ri";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
 import { Reorder } from "motion/react";
@@ -37,13 +37,6 @@ export const tournamentFormSchema = z.object({
       }),
     )
     .min(1, "Please add at least one judge to the tournament"),
-  drivers: z
-    .array(
-      z.object({
-        driverId: z.string(),
-      }),
-    )
-    .min(4, "Please add at least four drivers to the tournament"),
   qualifyingLaps: z.coerce
     .number()
     .min(1, "Qualifying laps must be at least 1")
@@ -55,6 +48,7 @@ export const tournamentFormSchema = z.object({
   qualifyingOrder: z.nativeEnum(QualifyingOrder),
   driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
   bracketSize: z.nativeEnum(BracketSize),
+  ratingRequested: z.boolean(),
 });
 
 interface PeopleFormProps {
@@ -276,7 +270,6 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
       enableQualifying: initialValues.enableQualifying ?? false,
       enableBattles: initialValues.enableBattles ?? false,
       judges: initialValues.judges ?? [],
-      drivers: initialValues.drivers ?? [],
       bracketSize: initialValues.bracketSize ?? BracketSize.TOP_4,
       enableProtests: initialValues.enableProtests ?? false,
       qualifyingLaps: initialValues.qualifyingLaps ?? 1,
@@ -286,6 +279,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
       qualifyingOrder: initialValues.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       driverNumbers:
         initialValues.driverNumbers ?? TournamentsDriverNumbers.NONE,
+      ratingRequested: initialValues.ratingRequested ?? false,
     },
     onSubmit: (values) => {
       fetcher.submit(JSON.stringify(values), {
@@ -332,8 +326,28 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
             </TabGroup>
           </FormControl>
 
+          <FormControl flex={1} error={formik.errors.ratingRequested}>
+            <Label>Is this a rated tournament?</Label>
+            <TabGroup>
+              <TabButton
+                type="button"
+                isActive={formik.values.ratingRequested}
+                onClick={() => formik.setFieldValue("ratingRequested", true)}
+              >
+                Yes
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={!formik.values.ratingRequested}
+                onClick={() => formik.setFieldValue("ratingRequested", false)}
+              >
+                No
+              </TabButton>
+            </TabGroup>
+          </FormControl>
+
           <FormControl flex={1} error={formik.errors.region}>
-            <Label>Driver Numbers</Label>
+            <Label>Driver Identification Numbers (DIN)</Label>
 
             <TabGroup>
               {Object.values(TournamentsDriverNumbers).map((item) => {
@@ -578,7 +592,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
               isLoading={fetcher.state === "submitting"}
               disabled={fetcher.state === "submitting"}
             >
-              Start Registration
+              Start Registration <RiRocketLine />
             </Button>
           </FormControl>
         </Flex>

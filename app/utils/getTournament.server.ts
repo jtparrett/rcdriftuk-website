@@ -17,7 +17,7 @@ export const getTournament = (id: string) => {
       bracketSize: true,
       enableProtests: true,
       qualifyingOrder: true,
-      ratingRequestedAt: true,
+      ratingRequested: true,
       rated: true,
       region: true,
       driverNumbers: true,

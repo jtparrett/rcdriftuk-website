@@ -95,10 +95,7 @@ export const tournamentEndQualifying = async (id: string) => {
     );
 
     // If the driver has no scores, convert them into a BYE run
-    if (
-      lapScores.every((score) => score === 0) &&
-      tournament.format !== TournamentsFormat.BATTLE_TREE
-    ) {
+    if (lapScores.every((score) => score === 0)) {
       return {
         lapScores: [],
         id: byeTounamentDriver.id,

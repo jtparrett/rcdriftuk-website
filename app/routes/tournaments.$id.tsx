@@ -450,36 +450,27 @@ const TournamentPage = () => {
                 </LinkButton>
               )}
 
-              {isOwner &&
-                tournament.state === TournamentsState.END &&
-                tournament.rated === false &&
-                !tournament.ratingRequestedAt && (
-                  <LinkButton
-                    to={`/tournaments/${tournament.id}/request-rating`}
+              {!tournament.rated &&
+                tournament.ratingRequested &&
+                tournament.state === TournamentsState.END && (
+                  <Flex
+                    alignSelf="center"
+                    color="brand.500"
+                    py={1.5}
+                    pl={4}
+                    pr={2.5}
+                    borderWidth={1}
+                    borderColor="brand.500"
+                    rounded="full"
+                    gap={2}
+                    alignItems="center"
                   >
-                    Request Rating <RiExchangeLine />
-                  </LinkButton>
+                    <styled.p fontWeight="medium" fontSize="sm">
+                      Rating Pending
+                    </styled.p>
+                    <RiExchangeLine />
+                  </Flex>
                 )}
-
-              {!tournament.rated && tournament.ratingRequestedAt && (
-                <Flex
-                  alignSelf="center"
-                  color="brand.500"
-                  py={1.5}
-                  pl={4}
-                  pr={2.5}
-                  borderWidth={1}
-                  borderColor="brand.500"
-                  rounded="full"
-                  gap={2}
-                  alignItems="center"
-                >
-                  <styled.p fontWeight="medium" fontSize="sm">
-                    Rating Pending
-                  </styled.p>
-                  <RiExchangeLine />
-                </Flex>
-              )}
 
               {isOwner &&
                 tournament.state === TournamentsState.QUALIFYING &&

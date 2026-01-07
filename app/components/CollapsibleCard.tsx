@@ -12,7 +12,7 @@ export const Card = styled("div", {
   },
 });
 
-export const CardHeader = styled("button", {
+export const CardHeader = styled("div", {
   base: {
     w: "full",
     p: 6,

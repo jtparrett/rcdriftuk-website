@@ -7,7 +7,6 @@ import { prisma } from "~/utils/prisma.server";
 import { CreateTournamentForm } from "~/components/CreateTournamentForm";
 import {
   BattlesBracket,
-  TicketStatus,
   TournamentsFormat,
   TournamentsState,
 } from "~/utils/enums";
@@ -21,39 +20,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    return redirect("/sign-in");
+    throw redirect("/sign-in");
   }
 
   const users = await getUsers();
 
   const url = new URL(args.request.url);
-  const eventId = z.string().nullable().parse(url.searchParams.get("eventId"));
   const tournamentId = z
     .string()
     .nullable()
     .parse(url.searchParams.get("tournamentId"));
-
-  if (eventId) {
-    const eventDrivers = await prisma.eventTickets.findMany({
-      where: {
-        eventId,
-        status: TicketStatus.CONFIRMED,
-      },
-      select: {
-        user: {
-          select: {
-            driverId: true,
-          },
-        },
-      },
-    });
-
-    const drivers = eventDrivers.map((driver) => ({
-      driverId: driver.user?.driverId?.toString() ?? "",
-    }));
-
-    return { users, drivers };
-  }
 
   if (tournamentId) {
     const tournament = await prisma.tournaments.findUnique({
@@ -83,12 +59,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    const drivers =
-      tournament?.drivers.map((driver) => ({
-        driverId: driver.driverId.toString(),
-      })) ?? [];
-
-    return { users, drivers, tournament };
+    return { users, tournament };
   }
 
   return { users };
@@ -103,8 +74,9 @@ export const action = async (args: ActionFunctionArgs) => {
 
   const {
     name,
+    enableQualifying,
+    enableBattles,
     judges,
-    drivers,
     qualifyingLaps,
     format,
     enableProtests,
@@ -113,17 +85,16 @@ export const action = async (args: ActionFunctionArgs) => {
     qualifyingOrder,
     bracketSize,
     driverNumbers,
+    ratingRequested,
   } = tournamentFormSchema.parse(body);
-
-  if (drivers.length < 4) {
-    throw new Error(`Please add at least 4 drivers to the tournament`);
-  }
 
   // Create tournament
   const tournament = await prisma.tournaments.create({
     data: {
       userId,
       name,
+      enableQualifying,
+      enableBattles,
       qualifyingLaps,
       format,
       bracketSize,
@@ -132,6 +103,7 @@ export const action = async (args: ActionFunctionArgs) => {
       scoreFormula,
       qualifyingOrder,
       driverNumbers,
+      ratingRequested,
     },
   });
 
@@ -153,89 +125,6 @@ export const action = async (args: ActionFunctionArgs) => {
       skipDuplicates: true,
     }),
   ]);
-
-  // Create new users (not previously registered)
-  const driversWithIndex = drivers.map((driver, index) => ({
-    ...driver,
-    index,
-  }));
-  const newDrivers = driversWithIndex.filter(
-    (driver) => !/^\d+$/.test(driver.driverId),
-  );
-  let allDrivers = driversWithIndex.filter(
-    (driver) => !newDrivers.some((d) => d.driverId === driver.driverId),
-  );
-
-  if (newDrivers.length > 0) {
-    const newUsers = await prisma.users.createManyAndReturn({
-      data: newDrivers.map((driver) => {
-        const [firstName, lastName] = driver.driverId.split(" ");
-
-        return {
-          firstName: firstName?.trim() ?? "",
-          lastName: lastName?.trim() ?? "",
-        };
-      }),
-      select: {
-        driverId: true,
-      },
-      skipDuplicates: true,
-    });
-
-    allDrivers = allDrivers
-      .concat(
-        newDrivers.map((driver, i) => ({
-          driverId: newUsers[i].driverId.toString(),
-          index: driver.index,
-        })),
-      )
-      .sort((a, b) => a.index - b.index);
-  }
-
-  // Create tournament drivers
-  const [_, tournamentDrivers] = await prisma.$transaction([
-    prisma.tournamentDrivers.deleteMany({
-      where: {
-        tournamentId: tournament.id,
-      },
-    }),
-    prisma.tournamentDrivers.createManyAndReturn({
-      data: allDrivers.map((driver) => {
-        return {
-          driverId: Number(driver.driverId),
-          tournamentId: tournament.id,
-          tournamentDriverNumber: driver.index + 1,
-        };
-      }),
-    }),
-  ]);
-
-  // Create qualifying laps
-  let nextQualifyingLapId: number | null = null;
-
-  if (tournament.enableQualifying) {
-    const [_, [nextQualifyingLap]] = await prisma.$transaction([
-      prisma.laps.deleteMany({
-        where: {
-          tournament: {
-            id: tournament.id,
-          },
-        },
-      }),
-      prisma.laps.createManyAndReturn({
-        data: Array.from({ length: qualifyingLaps }).flatMap((_, i) => {
-          return tournamentDrivers.map((driver) => {
-            return {
-              tournamentDriverId: driver.id,
-              round: i + 1,
-            };
-          });
-        }),
-      }),
-    ]);
-
-    nextQualifyingLapId = nextQualifyingLap?.id ?? null;
-  }
 
   // Create battles
   await prisma.tournamentBattles.deleteMany({
@@ -390,10 +279,7 @@ export const action = async (args: ActionFunctionArgs) => {
       id: tournament.id,
     },
     data: {
-      state: nextQualifyingLapId
-        ? TournamentsState.QUALIFYING
-        : TournamentsState.BATTLES,
-      nextQualifyingLapId,
+      state: TournamentsState.REGISTRATION,
       nextBattleId,
     },
   });
@@ -402,7 +288,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { users, drivers, tournament } = useLoaderData<typeof loader>();
+  const { users, tournament } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -416,7 +302,6 @@ const Page = () => {
         <CreateTournamentForm
           users={users}
           initialValues={{
-            drivers,
             name: tournament?.name,
             judges: tournament?.judges.map((judge) => ({
               driverId: judge.driverId.toString(),
@@ -430,6 +315,9 @@ const Page = () => {
             scoreFormula: tournament?.scoreFormula,
             qualifyingOrder: tournament?.qualifyingOrder,
             driverNumbers: tournament?.driverNumbers,
+            enableQualifying: tournament?.enableQualifying,
+            enableBattles: tournament?.enableBattles,
+            ratingRequested: tournament?.ratingRequested,
           }}
         />
       </Container>
