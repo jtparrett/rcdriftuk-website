@@ -526,6 +526,14 @@ const TournamentsOverviewPage = () => {
           <Box borderRadius="xl" overflow="hidden" textAlign="center">
             {tournament.state === TournamentsState.END && <FinalResults />}
 
+            {tournament?.state === TournamentsState.REGISTRATION && (
+              <Box p={6}>
+                <styled.h2 fontSize="xl" fontWeight="bold">
+                  Registration in progress...
+                </styled.h2>
+              </Box>
+            )}
+
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
                 <Flex

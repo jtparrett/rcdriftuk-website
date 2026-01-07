@@ -13,7 +13,12 @@ import {
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
-import { RiDeleteBinFill, RiDraggable, RiRocketLine } from "react-icons/ri";
+import {
+  RiDeleteBinFill,
+  RiDraggable,
+  RiShuffleLine,
+  RiVipCrown2Line,
+} from "react-icons/ri";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
 import { Reorder } from "motion/react";
@@ -54,16 +59,20 @@ export const tournamentFormSchema = z.object({
 interface PeopleFormProps {
   users: GetUsers;
   name: string;
+  allowNewDrivers?: boolean;
+  allowRandomise?: boolean;
   allowPoints?: boolean;
   onChange: (value: { driverId: string; points?: number }[]) => void;
   value: { driverId: string; points?: number }[];
 }
 
-const PeopleForm = ({
+export const PeopleForm = ({
   users,
   value,
   onChange,
   name,
+  allowNewDrivers = false,
+  allowRandomise = false,
   allowPoints = false,
 }: PeopleFormProps) => {
   const [focused, setFocused] = useState(false);
@@ -81,6 +90,20 @@ const PeopleForm = ({
 
   return (
     <Box>
+      {allowRandomise && (
+        <Button
+          variant="outline"
+          size="sm"
+          mb={2}
+          type="button"
+          onClick={() => {
+            onChange([...value].sort(() => Math.random() - 0.5));
+          }}
+        >
+          <RiShuffleLine /> Shuffle Order
+        </Button>
+      )}
+
       {value.length > 0 && (
         <Box
           bgColor="gray.900"
@@ -137,9 +160,29 @@ const PeopleForm = ({
                       overflow="hidden"
                       py={1}
                     >
-                      {user
-                        ? `${user.firstName} ${user.lastName} (#${person.driverId})`
-                        : person.driverId + " (new)"}
+                      {user ? (
+                        <>
+                          {user.firstName} {user.lastName}{" "}
+                          <styled.span
+                            color="gray.500"
+                            fontSize="sm"
+                            verticalAlign="middle"
+                          >
+                            #{person.driverId}
+                          </styled.span>
+                        </>
+                      ) : (
+                        <>
+                          {person.driverId}{" "}
+                          <styled.span
+                            color="gray.500"
+                            fontSize="sm"
+                            verticalAlign="middle"
+                          >
+                            (new)
+                          </styled.span>
+                        </>
+                      )}
                     </styled.p>
 
                     {allowPoints && (
@@ -195,7 +238,7 @@ const PeopleForm = ({
 
           <Box px={2} py={1}>
             <styled.p textAlign="right" fontSize="sm" color="gray.500">
-              {pluralize("people", value.length, true)}
+              {pluralize("People", value.length, true)}
             </styled.p>
           </Box>
         </Box>
@@ -203,7 +246,7 @@ const PeopleForm = ({
 
       <Box pos="relative">
         <Input
-          placeholder="Type to search..."
+          placeholder="Type to search for people..."
           onBlur={(_e) => {
             setTimeout(() => {
               const active = document.activeElement;
@@ -240,11 +283,34 @@ const PeopleForm = ({
               );
             })}
 
-            {filteredUsers.length === 0 && (
+            {!allowNewDrivers && filteredUsers.length === 0 && (
               <styled.p px={2} py={1} fontWeight="semibold">
                 No results found
               </styled.p>
             )}
+
+            {allowNewDrivers &&
+              filteredUsers.length === 0 &&
+              search
+                .trim()
+                .split(" ")
+                .every((part) => part.length > 0) && (
+                <Option
+                  type="button"
+                  onClick={() => {
+                    onChange([
+                      ...value,
+                      {
+                        driverId: search.trim(),
+                        points: 100,
+                      },
+                    ]);
+                    setSearch("");
+                  }}
+                >
+                  Create "{search.trim()}" as a new driver
+                </Option>
+              )}
           </Dropdown>
         )}
       </Box>
@@ -584,18 +650,16 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
           )}
         </Card>
 
-        <Flex>
-          <Spacer />
-          <FormControl>
-            <Button
-              type="submit"
-              isLoading={fetcher.state === "submitting"}
-              disabled={fetcher.state === "submitting"}
-            >
-              Start Registration <RiRocketLine />
-            </Button>
-          </FormControl>
-        </Flex>
+        <FormControl>
+          <Button
+            type="submit"
+            isLoading={fetcher.state === "submitting"}
+            disabled={fetcher.state === "submitting"}
+            w="full"
+          >
+            Start Registration <RiVipCrown2Line />
+          </Button>
+        </FormControl>
       </Flex>
     </form>
   );

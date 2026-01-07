@@ -1,9 +1,5 @@
 import { useUser } from "@clerk/react-router";
-import {
-  BattlesBracket,
-  TournamentsFormat,
-  TournamentsState,
-} from "~/utils/enums";
+import { BattlesBracket, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
@@ -36,6 +32,7 @@ import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
+  RiCheckboxCircleLine,
   RiExchangeLine,
   RiFlagLine,
   RiFullscreenFill,
@@ -174,10 +171,13 @@ const TournamentPage = () => {
   const isLoading =
     transition.state === "submitting" || transition.state === "loading";
   const isSubmitting = transition.state === "submitting";
+
   const isOverviewTab = location.pathname.includes("overview");
+  const isRegistrationTab = location.pathname.includes("registration");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
   const isStandingsTab = location.pathname.includes("standings");
+
   const { user } = useUser();
 
   const isOwner = user?.id === tournament.userId;
@@ -249,8 +249,8 @@ const TournamentPage = () => {
           <Container maxW={1100} px={2}>
             <Flex alignItems="center" gap={2}>
               <styled.h1
-                fontSize="xl"
-                fontWeight="bold"
+                fontSize="lg"
+                fontWeight="extrabold"
                 overflow="hidden"
                 textOverflow="ellipsis"
                 whiteSpace="nowrap"
@@ -330,6 +330,18 @@ const TournamentPage = () => {
           >
             Overview
           </Tab>
+
+          {tournament.state === TournamentsState.REGISTRATION && (
+            <Tab
+              to={`/tournaments/${tournament.id}/registration`}
+              isActive={isRegistrationTab}
+              data-replace="true"
+              replace
+            >
+              Registration
+            </Tab>
+          )}
+
           {tournament.enableQualifying && (
             <Tab
               to={`/tournaments/${tournament.id}/qualifying/0`}
@@ -412,6 +424,28 @@ const TournamentPage = () => {
             >
               <Spacer />
 
+              {!tournament.rated &&
+                tournament.ratingRequested &&
+                tournament.state === TournamentsState.END && (
+                  <Flex
+                    alignSelf="center"
+                    color="brand.500"
+                    py={1.5}
+                    pl={4}
+                    pr={2.5}
+                    borderWidth={1}
+                    borderColor="brand.500"
+                    rounded="full"
+                    gap={2}
+                    alignItems="center"
+                  >
+                    <styled.p fontWeight="medium" fontSize="sm">
+                      Rating Pending
+                    </styled.p>
+                    <RiExchangeLine />
+                  </Flex>
+                )}
+
               {isOwner && secondsRemaining > 0 && (
                 <Box
                   rounded="full"
@@ -450,26 +484,18 @@ const TournamentPage = () => {
                 </LinkButton>
               )}
 
-              {!tournament.rated &&
-                tournament.ratingRequested &&
-                tournament.state === TournamentsState.END && (
-                  <Flex
-                    alignSelf="center"
-                    color="brand.500"
-                    py={1.5}
-                    pl={4}
-                    pr={2.5}
-                    borderWidth={1}
-                    borderColor="brand.500"
-                    rounded="full"
-                    gap={2}
-                    alignItems="center"
-                  >
-                    <styled.p fontWeight="medium" fontSize="sm">
-                      Rating Pending
-                    </styled.p>
-                    <RiExchangeLine />
-                  </Flex>
+              {isOwner &&
+                tournament.state === TournamentsState.REGISTRATION && (
+                  <Form method="post">
+                    <Button
+                      type="submit"
+                      w={{ base: "full", sm: "auto" }}
+                      disabled={isLoading || isSubmitting}
+                      isLoading={isSubmitting}
+                    >
+                      Start Qualifying <RiCheckboxCircleLine />
+                    </Button>
+                  </Form>
                 )}
 
               {isOwner &&
@@ -521,14 +547,16 @@ const TournamentPage = () => {
                   </Form>
                 )}
 
-              {tournamentJudge && (
-                <LinkButton
-                  to={`/judge/${tournamentJudge.id}`}
-                  variant="outline"
-                >
-                  Open Judges Remote <RiRemoteControlLine />
-                </LinkButton>
-              )}
+              {tournamentJudge &&
+                (tournament.state === TournamentsState.QUALIFYING ||
+                  tournament.state === TournamentsState.BATTLES) && (
+                  <LinkButton
+                    to={`/judge/${tournamentJudge.id}`}
+                    variant="outline"
+                  >
+                    Open Judge Remote <RiRemoteControlLine />
+                  </LinkButton>
+                )}
             </Flex>
           </Container>
         </Box>
