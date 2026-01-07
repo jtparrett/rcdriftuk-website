@@ -20,6 +20,7 @@ export const CardHeader = styled("button", {
     alignItems: "center",
     justifyContent: "space-between",
     cursor: "pointer",
+    transition: "background-color .2s",
     _hover: {
       md: {
         bgColor: "gray.800",

@@ -298,7 +298,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <Flex overflow="hidden" flexDir="column" gap={4} maxW={600}>
-        <Card p={4} display="flex" flexDir="column" gap={4}>
+        <Card p={6} display="flex" flexDir="column" gap={4} overflow="visible">
           <FormControl flex={1} error={formik.errors.name}>
             <Label>Tournament Name</Label>
             <Input
@@ -333,7 +333,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
           </FormControl>
 
           <FormControl flex={1} error={formik.errors.region}>
-            <Label>Driver Number Display</Label>
+            <Label>Driver Numbers</Label>
 
             <TabGroup>
               {Object.values(TournamentsDriverNumbers).map((item) => {
@@ -365,7 +365,9 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader
+            onClick={() => formik.setFieldValue("enableQualifying", true)}
+          >
             <styled.h2 fontSize="lg" fontWeight="semibold">
               Qualifying
             </styled.h2>
@@ -375,17 +377,23 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
             <TabGroup>
               <TabButton
                 isActive={!formik.values.enableQualifying}
-                onClick={() => formik.setFieldValue("enableQualifying", false)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  formik.setFieldValue("enableQualifying", false);
+                }}
                 type="button"
               >
-                Disabled
+                Disable
               </TabButton>
               <TabButton
                 isActive={formik.values.enableQualifying}
-                onClick={() => formik.setFieldValue("enableQualifying", true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  formik.setFieldValue("enableQualifying", true);
+                }}
                 type="button"
               >
-                Enabled
+                Enable
               </TabButton>
             </TabGroup>
           </CardHeader>
@@ -463,7 +471,9 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader
+            onClick={() => formik.setFieldValue("enableBattles", true)}
+          >
             <styled.h2 fontSize="lg" fontWeight="semibold">
               Battles
             </styled.h2>
@@ -473,17 +483,23 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
             <TabGroup>
               <TabButton
                 isActive={!formik.values.enableBattles}
-                onClick={() => formik.setFieldValue("enableBattles", false)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  formik.setFieldValue("enableBattles", false);
+                }}
                 type="button"
               >
-                Disabled
+                Disable
               </TabButton>
               <TabButton
                 isActive={formik.values.enableBattles}
-                onClick={() => formik.setFieldValue("enableBattles", true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  formik.setFieldValue("enableBattles", true);
+                }}
                 type="button"
               >
-                Enabled
+                Enable
               </TabButton>
             </TabGroup>
           </CardHeader>
@@ -492,7 +508,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
             <CardContent display="flex" flexDir="column" gap={4}>
               <FormControl flex={1} error={formik.errors.format}>
                 <Label>What format is this tournament?</Label>
-                <Flex gap={0.5} flexWrap="wrap">
+                <TabGroup>
                   {Object.values(TournamentsFormat).map((item) => {
                     return (
                       <TabButton
@@ -505,7 +521,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
                       </TabButton>
                     );
                   })}
-                </Flex>
+                </TabGroup>
               </FormControl>
 
               <FormControl flex={1} error={formik.errors.bracketSize}>
