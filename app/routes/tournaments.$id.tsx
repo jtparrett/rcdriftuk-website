@@ -1,7 +1,6 @@
 import { useUser } from "@clerk/react-router";
 import {
   BattlesBracket,
-  QualifyingProcedure,
   TournamentsFormat,
   TournamentsState,
 } from "~/utils/enums";
@@ -55,7 +54,6 @@ import pluralize from "pluralize";
 import { AppName } from "~/utils/enums";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { tournamentHasQualifying } from "./tournaments.new";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -332,9 +330,9 @@ const TournamentPage = () => {
           >
             Overview
           </Tab>
-          {tournamentHasQualifying(tournament.format) && (
+          {tournament.enableQualifying && (
             <Tab
-              to={`/tournaments/${tournament.id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`}
+              to={`/tournaments/${tournament.id}/qualifying/0`}
               isActive={isQualifyingTab}
               data-replace="true"
               replace
@@ -350,8 +348,7 @@ const TournamentPage = () => {
           >
             Battles
           </Tab>
-          {(tournament.state === TournamentsState.END ||
-            tournament.format === TournamentsFormat.EXHIBITION) && (
+          {tournament.state === TournamentsState.END && (
             <Tab
               to={`/tournaments/${tournament.id}/standings`}
               isActive={isStandingsTab}
@@ -431,27 +428,6 @@ const TournamentPage = () => {
                 </Box>
               )}
 
-              {isOwner &&
-                tournament.state === TournamentsState.BATTLES &&
-                tournament.format === TournamentsFormat.EXHIBITION &&
-                judgingCompleteForNextBattle &&
-                !isOMT &&
-                !hasUnresolvedProtest && (
-                  <>
-                    <LinkButton
-                      to={`/tournaments/${tournament.id}/battles/create`}
-                    >
-                      Create Next Battle <RiFlagLine />
-                    </LinkButton>
-                    <LinkButton
-                      to={`/tournaments/${tournament.id}/end`}
-                      variant="outline"
-                    >
-                      End Tournament
-                    </LinkButton>
-                  </>
-                )}
-
               {isBattlingDriver &&
                 protestingEnabled &&
                 judgingCompleteForNextBattle &&
@@ -465,16 +441,14 @@ const TournamentPage = () => {
                   </LinkButton>
                 )}
 
-              {isOwner &&
-                tournament.state === TournamentsState.QUALIFYING &&
-                tournament.qualifyingProcedure === QualifyingProcedure.BEST && (
-                  <LinkButton
-                    variant="outline"
-                    to={`/tournaments/${tournament.id}/randomise`}
-                  >
-                    Randomise Qualifying <RiShuffleLine />
-                  </LinkButton>
-                )}
+              {isOwner && tournament.state === TournamentsState.QUALIFYING && (
+                <LinkButton
+                  variant="outline"
+                  to={`/tournaments/${tournament.id}/randomise`}
+                >
+                  Randomise Qualifying <RiShuffleLine />
+                </LinkButton>
+              )}
 
               {isOwner &&
                 tournament.state === TournamentsState.END &&
@@ -542,7 +516,6 @@ const TournamentPage = () => {
               {isOwner &&
                 tournament.state === TournamentsState.BATTLES &&
                 judgingCompleteForNextBattle &&
-                tournament.format !== TournamentsFormat.EXHIBITION &&
                 !hasUnresolvedProtest &&
                 secondsRemaining <= 0 && (
                   <Form method="post">

@@ -32,5 +32,7 @@ export const TabGroup = styled("div", {
     bgColor: "gray.900",
     rounded: "2xl",
     p: 1,
+    borderWidth: 1,
+    borderColor: "gray.800",
   },
 });

@@ -2,7 +2,7 @@ import { Box, styled } from "~/styled-system/jsx";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 
-const Card = styled("div", {
+export const Card = styled("div", {
   base: {
     borderWidth: 1,
     borderColor: "gray.800",
@@ -12,7 +12,7 @@ const Card = styled("div", {
   },
 });
 
-const CardHeader = styled("button", {
+export const CardHeader = styled("button", {
   base: {
     w: "full",
     p: 6,
@@ -28,7 +28,7 @@ const CardHeader = styled("button", {
   },
 });
 
-const CardContent = styled("div", {
+export const CardContent = styled("div", {
   base: {
     p: 6,
     borderTopWidth: 1,

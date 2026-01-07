@@ -67,6 +67,8 @@ model EventResponses {
 model Tournaments {
   id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String
+  enableQualifying    Boolean                  @default(true)
+  enableBattles       Boolean                  @default(true)
   archived            Boolean                  @default(false)
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @default(now()) @updatedAt
@@ -83,16 +85,15 @@ model Tournaments {
   nextQualifyingLap   Laps?                    @relation(fields: [nextQualifyingLapId], references: [id])
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?       @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
-  fullInclusion       Boolean                  @default(false)
   enableProtests      Boolean                  @default(false)
   region              Regions?
   rated               Boolean                  @default(false)
-  ratingRequestedAt   DateTime?
+  ratingRequested     Boolean                  @default(false)
   scoreFormula        ScoreFormula             @default(AVERAGED)
   leaderboards        LeaderboardTournaments[]
   qualifyingOrder     QualifyingOrder          @default(DRIVERS)
-  qualifyingProcedure QualifyingProcedure      @default(BEST)
   driverNumbers       TournamentsDriverNumbers @default(NONE)
+  bracketSize         Int                      @default(4)
 
   @@index([state])
   @@index([archived])
@@ -552,11 +553,6 @@ model LeaderboardDrivers {
   @@index([leaderboardId, driverId])
 }
 
-enum QualifyingProcedure {
-  BEST
-  WAVES
-}
-
 enum LeaderboardType {
   TOURNAMENTS
   DRIVERS
@@ -592,8 +588,6 @@ enum TournamentsDriverNumbers {
 enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
-  EXHIBITION
-  BATTLE_TREE
 }
 
 enum BattlesBracket {

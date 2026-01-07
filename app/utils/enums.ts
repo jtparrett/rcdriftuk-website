@@ -31,8 +31,6 @@ export type TournamentsState = Values<typeof TournamentsState>;
 export const TournamentsFormat = {
   STANDARD: "STANDARD",
   DOUBLE_ELIMINATION: "DOUBLE_ELIMINATION",
-  BATTLE_TREE: "BATTLE_TREE",
-  EXHIBITION: "EXHIBITION",
 } as const;
 
 export type TournamentsFormat = Values<typeof TournamentsFormat>;
@@ -95,13 +93,6 @@ export const QualifyingOrder = {
 
 export type QualifyingOrder = Values<typeof QualifyingOrder>;
 
-export const QualifyingProcedure = {
-  BEST: "BEST",
-  WAVES: "WAVES",
-} as const;
-
-export type QualifyingProcedure = Values<typeof QualifyingProcedure>;
-
 export const TournamentsDriverNumbers = {
   NONE: "NONE",
   UNIVERSAL: "UNIVERSAL",
@@ -109,3 +100,14 @@ export const TournamentsDriverNumbers = {
 } as const;
 
 export type TournamentsDriverNumbers = Values<typeof TournamentsDriverNumbers>;
+
+export const BracketSize = {
+  TOP_4: 4,
+  TOP_8: 8,
+  TOP_16: 16,
+  TOP_32: 32,
+  TOP_64: 64,
+  TOP_128: 128,
+};
+
+export type BracketSize = Values<typeof BracketSize>;

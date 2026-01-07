@@ -14,14 +14,15 @@ export const getTournament = (id: string) => {
       userId: true,
       liveUrl: true,
       scoreFormula: true,
-      fullInclusion: true,
+      bracketSize: true,
       enableProtests: true,
       qualifyingOrder: true,
-      qualifyingProcedure: true,
       ratingRequestedAt: true,
       rated: true,
       region: true,
       driverNumbers: true,
+      enableQualifying: true,
+      enableBattles: true,
       nextQualifyingLap: {
         include: {
           scores: true,

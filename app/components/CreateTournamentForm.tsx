@@ -1,6 +1,5 @@
-import { useFetcher, useSearchParams } from "react-router";
-import { styled, Box, Flex } from "~/styled-system/jsx";
-import type { GetTournament } from "~/utils/getTournament.server";
+import { useFetcher } from "react-router";
+import { styled, Box, Flex, Spacer } from "~/styled-system/jsx";
 import { Input } from "./Input";
 import { Button } from "./Button";
 import {
@@ -8,14 +7,13 @@ import {
   TournamentsFormat,
   ScoreFormula,
   QualifyingOrder,
-  QualifyingProcedure,
   TournamentsDriverNumbers,
+  BracketSize,
 } from "~/utils/enums";
 import { capitalCase } from "change-case";
 import type { GetUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
-import { RiDeleteBinFill, RiDraggable, RiShuffleLine } from "react-icons/ri";
-import { StepDot } from "./StepDot";
+import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
 import { Reorder } from "motion/react";
@@ -25,10 +23,12 @@ import { Label } from "./Label";
 import { FormControl } from "./FormControl";
 import pluralize from "pluralize";
 import { z } from "zod";
-import { tournamentHasQualifying } from "~/routes/tournaments.new";
+import { Card, CardContent, CardHeader } from "./CollapsibleCard";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
+  enableQualifying: z.boolean(),
+  enableBattles: z.boolean(),
   judges: z
     .array(
       z.object({
@@ -49,20 +49,17 @@ export const tournamentFormSchema = z.object({
     .min(1, "Qualifying laps must be at least 1")
     .max(3, "Qualifying laps must be at most 3"),
   format: z.nativeEnum(TournamentsFormat),
-  fullInclusion: z.boolean(),
   enableProtests: z.boolean(),
   region: z.nativeEnum(Regions),
   scoreFormula: z.nativeEnum(ScoreFormula),
   qualifyingOrder: z.nativeEnum(QualifyingOrder),
-  qualifyingProcedure: z.nativeEnum(QualifyingProcedure),
   driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
+  bracketSize: z.nativeEnum(BracketSize),
 });
 
 interface PeopleFormProps {
   users: GetUsers;
   name: string;
-  allowNewDrivers?: boolean;
-  allowRandomise?: boolean;
   allowPoints?: boolean;
   onChange: (value: { driverId: string; points?: number }[]) => void;
   value: { driverId: string; points?: number }[];
@@ -73,8 +70,6 @@ const PeopleForm = ({
   value,
   onChange,
   name,
-  allowNewDrivers = false,
-  allowRandomise = false,
   allowPoints = false,
 }: PeopleFormProps) => {
   const [focused, setFocused] = useState(false);
@@ -92,20 +87,6 @@ const PeopleForm = ({
 
   return (
     <Box>
-      {allowRandomise && (
-        <Button
-          variant="outline"
-          size="sm"
-          mb={2}
-          type="button"
-          onClick={() => {
-            onChange([...value].sort(() => Math.random() - 0.5));
-          }}
-        >
-          <RiShuffleLine /> Shuffle Order
-        </Button>
-      )}
-
       {value.length > 0 && (
         <Box
           bgColor="gray.900"
@@ -265,34 +246,11 @@ const PeopleForm = ({
               );
             })}
 
-            {!allowNewDrivers && filteredUsers.length === 0 && (
+            {filteredUsers.length === 0 && (
               <styled.p px={2} py={1} fontWeight="semibold">
                 No results found
               </styled.p>
             )}
-
-            {allowNewDrivers &&
-              filteredUsers.length === 0 &&
-              search
-                .trim()
-                .split(" ")
-                .every((part) => part.length > 0) && (
-                <Option
-                  type="button"
-                  onClick={() => {
-                    onChange([
-                      ...value,
-                      {
-                        driverId: search.trim(),
-                        points: 100,
-                      },
-                    ]);
-                    setSearch("");
-                  }}
-                >
-                  Create "{search.trim()}" as a new driver
-                </Option>
-              )}
           </Dropdown>
         )}
       </Box>
@@ -315,17 +273,17 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
     enableReinitialize: true,
     initialValues: {
       name: initialValues.name ?? "",
+      enableQualifying: initialValues.enableQualifying ?? false,
+      enableBattles: initialValues.enableBattles ?? false,
       judges: initialValues.judges ?? [],
       drivers: initialValues.drivers ?? [],
-      fullInclusion: initialValues.fullInclusion ?? false,
+      bracketSize: initialValues.bracketSize ?? BracketSize.TOP_4,
       enableProtests: initialValues.enableProtests ?? false,
       qualifyingLaps: initialValues.qualifyingLaps ?? 1,
       region: initialValues.region ?? Regions.UK,
       format: initialValues.format ?? TournamentsFormat.STANDARD,
       scoreFormula: initialValues.scoreFormula ?? ScoreFormula.CUMULATIVE,
       qualifyingOrder: initialValues.qualifyingOrder ?? QualifyingOrder.DRIVERS,
-      qualifyingProcedure:
-        initialValues.qualifyingProcedure ?? QualifyingProcedure.BEST,
       driverNumbers:
         initialValues.driverNumbers ?? TournamentsDriverNumbers.NONE,
     },
@@ -337,15 +295,12 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
     },
   });
 
-  const { format } = formik.values;
-
   return (
     <form onSubmit={formik.handleSubmit}>
-      <Flex overflow="hidden" flexDir="column" gap={8} maxW={600}>
-        <Flex gap={4}>
-          <StepDot />
+      <Flex overflow="hidden" flexDir="column" gap={4} maxW={600}>
+        <Card p={4} display="flex" flexDir="column" gap={4}>
           <FormControl flex={1} error={formik.errors.name}>
-            <Label>What is the name of this tournament?</Label>
+            <Label>Tournament Name</Label>
             <Input
               name="name"
               value={formik.values.name}
@@ -353,33 +308,90 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
               placeholder="e.g. 2026 Championship Round 1"
             />
           </FormControl>
-        </Flex>
 
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} error={formik.errors.format}>
-            <Label>What format is this tournament?</Label>
-            <Flex gap={0.5} flexWrap="wrap">
-              {Object.values(TournamentsFormat).map((item) => {
+          <FormControl flex={1} error={formik.errors.region}>
+            <Label>Region</Label>
+
+            <TabGroup>
+              {Object.values(Regions).map((item) => {
+                if (item === Regions.ALL) {
+                  return null;
+                }
+
                 return (
                   <TabButton
-                    key={item}
                     type="button"
-                    isActive={formik.values.format === item}
-                    onClick={() => formik.setFieldValue("format", item)}
+                    key={item}
+                    isActive={formik.values.region === item}
+                    onClick={() => formik.setFieldValue("region", item)}
+                  >
+                    {item}
+                  </TabButton>
+                );
+              })}
+            </TabGroup>
+          </FormControl>
+
+          <FormControl flex={1} error={formik.errors.region}>
+            <Label>Driver Number Display</Label>
+
+            <TabGroup>
+              {Object.values(TournamentsDriverNumbers).map((item) => {
+                return (
+                  <TabButton
+                    type="button"
+                    key={item}
+                    isActive={formik.values.driverNumbers === item}
+                    onClick={() => formik.setFieldValue("driverNumbers", item)}
                   >
                     {capitalCase(item)}
                   </TabButton>
                 );
               })}
-            </Flex>
+            </TabGroup>
           </FormControl>
-        </Flex>
 
-        {tournamentHasQualifying(format) && (
-          <>
-            <Flex gap={4}>
-              <StepDot />
+          <FormControl flex={1} error={formik.errors.judges}>
+            <Label>Who are the tournament judges?</Label>
+
+            <PeopleForm
+              users={users}
+              value={formik.values.judges}
+              onChange={(value) => formik.setFieldValue("judges", value)}
+              name="judges"
+              allowPoints
+            />
+          </FormControl>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <styled.h2 fontSize="lg" fontWeight="semibold">
+              Qualifying
+            </styled.h2>
+
+            <Spacer />
+
+            <TabGroup>
+              <TabButton
+                isActive={!formik.values.enableQualifying}
+                onClick={() => formik.setFieldValue("enableQualifying", false)}
+                type="button"
+              >
+                Disabled
+              </TabButton>
+              <TabButton
+                isActive={formik.values.enableQualifying}
+                onClick={() => formik.setFieldValue("enableQualifying", true)}
+                type="button"
+              >
+                Enabled
+              </TabButton>
+            </TabGroup>
+          </CardHeader>
+
+          {formik.values.enableQualifying && (
+            <CardContent display="flex" flexDir="column" gap={4}>
               <FormControl flex={1} error={formik.errors.qualifyingLaps}>
                 <Label>How many qualifying laps?</Label>
                 <TabGroup>
@@ -406,10 +418,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
                   </TabButton>
                 </TabGroup>
               </FormControl>
-            </Flex>
 
-            <Flex gap={4}>
-              <StepDot />
               <FormControl flex={1} error={formik.errors.qualifyingOrder}>
                 <Label>How should the qualifying order be run?</Label>
                 <TabGroup>
@@ -429,10 +438,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
                   })}
                 </TabGroup>
               </FormControl>
-            </Flex>
 
-            <Flex gap={4}>
-              <StepDot />
               <FormControl flex={1} error={formik.errors.scoreFormula}>
                 <Label>What score formula should be used?</Label>
                 <TabGroup>
@@ -452,193 +458,111 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
                   })}
                 </TabGroup>
               </FormControl>
-            </Flex>
+            </CardContent>
+          )}
+        </Card>
 
-            <Flex gap={4}>
-              <StepDot />
-              <FormControl flex={1} error={formik.errors.scoreFormula}>
-                <Label>What qualifying procedure should be used?</Label>
-                <styled.span
-                  mb={2}
-                  color="gray.500"
-                  display="block"
-                  textWrap="pretty"
-                >
-                  The qualifying procedure determines how drivers advance from
-                  qualifying into battles. Using the "Waves" format gives higher
-                  priority to drivers who complete their runs earlier.
-                </styled.span>
-                <TabGroup>
-                  {Object.values(QualifyingProcedure).map((item) => {
+        <Card>
+          <CardHeader>
+            <styled.h2 fontSize="lg" fontWeight="semibold">
+              Battles
+            </styled.h2>
+
+            <Spacer />
+
+            <TabGroup>
+              <TabButton
+                isActive={!formik.values.enableBattles}
+                onClick={() => formik.setFieldValue("enableBattles", false)}
+                type="button"
+              >
+                Disabled
+              </TabButton>
+              <TabButton
+                isActive={formik.values.enableBattles}
+                onClick={() => formik.setFieldValue("enableBattles", true)}
+                type="button"
+              >
+                Enabled
+              </TabButton>
+            </TabGroup>
+          </CardHeader>
+
+          {formik.values.enableBattles && (
+            <CardContent display="flex" flexDir="column" gap={4}>
+              <FormControl flex={1} error={formik.errors.format}>
+                <Label>What format is this tournament?</Label>
+                <Flex gap={0.5} flexWrap="wrap">
+                  {Object.values(TournamentsFormat).map((item) => {
                     return (
                       <TabButton
                         key={item}
                         type="button"
-                        isActive={formik.values.qualifyingProcedure === item}
-                        onClick={() =>
-                          formik.setFieldValue("qualifyingProcedure", item)
-                        }
+                        isActive={formik.values.format === item}
+                        onClick={() => formik.setFieldValue("format", item)}
                       >
                         {capitalCase(item)}
                       </TabButton>
                     );
                   })}
+                </Flex>
+              </FormControl>
+
+              <FormControl flex={1} error={formik.errors.bracketSize}>
+                <Label>What size bracket do you want to use?</Label>
+                <TabGroup>
+                  {Object.values(BracketSize).map((item) => {
+                    return (
+                      <TabButton
+                        type="button"
+                        key={item}
+                        isActive={formik.values.bracketSize === item}
+                        onClick={() =>
+                          formik.setFieldValue("bracketSize", item)
+                        }
+                      >
+                        Top {item}
+                      </TabButton>
+                    );
+                  })}
                 </TabGroup>
               </FormControl>
-            </Flex>
-          </>
-        )}
 
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} error={formik.errors.enableProtests}>
-            <Label>Enable protesting?</Label>
+              <FormControl flex={1} error={formik.errors.enableProtests}>
+                <Label>Enable protesting?</Label>
 
-            <TabGroup>
-              <TabButton
-                type="button"
-                isActive={!formik.values.enableProtests}
-                onClick={() => formik.setFieldValue("enableProtests", false)}
-              >
-                No
-              </TabButton>
-              <TabButton
-                type="button"
-                isActive={formik.values.enableProtests}
-                onClick={() => formik.setFieldValue("enableProtests", true)}
-              >
-                Yes
-              </TabButton>
-            </TabGroup>
-          </FormControl>
-        </Flex>
-
-        {(format === TournamentsFormat.STANDARD ||
-          format === TournamentsFormat.DOUBLE_ELIMINATION ||
-          format === TournamentsFormat.BATTLE_TREE) && (
-          <Flex gap={4}>
-            <StepDot />
-            <FormControl flex={1} error={formik.errors.fullInclusion}>
-              <Label>Should all drivers participate in battles?</Label>
-              <styled.span
-                mb={2}
-                color="gray.500"
-                display="block"
-                textWrap="pretty"
-              >
-                Enabling this option will ensure the bracket is fully populated,
-                granting Bye-runs to the highest-qualified drivers where
-                necessary.
-              </styled.span>
-
-              <TabGroup>
-                <TabButton
-                  type="button"
-                  isActive={!formik.values.fullInclusion}
-                  onClick={() => formik.setFieldValue("fullInclusion", false)}
-                >
-                  No
-                </TabButton>
-                <TabButton
-                  type="button"
-                  isActive={formik.values.fullInclusion}
-                  onClick={() => formik.setFieldValue("fullInclusion", true)}
-                >
-                  Yes
-                </TabButton>
-              </TabGroup>
-            </FormControl>
-          </Flex>
-        )}
-
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} error={formik.errors.region}>
-            <Label>Which region is this tournament in?</Label>
-
-            <TabGroup>
-              {Object.values(Regions).map((item) => {
-                if (item === Regions.ALL) {
-                  return null;
-                }
-
-                return (
+                <TabGroup>
                   <TabButton
                     type="button"
-                    key={item}
-                    isActive={formik.values.region === item}
-                    onClick={() => formik.setFieldValue("region", item)}
+                    isActive={!formik.values.enableProtests}
+                    onClick={() =>
+                      formik.setFieldValue("enableProtests", false)
+                    }
                   >
-                    {item}
+                    No
                   </TabButton>
-                );
-              })}
-            </TabGroup>
-          </FormControl>
-        </Flex>
-
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} error={formik.errors.region}>
-            <Label>Want to display driver numbers?</Label>
-
-            <TabGroup>
-              {Object.values(TournamentsDriverNumbers).map((item) => {
-                return (
                   <TabButton
                     type="button"
-                    key={item}
-                    isActive={formik.values.driverNumbers === item}
-                    onClick={() => formik.setFieldValue("driverNumbers", item)}
+                    isActive={formik.values.enableProtests}
+                    onClick={() => formik.setFieldValue("enableProtests", true)}
                   >
-                    {capitalCase(item)}
+                    Yes
                   </TabButton>
-                );
-              })}
-            </TabGroup>
-          </FormControl>
-        </Flex>
+                </TabGroup>
+              </FormControl>
+            </CardContent>
+          )}
+        </Card>
 
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} error={formik.errors.judges}>
-            <Label>Who are the tournament judges?</Label>
-
-            <PeopleForm
-              users={users}
-              value={formik.values.judges}
-              onChange={(value) => formik.setFieldValue("judges", value)}
-              name="judges"
-              allowPoints
-            />
-          </FormControl>
-        </Flex>
-
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} error={formik.errors.drivers}>
-            <Label>Who are the tournament drivers?</Label>
-            <PeopleForm
-              allowNewDrivers
-              allowRandomise
-              users={users}
-              value={formik.values.drivers}
-              onChange={(value) => formik.setFieldValue("drivers", value)}
-              name="drivers"
-            />
-          </FormControl>
-        </Flex>
-
-        <Flex gap={4}>
-          <StepDot />
-          <FormControl flex={1} pb={24}>
-            <Label>Are you ready to start this tournament?</Label>
+        <Flex>
+          <Spacer />
+          <FormControl>
             <Button
               type="submit"
               isLoading={fetcher.state === "submitting"}
               disabled={fetcher.state === "submitting"}
             >
-              Start Tournament
+              Start Registration
             </Button>
           </FormControl>
         </Flex>

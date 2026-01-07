@@ -7,7 +7,6 @@ import { prisma } from "~/utils/prisma.server";
 import { CreateTournamentForm } from "~/components/CreateTournamentForm";
 import {
   BattlesBracket,
-  QualifyingProcedure,
   TicketStatus,
   TournamentsFormat,
   TournamentsState,
@@ -15,16 +14,8 @@ import {
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { getUsers } from "~/utils/getUsers.server";
 import { tournamentFormSchema } from "~/components/CreateTournamentForm";
-import { pow2Ceil, pow2Floor } from "~/utils/powFns";
 import type { TournamentBattles } from "@prisma/client";
-import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server";
-
-export const tournamentHasQualifying = (format: TournamentsFormat) => {
-  return (
-    format === TournamentsFormat.STANDARD ||
-    format === TournamentsFormat.DOUBLE_ELIMINATION
-  );
-};
+import { TabsBar } from "~/components/TabsBar";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -116,23 +107,16 @@ export const action = async (args: ActionFunctionArgs) => {
     drivers,
     qualifyingLaps,
     format,
-    fullInclusion,
     enableProtests,
     region,
     scoreFormula,
     qualifyingOrder,
-    qualifyingProcedure,
+    bracketSize,
     driverNumbers,
   } = tournamentFormSchema.parse(body);
 
-  if (
-    fullInclusion || format === TournamentsFormat.EXHIBITION
-      ? drivers.length < 2
-      : drivers.length < 4
-  ) {
-    throw new Error(
-      `Please add at least ${fullInclusion ? 2 : 4} drivers to the tournament`,
-    );
+  if (drivers.length < 4) {
+    throw new Error(`Please add at least 4 drivers to the tournament`);
   }
 
   // Create tournament
@@ -142,12 +126,11 @@ export const action = async (args: ActionFunctionArgs) => {
       name,
       qualifyingLaps,
       format,
-      fullInclusion,
+      bracketSize,
       enableProtests,
       region,
       scoreFormula,
       qualifyingOrder,
-      qualifyingProcedure,
       driverNumbers,
     },
   });
@@ -229,12 +212,8 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create qualifying laps
   let nextQualifyingLapId: number | null = null;
-  const hasQualifying = tournamentHasQualifying(tournament.format);
 
-  if (hasQualifying) {
-    const totalLapsToCreate =
-      qualifyingProcedure === QualifyingProcedure.WAVES ? 1 : qualifyingLaps;
-
+  if (tournament.enableQualifying) {
     const [_, [nextQualifyingLap]] = await prisma.$transaction([
       prisma.laps.deleteMany({
         where: {
@@ -244,7 +223,7 @@ export const action = async (args: ActionFunctionArgs) => {
         },
       }),
       prisma.laps.createManyAndReturn({
-        data: Array.from({ length: totalLapsToCreate }).flatMap((_, i) => {
+        data: Array.from({ length: qualifyingLaps }).flatMap((_, i) => {
           return tournamentDrivers.map((driver) => {
             return {
               tournamentDriverId: driver.id,
@@ -266,11 +245,7 @@ export const action = async (args: ActionFunctionArgs) => {
   });
 
   let nextBattleId: number | null = null;
-  const totalDrivers = fullInclusion
-    ? pow2Ceil(drivers.length)
-    : pow2Floor(drivers.length);
-
-  const totalRounds = Math.ceil(Math.log2(totalDrivers)) - 1;
+  const totalRounds = Math.ceil(Math.log2(tournament.bracketSize)) - 1;
 
   let grandFinal: TournamentBattles | null = null;
   let lowerFinal: TournamentBattles | null = null;
@@ -296,10 +271,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Create the playoff battle
   let playoffBattle: TournamentBattles | null = null;
-  if (
-    tournament.format === TournamentsFormat.STANDARD ||
-    tournament.format === TournamentsFormat.BATTLE_TREE
-  ) {
+  if (tournament.format === TournamentsFormat.STANDARD) {
     playoffBattle = await prisma.tournamentBattles.create({
       data: {
         tournamentId: tournament.id,
@@ -316,13 +288,6 @@ export const action = async (args: ActionFunctionArgs) => {
       bracket: BattlesBracket.UPPER,
       winnerNextBattleId: grandFinal?.id,
       loserNextBattleId: lowerFinal?.id,
-
-      ...(tournament.format === TournamentsFormat.EXHIBITION
-        ? {
-            driverLeftId: tournamentDrivers[0]?.id,
-            driverRightId: tournamentDrivers[1]?.id,
-          }
-        : {}),
     },
   });
 
@@ -417,9 +382,7 @@ export const action = async (args: ActionFunctionArgs) => {
     }
   };
 
-  if (tournament.format !== TournamentsFormat.EXHIBITION) {
-    await makeBattles([upperFinal], lowerFinal ? [lowerFinal] : [], 1);
-  }
+  await makeBattles([upperFinal], lowerFinal ? [lowerFinal] : [], 1);
 
   // Update tournament
   await prisma.tournaments.update({
@@ -435,10 +398,6 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  if (tournament.format === TournamentsFormat.BATTLE_TREE) {
-    await tournamentEndQualifying(tournament.id);
-  }
-
   return redirect(`/tournaments/${tournament.id}/overview`);
 };
 
@@ -446,31 +405,35 @@ const Page = () => {
   const { users, drivers, tournament } = useLoaderData<typeof loader>();
 
   return (
-    <Container maxW={1100} px={4} py={8}>
-      <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
-        New Tournament
-      </styled.h1>
-      <CreateTournamentForm
-        users={users}
-        initialValues={{
-          drivers,
-          name: tournament?.name,
-          judges: tournament?.judges.map((judge) => ({
-            driverId: judge.driverId.toString(),
-            points: judge.points,
-          })),
-          format: tournament?.format,
-          fullInclusion: tournament?.fullInclusion,
-          enableProtests: tournament?.enableProtests,
-          qualifyingLaps: tournament?.qualifyingLaps,
-          region: tournament?.region ?? undefined,
-          scoreFormula: tournament?.scoreFormula,
-          qualifyingOrder: tournament?.qualifyingOrder,
-          qualifyingProcedure: tournament?.qualifyingProcedure,
-          driverNumbers: tournament?.driverNumbers,
-        }}
-      />
-    </Container>
+    <>
+      <TabsBar>
+        <styled.h1 fontSize="lg" fontWeight="extrabold">
+          New Tournament
+        </styled.h1>
+      </TabsBar>
+
+      <Container maxW={1100} px={2} py={4}>
+        <CreateTournamentForm
+          users={users}
+          initialValues={{
+            drivers,
+            name: tournament?.name,
+            judges: tournament?.judges.map((judge) => ({
+              driverId: judge.driverId.toString(),
+              points: judge.points,
+            })),
+            format: tournament?.format,
+            bracketSize: tournament?.bracketSize,
+            enableProtests: tournament?.enableProtests,
+            qualifyingLaps: tournament?.qualifyingLaps,
+            region: tournament?.region ?? undefined,
+            scoreFormula: tournament?.scoreFormula,
+            qualifyingOrder: tournament?.qualifyingOrder,
+            driverNumbers: tournament?.driverNumbers,
+          }}
+        />
+      </Container>
+    </>
   );
 };
 
