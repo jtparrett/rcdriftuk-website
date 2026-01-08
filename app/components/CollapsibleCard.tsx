@@ -21,6 +21,7 @@ export const CardHeader = styled("div", {
     justifyContent: "space-between",
     cursor: "pointer",
     transition: "background-color .2s",
+    borderTopRadius: "2xl",
     _hover: {
       md: {
         bgColor: "gray.800",
