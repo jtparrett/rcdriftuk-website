@@ -638,7 +638,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
           <Button
             type="submit"
             isLoading={fetcher.state === "submitting"}
-            disabled={fetcher.state === "submitting"}
+            disabled={fetcher.state === "submitting" || !formik.isValid}
             w="full"
           >
             Start Registration <RiVipCrown2Line />

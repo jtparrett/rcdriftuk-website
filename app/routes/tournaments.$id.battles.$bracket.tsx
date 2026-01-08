@@ -213,7 +213,7 @@ const TournamentBattlesPage = () => {
     <>
       <HiddenEmbed>
         {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
-          <TabGroup mb={4}>
+          <TabGroup mb={2}>
             {Object.values(BattlesBracket).map((sub) => {
               return (
                 <Tab

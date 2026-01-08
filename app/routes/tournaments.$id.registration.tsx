@@ -6,6 +6,7 @@ import {
   RiShuffleLine,
 } from "react-icons/ri";
 import {
+  redirect,
   useFetcher,
   useLoaderData,
   useNavigation,
@@ -21,19 +22,35 @@ import { DashedLine } from "~/components/DashedLine";
 import { Input } from "~/components/Input";
 import { Spinner } from "~/components/Spinner";
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
-import { getTournament } from "~/utils/getTournament.server";
 import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "User not found");
+
   const id = z.string().parse(args.params.id);
   const users = await getUsers();
 
-  const tournament = await getTournament(id);
+  const tournament = await prisma.tournaments.findUnique({
+    where: {
+      id,
+      userId,
+    },
+    include: {
+      drivers: true,
+    },
+  });
 
   notFoundInvariant(tournament, "Tournament not found");
+
+  if (tournament.state !== TournamentsState.REGISTRATION) {
+    throw redirect(`/tournaments/${id}/overview`);
+  }
 
   return { users, tournament };
 };

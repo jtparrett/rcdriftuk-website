@@ -51,6 +51,8 @@ import pluralize from "pluralize";
 import { AppName } from "~/utils/enums";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 import notFoundInvariant from "~/utils/notFoundInvariant";
+import { DashedLine } from "~/components/DashedLine";
+import { tournamentEndRegistration } from "~/utils/tournamentEndRegistration";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -127,16 +129,11 @@ export const action = async (args: ActionFunctionArgs) => {
   );
 
   if (tournament.state === TournamentsState.REGISTRATION) {
-    await prisma.tournaments.update({
-      where: {
-        id,
-      },
-      data: {
-        state: tournament.enableQualifying
-          ? TournamentsState.QUALIFYING
-          : TournamentsState.BATTLES,
-      },
-    });
+    await tournamentEndRegistration(id);
+
+    publishUpdate();
+
+    return redirect(referer);
   }
 
   if (
@@ -344,7 +341,7 @@ const TournamentPage = () => {
             Overview
           </Tab>
 
-          {tournament.state === TournamentsState.REGISTRATION && (
+          {tournament.state === TournamentsState.REGISTRATION && isOwner && (
             <Tab
               to={`/tournaments/${tournament.id}/registration`}
               isActive={isRegistrationTab}
@@ -574,13 +571,19 @@ const TournamentPage = () => {
                 )}
             </Flex>
           </Container>
+          {(isOwner || tournamentJudge) &&
+            tournament.state !== TournamentsState.END && (
+              <Box pt={2}>
+                <DashedLine />
+              </Box>
+            )}
         </Box>
       </HiddenEmbed>
 
       {isEmbed ? (
         <Outlet />
       ) : (
-        <Container pb={12} px={2} maxW={1100}>
+        <Container pb={4} px={2} maxW={1100}>
           <Outlet />
         </Container>
       )}

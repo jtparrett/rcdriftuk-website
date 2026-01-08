@@ -1,16 +1,10 @@
 import type { Tournaments } from "@prisma/client";
-import {
-  BattlesBracket,
-  TournamentsFormat,
-  TournamentsState,
-} from "~/utils/enums";
+import { BattlesBracket, TournamentsState } from "~/utils/enums";
 import invariant from "~/utils/invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
-import { pow2Ceil, pow2Floor } from "~/utils/powFns";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
-import { getQualifyingWaveSize } from "~/utils/tournament";
 
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
@@ -108,34 +102,7 @@ export const tournamentEndQualifying = async (id: string) => {
     };
   });
 
-  let sortedDrivers: { id: number; lapScores: number[] }[];
-
-  // if (tournament.qualifyingProcedure === QualifyingProcedure.WAVES) {
-  //   // Waves procedure: qualify drivers in waves per round
-  //   sortedDrivers = [];
-
-  //   // Process each round in order
-  //   for (let round = 1; round <= tournament.qualifyingLaps; round++) {
-  //     // Get drivers sorted by their performance in this specific round
-  //     const roundDrivers = driversWithScores
-  //       .filter((driver) => driver.lapScores[round - 1] !== undefined)
-  //       .sort(
-  //         (a, b) =>
-  //           b.lapScores[round - 1] - a.lapScores[round - 1] || a.id - b.id,
-  //       );
-
-  //     // Calculate wave size for this round
-  //     const waveSize = getQualifyingWaveSize(tournament.qualifyingLaps, round);
-  //     const qualifyingCutOff = pow2Floor(tournament.drivers.length) * waveSize;
-
-  //     // Take the top drivers from this round that haven't already qualified
-  //     const newQualifiers = roundDrivers.slice(0, qualifyingCutOff);
-
-  //     sortedDrivers.push(...newQualifiers);
-  //   }
-  // } else {
-  // Best procedure: sort by best lap score across all rounds
-  sortedDrivers = driversWithScores.sort((a, b) => {
+  let sortedDrivers = driversWithScores.sort((a, b) => {
     const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
       (lapA, lapB) => lapB - lapA,
     );
@@ -145,7 +112,6 @@ export const tournamentEndQualifying = async (id: string) => {
 
     return bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id;
   });
-  // }
 
   // Set qualifying positions (exclude bye driver)
   await prisma.$transaction(
@@ -174,10 +140,9 @@ export const tournamentEndQualifying = async (id: string) => {
     },
   });
 
-  const totalDriversWithBuys = pow2Floor(sortedDrivers.length);
   const initialBattleDrivers = sortByInnerOuter(
-    Array.from(new Array(totalDriversWithBuys / 2)).map((_, i) => {
-      let { id: driverLeftId } = sortedDrivers[totalDriversWithBuys - i - 1];
+    Array.from(new Array(tournament.bracketSize / 2)).map((_, i) => {
+      let { id: driverLeftId } = sortedDrivers[tournament.bracketSize - i - 1];
       let { id: driverRightId } = sortedDrivers[i];
 
       return {

@@ -29,6 +29,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
       },
       id: true,
+      enableBattles: true,
       bracketSize: true,
       format: true,
       qualifyingLaps: true,
@@ -91,6 +92,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isOwner,
     id: tournament.id,
     bracketSize: tournament.bracketSize,
+    enableBattles: tournament.enableBattles,
     format: tournament.format,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
@@ -170,7 +172,8 @@ const Table = ({
         return (
           <Fragment key={i}>
             {i + startPosition === tournament.bracketSize &&
-              tournament.run === 0 && (
+              tournament.run === 0 &&
+              tournament.enableBattles && (
                 <Box w="full" h="1px" bgColor="brand.500" />
               )}
             <Flex
@@ -294,7 +297,7 @@ const QualifyingPage = () => {
   return (
     <>
       <HiddenEmbed>
-        <TabGroup mb={4}>
+        <TabGroup mb={2}>
           <Tab
             to={`/tournaments/${tournament.id}/qualifying/0`}
             isActive={tournament.run === 0}
