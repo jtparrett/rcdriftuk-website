@@ -29,13 +29,9 @@ const addByeDriverToTournament = async (
 
 // Only run this if you're sure all laps have been judged
 export const tournamentEndQualifying = async (id: string) => {
-  const tournament = await prisma.tournaments.update({
+  const tournament = await prisma.tournaments.findUnique({
     where: {
       id,
-    },
-    data: {
-      state: TournamentsState.BATTLES,
-      nextQualifyingLapId: null,
     },
     select: {
       id: true,
@@ -43,6 +39,7 @@ export const tournamentEndQualifying = async (id: string) => {
       bracketSize: true,
       format: true,
       qualifyingLaps: true,
+      enableBattles: true,
       _count: {
         select: {
           judges: true,
@@ -64,6 +61,22 @@ export const tournamentEndQualifying = async (id: string) => {
   });
 
   invariant(tournament, "Missing tournament");
+
+  await prisma.tournaments.update({
+    where: {
+      id,
+    },
+    data: {
+      state: tournament.enableBattles
+        ? TournamentsState.BATTLES
+        : TournamentsState.END,
+      nextQualifyingLapId: null,
+    },
+  });
+
+  if (!tournament.enableBattles) {
+    return;
+  }
 
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
 

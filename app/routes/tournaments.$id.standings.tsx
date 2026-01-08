@@ -2,7 +2,7 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Flex, styled } from "~/styled-system/jsx";
-import { TournamentsFormat, TournamentsState } from "~/utils/enums";
+import { TournamentsState } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 import { getTournamentStandings } from "~/utils/getTournamentStandings";
 

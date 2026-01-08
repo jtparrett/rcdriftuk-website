@@ -189,7 +189,7 @@ const Page = () => {
             <styled.span
               style={{
                 color: isMyTournaments
-                  ? token("colors.brand.500")
+                  ? token("colors.green.500")
                   : token("colors.white"),
               }}
             >

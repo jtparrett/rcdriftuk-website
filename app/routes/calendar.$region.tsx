@@ -143,7 +143,7 @@ const CalendarPage = () => {
 
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} maxW={1100}>
-          <Flex gap={0.5} py={2}>
+          <Flex gap={0.5} py={2} alignItems="center">
             <Tab
               isActive={location.pathname.includes(
                 `/calendar/${params.region}/day`,
@@ -183,6 +183,7 @@ const CalendarPage = () => {
               to={`/calendar/${region}/${increment}/${previousDate()}`}
               data-replace="true"
               replace
+              h={10}
             >
               <RiArrowLeftSLine />
             </LinkButton>
@@ -190,6 +191,7 @@ const CalendarPage = () => {
               size="sm"
               variant="outline"
               to={`/calendar/${region}/${increment}/${today}`}
+              h={10}
               data-replace="true"
               replace
             >
@@ -199,6 +201,7 @@ const CalendarPage = () => {
               size="sm"
               variant="outline"
               to={`/calendar/${region}/${increment}/${nextDate()}`}
+              h={10}
               data-replace="true"
               replace
             >

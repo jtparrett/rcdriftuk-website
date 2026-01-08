@@ -78,7 +78,10 @@ export const tournamentAdvanceBattles = async (id: string) => {
     distinct: ["judgeId"],
   });
 
-  invariant(totalVotes.length >= tournament.judges.length, "Still judging bro");
+  invariant(
+    totalVotes.length >= tournament.judges.length,
+    "Judging not complete for current battle",
+  );
 
   const battleVotesLeft = await prisma.tournamentBattleVotes.findMany({
     where: {

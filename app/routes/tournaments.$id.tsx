@@ -138,6 +138,17 @@ export const action = async (args: ActionFunctionArgs) => {
 
   if (
     tournament.state === TournamentsState.QUALIFYING &&
+    tournament.nextQualifyingLapId !== null
+  ) {
+    await tournamentAdvanceQualifying(id);
+
+    publishUpdate();
+
+    return redirect(referer);
+  }
+
+  if (
+    tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
   ) {
     await tournamentEndQualifying(id);
@@ -145,12 +156,6 @@ export const action = async (args: ActionFunctionArgs) => {
     publishUpdate();
 
     return redirect(referer);
-  }
-
-  if (tournament.state === TournamentsState.QUALIFYING) {
-    await tournamentAdvanceQualifying(id);
-
-    publishUpdate();
   }
 
   if (tournament.state === TournamentsState.BATTLES) {
@@ -351,7 +356,6 @@ const TournamentPage = () => {
               Registration
             </Tab>
           )}
-
           {tournament.enableQualifying && (
             <Tab
               to={`/tournaments/${tournament.id}/qualifying/0`}
@@ -362,14 +366,16 @@ const TournamentPage = () => {
               Qualifying
             </Tab>
           )}
-          <Tab
-            to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-            isActive={isBattlesTab}
-            data-replace="true"
-            replace
-          >
-            Battles
-          </Tab>
+          {tournament.enableBattles && (
+            <Tab
+              to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+              isActive={isBattlesTab}
+              data-replace="true"
+              replace
+            >
+              Battles
+            </Tab>
+          )}
           {tournament.state === TournamentsState.END && (
             <Tab
               to={`/tournaments/${tournament.id}/standings`}

@@ -23,6 +23,9 @@ const ButtonStyles = cva({
       cursor: "not-allowed",
     },
     whiteSpace: "nowrap",
+    "& svg": {
+      fontSize: "16px",
+    },
   },
   variants: {
     size: {

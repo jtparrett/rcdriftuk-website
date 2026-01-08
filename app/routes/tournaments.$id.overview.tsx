@@ -524,8 +524,6 @@ const TournamentsOverviewPage = () => {
         >
           <Glow />
           <Box borderRadius="xl" overflow="hidden" textAlign="center">
-            {tournament.state === TournamentsState.END && <FinalResults />}
-
             {tournament?.state === TournamentsState.REGISTRATION && (
               <Box p={6}>
                 <styled.h2 fontSize="xl" fontWeight="bold">
@@ -684,6 +682,15 @@ const TournamentsOverviewPage = () => {
                     )}
                   </Flex>
                 </Flex>
+              )}
+
+            {tournament.state === TournamentsState.QUALIFYING &&
+              tournament.nextQualifyingLapId === null && (
+                <Box p={6}>
+                  <styled.h2 fontSize="xl" fontWeight="bold">
+                    Qualifying Complete
+                  </styled.h2>
+                </Box>
               )}
 
             {tournament?.state === TournamentsState.BATTLES &&
@@ -896,6 +903,8 @@ const TournamentsOverviewPage = () => {
                   </Box>
                 </Flex>
               )}
+
+            {tournament.state === TournamentsState.END && <FinalResults />}
           </Box>
         </Box>
       </Center>
