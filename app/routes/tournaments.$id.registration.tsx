@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RiCheckboxCircleLine, RiFileCopyLine } from "react-icons/ri";
+import {
+  RiCheckboxCircleLine,
+  RiFileCopyLine,
+  RiFileUploadLine,
+  RiShuffleLine,
+} from "react-icons/ri";
 import {
   useFetcher,
   useLoaderData,
@@ -13,7 +18,7 @@ import { Card } from "~/components/CollapsibleCard";
 import { PeopleForm } from "~/components/CreateTournamentForm";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
-import { Box, Flex } from "~/styled-system/jsx";
+import { Box, Flex, Spacer } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { getUsers } from "~/utils/getUsers.server";
@@ -143,16 +148,37 @@ const Page = () => {
   return (
     <Flex flexDir="column" gap={4}>
       <Card overflow="visible">
-        <Box py={2} px={4} borderBottomWidth={1} borderColor="gray.800">
+        <Flex
+          py={2}
+          px={4}
+          borderBottomWidth={1}
+          borderColor="gray.800"
+          gap={2}
+          alignItems="center"
+        >
           <Label>Drivers</Label>
-        </Box>
+          <Spacer />
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={() => {
+              addDrivers([...drivers].sort(() => Math.random() - 0.5));
+            }}
+          >
+            Shuffle
+            <RiShuffleLine />
+          </Button>
+          <Button variant="outline" size="sm" type="button">
+            Import CSV <RiFileUploadLine />
+          </Button>
+        </Flex>
         <Box p={4}>
           <PeopleForm
             users={users}
             name="drivers"
             onChange={addDrivers}
             value={drivers}
-            allowRandomise
             allowNewDrivers
           />
         </Box>

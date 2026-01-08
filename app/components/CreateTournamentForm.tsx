@@ -60,7 +60,6 @@ interface PeopleFormProps {
   users: GetUsers;
   name: string;
   allowNewDrivers?: boolean;
-  allowRandomise?: boolean;
   allowPoints?: boolean;
   onChange: (value: { driverId: string; points?: number }[]) => void;
   value: { driverId: string; points?: number }[];
@@ -72,7 +71,6 @@ export const PeopleForm = ({
   onChange,
   name,
   allowNewDrivers = false,
-  allowRandomise = false,
   allowPoints = false,
 }: PeopleFormProps) => {
   const [focused, setFocused] = useState(false);
@@ -90,20 +88,6 @@ export const PeopleForm = ({
 
   return (
     <Box>
-      {allowRandomise && (
-        <Button
-          variant="outline"
-          size="sm"
-          mb={2}
-          type="button"
-          onClick={() => {
-            onChange([...value].sort(() => Math.random() - 0.5));
-          }}
-        >
-          <RiShuffleLine /> Shuffle Order
-        </Button>
-      )}
-
       {value.length > 0 && (
         <Box
           bgColor="gray.900"

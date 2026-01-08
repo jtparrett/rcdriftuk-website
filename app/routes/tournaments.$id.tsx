@@ -126,6 +126,19 @@ export const action = async (args: ActionFunctionArgs) => {
     "Protests must be resolved before continuing",
   );
 
+  if (tournament.state === TournamentsState.REGISTRATION) {
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        state: tournament.enableQualifying
+          ? TournamentsState.QUALIFYING
+          : TournamentsState.BATTLES,
+      },
+    });
+  }
+
   if (
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
@@ -493,7 +506,9 @@ const TournamentPage = () => {
                       disabled={isLoading || isSubmitting}
                       isLoading={isSubmitting}
                     >
-                      Start Qualifying <RiCheckboxCircleLine />
+                      Start{" "}
+                      {tournament.enableQualifying ? "Qualifying" : "Battles"}{" "}
+                      <RiCheckboxCircleLine />
                     </Button>
                   </Form>
                 )}

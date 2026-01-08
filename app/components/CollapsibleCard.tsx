@@ -6,7 +6,7 @@ export const Card = styled("div", {
   base: {
     borderWidth: 1,
     borderColor: "gray.800",
-    rounded: "xl",
+    rounded: "2xl",
     overflow: "hidden",
     bgColor: "gray.900",
   },
