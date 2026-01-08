@@ -32,6 +32,7 @@ import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
+  RiBubbleChartLine,
   RiCheckboxCircleLine,
   RiExchangeLine,
   RiFlagLine,
@@ -39,7 +40,10 @@ import {
   RiOpenArmLine,
   RiRemoteControlLine,
   RiShareForwardFill,
+  RiShieldCheckLine,
   RiShuffleLine,
+  RiSwordLine,
+  RiUserAddLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
@@ -337,15 +341,6 @@ const TournamentPage = () => {
 
       <HiddenEmbed>
         <TabsBar>
-          <Tab
-            to={`/tournaments/${tournament.id}/overview`}
-            isActive={isOverviewTab}
-            data-replace="true"
-            replace
-          >
-            Overview
-          </Tab>
-
           {tournament.state === TournamentsState.REGISTRATION && isOwner && (
             <Tab
               to={`/tournaments/${tournament.id}/registration`}
@@ -353,9 +348,21 @@ const TournamentPage = () => {
               data-replace="true"
               replace
             >
+              <RiUserAddLine />
               Registration
             </Tab>
           )}
+
+          <Tab
+            to={`/tournaments/${tournament.id}/overview`}
+            isActive={isOverviewTab}
+            data-replace="true"
+            replace
+          >
+            <RiBubbleChartLine />
+            Overview
+          </Tab>
+
           {tournament.enableQualifying && (
             <Tab
               to={`/tournaments/${tournament.id}/qualifying/0`}
@@ -363,6 +370,7 @@ const TournamentPage = () => {
               data-replace="true"
               replace
             >
+              <RiShieldCheckLine />
               Qualifying
             </Tab>
           )}
@@ -373,6 +381,7 @@ const TournamentPage = () => {
               data-replace="true"
               replace
             >
+              <RiSwordLine />
               Battles
             </Tab>
           )}

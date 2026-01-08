@@ -16,8 +16,9 @@ import { useMemo, useState } from "react";
 import {
   RiDeleteBinFill,
   RiDraggable,
-  RiShuffleLine,
-  RiVipCrown2Line,
+  RiShieldCheckLine,
+  RiSwordLine,
+  RiUserAddLine,
 } from "react-icons/ri";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
@@ -29,6 +30,22 @@ import { FormControl } from "./FormControl";
 import pluralize from "pluralize";
 import { z } from "zod";
 import { Card, CardContent, CardHeader } from "./CollapsibleCard";
+
+const Icon = styled("div", {
+  base: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    rounded: "xl",
+    bgGradient: "to-t",
+    gradientFrom: "gray.700",
+    gradientTo: "gray.800",
+    w: 10,
+    h: 10,
+    borderWidth: 1,
+    borderColor: "gray.700",
+  },
+});
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
@@ -431,7 +448,12 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
         <Card>
           <CardHeader
             onClick={() => formik.setFieldValue("enableQualifying", true)}
+            gap={4}
           >
+            <Icon>
+              <RiShieldCheckLine />
+            </Icon>
+
             <styled.h2 fontSize="lg" fontWeight="semibold">
               Qualifying
             </styled.h2>
@@ -537,7 +559,12 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
         <Card>
           <CardHeader
             onClick={() => formik.setFieldValue("enableBattles", true)}
+            gap={4}
           >
+            <Icon>
+              <RiSwordLine />
+            </Icon>
+
             <styled.h2 fontSize="lg" fontWeight="semibold">
               Battles
             </styled.h2>
@@ -641,7 +668,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
             disabled={fetcher.state === "submitting" || !formik.isValid}
             w="full"
           >
-            Start Registration <RiVipCrown2Line />
+            Start Registration <RiUserAddLine />
           </Button>
         </FormControl>
       </Flex>

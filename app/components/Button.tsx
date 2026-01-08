@@ -8,7 +8,7 @@ const ButtonStyles = cva({
     px: 4,
     rounded: "xl",
     display: "inline-flex",
-    gap: 2,
+    gap: 1.5,
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "semibold",

@@ -6,21 +6,35 @@ import type { GetUser } from "~/utils/getUser.server";
 
 export const UserTracks = ({ user }: { user: GetUser }) => {
   return (
-    <Box p={3} borderBottomWidth={1} borderColor="gray.800">
-      <styled.p fontSize="sm" fontWeight="semibold" mb={1}>
-        Your Tracks
-      </styled.p>
+    <Box borderBottomWidth={1} borderColor="gray.800">
+      <Box px={3} pt={3}>
+        <styled.p fontSize="sm" fontWeight="semibold" mb={1}>
+          Your Tracks
+        </styled.p>
 
-      {(user?.Tracks.length ?? 0) <= 0 && (
-        <LinkButton to="/tracks/new" variant="outline" size="xs" fontSize="xs">
-          Register a Track <RiAddCircleFill />
-        </LinkButton>
-      )}
+        {(user?.Tracks.length ?? 0) <= 0 && (
+          <LinkButton
+            to="/tracks/new"
+            variant="outline"
+            size="xs"
+            fontSize="xs"
+          >
+            Register a Track <RiAddCircleFill />
+          </LinkButton>
+        )}
+      </Box>
 
       {(user?.Tracks.length ?? 0) > 0 && (
-        <Flex flexWrap="wrap" gap={2}>
+        <Flex pl={3} pb={3} overflow="auto">
           {user?.Tracks.map(({ track }) => (
-            <Box key={track.id} w={12} overflow="hidden" textAlign="center">
+            <Box
+              key={track.id}
+              w={12}
+              overflow="hidden"
+              textAlign="center"
+              flex="none"
+              mr={2}
+            >
               <Box w="full" h={12} overflow="hidden" rounded="full">
                 <Link to={`/tracks/${track.slug}`}>
                   <styled.img
@@ -45,7 +59,7 @@ export const UserTracks = ({ user }: { user: GetUser }) => {
             </Box>
           ))}
 
-          <Box w={12} textAlign="center">
+          <Box w={12} textAlign="center" flex="none" mr={2}>
             <Link to="/tracks/new">
               <Center w="full" h={12} rounded="full" bgColor="gray.800">
                 <RiAddLine />

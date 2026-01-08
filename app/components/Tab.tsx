@@ -4,6 +4,9 @@ import { cva } from "~/styled-system/css";
 
 const TabStyle = cva({
   base: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 1.5,
     px: 3,
     py: 2,
     flex: "none",
