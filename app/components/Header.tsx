@@ -1,7 +1,7 @@
 import { styled, Flex, Spacer, Box, Container } from "~/styled-system/jsx";
 import { Link, useLocation, useNavigation } from "react-router";
 import { Button, LinkButton } from "./Button";
-import { RiChat3Line, RiMenuFill, RiNotificationLine } from "react-icons/ri";
+import { RiMenuFill, RiNotificationLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "~/utils/useDisclosure";
 import { SignedOut } from "@clerk/react-router";
@@ -10,6 +10,7 @@ import { Menu, UserMenu } from "./Menu";
 import { UserTracks } from "./UserTracks";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { AppName } from "~/utils/enums";
+import { Spinner } from "./Spinner";
 
 export const HEADER_HEIGHT = 64;
 
@@ -121,17 +122,7 @@ export const Header = ({ user }: Props) => {
             <styled.img w={140} src="/rcdriftio.svg" alt={AppName} />
           </Link>
 
-          {isNavigating && (
-            <Box
-              w={5}
-              h={5}
-              rounded="full"
-              borderWidth={2}
-              borderColor="gray.800"
-              borderTopColor="brand.500"
-              animation="spin 1s linear infinite"
-            />
-          )}
+          {isNavigating && <Spinner />}
 
           <Spacer />
 

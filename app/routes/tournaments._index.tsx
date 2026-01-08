@@ -183,7 +183,8 @@ const Page = () => {
 
         <Flex gap={2} mb={2}>
           <Spacer />
-          <Button variant="outline" onClick={toggleMyTournaments}>
+          <Button variant="outline" onClick={toggleMyTournaments} pr={3}>
+            My Tournaments
             <styled.span
               style={{
                 color: isMyTournaments
@@ -193,10 +194,9 @@ const Page = () => {
             >
               {isMyTournaments ? <RiCheckboxCircleFill /> : <RiCircleLine />}
             </styled.span>
-            My Tournaments
           </Button>
           <LinkButton to="/tournaments/new" size="sm">
-            Create <RiAddCircleFill />
+            Create New <RiAddCircleFill />
           </LinkButton>
         </Flex>
 

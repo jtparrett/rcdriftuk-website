@@ -8,6 +8,7 @@ import {
 import {
   useFetcher,
   useLoaderData,
+  useNavigation,
   useParams,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
@@ -16,9 +17,10 @@ import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Card } from "~/components/CollapsibleCard";
 import { PeopleForm } from "~/components/CreateTournamentForm";
+import { DashedLine } from "~/components/DashedLine";
 import { Input } from "~/components/Input";
-import { Label } from "~/components/Label";
-import { Box, Flex, Spacer } from "~/styled-system/jsx";
+import { Spinner } from "~/components/Spinner";
+import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { getUsers } from "~/utils/getUsers.server";
@@ -105,6 +107,8 @@ const Page = () => {
     })),
   );
   const fetcher = useFetcher();
+  const transition = useNavigation();
+  const isSubmitting = transition.state !== "idle";
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const inviteLink = `https://rcdrift.io/t/${id}`;
@@ -148,16 +152,12 @@ const Page = () => {
   return (
     <Flex flexDir="column" gap={4}>
       <Card overflow="visible">
-        <Flex
-          py={2}
-          px={4}
-          borderBottomWidth={1}
-          borderColor="gray.800"
-          gap={2}
-          alignItems="center"
-        >
-          <Label>Drivers</Label>
+        <Flex py={2} px={4} gap={2} alignItems="center">
+          <styled.h2 fontWeight="medium" fontSize="lg">
+            Drivers
+          </styled.h2>
           <Spacer />
+          {isSubmitting && <Spinner />}
           <Button
             variant="outline"
             size="sm"
@@ -173,6 +173,7 @@ const Page = () => {
             Import CSV <RiFileUploadLine />
           </Button>
         </Flex>
+        <DashedLine />
         <Box p={4}>
           <PeopleForm
             users={users}
@@ -185,9 +186,12 @@ const Page = () => {
       </Card>
 
       <Card>
-        <Box py={2} px={4} borderBottomWidth={1} borderColor="gray.800">
-          <Label>Share invite link</Label>
+        <Box py={2} px={4}>
+          <styled.h2 fontWeight="medium" fontSize="lg">
+            Share invite link
+          </styled.h2>
         </Box>
+        <DashedLine />
         <Box p={4}>
           <Flex bgColor="gray.800" rounded="xl">
             <Input readOnly value={inviteLink} color="gray.400" />

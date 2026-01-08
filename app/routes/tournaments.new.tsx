@@ -284,7 +284,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/tournaments/${tournament.id}/overview`);
+  return redirect(`/tournaments/${tournament.id}/registration`);
 };
 
 const Page = () => {

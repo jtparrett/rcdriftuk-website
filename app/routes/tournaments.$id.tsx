@@ -493,7 +493,7 @@ const TournamentPage = () => {
                   variant="outline"
                   to={`/tournaments/${tournament.id}/randomise`}
                 >
-                  Randomise Qualifying <RiShuffleLine />
+                  Randomise <RiShuffleLine />
                 </LinkButton>
               )}
 
