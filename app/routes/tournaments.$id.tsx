@@ -33,17 +33,16 @@ import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
   RiBubbleChartLine,
-  RiCheckboxCircleLine,
   RiExchangeLine,
   RiFlagLine,
   RiFullscreenFill,
   RiOpenArmLine,
   RiRemoteControlLine,
+  RiSettings2Line,
   RiShareForwardFill,
   RiShieldCheckLine,
   RiShuffleLine,
   RiSwordLine,
-  RiUserAddLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
@@ -56,7 +55,6 @@ import { AppName } from "~/utils/enums";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { DashedLine } from "~/components/DashedLine";
-import { tournamentEndRegistration } from "~/utils/tournamentEndRegistration";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -132,14 +130,6 @@ export const action = async (args: ActionFunctionArgs) => {
     "Protests must be resolved before continuing",
   );
 
-  if (tournament.state === TournamentsState.REGISTRATION) {
-    await tournamentEndRegistration(id);
-
-    publishUpdate();
-
-    return redirect(referer);
-  }
-
   if (
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId !== null
@@ -192,7 +182,7 @@ const TournamentPage = () => {
   const isSubmitting = transition.state === "submitting";
 
   const isOverviewTab = location.pathname.includes("overview");
-  const isRegistrationTab = location.pathname.includes("registration");
+  const isAdminTab = location.pathname.includes("admin");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
   const isStandingsTab = location.pathname.includes("standings");
@@ -341,15 +331,15 @@ const TournamentPage = () => {
 
       <HiddenEmbed>
         <TabsBar>
-          {tournament.state === TournamentsState.REGISTRATION && isOwner && (
+          {isOwner && (
             <Tab
-              to={`/tournaments/${tournament.id}/registration`}
-              isActive={isRegistrationTab}
+              to={`/tournaments/${tournament.id}/admin`}
+              isActive={isAdminTab}
               data-replace="true"
               replace
             >
-              <RiUserAddLine />
-              Registration
+              <RiSettings2Line />
+              Admin
             </Tab>
           )}
 
@@ -508,22 +498,6 @@ const TournamentPage = () => {
                   Randomise <RiShuffleLine />
                 </LinkButton>
               )}
-
-              {isOwner &&
-                tournament.state === TournamentsState.REGISTRATION && (
-                  <Form method="post">
-                    <Button
-                      type="submit"
-                      w={{ base: "full", sm: "auto" }}
-                      disabled={isLoading || isSubmitting}
-                      isLoading={isSubmitting}
-                    >
-                      Start{" "}
-                      {tournament.enableQualifying ? "Qualifying" : "Battles"}{" "}
-                      <RiCheckboxCircleLine />
-                    </Button>
-                  </Form>
-                )}
 
               {isOwner &&
                 tournament.state === TournamentsState.QUALIFYING &&

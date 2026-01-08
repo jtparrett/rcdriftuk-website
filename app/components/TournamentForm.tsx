@@ -18,7 +18,6 @@ import {
   RiDraggable,
   RiShieldCheckLine,
   RiSwordLine,
-  RiUserAddLine,
 } from "react-icons/ri";
 import { Dropdown, Option } from "./Dropdown";
 import { TabButton, TabGroup } from "./Tab";
@@ -326,7 +325,7 @@ interface Props {
   initialValues: Partial<z.infer<typeof tournamentFormSchema>>;
 }
 
-export const CreateTournamentForm = ({ users, initialValues }: Props) => {
+export const TournamentForm = ({ users, initialValues }: Props) => {
   const fetcher = useFetcher();
 
   const formik = useFormik({
@@ -668,7 +667,7 @@ export const CreateTournamentForm = ({ users, initialValues }: Props) => {
             disabled={fetcher.state === "submitting" || !formik.isValid}
             w="full"
           >
-            Start Registration <RiUserAddLine />
+            Save Changes
           </Button>
         </FormControl>
       </Flex>

@@ -6,7 +6,6 @@ import {
   RiShuffleLine,
 } from "react-icons/ri";
 import {
-  redirect,
   useFetcher,
   useLoaderData,
   useNavigation,
@@ -17,12 +16,11 @@ import {
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Card } from "~/components/CollapsibleCard";
-import { PeopleForm } from "~/components/CreateTournamentForm";
 import { DashedLine } from "~/components/DashedLine";
 import { Input } from "~/components/Input";
 import { Spinner } from "~/components/Spinner";
+import { TournamentForm, PeopleForm } from "~/components/TournamentForm";
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
-import { TournamentsState } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
@@ -43,14 +41,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
     include: {
       drivers: true,
+      judges: true,
     },
   });
 
   notFoundInvariant(tournament, "Tournament not found");
-
-  if (tournament.state !== TournamentsState.REGISTRATION) {
-    throw redirect(`/tournaments/${id}/overview`);
-  }
 
   return { users, tournament };
 };
@@ -96,6 +91,14 @@ export const action = async (args: ActionFunctionArgs) => {
     resolvedDrivers[index] = { driverId: String(createdUsers[i].driverId) };
   });
 
+  await prisma.laps.deleteMany({
+    where: {
+      tournamentDriverId: {
+        in: tournament.drivers.map((driver) => driver.id),
+      },
+    },
+  });
+
   await prisma.tournamentDrivers.deleteMany({
     where: {
       tournamentId: id,
@@ -109,6 +112,35 @@ export const action = async (args: ActionFunctionArgs) => {
       tournamentDriverNumber: tournament.drivers.length + i + 1,
     })),
   });
+
+  // Create qualifying laps
+  let nextQualifyingLapId: number | null = null;
+
+  if (tournament.enableQualifying) {
+    const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
+      data: Array.from({ length: tournament.qualifyingLaps }).flatMap(
+        (_, i) => {
+          return tournament.drivers.map((driver) => {
+            return {
+              tournamentDriverId: driver.id,
+              round: i + 1,
+            };
+          });
+        },
+      ),
+    });
+
+    nextQualifyingLapId = nextQualifyingLap?.id ?? null;
+
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        nextQualifyingLapId,
+      },
+    });
+  }
 
   return null;
 };
@@ -167,7 +199,29 @@ const Page = () => {
   };
 
   return (
-    <Flex flexDir="column" gap={4}>
+    <Flex flexDir="column" gap={4} maxW={600}>
+      <TournamentForm
+        users={users}
+        initialValues={{
+          name: tournament?.name,
+          judges: tournament?.judges.map((judge) => ({
+            driverId: judge.driverId.toString(),
+            points: judge.points,
+          })),
+          format: tournament?.format,
+          bracketSize: tournament?.bracketSize,
+          enableProtests: tournament?.enableProtests,
+          qualifyingLaps: tournament?.qualifyingLaps,
+          region: tournament?.region ?? undefined,
+          scoreFormula: tournament?.scoreFormula,
+          qualifyingOrder: tournament?.qualifyingOrder,
+          driverNumbers: tournament?.driverNumbers,
+          enableQualifying: tournament?.enableQualifying,
+          enableBattles: tournament?.enableBattles,
+          ratingRequested: tournament?.ratingRequested,
+        }}
+      />
+
       <Card overflow="visible">
         <Flex py={2} px={4} gap={2} alignItems="center">
           <styled.h2 fontWeight="medium" fontSize="lg">

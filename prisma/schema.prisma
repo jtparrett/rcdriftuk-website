@@ -75,7 +75,7 @@ model Tournaments {
   nextBattleId        Int?                     @unique
   format              TournamentsFormat        @default(STANDARD)
   qualifyingLaps      Int                      @default(1)
-  state               TournamentsState         @default(START)
+  state               TournamentsState         @default(QUALIFYING)
   userId              String?
   nextQualifyingLapId Int?                     @unique
   liveUrl             String?
@@ -573,8 +573,6 @@ enum ProductStatus {
 }
 
 enum TournamentsState {
-  START
-  REGISTRATION
   QUALIFYING
   BATTLES
   END

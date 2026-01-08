@@ -21,7 +21,6 @@ export const ProductStatus = {
 export type ProductStatus = Values<typeof ProductStatus>;
 
 export const TournamentsState = {
-  REGISTRATION: "REGISTRATION",
   QUALIFYING: "QUALIFYING",
   BATTLES: "BATTLES",
   END: "END",
