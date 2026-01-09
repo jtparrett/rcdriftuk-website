@@ -118,15 +118,34 @@ export const action = async (args: ActionFunctionArgs) => {
       bracketSize: data.bracketSize,
       ratingRequested: data.ratingRequested,
     },
+    include: {
+      judges: true,
+      drivers: true,
+    },
   });
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  if (tournament.enableQualifying) {
+  const shouldUpdateQualifying = () => {
+    return (
+      tournament.enableQualifying &&
+      tournament.qualifyingLaps !== data.qualifyingLaps
+    );
+  };
+
+  const shouldUpdateBattles = () => {
+    return (
+      tournament.enableBattles &&
+      (tournament.format !== data.format ||
+        tournament.bracketSize !== data.bracketSize)
+    );
+  };
+
+  if (shouldUpdateQualifying()) {
     await tournamentCreateLaps(id);
   }
 
-  if (tournament.enableBattles) {
+  if (shouldUpdateBattles()) {
     await tournamentCreateBattles(id);
 
     if (tournament.state === TournamentsState.BATTLES) {
