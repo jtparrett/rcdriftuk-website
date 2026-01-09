@@ -1,6 +1,6 @@
 import { capitalCase } from "change-case";
 import { useFormik } from "formik";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   RiFileUploadLine,
   RiShieldCheckLine,
@@ -17,13 +17,12 @@ import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Button } from "~/components/Button";
 import { Card, CardContent, CardHeader } from "~/components/CollapsibleCard";
-import { DashedLine } from "~/components/DashedLine";
 import { FormControl } from "~/components/FormControl";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { PeopleForm } from "~/components/PeopleForm";
-import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Flex, Spacer, styled } from "~/styled-system/jsx";
 import {
   BracketSize,
   TournamentsDriverNumbers,
@@ -31,12 +30,16 @@ import {
   Regions,
   ScoreFormula,
   TournamentsFormat,
+  TournamentsState,
 } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 import { Spinner } from "~/components/Spinner";
+import { tournamentCreateLaps } from "~/utils/tournamentCreateLaps";
+import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
+import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
@@ -92,92 +95,43 @@ export const action = async (args: ActionFunctionArgs) => {
   const { userId } = await getAuth(args);
   const id = z.string().parse(args.params.id);
   const body = await args.request.json();
-  const drivers = z.array(z.object({ driverId: z.string() })).parse(body);
+  const data = tournamentFormSchema.parse(body);
 
   notFoundInvariant(userId, "User not found");
 
-  const tournament = await prisma.tournaments.findUnique({
+  const tournament = await prisma.tournaments.update({
     where: {
       id,
       userId,
     },
-    include: {
-      drivers: true,
+    data: {
+      name: data.name,
+      enableQualifying: data.enableQualifying,
+      enableBattles: data.enableBattles,
+      qualifyingLaps: data.qualifyingLaps,
+      format: data.format,
+      enableProtests: data.enableProtests,
+      region: data.region,
+      scoreFormula: data.scoreFormula,
+      qualifyingOrder: data.qualifyingOrder,
+      driverNumbers: data.driverNumbers,
+      bracketSize: data.bracketSize,
+      ratingRequested: data.ratingRequested,
     },
   });
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  // Find new drivers (those with non-numeric driverIds) and their indices
-  const newDriversWithIndex = drivers
-    .map((driver, index) => ({ driver, index }))
-    .filter(({ driver }) => isNaN(Number(driver.driverId)));
-
-  // Create users for new drivers
-  const createdUsers = await prisma.users.createManyAndReturn({
-    data: newDriversWithIndex.map(({ driver }) => {
-      const nameParts = driver.driverId.trim().split(" ");
-      const firstName = nameParts[0] || "";
-      const lastName = nameParts.slice(1).join(" ") || "";
-      return { firstName, lastName };
-    }),
-  });
-
-  // Splice the created users back into the drivers array at their original positions
-  const resolvedDrivers = [...drivers];
-  newDriversWithIndex.forEach(({ index }, i) => {
-    resolvedDrivers[index] = { driverId: String(createdUsers[i].driverId) };
-  });
-
-  await prisma.laps.deleteMany({
-    where: {
-      tournamentDriverId: {
-        in: tournament.drivers.map((driver) => driver.id),
-      },
-    },
-  });
-
-  await prisma.tournamentDrivers.deleteMany({
-    where: {
-      tournamentId: id,
-    },
-  });
-
-  await prisma.tournamentDrivers.createMany({
-    data: resolvedDrivers.map((driver, i) => ({
-      tournamentId: id,
-      driverId: Number(driver.driverId),
-      tournamentDriverNumber: tournament.drivers.length + i + 1,
-    })),
-  });
-
-  // Create qualifying laps
-  let nextQualifyingLapId: number | null = null;
-
   if (tournament.enableQualifying) {
-    const [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
-      data: Array.from({ length: tournament.qualifyingLaps }).flatMap(
-        (_, i) => {
-          return tournament.drivers.map((driver) => {
-            return {
-              tournamentDriverId: driver.id,
-              round: i + 1,
-            };
-          });
-        },
-      ),
-    });
+    await tournamentCreateLaps(id);
+  }
 
-    nextQualifyingLapId = nextQualifyingLap?.id ?? null;
+  if (tournament.enableBattles) {
+    await tournamentCreateBattles(id);
 
-    await prisma.tournaments.update({
-      where: {
-        id,
-      },
-      data: {
-        nextQualifyingLapId,
-      },
-    });
+    if (tournament.state === TournamentsState.BATTLES) {
+      await tournamentSeedBattles(id);
+    }
   }
 
   return null;
@@ -240,6 +194,16 @@ const Page = () => {
   });
 
   const isFirstRender = useRef(true);
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedSubmit = useCallback(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(() => {
+      formik.submitForm();
+    }, 500);
+  }, [formik]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -247,7 +211,13 @@ const Page = () => {
       return;
     }
 
-    formik.submitForm();
+    debouncedSubmit();
+
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
   }, [formik.values]);
 
   return (

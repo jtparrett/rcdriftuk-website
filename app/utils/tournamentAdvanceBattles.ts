@@ -3,50 +3,6 @@ import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 
-const advanceToNextBattle = async (tournamentId: string) => {
-  const nextBattle = await prisma.tournamentBattles.findFirst({
-    where: {
-      tournamentId,
-      winnerId: null,
-    },
-    orderBy: [
-      { round: "asc" },
-      { bracket: "asc" },
-      {
-        id: "asc",
-      },
-    ],
-    select: {
-      id: true,
-    },
-  });
-
-  if (!nextBattle) {
-    await prisma.tournaments.update({
-      where: {
-        id: tournamentId,
-      },
-      data: {
-        nextBattleId: null,
-        state: TournamentsState.END,
-      },
-    });
-
-    return null;
-  }
-
-  await prisma.tournaments.update({
-    where: {
-      id: tournamentId,
-    },
-    data: {
-      nextBattleId: nextBattle.id,
-    },
-  });
-
-  return null;
-};
-
 export const tournamentAdvanceBattles = async (id: string) => {
   const tournament = await prisma.tournaments.findFirst({
     where: {
@@ -61,16 +17,14 @@ export const tournamentAdvanceBattles = async (id: string) => {
 
   invariant(tournament, "Tournament not found");
 
-  if (!tournament.nextBattleId || !tournament.nextBattle) {
-    // End the comp!
-    await advanceToNextBattle(id);
-
+  if (!tournament.nextBattle) {
+    // battles are over
     return null;
   }
 
   const totalVotes = await prisma.tournamentBattleVotes.findMany({
     where: {
-      battleId: tournament.nextBattleId,
+      battleId: tournament.nextBattle.id,
     },
     select: {
       judgeId: true,
@@ -85,7 +39,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
 
   const battleVotesLeft = await prisma.tournamentBattleVotes.findMany({
     where: {
-      battleId: tournament.nextBattleId,
+      battleId: tournament.nextBattle.id,
       winnerId: tournament.nextBattle.driverLeftId,
     },
     orderBy: {
@@ -99,7 +53,7 @@ export const tournamentAdvanceBattles = async (id: string) => {
 
   const battleVotesRight = await prisma.tournamentBattleVotes.findMany({
     where: {
-      battleId: tournament.nextBattleId,
+      battleId: tournament.nextBattle.id,
       winnerId: tournament.nextBattle.driverRightId,
     },
     orderBy: {
@@ -129,16 +83,17 @@ export const tournamentAdvanceBattles = async (id: string) => {
     // It's OMT - Delete all votes and go again
     await prisma.tournamentBattleVotes.deleteMany({
       where: {
-        battleId: tournament.nextBattleId,
+        battleId: tournament.nextBattle.id,
       },
     });
 
     return null;
   }
 
+  // Update the current battle with the winner
   await prisma.tournamentBattles.update({
     where: {
-      id: tournament.nextBattleId,
+      id: tournament.nextBattle.id,
     },
     data: {
       winnerId,
@@ -201,10 +156,32 @@ export const tournamentAdvanceBattles = async (id: string) => {
     }
   }
 
-  await advanceToNextBattle(id);
+  const nextBattle = await prisma.tournamentBattles.findFirst({
+    where: {
+      tournamentId: id,
+      winnerId: null,
+    },
+    orderBy: [
+      { round: "asc" },
+      { bracket: "asc" },
+      {
+        id: "asc",
+      },
+    ],
+    select: {
+      id: true,
+    },
+  });
+
+  await prisma.tournaments.update({
+    where: {
+      id,
+    },
+    data: {
+      nextBattleId: nextBattle?.id ?? null,
+    },
+  });
 
   // After advancing, check if the next battle is a bye run that needs auto-advancement
   await autoAdvanceByeRuns(id);
-
-  return null;
 };

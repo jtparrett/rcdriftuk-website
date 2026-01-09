@@ -36,7 +36,7 @@ export const tournamentAdvanceQualifying = async (
     "Judging not complete for current lap",
   );
 
-  let nextQualifyingLap = await prisma.laps.findFirst({
+  const nextQualifyingLap = await prisma.laps.findFirst({
     where: {
       driver: {
         tournamentId: id,

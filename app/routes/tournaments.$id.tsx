@@ -27,7 +27,6 @@ import { ably as AblyClient } from "~/utils/ably";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { prisma } from "~/utils/prisma.server";
-import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server";
 import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
@@ -55,6 +54,7 @@ import { AppName } from "~/utils/enums";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { DashedLine } from "~/components/DashedLine";
+import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -145,7 +145,17 @@ export const action = async (args: ActionFunctionArgs) => {
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
   ) {
-    await tournamentEndQualifying(id);
+    // Enter battles state
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        state: TournamentsState.BATTLES,
+      },
+    });
+
+    await tournamentSeedBattles(id);
 
     publishUpdate();
 

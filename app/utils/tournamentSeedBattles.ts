@@ -28,7 +28,7 @@ const addByeDriverToTournament = async (
 };
 
 // Only run this if you're sure all laps have been judged
-export const tournamentEndQualifying = async (id: string) => {
+export const tournamentSeedBattles = async (id: string) => {
   const tournament = await prisma.tournaments.findUnique({
     where: {
       id,
