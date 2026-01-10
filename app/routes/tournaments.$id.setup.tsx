@@ -112,7 +112,6 @@ export const action = async (args: ActionFunctionArgs) => {
     where: { id, userId },
     select: {
       state: true,
-      enableBattles: true,
       format: true,
       bracketSize: true,
     },
@@ -504,30 +503,30 @@ const Page = () => {
 
               <Spacer />
 
-              <TabGroup>
-                <TabButton
-                  isActive={!formik.values.enableQualifying}
-                  disabled={!isStartState}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    formik.setFieldValue("enableQualifying", false);
-                  }}
-                  type="button"
-                >
-                  Disable
-                </TabButton>
-                <TabButton
-                  isActive={formik.values.enableQualifying}
-                  disabled={!isStartState}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    formik.setFieldValue("enableQualifying", true);
-                  }}
-                  type="button"
-                >
-                  Enable
-                </TabButton>
-              </TabGroup>
+              {isStartState && (
+                <TabGroup>
+                  <TabButton
+                    isActive={!formik.values.enableQualifying}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      formik.setFieldValue("enableQualifying", false);
+                    }}
+                    type="button"
+                  >
+                    Disable
+                  </TabButton>
+                  <TabButton
+                    isActive={formik.values.enableQualifying}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      formik.setFieldValue("enableQualifying", true);
+                    }}
+                    type="button"
+                  >
+                    Enable
+                  </TabButton>
+                </TabGroup>
+              )}
             </CardHeader>
 
             {formik.values.enableQualifying && (
@@ -628,30 +627,30 @@ const Page = () => {
 
               <Spacer />
 
-              <TabGroup>
-                <TabButton
-                  isActive={!formik.values.enableBattles}
-                  disabled={!isStartState}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    formik.setFieldValue("enableBattles", false);
-                  }}
-                  type="button"
-                >
-                  Disable
-                </TabButton>
-                <TabButton
-                  isActive={formik.values.enableBattles}
-                  disabled={!isStartState}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    formik.setFieldValue("enableBattles", true);
-                  }}
-                  type="button"
-                >
-                  Enable
-                </TabButton>
-              </TabGroup>
+              {isStartState && (
+                <TabGroup>
+                  <TabButton
+                    isActive={!formik.values.enableBattles}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      formik.setFieldValue("enableBattles", false);
+                    }}
+                    type="button"
+                  >
+                    Disable
+                  </TabButton>
+                  <TabButton
+                    isActive={formik.values.enableBattles}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      formik.setFieldValue("enableBattles", true);
+                    }}
+                    type="button"
+                  >
+                    Enable
+                  </TabButton>
+                </TabGroup>
+              )}
             </CardHeader>
 
             {formik.values.enableBattles && (

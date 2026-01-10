@@ -18,6 +18,14 @@ export const tournamentCreateBattles = async (id: string) => {
   let grandFinal: TournamentBattles | null = null;
   let lowerFinal: TournamentBattles | null = null;
 
+  await prisma.tournamentBattleVotes.deleteMany({
+    where: {
+      battle: {
+        tournamentId: tournament.id,
+      },
+    },
+  });
+
   await prisma.tournamentBattles.deleteMany({
     where: {
       tournamentId: tournament.id,
