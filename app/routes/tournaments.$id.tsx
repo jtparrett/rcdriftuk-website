@@ -36,6 +36,7 @@ import {
   RiFlagLine,
   RiFullscreenFill,
   RiOpenArmLine,
+  RiPlayLine,
   RiRemoteControlLine,
   RiSettings2Line,
   RiShareForwardFill,
@@ -55,6 +56,7 @@ import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { DashedLine } from "~/components/DashedLine";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
+import { tournamentStart } from "~/utils/tournamentStart";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -63,12 +65,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   let user: GetUser | null = null;
   const tournament = await getTournament(id);
 
-  if (!tournament) {
-    throw new Response(null, {
-      status: 404,
-      statusText: "Not Found",
-    });
-  }
+  notFoundInvariant(tournament, "Tournament not found");
 
   if (userId) {
     user = await getUser(userId);
@@ -129,6 +126,15 @@ export const action = async (args: ActionFunctionArgs) => {
     (tournament.nextBattle?.BattleProtests.length ?? 0) === 0,
     "Protests must be resolved before continuing",
   );
+
+  // Handle START state - transition to QUALIFYING or BATTLES
+  if (tournament.state === TournamentsState.START) {
+    await tournamentStart(id);
+
+    publishUpdate();
+
+    return redirect(referer);
+  }
 
   if (
     tournament.state === TournamentsState.QUALIFYING &&
@@ -192,7 +198,7 @@ const TournamentPage = () => {
   const isSubmitting = transition.state === "submitting";
 
   const isOverviewTab = location.pathname.includes("overview");
-  const isAdminTab = location.pathname.includes("admin");
+  const isSetupTab = location.pathname.includes("setup");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
   const isStandingsTab = location.pathname.includes("standings");
@@ -227,7 +233,7 @@ const TournamentPage = () => {
   const judgingCompleteAt = judgingCompleteForNextBattle
     ? tournament.nextBattle?.BattleVotes.sort(
         (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
-      )[0].updatedAt
+      )[0]?.updatedAt
     : null;
 
   const getProtestSecondsRemaining = () => {
@@ -343,13 +349,13 @@ const TournamentPage = () => {
         <TabsBar>
           {isOwner && (
             <Tab
-              to={`/tournaments/${tournament.id}/admin`}
-              isActive={isAdminTab}
+              to={`/tournaments/${tournament.id}/setup`}
+              isActive={isSetupTab}
               data-replace="true"
               replace
             >
               <RiSettings2Line />
-              Admin
+              Setup
             </Tab>
           )}
 
@@ -499,6 +505,19 @@ const TournamentPage = () => {
                     Protest Decision <RiOpenArmLine />
                   </LinkButton>
                 )}
+
+              {isOwner && tournament.state === TournamentsState.START && (
+                <Form method="post">
+                  <Button
+                    type="submit"
+                    w={{ base: "full", sm: "auto" }}
+                    disabled={isLoading || isSubmitting}
+                    isLoading={isSubmitting}
+                  >
+                    Start Tournament <RiPlayLine />
+                  </Button>
+                </Form>
+              )}
 
               {isOwner && tournament.state === TournamentsState.QUALIFYING && (
                 <LinkButton

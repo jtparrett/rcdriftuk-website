@@ -13,6 +13,7 @@ interface PeopleFormProps {
   name: string;
   allowNewDrivers?: boolean;
   allowPoints?: boolean;
+  disabled?: boolean;
   onChange: (value: { driverId: string; points?: number }[]) => void;
   value: { driverId: string; points?: number }[];
 }
@@ -24,6 +25,7 @@ export const PeopleForm = ({
   name,
   allowNewDrivers = false,
   allowPoints = false,
+  disabled = false,
 }: PeopleFormProps) => {
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
@@ -74,19 +76,20 @@ export const PeopleForm = ({
                     zIndex: 1000,
                   }}
                   dragElastic={0.1}
+                  drag={!disabled}
                 >
                   <Flex
                     gap={2}
                     borderBottomWidth={1}
                     borderBottomColor="gray.800"
-                    cursor="grab"
-                    _active={{ cursor: "grabbing" }}
+                    cursor={disabled ? "default" : "grab"}
+                    _active={{ cursor: disabled ? "default" : "grabbing" }}
                     transition="all 0.2s ease"
-                    _hover={{ bgColor: "gray.800" }}
+                    _hover={{ bgColor: disabled ? undefined : "gray.800" }}
                     alignItems="center"
                     pl={2}
                   >
-                    <RiDraggable size={16} />
+                    {!disabled && <RiDraggable size={16} />}
 
                     <styled.p
                       flex={1}
@@ -130,6 +133,7 @@ export const PeopleForm = ({
                         rounded="sm"
                         fontFamily="mono"
                         value={person.points}
+                        disabled={disabled}
                         onChange={(e) => {
                           onChange(
                             value.map((p, index) =>
@@ -153,19 +157,21 @@ export const PeopleForm = ({
                       </styled.select>
                     )}
 
-                    <Box p={1}>
-                      <Button
-                        px={1}
-                        size="xs"
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          onChange(value.filter((_id, index) => index !== i));
-                        }}
-                      >
-                        <RiDeleteBinFill />
-                      </Button>
-                    </Box>
+                    {!disabled && (
+                      <Box p={1}>
+                        <Button
+                          px={1}
+                          size="xs"
+                          type="button"
+                          variant="ghost"
+                          onClick={() => {
+                            onChange(value.filter((_id, index) => index !== i));
+                          }}
+                        >
+                          <RiDeleteBinFill />
+                        </Button>
+                      </Box>
+                    )}
                   </Flex>
                 </Reorder.Item>
               );
@@ -180,23 +186,24 @@ export const PeopleForm = ({
         </Box>
       )}
 
-      <Box pos="relative">
-        <Input
-          placeholder="Type to search for people..."
-          onBlur={(_e) => {
-            setTimeout(() => {
-              const active = document.activeElement;
-              const listbox = document.querySelector('[role="listbox"]');
-              if (!listbox?.contains(active)) {
-                setFocused(false);
-              }
-            }, 300);
-          }}
-          onFocus={() => setFocused(true)}
-          onChange={(e) => setSearch(e.target.value)}
-          value={search}
-        />
-        {focused && search.length > 0 && (
+      {!disabled && (
+        <Box pos="relative">
+          <Input
+            placeholder="Type to search for people..."
+            onBlur={(_e) => {
+              setTimeout(() => {
+                const active = document.activeElement;
+                const listbox = document.querySelector('[role="listbox"]');
+                if (!listbox?.contains(active)) {
+                  setFocused(false);
+                }
+              }, 300);
+            }}
+            onFocus={() => setFocused(true)}
+            onChange={(e) => setSearch(e.target.value)}
+            value={search}
+          />
+          {focused && search.length > 0 && (
           <Dropdown role="listbox">
             {filteredUsers.map((user) => {
               return (
@@ -247,9 +254,10 @@ export const PeopleForm = ({
                   Create "{search.trim()}" as a new driver
                 </Option>
               )}
-          </Dropdown>
-        )}
-      </Box>
+            </Dropdown>
+          )}
+        </Box>
+      )}
     </Box>
   );
 };

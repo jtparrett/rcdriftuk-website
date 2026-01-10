@@ -6,6 +6,7 @@ import {
   RiShieldCheckLine,
   RiShuffleLine,
   RiSwordLine,
+  RiUser3Line,
 } from "react-icons/ri";
 import {
   useFetcher,
@@ -37,14 +38,21 @@ import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 import { Spinner } from "~/components/Spinner";
-import { tournamentCreateLaps } from "~/utils/tournamentCreateLaps";
 import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
+import { tournamentAddDrivers } from "~/utils/tournamentAddDrivers";
+import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
+import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
   enableQualifying: z.boolean(),
   enableBattles: z.boolean(),
+  drivers: z.array(
+    z.object({
+      driverId: z.string(),
+    }),
+  ),
   judges: z
     .array(
       z.object({
@@ -99,6 +107,21 @@ export const action = async (args: ActionFunctionArgs) => {
 
   notFoundInvariant(userId, "User not found");
 
+  // First fetch current state to determine what can be edited
+  const currentTournament = await prisma.tournaments.findFirst({
+    where: { id, userId },
+    select: {
+      state: true,
+      enableBattles: true,
+      format: true,
+      bracketSize: true,
+    },
+  });
+
+  notFoundInvariant(currentTournament, "Tournament not found");
+
+  const isStartState = currentTournament.state === TournamentsState.START;
+
   const tournament = await prisma.tournaments.update({
     where: {
       id,
@@ -106,9 +129,9 @@ export const action = async (args: ActionFunctionArgs) => {
     },
     data: {
       name: data.name,
-      enableQualifying: data.enableQualifying,
-      enableBattles: data.enableBattles,
-      qualifyingLaps: data.qualifyingLaps,
+      enableQualifying: isStartState ? data.enableQualifying : undefined,
+      enableBattles: isStartState ? data.enableBattles : undefined,
+      qualifyingLaps: isStartState ? data.qualifyingLaps : undefined,
       format: data.format,
       enableProtests: data.enableProtests,
       region: data.region,
@@ -124,25 +147,61 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  notFoundInvariant(tournament, "Tournament not found");
+  const canEditDrivers =
+    isStartState || tournament.state === TournamentsState.QUALIFYING;
 
-  const shouldUpdateQualifying = () => {
-    return (
-      tournament.enableQualifying &&
-      tournament.qualifyingLaps !== data.qualifyingLaps
-    );
-  };
+  // Compare drivers
+  const currentDriverIds = tournament.drivers.map((d) => d.driverId.toString());
+  const submittedDriverIds = data.drivers.map((d) => d.driverId);
+  const newDrivers = submittedDriverIds.filter(
+    (id) => !currentDriverIds.includes(id),
+  );
+  const removedDrivers = currentDriverIds.filter(
+    (id) => !submittedDriverIds.includes(id),
+  );
+  const driversOrderChanged =
+    JSON.stringify(currentDriverIds) !== JSON.stringify(submittedDriverIds);
 
   const shouldUpdateBattles = () => {
     return (
       tournament.enableBattles &&
-      (tournament.format !== data.format ||
-        tournament.bracketSize !== data.bracketSize)
+      (currentTournament.format !== data.format ||
+        currentTournament.bracketSize !== data.bracketSize)
     );
   };
 
-  if (shouldUpdateQualifying()) {
-    await tournamentCreateLaps(id);
+  // Handle driver changes (only if allowed)
+  if (canEditDrivers) {
+    if (removedDrivers.length > 0) {
+      await tournamentRemoveDrivers(id, removedDrivers.map(Number));
+    }
+
+    if (newDrivers.length > 0) {
+      await tournamentAddDrivers(id, newDrivers.map(Number));
+    }
+
+    // Always reorder after adds/removes to ensure correct order
+    if (driversOrderChanged) {
+      await tournamentReorderDrivers(id, submittedDriverIds.map(Number));
+    }
+  }
+
+  // Handle judge changes (only if allowed)
+  // Since we're in START state, we can simply delete all and re-create
+  if (isStartState) {
+    // Delete all existing judges
+    await prisma.tournamentJudges.deleteMany({
+      where: { tournamentId: id },
+    });
+
+    // Create all judges fresh
+    await prisma.tournamentJudges.createMany({
+      data: data.judges.map((judge) => ({
+        tournamentId: id,
+        driverId: Number(judge.driverId),
+        points: judge.points,
+      })),
+    });
   }
 
   if (shouldUpdateBattles()) {
@@ -151,6 +210,35 @@ export const action = async (args: ActionFunctionArgs) => {
     if (tournament.state === TournamentsState.BATTLES) {
       await tournamentSeedBattles(id);
     }
+  }
+
+  // Update nextQualifyingLapId if qualifying is enabled and we're in QUALIFYING state
+  // This handles the case where the current lap's driver was deleted
+  if (
+    tournament.enableQualifying &&
+    tournament.state === TournamentsState.QUALIFYING
+  ) {
+    const nextQualifyingLap = await prisma.laps.findFirst({
+      where: {
+        driver: {
+          tournamentId: id,
+        },
+        scores: {
+          none: {},
+        },
+      },
+      orderBy:
+        tournament.qualifyingOrder === QualifyingOrder.DRIVERS
+          ? [{ tournamentDriverId: "asc" }, { id: "asc" }]
+          : [{ id: "asc" }],
+    });
+
+    await prisma.tournaments.update({
+      where: { id },
+      data: {
+        nextQualifyingLapId: nextQualifyingLap?.id ?? null,
+      },
+    });
   }
 
   return null;
@@ -176,6 +264,10 @@ const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 const Page = () => {
   const { users, tournament } = useLoaderData<typeof loader>();
+
+  const isStartState = tournament.state === TournamentsState.START;
+  const canEditDrivers =
+    isStartState || tournament.state === TournamentsState.QUALIFYING;
 
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state !== "idle";
@@ -212,32 +304,32 @@ const Page = () => {
     },
   });
 
-  const isFirstRender = useRef(true);
-  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // const isFirstRender = useRef(true);
+  // const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const debouncedSubmit = useCallback(() => {
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-    debounceTimeout.current = setTimeout(() => {
-      formik.submitForm();
-    }, 500);
-  }, [formik]);
+  // const debouncedSubmit = useCallback(() => {
+  //   if (debounceTimeout.current) {
+  //     clearTimeout(debounceTimeout.current);
+  //   }
+  //   debounceTimeout.current = setTimeout(() => {
+  //     formik.submitForm();
+  //   }, 500);
+  // }, [formik]);
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+  // useEffect(() => {
+  //   if (isFirstRender.current) {
+  //     isFirstRender.current = false;
+  //     return;
+  //   }
 
-    debouncedSubmit();
+  //   debouncedSubmit();
 
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [formik.values]);
+  //   return () => {
+  //     if (debounceTimeout.current) {
+  //       clearTimeout(debounceTimeout.current);
+  //     }
+  //   };
+  // }, [formik.values]);
 
   return (
     <Flex flexDir="column" gap={4} maxW={600}>
@@ -326,6 +418,11 @@ const Page = () => {
 
             <FormControl flex={1} error={formik.errors.judges}>
               <Label>Who are the tournament judges?</Label>
+              {!isStartState && (
+                <styled.p fontSize="sm" color="brand.500" mb={2}>
+                  Judges cannot be changed after the tournament has started.
+                </styled.p>
+              )}
 
               <PeopleForm
                 users={users}
@@ -333,50 +430,68 @@ const Page = () => {
                 onChange={(value) => formik.setFieldValue("judges", value)}
                 name="judges"
                 allowPoints
+                disabled={!isStartState}
               />
             </FormControl>
           </Card>
 
           <Card overflow="visible">
-            <CardHeader>
+            <CardHeader gap={4}>
+              <Icon>
+                <RiUser3Line />
+              </Icon>
               <styled.h2 fontWeight="medium" fontSize="lg">
                 Drivers
               </styled.h2>
               <Spacer />
               {isSubmitting && <Spinner />}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={() =>
-                  formik.setFieldValue(
-                    "drivers",
-                    [...formik.values.drivers].sort(() => Math.random() - 0.5),
-                  )
-                }
-              >
-                Shuffle
-                <RiShuffleLine />
-              </Button>
-              <Button variant="outline" size="sm" type="button">
-                Import CSV <RiFileUploadLine />
-              </Button>
+              {canEditDrivers && (
+                <>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={() =>
+                      formik.setFieldValue(
+                        "drivers",
+                        [...formik.values.drivers].sort(
+                          () => Math.random() - 0.5,
+                        ),
+                      )
+                    }
+                  >
+                    Shuffle
+                    <RiShuffleLine />
+                  </Button>
+                  <Button variant="secondary" size="sm" type="button">
+                    Import CSV <RiFileUploadLine />
+                  </Button>
+                </>
+              )}
             </CardHeader>
 
             <CardContent p={4}>
+              {!canEditDrivers && (
+                <styled.p fontSize="sm" color="brand.500" mb={2}>
+                  Drivers cannot be changed during battles.
+                </styled.p>
+              )}
               <PeopleForm
                 users={users}
                 value={formik.values.drivers}
                 onChange={(value) => formik.setFieldValue("drivers", value)}
                 name="drivers"
                 allowNewDrivers
+                disabled={!canEditDrivers}
               />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader
-              onClick={() => formik.setFieldValue("enableQualifying", true)}
+              onClick={() =>
+                isStartState && formik.setFieldValue("enableQualifying", true)
+              }
               gap={4}
             >
               <Icon>
@@ -392,6 +507,7 @@ const Page = () => {
               <TabGroup>
                 <TabButton
                   isActive={!formik.values.enableQualifying}
+                  disabled={!isStartState}
                   onClick={(e) => {
                     e.stopPropagation();
                     formik.setFieldValue("enableQualifying", false);
@@ -402,6 +518,7 @@ const Page = () => {
                 </TabButton>
                 <TabButton
                   isActive={formik.values.enableQualifying}
+                  disabled={!isStartState}
                   onClick={(e) => {
                     e.stopPropagation();
                     formik.setFieldValue("enableQualifying", true);
@@ -417,9 +534,16 @@ const Page = () => {
               <CardContent display="flex" flexDir="column" gap={4}>
                 <FormControl flex={1} error={formik.errors.qualifyingLaps}>
                   <Label>How many qualifying laps?</Label>
+                  {!isStartState && (
+                    <styled.p fontSize="sm" color="brand.500" mb={2}>
+                      Qualifying laps cannot be changed after the tournament has
+                      started.
+                    </styled.p>
+                  )}
                   <TabGroup>
                     <TabButton
                       isActive={formik.values.qualifyingLaps === 1}
+                      disabled={!isStartState}
                       onClick={() => formik.setFieldValue("qualifyingLaps", 1)}
                       type="button"
                     >
@@ -427,6 +551,7 @@ const Page = () => {
                     </TabButton>
                     <TabButton
                       isActive={formik.values.qualifyingLaps === 2}
+                      disabled={!isStartState}
                       onClick={() => formik.setFieldValue("qualifyingLaps", 2)}
                       type="button"
                     >
@@ -434,6 +559,7 @@ const Page = () => {
                     </TabButton>
                     <TabButton
                       isActive={formik.values.qualifyingLaps === 3}
+                      disabled={!isStartState}
                       onClick={() => formik.setFieldValue("qualifyingLaps", 3)}
                       type="button"
                     >
@@ -487,7 +613,9 @@ const Page = () => {
 
           <Card>
             <CardHeader
-              onClick={() => formik.setFieldValue("enableBattles", true)}
+              onClick={() =>
+                isStartState && formik.setFieldValue("enableBattles", true)
+              }
               gap={4}
             >
               <Icon>
@@ -503,6 +631,7 @@ const Page = () => {
               <TabGroup>
                 <TabButton
                   isActive={!formik.values.enableBattles}
+                  disabled={!isStartState}
                   onClick={(e) => {
                     e.stopPropagation();
                     formik.setFieldValue("enableBattles", false);
@@ -513,6 +642,7 @@ const Page = () => {
                 </TabButton>
                 <TabButton
                   isActive={formik.values.enableBattles}
+                  disabled={!isStartState}
                   onClick={(e) => {
                     e.stopPropagation();
                     formik.setFieldValue("enableBattles", true);
@@ -591,6 +721,8 @@ const Page = () => {
               </CardContent>
             )}
           </Card>
+
+          <Button type="submit">Save Changes</Button>
         </Flex>
       </form>
     </Flex>

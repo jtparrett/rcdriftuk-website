@@ -2,6 +2,7 @@ import { redirect, type LoaderFunctionArgs } from "react-router";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
+import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -15,5 +16,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  return redirect(`/tournaments/${tournament.id}/admin`);
+  await tournamentCreateBattles(tournament.id);
+
+  return redirect(`/tournaments/${tournament.id}/setup`);
 };
