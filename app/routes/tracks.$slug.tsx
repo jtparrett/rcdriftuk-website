@@ -129,15 +129,29 @@ const TrackPage = () => {
                 target="_blank"
                 size="sm"
               >
-                {track?.url.includes("facebook")
-                  ? "Visit Facebook"
-                  : track?.types.includes(TrackTypes.SHOPS)
-                    ? "Shop Now"
-                    : "Visit Website"}
+                {track?.url.includes("facebook") ? (
+                  "Visit Facebook"
+                ) : track?.types.includes(TrackTypes.SHOPS) ? (
+                  "Shop Now"
+                ) : track?.url.includes("rcdriftjapan.com") ? (
+                  <>
+                    View on{" "}
+                    <styled.img
+                      src="/rcd-jp.svg"
+                      h={6}
+                      alt="RCDriftJapan.com"
+                      ml={-1}
+                    />
+                  </>
+                ) : (
+                  "Visit Website"
+                )}
                 {track?.url.includes("facebook") ? (
                   <RiFacebookCircleFill />
                 ) : track?.types.includes(TrackTypes.SHOPS) ? (
                   <RiStoreFill />
+                ) : track?.url.includes("rcdriftjapan.com") ? (
+                  <></>
                 ) : (
                   <RiLink />
                 )}
