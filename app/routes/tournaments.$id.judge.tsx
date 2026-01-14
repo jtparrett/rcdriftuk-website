@@ -38,17 +38,32 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import numberToWords from "number-to-words";
 import { appGoBack } from "~/utils/appEvents";
+import { getAuth } from "~/utils/getAuth.server";
+import notFoundInvariant from "~/utils/notFoundInvariant";
+import { getUser } from "~/utils/getUser.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const judgeId = z.coerce.string().parse(params.id);
+export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "User not found");
+
+  const user = await getUser(userId);
+
+  notFoundInvariant(user, "User not found");
+
+  const judge = await prisma.tournamentJudges.findFirst({
+    where: {
+      driverId: user.driverId,
+      tournamentId: id,
+    },
+  });
+
+  notFoundInvariant(judge, "Judge not found");
 
   const tournament = await prisma.tournaments.findFirst({
     where: {
-      judges: {
-        some: {
-          id: judgeId,
-        },
-      },
+      id,
     },
     include: {
       judges: {
@@ -61,14 +76,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           },
         },
         where: {
-          id: judgeId,
+          id: judge.id,
         },
       },
       nextQualifyingLap: {
         include: {
           scores: {
             where: {
-              judgeId,
+              judgeId: judge.id,
             },
           },
           driver: {
@@ -111,7 +126,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           },
           BattleVotes: {
             where: {
-              judgeId,
+              judgeId: judge.id,
             },
           },
         },
@@ -128,17 +143,27 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   };
 };
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
-  const judgeId = z.coerce.string().parse(params.id);
+export const action = async (args: ActionFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
 
-  const judge = await prisma.tournamentJudges.findFirstOrThrow({
+  notFoundInvariant(userId, "User not found");
+
+  const user = await getUser(userId);
+
+  notFoundInvariant(user, "User not found");
+
+  const judge = await prisma.tournamentJudges.findFirst({
     where: {
-      id: judgeId,
+      driverId: user.driverId,
+      tournamentId: id,
     },
     include: {
       tournament: true,
     },
   });
+
+  notFoundInvariant(judge, "Judge not found");
 
   const publishUpdate = () => {
     createAbly(process.env.VITE_ABLY_API_KEY!)
@@ -150,7 +175,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     judge.tournament.state === TournamentsState.QUALIFYING &&
     judge.tournament.nextQualifyingLapId
   ) {
-    const formData = await request.formData();
+    const formData = await args.request.formData();
     const score = z.coerce.number().parse(formData.get("score"));
     const penalty = z.coerce.number().parse(formData.get("penalty"));
 
@@ -166,7 +191,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
       prisma.lapScores.upsert({
         where: {
           judgeId_lapId: {
-            judgeId,
+            judgeId: judge.id,
             lapId: judge.tournament.nextQualifyingLapId,
           },
         },
@@ -174,7 +199,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
           score: Math.min(score, judge.points),
         },
         create: {
-          judgeId,
+          judgeId: judge.id,
           lapId: judge.tournament.nextQualifyingLapId,
           score: Math.min(score, judge.points),
         },
@@ -186,19 +211,19 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     judge.tournament.state === TournamentsState.BATTLES &&
     judge.tournament.nextBattleId
   ) {
-    const formData = await request.formData();
+    const formData = await args.request.formData();
     const driverId = z.coerce.number().nullable().parse(formData.get("driver"));
     const isOMT = z.coerce.boolean().parse(formData.get("omt"));
 
     await prisma.tournamentBattleVotes.upsert({
       where: {
         judgeId_battleId: {
-          judgeId,
+          judgeId: judge.id,
           battleId: judge.tournament.nextBattleId,
         },
       },
       create: {
-        judgeId,
+        judgeId: judge.id,
         battleId: judge.tournament.nextBattleId,
         winnerId: driverId,
         omt: isOMT,
@@ -213,7 +238,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   publishUpdate();
 
-  return redirect(`/judge/${judgeId}`);
+  const referer =
+    args.request.headers.get("Referer") ?? `/tournaments/${id}/judge`;
+
+  return redirect(referer);
 };
 
 const formSchema = z.object({
@@ -493,7 +521,13 @@ const JudgePage = () => {
   useAblyRealtimeReloader(tournament.id);
 
   return (
-    <>
+    <Box
+      borderWidth={1}
+      borderColor="gray.800"
+      rounded="3xl"
+      bgColor="gray.900"
+      p={1}
+    >
       <Center
         minH="60dvh"
         bgImage="url(/dot-bg.svg)"
@@ -502,6 +536,11 @@ const JudgePage = () => {
         bgPosition="center"
         pos="relative"
         zIndex={1}
+        rounded="2xl"
+        overflow="hidden"
+        borderWidth={1}
+        borderColor="gray.800"
+        bgColor="gray.950"
         _before={{
           content: '""',
           pos: "absolute",
@@ -514,24 +553,6 @@ const JudgePage = () => {
         }}
       >
         <Container w={500} maxW="full">
-          <LinkButton
-            to={`/tournaments/${tournament.id}/overview`}
-            mb={2}
-            size="sm"
-            variant="outline"
-            bgColor="black"
-            py={1.5}
-            pr={4}
-            onClick={(e) => {
-              const wentBack = appGoBack();
-              if (wentBack) {
-                e.preventDefault();
-              }
-            }}
-          >
-            <RiArrowLeftLine />
-            Back
-          </LinkButton>
           <Box
             bgColor="black"
             pos="relative"
@@ -589,7 +610,7 @@ const JudgePage = () => {
           </Box>
         </Container>
       </Center>
-    </>
+    </Box>
   );
 };
 

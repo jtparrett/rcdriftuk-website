@@ -61,27 +61,27 @@ import { tournamentStart } from "~/utils/tournamentStart";
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
-
-  let user: GetUser | null = null;
   const tournament = await getTournament(id);
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  if (userId) {
-    user = await getUser(userId);
-  }
+  let isJudge = false;
+  let isBattlingDriver = false;
 
-  const tournamentJudge = tournament.judges.find(
-    (judge) => judge.user.id === userId,
-  );
-  const isBattlingDriver =
-    !!userId &&
-    (tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
-      tournament.nextBattle?.driverRight?.driverId === user?.driverId);
+  if (userId) {
+    const user = await getUser(userId);
+
+    isJudge =
+      tournament.judges.find((judge) => judge.user.id === userId) !== undefined;
+
+    isBattlingDriver =
+      tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
+      tournament.nextBattle?.driverRight?.driverId === user?.driverId;
+  }
 
   return {
     tournament,
-    tournamentJudge,
+    isJudge,
     isBattlingDriver,
   };
 };
@@ -188,7 +188,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
 };
 
 const TournamentPage = () => {
-  const { tournament, tournamentJudge, isBattlingDriver } =
+  const { tournament, isJudge, isBattlingDriver } =
     useLoaderData<typeof loader>();
   const location = useLocation();
   const transition = useNavigation();
@@ -197,8 +197,9 @@ const TournamentPage = () => {
     transition.state === "submitting" || transition.state === "loading";
   const isSubmitting = transition.state === "submitting";
 
-  const isOverviewTab = location.pathname.includes("overview");
   const isSetupTab = location.pathname.includes("setup");
+  const isJudgeTab = location.pathname.includes("judge");
+  const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
   const isStandingsTab = location.pathname.includes("standings");
@@ -206,20 +207,6 @@ const TournamentPage = () => {
   const { user } = useUser();
 
   const isOwner = user?.id === tournament.userId;
-  const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
-
-  const leftVotes =
-    tournament.nextBattle?.BattleVotes.filter(
-      (vote) => vote.winnerId === tournament.nextBattle?.driverLeftId,
-    ) ?? [];
-  const rightVotes =
-    tournament.nextBattle?.BattleVotes.filter(
-      (vote) => vote.winnerId === tournament.nextBattle?.driverRightId,
-    ) ?? [];
-
-  const isOMT =
-    leftVotes.length < winThreshold && rightVotes.length < winThreshold;
-
   const protestingEnabled = tournament.enableProtests;
   const hasProtest = (tournament.nextBattle?.BattleProtests.length ?? 0) > 0;
   const hasUnresolvedProtest =
@@ -356,6 +343,18 @@ const TournamentPage = () => {
             >
               <RiSettings2Line />
               Setup
+            </Tab>
+          )}
+
+          {isJudge && (
+            <Tab
+              to={`/tournaments/${tournament.id}/judge`}
+              isActive={isJudgeTab}
+              data-replace="true"
+              replace
+            >
+              <RiRemoteControlLine />
+              Judge
             </Tab>
           )}
 
@@ -576,25 +575,13 @@ const TournamentPage = () => {
                     </Button>
                   </Form>
                 )}
-
-              {tournamentJudge &&
-                (tournament.state === TournamentsState.QUALIFYING ||
-                  tournament.state === TournamentsState.BATTLES) && (
-                  <LinkButton
-                    to={`/judge/${tournamentJudge.id}`}
-                    variant="outline"
-                  >
-                    Open Judge Remote <RiRemoteControlLine />
-                  </LinkButton>
-                )}
             </Flex>
           </Container>
-          {(isOwner || tournamentJudge) &&
-            tournament.state !== TournamentsState.END && (
-              <Box pt={2}>
-                <DashedLine />
-              </Box>
-            )}
+          {isOwner && tournament.state !== TournamentsState.END && (
+            <Box pt={2}>
+              <DashedLine />
+            </Box>
+          )}
         </Box>
       </HiddenEmbed>
 
