@@ -1,6 +1,5 @@
 import { capitalCase } from "change-case";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useRef } from "react";
 import {
   RiFileUploadLine,
   RiShieldCheckLine,
@@ -37,13 +36,13 @@ import { getAuth } from "~/utils/getAuth.server";
 import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
-import { Spinner } from "~/components/Spinner";
 import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 import { tournamentAddDrivers } from "~/utils/tournamentAddDrivers";
 import { tournamentCreateLaps } from "~/utils/tournamentCreateLaps";
 import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
 import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
+import { toast } from "sonner";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
@@ -300,40 +299,15 @@ const Page = () => {
       driverNumbers: tournament.driverNumbers ?? TournamentsDriverNumbers.NONE,
       ratingRequested: tournament.ratingRequested ?? false,
     },
-    onSubmit: (values) => {
-      fetcher.submit(JSON.stringify(values), {
+    async onSubmit(values) {
+      await fetcher.submit(JSON.stringify(values), {
         method: "post",
         encType: "application/json",
       });
+
+      toast.success("Changes saved successfully");
     },
   });
-
-  // const isFirstRender = useRef(true);
-  // const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // const debouncedSubmit = useCallback(() => {
-  //   if (debounceTimeout.current) {
-  //     clearTimeout(debounceTimeout.current);
-  //   }
-  //   debounceTimeout.current = setTimeout(() => {
-  //     formik.submitForm();
-  //   }, 500);
-  // }, [formik]);
-
-  // useEffect(() => {
-  //   if (isFirstRender.current) {
-  //     isFirstRender.current = false;
-  //     return;
-  //   }
-
-  //   debouncedSubmit();
-
-  //   return () => {
-  //     if (debounceTimeout.current) {
-  //       clearTimeout(debounceTimeout.current);
-  //     }
-  //   };
-  // }, [formik.values]);
 
   return (
     <Flex flexDir="column" gap={4} maxW={600}>
@@ -438,7 +412,13 @@ const Page = () => {
               />
             </FormControl>
 
-            <Button type="submit">Save Changes</Button>
+            <Button
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
+            >
+              Save Changes
+            </Button>
           </Card>
 
           <Card overflow="visible">
@@ -450,7 +430,6 @@ const Page = () => {
                 Drivers
               </styled.h2>
               <Spacer />
-              {isSubmitting && <Spinner />}
               {canEditDrivers && (
                 <>
                   <Button
@@ -491,7 +470,13 @@ const Page = () => {
                 disabled={!canEditDrivers}
               />
 
-              <Button type="submit">Save Changes</Button>
+              <Button
+                type="submit"
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+              >
+                Save Changes
+              </Button>
             </CardContent>
           </Card>
 
@@ -616,7 +601,13 @@ const Page = () => {
                   </TabGroup>
                 </FormControl>
 
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  type="submit"
+                  isLoading={isSubmitting}
+                  disabled={isSubmitting}
+                >
+                  Save Changes
+                </Button>
               </CardContent>
             )}
           </Card>
@@ -729,7 +720,13 @@ const Page = () => {
                   </TabGroup>
                 </FormControl>
 
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  type="submit"
+                  isLoading={isSubmitting}
+                  disabled={isSubmitting}
+                >
+                  Save Changes
+                </Button>
               </CardContent>
             )}
           </Card>

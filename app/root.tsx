@@ -12,6 +12,7 @@ import {
 } from "react-router";
 import { ClerkProvider } from "@clerk/react-router";
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
+import { Toaster } from "sonner";
 
 import "./index.css";
 import { Header } from "./components/Header";
@@ -257,6 +258,8 @@ function App({
               <Outlet />
 
               {!isMap && !isEmbed && !isApp && <Footer />}
+
+              <Toaster position="top-center" />
             </EmbedProvider>
           </AppProvider>
         </PostHogProvider>
