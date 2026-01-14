@@ -1,8 +1,7 @@
 import { prisma } from "./prisma.server";
-import invariant from "./invariant";
 
 /**
- * Removes drivers from a tournament and deletes their laps
+ * Removes drivers from a tournament and their associated data
  * @param tournamentId - The tournament ID
  * @param driverIds - Array of driver IDs to remove
  */
@@ -10,55 +9,53 @@ export const tournamentRemoveDrivers = async (
   tournamentId: string,
   driverIds: number[],
 ) => {
-  const tournament = await prisma.tournaments.findFirst({
-    where: {
-      id: tournamentId,
-    },
-    include: {
-      drivers: {
-        where: {
-          driverId: {
-            in: driverIds,
-          },
-        },
-      },
-    },
-  });
-
-  invariant(tournament, "Tournament not found");
-
   if (driverIds.length === 0) {
     return;
   }
 
-  const tournamentDriverIds = tournament.drivers.map((d) => d.id);
-
-  // Delete lap scores for the drivers' laps first
-  await prisma.lapScores.deleteMany({
+  // Get the tournament driver IDs for the given driver IDs
+  const tournamentDrivers = await prisma.tournamentDrivers.findMany({
     where: {
-      lap: {
+      tournamentId,
+      driverId: {
+        in: driverIds,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const tournamentDriverIds = tournamentDrivers.map((d) => d.id);
+
+  if (tournamentDriverIds.length === 0) {
+    return;
+  }
+
+  // Delete lap scores, laps, and tournament drivers in a transaction
+  await prisma.$transaction([
+    prisma.lapScores.deleteMany({
+      where: {
+        lap: {
+          tournamentDriverId: {
+            in: tournamentDriverIds,
+          },
+        },
+      },
+    }),
+    prisma.laps.deleteMany({
+      where: {
         tournamentDriverId: {
           in: tournamentDriverIds,
         },
       },
-    },
-  });
-
-  // Delete laps for the drivers
-  await prisma.laps.deleteMany({
-    where: {
-      tournamentDriverId: {
-        in: tournamentDriverIds,
+    }),
+    prisma.tournamentDrivers.deleteMany({
+      where: {
+        id: {
+          in: tournamentDriverIds,
+        },
       },
-    },
-  });
-
-  // Delete the tournament drivers
-  await prisma.tournamentDrivers.deleteMany({
-    where: {
-      id: {
-        in: tournamentDriverIds,
-      },
-    },
-  });
+    }),
+  ]);
 };

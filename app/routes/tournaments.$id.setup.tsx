@@ -41,6 +41,7 @@ import { Spinner } from "~/components/Spinner";
 import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 import { tournamentAddDrivers } from "~/utils/tournamentAddDrivers";
+import { tournamentCreateLaps } from "~/utils/tournamentCreateLaps";
 import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
 import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
 
@@ -168,13 +169,20 @@ export const action = async (args: ActionFunctionArgs) => {
     }
 
     if (newDrivers.length > 0) {
-      await tournamentAddDrivers(id, newDrivers.map(Number));
+      await tournamentAddDrivers(id, newDrivers.map(Number), {
+        createLaps: !isStartState,
+      });
     }
 
     // Always reorder after adds/removes to ensure correct order
     if (driversOrderChanged) {
       await tournamentReorderDrivers(id, submittedDriverIds.map(Number));
     }
+  }
+
+  // Create qualifying laps when in START state with qualifying enabled
+  if (isStartState && data.enableQualifying) {
+    await tournamentCreateLaps(id);
   }
 
   // Handle judge changes (only if allowed)

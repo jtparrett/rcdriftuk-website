@@ -1,15 +1,23 @@
 import { prisma } from "./prisma.server";
 import invariant from "./invariant";
 
+interface AddDriversOptions {
+  createLaps?: boolean;
+}
+
 /**
- * Adds new drivers to a tournament and creates their laps
+ * Adds new drivers to a tournament
  * @param tournamentId - The tournament ID
  * @param driverIds - Array of driver IDs to add
+ * @param options.createLaps - If true, creates qualifying laps for the new drivers
  */
 export const tournamentAddDrivers = async (
   tournamentId: string,
   driverIds: number[],
+  options: AddDriversOptions = {},
 ) => {
+  const { createLaps = false } = options;
+
   const tournament = await prisma.tournaments.findFirst({
     where: {
       id: tournamentId,
@@ -43,8 +51,8 @@ export const tournamentAddDrivers = async (
     })),
   });
 
-  // Create laps for the new drivers
-  if (tournament.enableQualifying) {
+  // Create laps for the new drivers if requested
+  if (createLaps && tournament.enableQualifying) {
     await prisma.laps.createMany({
       data: Array.from({ length: tournament.qualifyingLaps }).flatMap(
         (_, lapIndex) => {
