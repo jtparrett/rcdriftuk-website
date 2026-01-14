@@ -32,11 +32,11 @@ import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
   RiBubbleChartLine,
+  RiCheckboxCircleFill,
   RiExchangeLine,
   RiFlagLine,
   RiFullscreenFill,
   RiOpenArmLine,
-  RiPlayLine,
   RiRemoteControlLine,
   RiSettings2Line,
   RiShareForwardFill,
@@ -514,7 +514,7 @@ const TournamentPage = () => {
                     disabled={isLoading || isSubmitting}
                     isLoading={isSubmitting}
                   >
-                    Start Tournament <RiPlayLine />
+                    Start Tournament <RiCheckboxCircleFill />
                   </Button>
                 </Form>
               )}

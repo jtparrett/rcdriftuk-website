@@ -161,14 +161,6 @@ export const action = async (args: ActionFunctionArgs) => {
   const driversOrderChanged =
     JSON.stringify(currentDriverIds) !== JSON.stringify(submittedDriverIds);
 
-  const shouldUpdateBattles = () => {
-    return (
-      tournament.enableBattles &&
-      (currentTournament.format !== data.format ||
-        currentTournament.bracketSize !== data.bracketSize)
-    );
-  };
-
   // Handle driver changes (only if allowed)
   if (canEditDrivers) {
     if (removedDrivers.length > 0) {
@@ -203,7 +195,12 @@ export const action = async (args: ActionFunctionArgs) => {
     });
   }
 
-  if (shouldUpdateBattles()) {
+  const shouldUpdateBattles =
+    tournament.enableBattles &&
+    (currentTournament.format !== data.format ||
+      currentTournament.bracketSize !== data.bracketSize);
+
+  if (shouldUpdateBattles) {
     await tournamentCreateBattles(id);
 
     if (tournament.state === TournamentsState.BATTLES) {
@@ -416,7 +413,7 @@ const Page = () => {
             </FormControl>
 
             <FormControl flex={1} error={formik.errors.judges}>
-              <Label>Who are the tournament judges?</Label>
+              <Label>Tournament Judges</Label>
               {!isStartState && (
                 <styled.p fontSize="sm" color="brand.500" mb={2}>
                   Judges cannot be changed after the tournament has started.
@@ -432,6 +429,8 @@ const Page = () => {
                 disabled={!isStartState}
               />
             </FormControl>
+
+            <Button type="submit">Save Changes</Button>
           </Card>
 
           <Card overflow="visible">
@@ -469,7 +468,7 @@ const Page = () => {
               )}
             </CardHeader>
 
-            <CardContent p={4}>
+            <CardContent p={4} display="flex" flexDir="column" gap={4}>
               {!canEditDrivers && (
                 <styled.p fontSize="sm" color="brand.500" mb={2}>
                   Drivers cannot be changed during battles.
@@ -483,6 +482,8 @@ const Page = () => {
                 allowNewDrivers
                 disabled={!canEditDrivers}
               />
+
+              <Button type="submit">Save Changes</Button>
             </CardContent>
           </Card>
 
@@ -532,7 +533,7 @@ const Page = () => {
             {formik.values.enableQualifying && (
               <CardContent display="flex" flexDir="column" gap={4}>
                 <FormControl flex={1} error={formik.errors.qualifyingLaps}>
-                  <Label>How many qualifying laps?</Label>
+                  <Label>How many qualifying runs per driver?</Label>
                   {!isStartState && (
                     <styled.p fontSize="sm" color="brand.500" mb={2}>
                       Qualifying laps cannot be changed after the tournament has
@@ -606,6 +607,8 @@ const Page = () => {
                     })}
                   </TabGroup>
                 </FormControl>
+
+                <Button type="submit">Save Changes</Button>
               </CardContent>
             )}
           </Card>
@@ -656,7 +659,7 @@ const Page = () => {
             {formik.values.enableBattles && (
               <CardContent display="flex" flexDir="column" gap={4}>
                 <FormControl flex={1} error={formik.errors.format}>
-                  <Label>What format is this tournament?</Label>
+                  <Label>Battle Format</Label>
                   <TabGroup>
                     {Object.values(TournamentsFormat).map((item) => {
                       return (
@@ -674,7 +677,7 @@ const Page = () => {
                 </FormControl>
 
                 <FormControl flex={1} error={formik.errors.bracketSize}>
-                  <Label>What size bracket do you want to use?</Label>
+                  <Label>Bracket Size</Label>
                   <TabGroup>
                     {Object.values(BracketSize).map((item) => {
                       return (
@@ -694,7 +697,7 @@ const Page = () => {
                 </FormControl>
 
                 <FormControl flex={1} error={formik.errors.enableProtests}>
-                  <Label>Enable protesting?</Label>
+                  <Label>Enable Protesting</Label>
 
                   <TabGroup>
                     <TabButton
@@ -717,11 +720,11 @@ const Page = () => {
                     </TabButton>
                   </TabGroup>
                 </FormControl>
+
+                <Button type="submit">Save Changes</Button>
               </CardContent>
             )}
           </Card>
-
-          <Button type="submit">Save Changes</Button>
         </Flex>
       </form>
     </Flex>
