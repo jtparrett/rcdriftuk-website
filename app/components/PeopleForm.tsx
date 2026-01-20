@@ -184,7 +184,11 @@ export const PeopleForm = ({
 
           <Box px={2} py={1}>
             <styled.p textAlign="right" fontSize="sm" color="gray.500">
-              {pluralize("People", value.length, true)}
+              {pluralize(
+                "People",
+                value.filter((p) => p.driverId !== "0").length,
+                true,
+              )}
             </styled.p>
           </Box>
         </Box>

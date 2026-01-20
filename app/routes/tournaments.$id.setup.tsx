@@ -325,6 +325,17 @@ const Page = () => {
     },
   });
 
+  const SaveButton = () => (
+    <Button
+      type="button"
+      onClick={onOpen}
+      isLoading={isSubmitting}
+      disabled={isSubmitting || !formik.isValid || !formik.dirty}
+    >
+      Save Changes
+    </Button>
+  );
+
   return (
     <Flex flexDir="column" gap={4} maxW={600}>
       <form onSubmit={formik.handleSubmit}>
@@ -428,14 +439,7 @@ const Page = () => {
               />
             </FormControl>
 
-            <Button
-              type="button"
-              onClick={onOpen}
-              isLoading={isSubmitting}
-              disabled={isSubmitting || !formik.isValid}
-            >
-              Save Changes
-            </Button>
+            <SaveButton />
           </Card>
 
           <Card overflow="visible">
@@ -487,14 +491,7 @@ const Page = () => {
                 disabled={!canEditDrivers}
               />
 
-              <Button
-                type="button"
-                onClick={onOpen}
-                isLoading={isSubmitting}
-                disabled={isSubmitting || !formik.isValid}
-              >
-                Save Changes
-              </Button>
+              <SaveButton />
             </CardContent>
           </Card>
 
@@ -619,14 +616,7 @@ const Page = () => {
                   </TabGroup>
                 </FormControl>
 
-                <Button
-                  type="button"
-                  isLoading={isSubmitting}
-                  disabled={isSubmitting || !formik.isValid}
-                  onClick={onOpen}
-                >
-                  Save Changes
-                </Button>
+                <SaveButton />
               </CardContent>
             )}
           </Card>
@@ -739,14 +729,7 @@ const Page = () => {
                   </TabGroup>
                 </FormControl>
 
-                <Button
-                  type="button"
-                  isLoading={isSubmitting}
-                  disabled={isSubmitting || !formik.isValid}
-                  onClick={onOpen}
-                >
-                  Save Changes
-                </Button>
+                <SaveButton />
               </CardContent>
             )}
           </Card>
@@ -812,7 +795,7 @@ const Page = () => {
               <Button
                 type="submit"
                 isLoading={isSubmitting}
-                disabled={isSubmitting || !formik.isValid}
+                disabled={isSubmitting || !formik.isValid || !formik.dirty}
               >
                 Save Changes
               </Button>

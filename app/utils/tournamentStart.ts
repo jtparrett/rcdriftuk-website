@@ -39,13 +39,13 @@ export const tournamentStart = async (id: string) => {
       },
     });
   } else if (tournament.enableBattles) {
+    await tournamentSeedBattles(id);
     await prisma.tournaments.update({
       where: { id },
       data: {
         state: TournamentsState.BATTLES,
       },
     });
-    await tournamentSeedBattles(id);
   } else {
     // No qualifying or battles enabled, go straight to END
     await prisma.tournaments.update({

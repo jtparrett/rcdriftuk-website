@@ -151,27 +151,55 @@ export const action = async (args: ActionFunctionArgs) => {
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
   ) {
-    // Enter battles state
+    if (tournament.enableBattles) {
+      // Enter battles state
+      await tournamentSeedBattles(id);
+
+      await prisma.tournaments.update({
+        where: {
+          id,
+        },
+        data: {
+          state: TournamentsState.BATTLES,
+        },
+      });
+
+      publishUpdate();
+
+      return redirect(referer);
+    } else {
+      await prisma.tournaments.update({
+        where: {
+          id,
+        },
+        data: {
+          state: TournamentsState.END,
+        },
+      });
+    }
+  }
+
+  if (
+    tournament.state === TournamentsState.BATTLES &&
+    tournament.nextBattleId !== null
+  ) {
+    await tournamentAdvanceBattles(id);
+
+    publishUpdate();
+  }
+
+  if (
+    tournament.state === TournamentsState.BATTLES &&
+    tournament.nextBattleId === null
+  ) {
     await prisma.tournaments.update({
       where: {
         id,
       },
       data: {
-        state: TournamentsState.BATTLES,
+        state: TournamentsState.END,
       },
     });
-
-    await tournamentSeedBattles(id);
-
-    publishUpdate();
-
-    return redirect(referer);
-  }
-
-  if (tournament.state === TournamentsState.BATTLES) {
-    await tournamentAdvanceBattles(id);
-
-    publishUpdate();
   }
 
   return redirect(referer);
@@ -215,8 +243,9 @@ const TournamentPage = () => {
     ) ?? false;
 
   const judgingCompleteForNextBattle =
+    tournament.nextBattle === null ||
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
-    tournament.judges.length;
+      tournament.judges.length;
   const judgingCompleteAt = judgingCompleteForNextBattle
     ? tournament.nextBattle?.BattleVotes.sort(
         (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
