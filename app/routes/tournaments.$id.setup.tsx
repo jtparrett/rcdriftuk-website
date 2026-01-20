@@ -490,7 +490,7 @@ const Page = () => {
                   value={formik.values.drivers}
                   onChange={(value) => formik.setFieldValue("drivers", value)}
                   name="drivers"
-                  allowNewDrivers
+                  // allowNewDrivers
                   disabled={!canEditDrivers}
                 />
               </FormControl>
