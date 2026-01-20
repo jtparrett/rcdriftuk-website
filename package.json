@@ -24,6 +24,7 @@
     "@tanstack/react-query": "^5.81.5",
     "@vercel/blob": "^1.0.0",
     "ably": "^2.9.0",
+    "body-scroll-lock": "^4.0.0-beta.0",
     "calendar-link": "^2.8.0",
     "change-case": "^5.4.4",
     "cli-color": "^2.0.4",
@@ -59,6 +60,7 @@
   "devDependencies": {
     "@pandacss/dev": "^0.54.0",
     "@react-router/dev": "^7.9.4",
+    "@types/body-scroll-lock": "^3.1.2",
     "@types/cli-color": "^2.0.6",
     "@types/mapbox-gl": "^3.4.1",
     "@types/number-to-words": "^1.2.3",

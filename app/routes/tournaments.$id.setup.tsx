@@ -22,7 +22,8 @@ import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { PeopleForm } from "~/components/PeopleForm";
-import { Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import {
   BracketSize,
   TournamentsDriverNumbers,
@@ -43,6 +44,7 @@ import { tournamentCreateLaps } from "~/utils/tournamentCreateLaps";
 import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
 import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
 import { toast } from "sonner";
+import { useRef } from "react";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
@@ -267,6 +269,18 @@ const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 const Page = () => {
   const { users, tournament } = useLoaderData<typeof loader>();
+  const modalRef = useRef<HTMLDialogElement>(null);
+  const body = global.document?.body;
+
+  const onOpen = () => {
+    disableBodyScroll(body);
+    modalRef.current?.showModal();
+  };
+
+  const onClose = () => {
+    enableBodyScroll(body);
+    modalRef.current?.close();
+  };
 
   const isStartState = tournament.state === TournamentsState.START;
   const canEditDrivers =
@@ -304,6 +318,8 @@ const Page = () => {
         method: "post",
         encType: "application/json",
       });
+
+      onClose();
 
       toast.success("Changes saved successfully");
     },
@@ -413,7 +429,8 @@ const Page = () => {
             </FormControl>
 
             <Button
-              type="submit"
+              type="button"
+              onClick={onOpen}
               isLoading={isSubmitting}
               disabled={isSubmitting}
             >
@@ -471,7 +488,8 @@ const Page = () => {
               />
 
               <Button
-                type="submit"
+                type="button"
+                onClick={onOpen}
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
               >
@@ -602,9 +620,10 @@ const Page = () => {
                 </FormControl>
 
                 <Button
-                  type="submit"
+                  type="button"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
+                  onClick={onOpen}
                 >
                   Save Changes
                 </Button>
@@ -721,9 +740,10 @@ const Page = () => {
                 </FormControl>
 
                 <Button
-                  type="submit"
+                  type="button"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
+                  onClick={onOpen}
                 >
                   Save Changes
                 </Button>
@@ -731,6 +751,74 @@ const Page = () => {
             )}
           </Card>
         </Flex>
+
+        <styled.dialog
+          ref={modalRef}
+          role="dialog"
+          m="auto"
+          bgColor="gray.950"
+          color="white"
+          p={1}
+          rounded="3xl"
+          borderWidth={1}
+          borderColor="gray.800"
+          textAlign="center"
+          _backdrop={{
+            bg: "rgba(0, 0, 0, 0.7)",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          <Box
+            bgColor="gray.900"
+            p={6}
+            borderWidth={1}
+            borderColor="gray.800"
+            rounded="2xl"
+          >
+            <styled.h1
+              mb={2}
+              fontWeight="medium"
+              fontSize="2xl"
+              lineHeight="1.2"
+            >
+              Are you sure you want to save these changes?
+            </styled.h1>
+
+            <styled.p
+              color="brand.500"
+              fontWeight="medium"
+              mb={2}
+              whiteSpace="pre-line"
+            >
+              This may result in some or all of the tournament progress being
+              reset.
+            </styled.p>
+
+            <Flex
+              gap={2}
+              justifyContent="center"
+              mt={6}
+              flexDir={{ base: "column", sm: "row" }}
+            >
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  onClose();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+              >
+                Save Changes
+              </Button>
+            </Flex>
+          </Box>
+        </styled.dialog>
       </form>
     </Flex>
   );
