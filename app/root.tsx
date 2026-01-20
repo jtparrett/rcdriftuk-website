@@ -29,7 +29,7 @@ import { AppProvider } from "./utils/AppContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { AppName } from "./utils/enums";

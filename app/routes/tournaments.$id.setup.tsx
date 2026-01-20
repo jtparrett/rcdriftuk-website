@@ -50,11 +50,13 @@ export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
   enableQualifying: z.boolean(),
   enableBattles: z.boolean(),
-  drivers: z.array(
-    z.object({
-      driverId: z.string(),
-    }),
-  ),
+  drivers: z
+    .array(
+      z.object({
+        driverId: z.string(),
+      }),
+    )
+    .min(1, "Please add at least one driver to the tournament"),
   judges: z
     .array(
       z.object({
@@ -477,19 +479,21 @@ const Page = () => {
             </CardHeader>
 
             <CardContent p={4} display="flex" flexDir="column" gap={4}>
-              {!canEditDrivers && (
-                <styled.p fontSize="sm" color="brand.500" mb={2}>
-                  Drivers cannot be changed during battles.
-                </styled.p>
-              )}
-              <PeopleForm
-                users={users}
-                value={formik.values.drivers}
-                onChange={(value) => formik.setFieldValue("drivers", value)}
-                name="drivers"
-                allowNewDrivers
-                disabled={!canEditDrivers}
-              />
+              <FormControl error={formik.errors.drivers}>
+                {!canEditDrivers && (
+                  <styled.p fontSize="sm" color="brand.500" mb={2}>
+                    Drivers cannot be changed during battles.
+                  </styled.p>
+                )}
+                <PeopleForm
+                  users={users}
+                  value={formik.values.drivers}
+                  onChange={(value) => formik.setFieldValue("drivers", value)}
+                  name="drivers"
+                  allowNewDrivers
+                  disabled={!canEditDrivers}
+                />
+              </FormControl>
 
               <SaveButton />
             </CardContent>
