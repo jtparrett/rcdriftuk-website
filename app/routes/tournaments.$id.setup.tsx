@@ -432,7 +432,7 @@ const Page = () => {
               type="button"
               onClick={onOpen}
               isLoading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !formik.isValid}
             >
               Save Changes
             </Button>
@@ -491,7 +491,7 @@ const Page = () => {
                 type="button"
                 onClick={onOpen}
                 isLoading={isSubmitting}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !formik.isValid}
               >
                 Save Changes
               </Button>
@@ -622,7 +622,7 @@ const Page = () => {
                 <Button
                   type="button"
                   isLoading={isSubmitting}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !formik.isValid}
                   onClick={onOpen}
                 >
                   Save Changes
@@ -742,7 +742,7 @@ const Page = () => {
                 <Button
                   type="button"
                   isLoading={isSubmitting}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !formik.isValid}
                   onClick={onOpen}
                 >
                   Save Changes
@@ -812,7 +812,7 @@ const Page = () => {
               <Button
                 type="submit"
                 isLoading={isSubmitting}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !formik.isValid}
               >
                 Save Changes
               </Button>
