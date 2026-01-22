@@ -904,6 +904,15 @@ const TournamentsOverviewPage = () => {
                 </Flex>
               )}
 
+            {tournament?.state === TournamentsState.BATTLES &&
+              !tournament.nextBattle && (
+                <Box p={6}>
+                  <styled.h2 fontSize="xl" fontWeight="semibold">
+                    Battles Complete
+                  </styled.h2>
+                </Box>
+              )}
+
             {tournament.state === TournamentsState.END && <FinalResults />}
           </Box>
         </Box>

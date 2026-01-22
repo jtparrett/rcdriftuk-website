@@ -412,6 +412,14 @@ const BattleForm = () => {
         ? nextBattle?.driverRight?.user.driverId
         : nextBattle?.driverRight?.tournamentDriverNumber;
 
+  if (!tournament.nextBattle) {
+    return (
+      <styled.h2 fontSize="xl" fontWeight="semibold" textAlign="center" mt={4}>
+        Battles Complete
+      </styled.h2>
+    );
+  }
+
   return (
     <>
       {nextBattle?.winnerId !== null && (

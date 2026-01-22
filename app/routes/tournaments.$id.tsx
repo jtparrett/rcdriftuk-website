@@ -600,7 +600,10 @@ const TournamentPage = () => {
                       disabled={isLoading || isSubmitting}
                       isLoading={isSubmitting}
                     >
-                      Start Next Battle <RiFlagLine />
+                      {tournament.nextBattle
+                        ? "Start Next Battle"
+                        : "End Tournament"}{" "}
+                      <RiFlagLine />
                     </Button>
                   </Form>
                 )}
