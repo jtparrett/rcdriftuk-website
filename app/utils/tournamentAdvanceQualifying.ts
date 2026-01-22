@@ -49,7 +49,9 @@ export const tournamentAdvanceQualifying = async (
       tournament.qualifyingOrder === QualifyingOrder.DRIVERS
         ? [
             {
-              tournamentDriverId: "asc",
+              driver: {
+                tournamentDriverNumber: "asc",
+              },
             },
             { id: "asc" },
           ]

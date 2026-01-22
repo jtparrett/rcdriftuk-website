@@ -270,7 +270,7 @@ export const action = async (args: ActionFunctionArgs) => {
       },
       orderBy:
         tournament.qualifyingOrder === QualifyingOrder.DRIVERS
-          ? [{ tournamentDriverId: "asc" }, { id: "asc" }]
+          ? [{ driver: { tournamentDriverNumber: "asc" } }, { id: "asc" }]
           : [{ id: "asc" }],
     });
 

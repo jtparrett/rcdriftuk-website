@@ -290,7 +290,11 @@ const QualiForm = () => {
         : tournament.nextQualifyingLap?.driver?.tournamentDriverNumber;
 
   if (tournament.nextQualifyingLap === null) {
-    return null;
+    return (
+      <styled.h2 fontSize="xl" fontWeight="semibold" textAlign="center" mt={4}>
+        Qualifying Complete
+      </styled.h2>
+    );
   }
 
   return (
@@ -607,6 +611,7 @@ const JudgePage = () => {
                 {tournament.state === TournamentsState.QUALIFYING && (
                   <QualiForm />
                 )}
+
                 {tournament.state === TournamentsState.BATTLES && (
                   <BattleForm />
                 )}
