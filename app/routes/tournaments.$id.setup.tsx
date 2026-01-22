@@ -361,16 +361,24 @@ const Page = () => {
     },
   });
 
-  const SaveButton = () => (
-    <Button
-      type={tournament.state === TournamentsState.START ? "submit" : "button"}
-      onClick={tournament.state === TournamentsState.START ? undefined : onOpen}
-      isLoading={isSubmitting}
-      disabled={isSubmitting || !formik.isValid || !formik.dirty}
-    >
-      Save Changes
-    </Button>
-  );
+  const SaveButton = () => {
+    if (tournament.state === TournamentsState.END) {
+      return null;
+    }
+
+    return (
+      <Button
+        type={tournament.state === TournamentsState.START ? "submit" : "button"}
+        onClick={
+          tournament.state === TournamentsState.START ? undefined : onOpen
+        }
+        isLoading={isSubmitting}
+        disabled={isSubmitting || !formik.isValid || !formik.dirty}
+      >
+        Save Changes
+      </Button>
+    );
+  };
 
   return (
     <Flex flexDir="column" gap={4} maxW={600}>

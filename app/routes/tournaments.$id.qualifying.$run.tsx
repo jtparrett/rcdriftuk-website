@@ -1,6 +1,6 @@
 import { styled, Box, Center, Flex } from "~/styled-system/jsx";
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { Fragment } from "react";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { TournamentsDriverNumbers } from "~/utils/enums";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 import { token } from "~/styled-system/tokens";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -194,6 +195,9 @@ const Table = ({
                 } as React.CSSProperties
               }
               bg="var(--bg)"
+              _hover={{
+                bg: "gray.800",
+              }}
               alignItems="center"
             >
               {isNext && <Glow size="sm" />}
@@ -223,14 +227,20 @@ const Table = ({
                 textOverflow="ellipsis"
                 flex={1}
               >
-                <Link to={`/drivers/${driver.user.driverId}`}>
+                <LinkOverlay
+                  to={
+                    isOwner && driver.lapId
+                      ? `/tournaments/${tournament.id}/activate/lap/${driver.lapId}`
+                      : `/drivers/${driver.user.driverId}`
+                  }
+                >
                   {driver.user.firstName} {driver.user.lastName}{" "}
                   {driverNumber !== undefined && (
                     <styled.span color="gray.600">
                       ({getDriverNumber(driver)})
                     </styled.span>
                   )}
-                </Link>
+                </LinkOverlay>
               </styled.p>
 
               {tournament.run <= 0 && (
@@ -257,15 +267,7 @@ const Table = ({
                   fontFamily="mono"
                   fontSize="sm"
                 >
-                  {isOwner && tournament.run > 0 ? (
-                    <Link
-                      to={`/tournaments/${tournament.id}/lap/${driver.lapId}`}
-                    >
-                      {driver.score?.toFixed(2).padStart(5, "0")}
-                    </Link>
-                  ) : (
-                    driver.score?.toFixed(2).padStart(5, "0")
-                  )}
+                  {driver.score?.toFixed(2).padStart(5, "0")}
                 </styled.p>
               )}
             </Flex>

@@ -14,12 +14,16 @@ import { Glow } from "~/components/Glow";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
+import { getAuth } from "~/utils/getAuth.server";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
   const bracket = z
     .nativeEnum(BattlesBracket)
-    .parse(params.bracket?.toUpperCase());
+    .parse(args.params.bracket?.toUpperCase());
+
+  const { userId } = await getAuth(args);
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
     where: {
@@ -75,10 +79,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return {
-    tournament,
-    bracket,
-  };
+  const isOwner = tournament.userId === userId;
+
+  return { tournament, bracket, isOwner };
 };
 
 type Battle = Awaited<
@@ -146,19 +149,17 @@ export const Driver = ({
         }
         pr={2}
       >
-        <Link to={`/drivers/${driver?.user.driverId}`}>
-          {driver?.user.firstName} {driver?.user.lastName}{" "}
-          {driverNo !== undefined && (
-            <styled.span color="gray.600">({driverNo})</styled.span>
-          )}
-        </Link>
+        {driver?.user.firstName} {driver?.user.lastName}{" "}
+        {driverNo !== undefined && (
+          <styled.span color="gray.600">({driverNo})</styled.span>
+        )}
       </styled.p>
     </Flex>
   );
 };
 
 const TournamentBattlesPage = () => {
-  const { tournament, bracket } = useLoaderData<typeof loader>();
+  const { tournament, bracket, isOwner } = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
   const [searchParams] = useSearchParams();
   const maxBattlesToShow =
@@ -311,8 +312,19 @@ const TournamentBattlesPage = () => {
                             overflow="hidden"
                             bgColor="gray.950"
                             shadow="0 4px 12px black"
+                            _hover={{
+                              borderColor: "brand.500",
+                            }}
                             zIndex={0}
                           >
+                            {isOwner && (
+                              <LinkOverlay
+                                to={`/tournaments/${tournament.id}/activate/battle/${battle.id}`}
+                              >
+                                <styled.span srOnly>{battle.id}</styled.span>
+                              </LinkOverlay>
+                            )}
+
                             {isNextBattle && <Glow size="sm" />}
                             <Driver
                               driver={battle.driverLeft}

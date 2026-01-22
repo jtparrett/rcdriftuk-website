@@ -7,7 +7,9 @@ import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
-  notFoundInvariant(userId, "User not not found");
+  if (!userId) {
+    return redirect("/sign-in");
+  }
 
   const tournament = await prisma.tournaments.create({
     data: {
