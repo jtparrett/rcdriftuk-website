@@ -16,6 +16,9 @@ const TabStyle = cva({
     transition: "background-color .3s",
     whiteSpace: "nowrap",
     cursor: "pointer",
+    _disabled: {
+      opacity: 0.5,
+    },
   },
   variants: {
     isActive: {

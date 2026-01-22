@@ -14,8 +14,10 @@ interface PeopleFormProps {
   allowNewDrivers?: boolean;
   allowPoints?: boolean;
   disabled?: boolean;
-  onChange: (value: { driverId: string; points?: number }[]) => void;
-  value: { driverId: string; points?: number }[];
+  onChange: (
+    value: { driverId: string; points?: number; isNew?: boolean }[],
+  ) => void;
+  value: { driverId: string; points?: number; isNew?: boolean }[];
 }
 
 export const PeopleForm = ({
@@ -254,6 +256,7 @@ export const PeopleForm = ({
                         {
                           driverId: search.trim(),
                           points: 100,
+                          isNew: true,
                         },
                       ]);
                       setSearch("");

@@ -31,12 +31,7 @@ export const tournamentReorderDrivers = async (
     driverIds.map((driverId, index) => {
       const driver = tournament.drivers.find((d) => d.driverId === driverId);
 
-      if (!driver) {
-        return prisma.tournamentDrivers.updateMany({
-          where: { id: -1 }, // No-op if driver not found
-          data: {},
-        });
-      }
+      invariant(driver, "Driver not found");
 
       return prisma.tournamentDrivers.update({
         where: {

@@ -54,6 +54,7 @@ export const tournamentFormSchema = z.object({
     .array(
       z.object({
         driverId: z.string(),
+        isNew: z.boolean().optional(),
       }),
     )
     .min(1, "Please add at least one driver to the tournament"),
@@ -93,7 +94,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
       userId,
     },
     include: {
-      drivers: true,
+      drivers: {
+        orderBy: {
+          tournamentDriverNumber: "asc",
+        },
+      },
       judges: true,
     },
   });
@@ -155,8 +160,37 @@ export const action = async (args: ActionFunctionArgs) => {
 
   // Compare drivers
   const currentDriverIds = tournament.drivers.map((d) => d.driverId.toString());
-  const submittedDriverIds = data.drivers.map((d) => d.driverId);
-  const newDrivers = submittedDriverIds.filter(
+  const newDrivers = data.drivers.filter((d) => d.isNew);
+
+  // Create new users first if needed and build a mapping from name to generated ID
+  const newUserIdMap: Record<string, string> = {};
+  if (newDrivers.length > 0) {
+    const newUsers = await prisma.users.createManyAndReturn({
+      data: newDrivers.map((d) => {
+        const [firstName, lastName] = d.driverId.split(" ");
+
+        return {
+          firstName: firstName,
+          lastName: lastName,
+        };
+      }),
+    });
+
+    // Map original driverId (name) to the generated ID
+    newDrivers.forEach((driver, i) => {
+      const newUser = newUsers[i];
+      if (newUser?.driverId) {
+        newUserIdMap[driver.driverId] = newUser.driverId.toString();
+      }
+    });
+  }
+
+  // Build submittedDriverIds with all drivers (including newly created) in correct order
+  const submittedDriverIds = data.drivers.map((d) =>
+    d.isNew ? newUserIdMap[d.driverId] : d.driverId,
+  );
+
+  const newlyAddedDrivers = submittedDriverIds.filter(
     (id) => !currentDriverIds.includes(id),
   );
   const removedDrivers = currentDriverIds.filter(
@@ -171,8 +205,8 @@ export const action = async (args: ActionFunctionArgs) => {
       await tournamentRemoveDrivers(id, removedDrivers.map(Number));
     }
 
-    if (newDrivers.length > 0) {
-      await tournamentAddDrivers(id, newDrivers.map(Number), {
+    if (newlyAddedDrivers.length > 0) {
+      await tournamentAddDrivers(id, newlyAddedDrivers.map(Number), {
         createLaps: !isStartState,
       });
     }
@@ -329,8 +363,8 @@ const Page = () => {
 
   const SaveButton = () => (
     <Button
-      type="button"
-      onClick={onOpen}
+      type={tournament.state === TournamentsState.START ? "submit" : "button"}
+      onClick={tournament.state === TournamentsState.START ? undefined : onOpen}
       isLoading={isSubmitting}
       disabled={isSubmitting || !formik.isValid || !formik.dirty}
     >
@@ -490,7 +524,7 @@ const Page = () => {
                   value={formik.values.drivers}
                   onChange={(value) => formik.setFieldValue("drivers", value)}
                   name="drivers"
-                  // allowNewDrivers
+                  allowNewDrivers
                   disabled={!canEditDrivers}
                 />
               </FormControl>
