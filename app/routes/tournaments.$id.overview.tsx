@@ -526,7 +526,7 @@ const TournamentsOverviewPage = () => {
           <Box borderRadius="xl" overflow="hidden" textAlign="center">
             {tournament.state === TournamentsState.START && (
               <Box p={6}>
-                <styled.h2 fontSize="xl" fontWeight="bold">
+                <styled.h2 fontSize="xl" fontWeight="semibold">
                   Waiting to start...
                 </styled.h2>
               </Box>
@@ -687,7 +687,7 @@ const TournamentsOverviewPage = () => {
             {tournament.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLapId === null && (
                 <Box p={6}>
-                  <styled.h2 fontSize="xl" fontWeight="bold">
+                  <styled.h2 fontSize="xl" fontWeight="semibold">
                     Qualifying Complete
                   </styled.h2>
                 </Box>

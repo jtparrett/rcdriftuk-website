@@ -212,7 +212,7 @@ export const action = async (args: ActionFunctionArgs) => {
     }
 
     // Always reorder after adds/removes to ensure correct order
-    if (driversOrderChanged) {
+    if (driversOrderChanged && isStartState) {
       await tournamentReorderDrivers(id, submittedDriverIds.map(Number));
     }
   }

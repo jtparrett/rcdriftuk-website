@@ -21,24 +21,12 @@ export const tournamentCreateLaps = async (tournamentId: string) => {
 
   invariant(tournament, "Tournament not found");
 
-  const tournamentDriverIds = tournament.drivers.map((d) => d.id);
-
-  // Delete existing lap scores
-  await prisma.lapScores.deleteMany({
-    where: {
-      lap: {
-        tournamentDriverId: {
-          in: tournamentDriverIds,
-        },
-      },
-    },
-  });
-
   // Delete existing laps
+  // There shouldn't be any lap scores to delete
   await prisma.laps.deleteMany({
     where: {
       tournamentDriverId: {
-        in: tournamentDriverIds,
+        in: tournament.drivers.map((d) => d.id),
       },
     },
   });

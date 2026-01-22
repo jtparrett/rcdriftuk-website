@@ -593,6 +593,17 @@ const JudgePage = () => {
                 </Link>
               </Flex>
               <Box p={4} pb={8}>
+                {tournament.state === TournamentsState.START && (
+                  <styled.h2
+                    fontSize="xl"
+                    fontWeight="semibold"
+                    textAlign="center"
+                    mt={4}
+                  >
+                    Waiting to start...
+                  </styled.h2>
+                )}
+
                 {tournament.state === TournamentsState.QUALIFYING && (
                   <QualiForm />
                 )}

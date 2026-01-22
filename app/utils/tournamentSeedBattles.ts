@@ -88,9 +88,10 @@ export const tournamentSeedBattles = async (id: string) => {
 
   const driversWithScores = [
     ...tournament.drivers,
-    ...Array.from(new Array(totalBuysToCreate)).map(() => ({
+    ...Array.from(new Array(totalBuysToCreate)).map((_, i) => ({
       id: byeTounamentDriver.id,
       laps: [],
+      tournamentDriverNumber: tournament.drivers.length + i + 1,
     })),
   ].map((driver) => {
     const lapScores = driver.laps.map((lap) =>
@@ -110,12 +111,14 @@ export const tournamentSeedBattles = async (id: string) => {
       return {
         lapScores: [],
         id: byeTounamentDriver.id,
+        tournamentDriverNumber: byeTounamentDriver.tournamentDriverNumber,
       };
     }
 
     return {
       lapScores,
       id: driver.id,
+      tournamentDriverNumber: driver.tournamentDriverNumber,
     };
   });
 
@@ -127,7 +130,12 @@ export const tournamentSeedBattles = async (id: string) => {
       (lapA, lapB) => lapB - lapA,
     );
 
-    return bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id;
+    return (
+      bestB - bestA ||
+      secondB - secondA ||
+      thirdB - thirdA ||
+      a.tournamentDriverNumber - b.tournamentDriverNumber
+    );
   });
 
   // Set qualifying positions (exclude bye driver)
