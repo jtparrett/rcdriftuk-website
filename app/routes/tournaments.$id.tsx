@@ -48,7 +48,7 @@ import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab } from "~/components/Tab";
 import { TabsBar } from "~/components/TabsBar";
-import { getUser, type GetUser } from "~/utils/getUser.server";
+import { getUser } from "~/utils/getUser.server";
 import { useEffect, useState } from "react";
 import pluralize from "pluralize";
 import { AppName } from "~/utils/enums";
@@ -155,32 +155,12 @@ export const action = async (args: ActionFunctionArgs) => {
     // Set qualifying positions for all drivers before transitioning
     await setQualifyingPositions(id);
 
-    if (tournament.enableBattles) {
-      // Enter battles state
-      await tournamentSeedBattles(id);
+    // Enter battles state
+    await tournamentSeedBattles(id);
 
-      await prisma.tournaments.update({
-        where: {
-          id,
-        },
-        data: {
-          state: TournamentsState.BATTLES,
-        },
-      });
+    publishUpdate();
 
-      publishUpdate();
-
-      return redirect(referer);
-    } else {
-      await prisma.tournaments.update({
-        where: {
-          id,
-        },
-        data: {
-          state: TournamentsState.END,
-        },
-      });
-    }
+    return redirect(referer);
   }
 
   if (

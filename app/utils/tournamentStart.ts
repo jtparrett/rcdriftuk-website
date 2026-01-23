@@ -3,6 +3,7 @@ import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQuali
 import { prisma } from "~/utils/prisma.server";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 import invariant from "~/utils/invariant";
+import { setQualifyingPositions } from "./setQualifyingPositions";
 
 /**
  * Starts a tournament by transitioning from START state to QUALIFYING or BATTLES
@@ -33,6 +34,7 @@ export const tournamentStart = async (id: string) => {
       },
     });
   } else if (tournament.enableBattles) {
+    await setQualifyingPositions(id);
     await tournamentSeedBattles(id);
     await prisma.tournaments.update({
       where: { id },
