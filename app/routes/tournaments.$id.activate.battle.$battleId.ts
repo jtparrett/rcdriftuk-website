@@ -6,6 +6,74 @@ import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 
+type Battle = {
+  id: number;
+  driverLeftId: number | null;
+  driverRightId: number | null;
+  winnerNextBattleId: number | null;
+  loserNextBattleId: number | null;
+};
+
+/**
+ * Undoes commitBattleWinner: clears the winner and removes the battle's
+ * drivers from the immediate downstream battles.
+ */
+async function clearBattle(battle: Battle): Promise<void> {
+  // Clear the winner
+  await prisma.tournamentBattles.update({
+    where: { id: battle.id },
+    data: { winnerId: null },
+  });
+
+  const drivers = [battle.driverLeftId, battle.driverRightId].filter(
+    (id): id is number => id !== null,
+  );
+
+  // Remove drivers from winner's next battle
+  if (battle.winnerNextBattleId) {
+    const next = await prisma.tournamentBattles.findFirst({
+      where: { id: battle.winnerNextBattleId },
+    });
+    if (next) {
+      const updates: { driverLeftId?: null; driverRightId?: null } = {};
+      if (next.driverLeftId && drivers.includes(next.driverLeftId)) {
+        updates.driverLeftId = null;
+      }
+      if (next.driverRightId && drivers.includes(next.driverRightId)) {
+        updates.driverRightId = null;
+      }
+      if (Object.keys(updates).length > 0) {
+        await prisma.tournamentBattles.update({
+          where: { id: next.id },
+          data: updates,
+        });
+      }
+    }
+  }
+
+  // Remove drivers from loser's next battle
+  if (battle.loserNextBattleId) {
+    const next = await prisma.tournamentBattles.findFirst({
+      where: { id: battle.loserNextBattleId },
+    });
+    if (next) {
+      const updates: { driverLeftId?: null; driverRightId?: null } = {};
+      if (next.driverLeftId && drivers.includes(next.driverLeftId)) {
+        updates.driverLeftId = null;
+      }
+      if (next.driverRightId && drivers.includes(next.driverRightId)) {
+        updates.driverRightId = null;
+      }
+      if (Object.keys(updates).length > 0) {
+        await prisma.tournamentBattles.update({
+          where: { id: next.id },
+          data: updates,
+        });
+      }
+    }
+  }
+}
+
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const battleId = z.coerce.number().parse(args.params.battleId);
@@ -46,6 +114,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
   if (tournament.nextBattle) {
     await commitBattleWinner(tournament.nextBattle, tournament.judges);
   }
+
+  await clearBattle(battle);
 
   await prisma.tournaments.update({
     where: {
