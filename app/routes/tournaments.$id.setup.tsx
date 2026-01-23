@@ -43,6 +43,7 @@ import { tournamentAddDrivers } from "~/utils/tournamentAddDrivers";
 import { tournamentCreateLaps } from "~/utils/tournamentCreateLaps";
 import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
 import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
+import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQualifyingLap";
 import { toast } from "sonner";
 import { useRef } from "react";
 
@@ -259,20 +260,10 @@ export const action = async (args: ActionFunctionArgs) => {
     tournament.enableQualifying &&
     tournament.state === TournamentsState.QUALIFYING
   ) {
-    const nextQualifyingLap = await prisma.laps.findFirst({
-      where: {
-        driver: {
-          tournamentId: id,
-        },
-        scores: {
-          none: {},
-        },
-      },
-      orderBy:
-        tournament.qualifyingOrder === QualifyingOrder.DRIVERS
-          ? [{ driver: { tournamentDriverNumber: "asc" } }, { id: "asc" }]
-          : [{ id: "asc" }],
-    });
+    const nextQualifyingLap = await findNextIncompleteQualifyingLap(
+      id,
+      tournament.qualifyingOrder,
+    );
 
     await prisma.tournaments.update({
       where: { id },

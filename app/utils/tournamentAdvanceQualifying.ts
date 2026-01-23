@@ -1,6 +1,7 @@
 import { prisma } from "./prisma.server";
 import invariant from "./invariant";
-import { QualifyingOrder, TournamentsState } from "./enums";
+import { TournamentsState } from "./enums";
+import { findNextIncompleteQualifyingLap } from "./findNextIncompleteQualifyingLap";
 
 export const tournamentAdvanceQualifying = async (
   id: string,
@@ -36,27 +37,10 @@ export const tournamentAdvanceQualifying = async (
     "Judging not complete for current lap",
   );
 
-  const nextQualifyingLap = await prisma.laps.findFirst({
-    where: {
-      driver: {
-        tournamentId: id,
-      },
-      scores: {
-        none: {},
-      },
-    },
-    orderBy:
-      tournament.qualifyingOrder === QualifyingOrder.DRIVERS
-        ? [
-            {
-              driver: {
-                tournamentDriverNumber: "asc",
-              },
-            },
-            { id: "asc" },
-          ]
-        : [{ id: "asc" }],
-  });
+  const nextQualifyingLap = await findNextIncompleteQualifyingLap(
+    id,
+    tournament.qualifyingOrder,
+  );
 
   await prisma.tournaments.update({
     where: {

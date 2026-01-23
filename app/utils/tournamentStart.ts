@@ -1,4 +1,5 @@
 import { TournamentsState } from "~/utils/enums";
+import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQualifyingLap";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 import invariant from "~/utils/invariant";
@@ -19,17 +20,10 @@ export const tournamentStart = async (id: string) => {
 
   if (tournament.enableQualifying) {
     // Find the first qualifying lap to set as next
-    const firstLap = await prisma.laps.findFirst({
-      where: {
-        driver: {
-          tournamentId: id,
-        },
-        scores: {
-          none: {},
-        },
-      },
-      orderBy: [{ round: "asc" }, { id: "asc" }],
-    });
+    const firstLap = await findNextIncompleteQualifyingLap(
+      id,
+      tournament.qualifyingOrder,
+    );
 
     await prisma.tournaments.update({
       where: { id },
