@@ -35,6 +35,21 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
     include: {
       judges: true,
+      drivers: {
+        select: {
+          id: true,
+          qualifyingPosition: true,
+          isBye: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              image: true,
+              driverId: true,
+            },
+          },
+        },
+      },
       battles: {
         orderBy: [
           { round: "asc" },
@@ -157,7 +172,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 const FinalResults = () => {
   const tournament = useLoaderData<typeof loader>();
-  const results = getTournamentStandings(tournament.battles).slice(0, 3);
+  const results = getTournamentStandings([
+    {
+      id: tournament.id,
+      format: tournament.format,
+      enableQualifying: tournament.enableQualifying,
+      enableBattles: tournament.enableBattles,
+      battles: tournament.battles,
+      drivers: tournament.drivers,
+    },
+  ]).slice(0, 3);
 
   return (
     <Flex w={700} maxW="full" flexDir="column" gap={2} p={2} textAlign="left">

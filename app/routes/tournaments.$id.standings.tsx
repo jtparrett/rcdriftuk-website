@@ -9,50 +9,64 @@ import { getTournamentStandings } from "~/utils/getTournamentStandings";
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
 
-  const battles = await prisma.tournamentBattles.findMany({
+  const tournament = await prisma.tournaments.findFirst({
     where: {
-      tournamentId: id,
-      tournament: {
-        state: TournamentsState.END,
-      },
+      id,
+      state: TournamentsState.END,
     },
-    orderBy: [
-      { round: "asc" },
-      { bracket: "asc" },
-      {
-        id: "asc",
-      },
-    ],
     select: {
       id: true,
-      winnerId: true,
-      bracket: true,
-      round: true,
-      tournament: {
+      format: true,
+      enableQualifying: true,
+      enableBattles: true,
+      battles: {
+        orderBy: [
+          { round: "asc" },
+          { bracket: "asc" },
+          { id: "asc" },
+        ],
         select: {
-          format: true,
-        },
-      },
-      driverLeft: {
-        select: {
-          isBye: true,
           id: true,
-          qualifyingPosition: true,
-          user: {
+          winnerId: true,
+          bracket: true,
+          round: true,
+          driverLeft: {
             select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-              driverId: true,
+              isBye: true,
+              id: true,
+              qualifyingPosition: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                  driverId: true,
+                },
+              },
+            },
+          },
+          driverRight: {
+            select: {
+              isBye: true,
+              id: true,
+              qualifyingPosition: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                  driverId: true,
+                },
+              },
             },
           },
         },
       },
-      driverRight: {
+      drivers: {
         select: {
-          isBye: true,
           id: true,
           qualifyingPosition: true,
+          isBye: true,
           user: {
             select: {
               firstName: true,
@@ -66,7 +80,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return getTournamentStandings(battles);
+  if (!tournament) {
+    return [];
+  }
+
+  return getTournamentStandings([tournament]);
 };
 
 const TournamentStandingsPage = () => {

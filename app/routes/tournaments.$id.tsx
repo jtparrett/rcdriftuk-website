@@ -57,6 +57,7 @@ import notFoundInvariant from "~/utils/notFoundInvariant";
 import { DashedLine } from "~/components/DashedLine";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 import { tournamentStart } from "~/utils/tournamentStart";
+import { setQualifyingPositions } from "~/utils/setQualifyingPositions";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -151,6 +152,9 @@ export const action = async (args: ActionFunctionArgs) => {
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
   ) {
+    // Set qualifying positions for all drivers before transitioning
+    await setQualifyingPositions(id);
+
     if (tournament.enableBattles) {
       // Enter battles state
       await tournamentSeedBattles(id);
