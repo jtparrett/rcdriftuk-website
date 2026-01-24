@@ -26,6 +26,7 @@ import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import {
   BracketSize,
+  JudgingInterface,
   TournamentsDriverNumbers,
   QualifyingOrder,
   Regions,
@@ -79,6 +80,7 @@ export const tournamentFormSchema = z.object({
   driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
   bracketSize: z.nativeEnum(BracketSize),
   ratingRequested: z.boolean(),
+  judgingInterface: z.nativeEnum(JudgingInterface),
 });
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -149,6 +151,7 @@ export const action = async (args: ActionFunctionArgs) => {
       driverNumbers: data.driverNumbers,
       bracketSize: data.bracketSize,
       ratingRequested: data.ratingRequested,
+      judgingInterface: data.judgingInterface,
     },
     include: {
       judges: true,
@@ -339,6 +342,8 @@ const Page = () => {
       qualifyingOrder: tournament.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       driverNumbers: tournament.driverNumbers ?? TournamentsDriverNumbers.NONE,
       ratingRequested: tournament.ratingRequested ?? false,
+      judgingInterface:
+        tournament.judgingInterface ?? JudgingInterface.SIMPLE,
     },
     async onSubmit(values) {
       await fetcher.submit(JSON.stringify(values), {
@@ -762,6 +767,43 @@ const Page = () => {
                       }
                     >
                       Yes
+                    </TabButton>
+                  </TabGroup>
+                </FormControl>
+
+                <FormControl flex={1} error={formik.errors.judgingInterface}>
+                  <Label>Judging Interface</Label>
+
+                  <TabGroup>
+                    <TabButton
+                      type="button"
+                      isActive={
+                        formik.values.judgingInterface ===
+                        JudgingInterface.SIMPLE
+                      }
+                      onClick={() =>
+                        formik.setFieldValue(
+                          "judgingInterface",
+                          JudgingInterface.SIMPLE,
+                        )
+                      }
+                    >
+                      Simple
+                    </TabButton>
+                    <TabButton
+                      type="button"
+                      isActive={
+                        formik.values.judgingInterface ===
+                        JudgingInterface.ADVANCED
+                      }
+                      onClick={() =>
+                        formik.setFieldValue(
+                          "judgingInterface",
+                          JudgingInterface.ADVANCED,
+                        )
+                      }
+                    >
+                      Advanced
                     </TabButton>
                   </TabGroup>
                 </FormControl>

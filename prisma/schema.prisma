@@ -94,6 +94,7 @@ model Tournaments {
   qualifyingOrder     QualifyingOrder          @default(DRIVERS)
   driverNumbers       TournamentsDriverNumbers @default(NONE)
   bracketSize         Int                      @default(4)
+  judgingInterface    JudgingInterface         @default(SIMPLE)
 
   @@index([state])
   @@index([archived])
@@ -588,6 +589,11 @@ enum TournamentsDriverNumbers {
 enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
+}
+
+enum JudgingInterface {
+  SIMPLE
+  ADVANCED
 }
 
 enum BattlesBracket {

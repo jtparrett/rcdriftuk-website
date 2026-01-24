@@ -36,6 +36,13 @@ export const TournamentsFormat = {
 
 export type TournamentsFormat = Values<typeof TournamentsFormat>;
 
+export const JudgingInterface = {
+  SIMPLE: "SIMPLE",
+  ADVANCED: "ADVANCED",
+} as const;
+
+export type JudgingInterface = Values<typeof JudgingInterface>;
+
 export const BattlesBracket = {
   UPPER: "UPPER",
   LOWER: "LOWER",

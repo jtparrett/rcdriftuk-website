@@ -1,4 +1,8 @@
-import { TournamentsDriverNumbers, TournamentsState } from "~/utils/enums";
+import {
+  JudgingInterface,
+  TournamentsDriverNumbers,
+  TournamentsState,
+} from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
@@ -12,7 +16,7 @@ import { ChannelProvider, AblyProvider } from "ably/react";
 import pluralize from "pluralize";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
-import { Button, LinkButton } from "~/components/Button";
+import { Button } from "~/components/Button";
 import { Glow } from "~/components/Glow";
 import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
@@ -24,6 +28,8 @@ import {
   VStack,
   Container,
   Center,
+  HStack,
+  Grid,
 } from "~/styled-system/jsx";
 import { createAbly } from "~/utils/ably.server";
 import { ably as AblyClient } from "~/utils/ably";
@@ -31,16 +37,15 @@ import { prisma } from "~/utils/prisma.server";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import { css } from "~/styled-system/css";
-import { RiArrowLeftLine } from "react-icons/ri";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import numberToWords from "number-to-words";
-import { appGoBack } from "~/utils/appEvents";
 import { getAuth } from "~/utils/getAuth.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { getUser } from "~/utils/getUser.server";
+import { useState } from "react";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -388,10 +393,363 @@ const QualiForm = () => {
   );
 };
 
+interface AdvancedScores {
+  run1: { lead: number; chase: number };
+  run2: { lead: number; chase: number };
+}
+
+const MAX_SCORE = 6;
+
+const ScoreButton = ({
+  score,
+  isActive,
+  onClick,
+}: {
+  score: number;
+  isActive: boolean;
+  onClick: () => void;
+}) => (
+  <Button
+    type="button"
+    size="sm"
+    variant={isActive ? "primary" : "outline"}
+    onClick={onClick}
+    w="full"
+    px={2}
+  >
+    {score}
+  </Button>
+);
+
+const AdvancedJudging = ({
+  leftDriver,
+  rightDriver,
+  leftDriverNumber,
+  rightDriverNumber,
+  leftDriverHigherQualifier,
+  battleVote,
+  driverLeftId,
+  driverRightId,
+}: {
+  leftDriver: {
+    firstName: string | null;
+    lastName: string | null;
+    id: number;
+  } | null;
+  rightDriver: {
+    firstName: string | null;
+    lastName: string | null;
+    id: number;
+  } | null;
+  leftDriverNumber: number | undefined;
+  rightDriverNumber: number | undefined;
+  leftDriverHigherQualifier: boolean;
+  battleVote: { winnerId: number | null; omt: boolean } | undefined;
+  driverLeftId: number | null;
+  driverRightId: number | null;
+}) => {
+  const [activeRun, setActiveRun] = useState<1 | 2>(1);
+  const [scores, setScores] = useState<AdvancedScores>({
+    run1: { lead: MAX_SCORE, chase: MAX_SCORE },
+    run2: { lead: MAX_SCORE, chase: MAX_SCORE },
+  });
+
+  // Higher qualifier leads first in Run 1
+  // If leftDriverHigherQualifier: Run 1 = Left leads, Right chases; Run 2 = Right leads, Left chases
+  // If rightDriverHigherQualifier: Run 1 = Right leads, Left chases; Run 2 = Left leads, Right chases
+  const leftDriverTotal = leftDriverHigherQualifier
+    ? scores.run1.lead + scores.run2.chase
+    : scores.run1.chase + scores.run2.lead;
+  const rightDriverTotal = leftDriverHigherQualifier
+    ? scores.run1.chase + scores.run2.lead
+    : scores.run1.lead + scores.run2.chase;
+
+  const updateScore = (run: 1 | 2, role: "lead" | "chase", value: number) => {
+    setScores((prev) => ({
+      ...prev,
+      [`run${run}`]: {
+        ...prev[`run${run}`],
+        [role]: value,
+      },
+    }));
+  };
+
+  const getWinner = () => {
+    if (leftDriverTotal > rightDriverTotal) return "left";
+    if (rightDriverTotal > leftDriverTotal) return "right";
+    return "tie";
+  };
+
+  const winner = getWinner();
+
+  // Check if the current result matches the existing vote
+  const isAlreadySubmitted =
+    (winner === "left" && battleVote?.winnerId === driverLeftId) ||
+    (winner === "right" && battleVote?.winnerId === driverRightId) ||
+    (winner === "tie" && battleVote?.omt === true);
+
+  return (
+    <VStack gap={4} alignItems="stretch">
+      {/* Run Tabs */}
+      <TabGroup>
+        <TabButton
+          type="button"
+          isActive={activeRun === 1}
+          onClick={() => setActiveRun(1)}
+        >
+          Run 1
+        </TabButton>
+        <TabButton
+          type="button"
+          isActive={activeRun === 2}
+          onClick={() => setActiveRun(2)}
+        >
+          Run 2
+        </TabButton>
+      </TabGroup>
+
+      {/* Scoring UI */}
+      <Box>
+        {activeRun === 1 ? (
+          <VStack gap={4} alignItems="stretch">
+            {/* Run 1: Higher qualifier leads */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Lead:{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.firstName
+                  : rightDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.lastName
+                  : rightDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? leftDriverNumber
+                  : rightDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? leftDriverNumber
+                      : rightDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run1.lead >= score}
+                    onClick={() => updateScore(1, "lead", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+
+            {/* Run 1: Lower qualifier chases */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Chase:{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.firstName
+                  : leftDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.lastName
+                  : leftDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? rightDriverNumber
+                  : leftDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? rightDriverNumber
+                      : leftDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run1.chase >= score}
+                    onClick={() => updateScore(1, "chase", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+          </VStack>
+        ) : (
+          <VStack gap={4} alignItems="stretch">
+            {/* Run 2: Lower qualifier leads */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Lead:{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.firstName
+                  : leftDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.lastName
+                  : leftDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? rightDriverNumber
+                  : leftDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? rightDriverNumber
+                      : leftDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run2.lead >= score}
+                    onClick={() => updateScore(2, "lead", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+
+            {/* Run 2: Higher qualifier chases */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Chase:{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.firstName
+                  : rightDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.lastName
+                  : rightDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? leftDriverNumber
+                  : rightDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? leftDriverNumber
+                      : rightDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run2.chase >= score}
+                    onClick={() => updateScore(2, "chase", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+          </VStack>
+        )}
+      </Box>
+
+      {/* Score Summary */}
+      <Box
+        bgColor="gray.900"
+        rounded="lg"
+        p={3}
+        borderWidth={1}
+        borderColor="gray.800"
+      >
+        <styled.p fontSize="xs" color="gray.500" mb={2} textAlign="center">
+          Current Totals
+        </styled.p>
+        <Flex justifyContent="space-around">
+          <VStack gap={0}>
+            <styled.span
+              fontSize="lg"
+              fontWeight="bold"
+              color={winner === "left" ? "green.400" : "white"}
+            >
+              {leftDriverTotal}
+            </styled.span>
+            <styled.span fontSize="xs" color="gray.500">
+              {leftDriver?.firstName?.charAt(0)}. {leftDriver?.lastName}
+            </styled.span>
+          </VStack>
+          <styled.span fontSize="lg" color="gray.600" alignSelf="center">
+            vs
+          </styled.span>
+          <VStack gap={0}>
+            <styled.span
+              fontSize="lg"
+              fontWeight="bold"
+              color={winner === "right" ? "green.400" : "white"}
+            >
+              {rightDriverTotal}
+            </styled.span>
+            <styled.span fontSize="xs" color="gray.500">
+              {rightDriver?.firstName?.charAt(0)}. {rightDriver?.lastName}
+            </styled.span>
+          </VStack>
+        </Flex>
+      </Box>
+
+      {/* Submit Winner */}
+      <VStack gap={2} alignItems="stretch">
+        <Button
+          w="full"
+          type="submit"
+          name={winner === "tie" ? "omt" : "driver"}
+          variant="primary"
+          disabled={isAlreadySubmitted}
+          value={
+            winner === "left"
+              ? leftDriver?.id.toString()
+              : winner === "right"
+                ? rightDriver?.id.toString()
+                : "true"
+          }
+        >
+          Submit: {winner === "left" ? leftDriver?.firstName + " Wins" : ""}
+          {winner === "right" ? rightDriver?.firstName + " Wins" : ""}
+          {winner === "tie" ? "OMT" : ""}
+        </Button>
+      </VStack>
+    </VStack>
+  );
+};
+
 const BattleForm = () => {
   const { tournament } = useLoaderData<typeof loader>();
   const nextBattle = tournament.nextBattle;
   const battleVote = nextBattle?.BattleVotes[0];
+
+  const judgingInterface = tournament.judgingInterface;
 
   const leftDriverHigherQualifier =
     (nextBattle?.driverLeft?.qualifyingPosition ?? 0) <
@@ -429,86 +787,54 @@ const BattleForm = () => {
       )}
 
       {nextBattle !== null && nextBattle.winnerId === null && (
-        <Form method="post">
-          <Flex flexDir="column" gap={4}>
-            {(nextBattle.driverLeft?.isBye ||
-              nextBattle.driverRight?.isBye) && (
-              <styled.p
-                fontSize="md"
-                fontWeight="semibold"
-                color="gray.500"
-                textAlign="center"
-              >
-                Bye Run
-              </styled.p>
-            )}
+        <VStack gap={4} alignItems="stretch">
+          <Form method="post">
+            {judgingInterface === JudgingInterface.SIMPLE ? (
+              <Flex flexDir="column" gap={4}>
+                <Button
+                  w="full"
+                  type="submit"
+                  name="driver"
+                  value={nextBattle.driverLeft?.id.toString()}
+                  variant={
+                    battleVote?.winnerId === nextBattle.driverLeftId
+                      ? "primary"
+                      : "outline"
+                  }
+                  gap={0.5}
+                >
+                  {nextBattle.driverLeft?.user.firstName}{" "}
+                  {nextBattle.driverLeft?.user.lastName}{" "}
+                  {leftDriverNumber !== undefined && (
+                    <styled.span color="gray.600">
+                      ({leftDriverNumber})
+                    </styled.span>
+                  )}
+                  {leftDriverHigherQualifier && "(Higher Qualifier)"}
+                </Button>
 
-            {!nextBattle.driverLeft?.isBye && (
-              <Button
-                w="full"
-                type="submit"
-                name="driver"
-                value={nextBattle.driverLeft?.id.toString()}
-                variant={
-                  battleVote?.winnerId === nextBattle.driverLeftId
-                    ? "primary"
-                    : "outline"
-                }
-                gap={0.5}
-              >
-                {nextBattle.driverLeft?.user.firstName}{" "}
-                {nextBattle.driverLeft?.user.lastName}{" "}
-                {leftDriverNumber !== undefined && (
-                  <styled.span color="gray.600">
-                    ({leftDriverNumber})
-                  </styled.span>
-                )}
-                {leftDriverHigherQualifier && "(Higher Qualifier)"}
-              </Button>
-            )}
+                <Button
+                  w="full"
+                  type="submit"
+                  name="driver"
+                  value={nextBattle.driverRight?.id.toString()}
+                  variant={
+                    battleVote?.winnerId === nextBattle.driverRightId
+                      ? "primary"
+                      : "outline"
+                  }
+                  gap={0.5}
+                >
+                  {nextBattle.driverRight?.user.firstName}{" "}
+                  {nextBattle.driverRight?.user.lastName}{" "}
+                  {rightDriverNumber !== undefined && (
+                    <styled.span color="gray.600">
+                      ({rightDriverNumber})
+                    </styled.span>
+                  )}
+                  {!leftDriverHigherQualifier && "(Higher Qualifier)"}
+                </Button>
 
-            {!nextBattle.driverRight?.isBye && (
-              <Button
-                w="full"
-                type="submit"
-                name="driver"
-                value={nextBattle.driverRight?.id.toString()}
-                variant={
-                  battleVote?.winnerId === nextBattle.driverRightId
-                    ? "primary"
-                    : "outline"
-                }
-                gap={0.5}
-              >
-                {nextBattle.driverRight?.user.firstName}{" "}
-                {nextBattle.driverRight?.user.lastName}{" "}
-                {rightDriverNumber !== undefined && (
-                  <styled.span color="gray.600">
-                    ({rightDriverNumber})
-                  </styled.span>
-                )}
-                {!leftDriverHigherQualifier && "(Higher Qualifier)"}
-              </Button>
-            )}
-
-            {nextBattle.driverLeft?.isBye && nextBattle.driverRight?.isBye && (
-              <Button
-                w="full"
-                type="submit"
-                name="driver"
-                value={nextBattle.driverRight?.id.toString()}
-                variant={
-                  battleVote?.winnerId === nextBattle.driverRightId
-                    ? "primary"
-                    : "outline"
-                }
-              >
-                Click here to continue
-              </Button>
-            )}
-
-            {!nextBattle.driverLeft?.isBye &&
-              !nextBattle.driverRight?.isBye && (
                 <Button
                   w="full"
                   type="submit"
@@ -518,9 +844,37 @@ const BattleForm = () => {
                 >
                   OMT
                 </Button>
-              )}
-          </Flex>
-        </Form>
+              </Flex>
+            ) : (
+              <AdvancedJudging
+                leftDriver={
+                  nextBattle.driverLeft
+                    ? {
+                        firstName: nextBattle.driverLeft.user.firstName,
+                        lastName: nextBattle.driverLeft.user.lastName,
+                        id: nextBattle.driverLeft.id,
+                      }
+                    : null
+                }
+                rightDriver={
+                  nextBattle.driverRight
+                    ? {
+                        firstName: nextBattle.driverRight.user.firstName,
+                        lastName: nextBattle.driverRight.user.lastName,
+                        id: nextBattle.driverRight.id,
+                      }
+                    : null
+                }
+                leftDriverNumber={leftDriverNumber}
+                rightDriverNumber={rightDriverNumber}
+                leftDriverHigherQualifier={leftDriverHigherQualifier}
+                battleVote={battleVote}
+                driverLeftId={nextBattle.driverLeftId}
+                driverRightId={nextBattle.driverRightId}
+              />
+            )}
+          </Form>
+        </VStack>
       )}
     </>
   );
