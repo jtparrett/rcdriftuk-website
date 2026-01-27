@@ -16,7 +16,7 @@ import { Toaster } from "sonner";
 
 import "./index.css";
 import { Header } from "./components/Header";
-import { rootAuthLoader, clerkMiddleware } from "@clerk/react-router/server";
+import { rootAuthLoader } from "@clerk/react-router/server";
 import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { Button, LinkButton } from "./components/Button";
@@ -34,7 +34,7 @@ import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { AppName } from "./utils/enums";
 
-export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
+// export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
 export const meta: Route.MetaFunction = () => {
   return [
