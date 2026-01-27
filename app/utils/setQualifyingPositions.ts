@@ -18,6 +18,14 @@ export const setQualifyingPositions = async (id: string) => {
           judges: true,
         },
       },
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
+        },
+      },
       drivers: {
         where: {
           isBye: false,
@@ -38,6 +46,8 @@ export const setQualifyingPositions = async (id: string) => {
 
   invariant(tournament, "Tournament not found");
 
+  const judgeIds = tournament.judges.map((j) => j.id);
+
   const driversWithScores = tournament.drivers.map((driver) => {
     const lapScores = driver.laps.map((lap) =>
       sumScores(
@@ -45,6 +55,7 @@ export const setQualifyingPositions = async (id: string) => {
         tournament._count.judges,
         tournament.scoreFormula,
         lap.penalty,
+        judgeIds,
       ),
     );
 

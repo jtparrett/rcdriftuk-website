@@ -46,6 +46,14 @@ export const tournamentSeedBattles = async (id: string) => {
           judges: true,
         },
       },
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
+        },
+      },
       drivers: {
         orderBy: {
           id: "asc",
@@ -62,6 +70,8 @@ export const tournamentSeedBattles = async (id: string) => {
   });
 
   invariant(tournament, "Missing tournament");
+
+  const judgeIds = tournament.judges.map((j) => j.id);
 
   await prisma.tournaments.update({
     where: {
@@ -100,6 +110,7 @@ export const tournamentSeedBattles = async (id: string) => {
         tournament._count.judges,
         tournament.scoreFormula,
         lap.penalty,
+        judgeIds,
       ),
     );
 

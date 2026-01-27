@@ -34,7 +34,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       id,
     },
     include: {
-      judges: true,
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
       drivers: {
         select: {
           id: true,
@@ -681,6 +685,7 @@ const TournamentsOverviewPage = () => {
                               tournament.judges.length,
                               tournament.scoreFormula,
                               tournament.nextQualifyingLap.penalty,
+                              tournament.judges.map((j) => j.id),
                             )}
                           </styled.p>
                         </RightInfoBox>

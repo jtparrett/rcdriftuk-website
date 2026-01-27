@@ -626,6 +626,12 @@ enum Regions {
 }
 
 enum ScoreFormula {
+  SUM
+  AVERAGE
+  HEAD_JUDGE_1
+  HEAD_JUDGE_2
+  HEAD_JUDGE_3
+  // Legacy values for backward compatibility
   CUMULATIVE
   AVERAGED
 }

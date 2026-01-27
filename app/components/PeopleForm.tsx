@@ -154,7 +154,7 @@ export const PeopleForm = ({
                           {Array.from({ length: 10 }, (_, i) => i + 1).map(
                             (points) => (
                               <option key={points} value={points * 10}>
-                                {points * 10}
+                                {points * 10} Max Points
                               </option>
                             ),
                           )}

@@ -29,6 +29,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
           judges: true,
         },
       },
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
+        },
+      },
       id: true,
       enableBattles: true,
       bracketSize: true,
@@ -87,6 +95,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   invariant(tournament, "Tournament not found");
 
   const isOwner = tournament?.userId === userId;
+  const judgeIds = tournament.judges.map((j) => j.id);
 
   return {
     run,
@@ -113,6 +122,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
               tournament._count.judges,
               tournament.scoreFormula,
               lap.penalty,
+              judgeIds,
             ),
           );
 

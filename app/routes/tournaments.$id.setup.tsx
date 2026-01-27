@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader } from "~/components/CollapsibleCard";
 import { FormControl } from "~/components/FormControl";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
+import { Select } from "~/components/Select";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { PeopleForm } from "~/components/PeopleForm";
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
@@ -33,6 +34,7 @@ import {
   ScoreFormula,
   TournamentsFormat,
   TournamentsState,
+  getScoreFormulaOptions,
 } from "~/utils/enums";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUsers } from "~/utils/getUsers.server";
@@ -46,7 +48,7 @@ import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
 import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
 import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQualifyingLap";
 import { toast } from "sonner";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
@@ -295,6 +297,119 @@ const Icon = styled("div", {
   },
 });
 
+type User = {
+  driverId: number;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+// Map legacy values to new equivalents
+const mapLegacyFormula = (formula: ScoreFormula): ScoreFormula => {
+  if (formula === ScoreFormula.CUMULATIVE) return ScoreFormula.SUM;
+  if (formula === ScoreFormula.AVERAGED) return ScoreFormula.AVERAGE;
+  return formula;
+};
+
+const ScoreFormulaSelect = ({
+  judgeCount,
+  users,
+  judgeIds,
+  value,
+  onChange,
+  error,
+}: {
+  judgeCount: number;
+  users: User[];
+  judgeIds: string[];
+  value: ScoreFormula;
+  onChange: (value: ScoreFormula) => void;
+  error?: string;
+}) => {
+  // Map legacy values to their new equivalents
+  const normalizedValue = mapLegacyFormula(value);
+
+  // Get judge names in order (format: "FirstName L.")
+  const judgeNames = judgeIds
+    .map((id) => {
+      const user = users.find((u) => u.driverId.toString() === id);
+      if (!user?.firstName) return `Judge ${id}`;
+      const lastInitial = user.lastName?.charAt(0).toUpperCase();
+      return lastInitial ? `${user.firstName} ${lastInitial}` : user.firstName;
+    })
+    .slice(0, judgeCount);
+
+  const options = getScoreFormulaOptions(judgeCount, judgeNames);
+
+  // Check if current value is valid for judge count
+  const isCurrentValueValid = options.some(
+    (opt) => opt.value === normalizedValue,
+  );
+  const effectiveValue = isCurrentValueValid
+    ? normalizedValue
+    : options[0]?.value;
+
+  // Auto-select valid option if current value is invalid or a legacy value
+  useEffect(() => {
+    const needsUpdate =
+      !isCurrentValueValid ||
+      (value !== normalizedValue && effectiveValue !== value);
+    if (needsUpdate && options.length > 0 && effectiveValue) {
+      onChange(effectiveValue);
+    }
+  }, [
+    isCurrentValueValid,
+    options.length,
+    effectiveValue,
+    normalizedValue,
+    value,
+    onChange,
+  ]);
+
+  if (judgeCount <= 1) {
+    return (
+      <FormControl flex={1} error={error}>
+        <Label>Score Formula</Label>
+        <styled.p fontSize="sm" color="gray.400">
+          Option unavailable for single judge.
+        </styled.p>
+      </FormControl>
+    );
+  }
+
+  return (
+    <FormControl flex={1} error={error}>
+      <Label>Score Formula</Label>
+      <Select
+        value={effectiveValue}
+        onChange={(e) => onChange(e.target.value as ScoreFormula)}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}: {option.formula}
+          </option>
+        ))}
+      </Select>
+      <styled.p fontSize="sm" color="gray.500" mt={1}>
+        {judgeNames.length > 0 && (
+          <>
+            Where{" "}
+            {judgeNames.map((name, i) => (
+              <span key={i}>
+                <styled.span fontWeight="medium" color="white">
+                  {String.fromCharCode(65 + i)}
+                </styled.span>
+                {" = "}
+                {name}
+                {i < judgeNames.length - 1 ? ", " : ""}
+              </span>
+            ))}
+          </>
+        )}
+      </styled.p>
+    </FormControl>
+  );
+};
+
 const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 const Page = () => {
@@ -338,12 +453,11 @@ const Page = () => {
       qualifyingLaps: tournament.qualifyingLaps ?? 1,
       region: tournament.region ?? Regions.UK,
       format: tournament.format ?? TournamentsFormat.STANDARD,
-      scoreFormula: tournament.scoreFormula ?? ScoreFormula.CUMULATIVE,
+      scoreFormula: tournament.scoreFormula ?? ScoreFormula.AVERAGE,
       qualifyingOrder: tournament.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       driverNumbers: tournament.driverNumbers ?? TournamentsDriverNumbers.NONE,
       ratingRequested: tournament.ratingRequested ?? false,
-      judgingInterface:
-        tournament.judgingInterface ?? JudgingInterface.SIMPLE,
+      judgingInterface: tournament.judgingInterface ?? JudgingInterface.SIMPLE,
     },
     async onSubmit(values) {
       await fetcher.submit(JSON.stringify(values), {
@@ -638,25 +752,16 @@ const Page = () => {
                   </TabGroup>
                 </FormControl>
 
-                <FormControl flex={1} error={formik.errors.scoreFormula}>
-                  <Label>What score formula should be used?</Label>
-                  <TabGroup>
-                    {Object.values(ScoreFormula).map((item) => {
-                      return (
-                        <TabButton
-                          key={item}
-                          type="button"
-                          isActive={formik.values.scoreFormula === item}
-                          onClick={() =>
-                            formik.setFieldValue("scoreFormula", item)
-                          }
-                        >
-                          {capitalCase(item)}
-                        </TabButton>
-                      );
-                    })}
-                  </TabGroup>
-                </FormControl>
+                <ScoreFormulaSelect
+                  judgeCount={formik.values.judges.length}
+                  users={users}
+                  judgeIds={formik.values.judges.map((j) => j.driverId)}
+                  value={formik.values.scoreFormula}
+                  onChange={(value) =>
+                    formik.setFieldValue("scoreFormula", value)
+                  }
+                  error={formik.errors.scoreFormula}
+                />
 
                 <SaveButton />
               </CardContent>
