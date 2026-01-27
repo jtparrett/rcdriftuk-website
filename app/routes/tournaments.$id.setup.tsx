@@ -1,7 +1,10 @@
 import { capitalCase } from "change-case";
 import { useFormik } from "formik";
 import {
+  RiClipboardLine,
   RiFileUploadLine,
+  RiLink,
+  RiRefreshLine,
   RiShieldCheckLine,
   RiShuffleLine,
   RiSwordLine,
@@ -436,6 +439,26 @@ const Page = () => {
 
   const fetcher = useFetcher();
   const csvFetcher = useFetcher();
+  const inviteFetcher = useFetcher<{ inviteCode: string }>();
+
+  const inviteCode = inviteFetcher.data?.inviteCode ?? tournament.inviteCode;
+  const inviteUrl = inviteCode
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/t/${inviteCode}`
+    : null;
+
+  const handleGenerateInviteCode = () => {
+    inviteFetcher.submit(null, {
+      method: "POST",
+      action: `/api/tournaments/${params.id}/invite-code`,
+    });
+  };
+
+  const handleCopyInviteLink = () => {
+    if (inviteUrl) {
+      navigator.clipboard.writeText(inviteUrl);
+      toast.success("Invite link copied to clipboard");
+    }
+  };
 
   const handleCsvImport = () => {
     fileInputRef.current?.click();
@@ -619,6 +642,66 @@ const Page = () => {
             </FormControl>
 
             <SaveButton />
+          </Card>
+
+          <Card overflow="visible">
+            <CardHeader gap={4}>
+              <Icon>
+                <RiLink />
+              </Icon>
+              <styled.h2 fontWeight="medium" fontSize="lg">
+                Invite Link
+              </styled.h2>
+              <Spacer />
+              {inviteCode && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  type="button"
+                  onClick={handleCopyInviteLink}
+                >
+                  Copy Link
+                  <RiClipboardLine />
+                </Button>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={handleGenerateInviteCode}
+                isLoading={inviteFetcher.state !== "idle"}
+                disabled={inviteFetcher.state !== "idle"}
+              >
+                {inviteCode ? "Regenerate" : "Generate"}
+                <RiRefreshLine />
+              </Button>
+            </CardHeader>
+
+            <CardContent p={4} display="flex" flexDir="column" gap={2}>
+              <styled.p color="gray.400" fontSize="sm">
+                Share this link with drivers to let them join the tournament.
+              </styled.p>
+              {inviteUrl ? (
+                <Box
+                  p={3}
+                  rounded="lg"
+                  bgColor="gray.800"
+                  borderWidth={1}
+                  borderColor="gray.700"
+                  fontFamily="mono"
+                  fontSize="sm"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                >
+                  {inviteUrl}
+                </Box>
+              ) : (
+                <styled.p color="gray.500" fontSize="sm">
+                  No invite link generated yet. Click "Generate" to create one.
+                </styled.p>
+              )}
+            </CardContent>
           </Card>
 
           <Card overflow="visible">

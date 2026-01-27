@@ -79,6 +79,7 @@ model Tournaments {
   userId              String?
   nextQualifyingLapId Int?                     @unique
   liveUrl             String?
+  inviteCode          String?                  @unique
   drivers             TournamentDrivers[]
   judges              TournamentJudges[]
   user                Users?                   @relation(fields: [userId], references: [id])
