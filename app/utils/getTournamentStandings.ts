@@ -133,11 +133,7 @@ const getBattleStandings = (
 
   const driverMap = new Map<number, BattleDriverStats>();
 
-  const processDriver = (
-    driver: Driver,
-    isWinner: boolean,
-    battle: Battle,
-  ) => {
+  const processDriver = (driver: Driver, isWinner: boolean, battle: Battle) => {
     if (driver.isBye) return;
 
     const driverId = driver.user.driverId;
@@ -232,8 +228,7 @@ const getBattleStandings = (
     if (lowerBracketBattles.length > 0) {
       // The Lower Final is the last lower bracket battle (round 1001)
       // The loser of the Lower Final is 3rd place
-      const lowerFinal =
-        lowerBracketBattles[lowerBracketBattles.length - 1];
+      const lowerFinal = lowerBracketBattles[lowerBracketBattles.length - 2];
 
       if (lowerFinal?.winnerId) {
         // The winner of the Lower Final is already in standings as 2nd place
