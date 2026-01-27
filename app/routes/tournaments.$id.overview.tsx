@@ -34,7 +34,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       id,
     },
     include: {
-      judges: true,
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+      drivers: {
+        select: {
+          id: true,
+          qualifyingPosition: true,
+          isBye: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              image: true,
+              driverId: true,
+            },
+          },
+        },
+      },
       battles: {
         orderBy: [
           { round: "asc" },
@@ -157,7 +176,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 const FinalResults = () => {
   const tournament = useLoaderData<typeof loader>();
-  const results = getTournamentStandings(tournament.battles).slice(0, 3);
+  const results = getTournamentStandings([
+    {
+      id: tournament.id,
+      format: tournament.format,
+      enableQualifying: tournament.enableQualifying,
+      enableBattles: tournament.enableBattles,
+      battles: tournament.battles,
+      drivers: tournament.drivers,
+    },
+  ]).slice(0, 3);
 
   return (
     <Flex w={700} maxW="full" flexDir="column" gap={2} p={2} textAlign="left">
@@ -524,7 +552,13 @@ const TournamentsOverviewPage = () => {
         >
           <Glow />
           <Box borderRadius="xl" overflow="hidden" textAlign="center">
-            {tournament.state === TournamentsState.END && <FinalResults />}
+            {tournament.state === TournamentsState.START && (
+              <Box p={6}>
+                <styled.h2 fontSize="xl" fontWeight="semibold">
+                  Waiting to start...
+                </styled.h2>
+              </Box>
+            )}
 
             {tournament?.state === TournamentsState.QUALIFYING &&
               tournament.nextQualifyingLap && (
@@ -651,6 +685,7 @@ const TournamentsOverviewPage = () => {
                               tournament.judges.length,
                               tournament.scoreFormula,
                               tournament.nextQualifyingLap.penalty,
+                              tournament.judges.map((j) => j.id),
                             )}
                           </styled.p>
                         </RightInfoBox>
@@ -676,6 +711,15 @@ const TournamentsOverviewPage = () => {
                     )}
                   </Flex>
                 </Flex>
+              )}
+
+            {tournament.state === TournamentsState.QUALIFYING &&
+              tournament.nextQualifyingLapId === null && (
+                <Box p={6}>
+                  <styled.h2 fontSize="xl" fontWeight="semibold">
+                    Qualifying Complete
+                  </styled.h2>
+                </Box>
               )}
 
             {tournament?.state === TournamentsState.BATTLES &&
@@ -888,6 +932,17 @@ const TournamentsOverviewPage = () => {
                   </Box>
                 </Flex>
               )}
+
+            {tournament?.state === TournamentsState.BATTLES &&
+              !tournament.nextBattle && (
+                <Box p={6}>
+                  <styled.h2 fontSize="xl" fontWeight="semibold">
+                    Battles Complete
+                  </styled.h2>
+                </Box>
+              )}
+
+            {tournament.state === TournamentsState.END && <FinalResults />}
           </Box>
         </Box>
       </Center>

@@ -9,6 +9,7 @@ import {
   RiCircleLine,
   RiDeleteBinFill,
   RiSearchLine,
+  RiVerifiedBadgeFill,
 } from "react-icons/ri";
 import { Button, LinkButton } from "~/components/Button";
 import {
@@ -183,20 +184,20 @@ const Page = () => {
 
         <Flex gap={2} mb={2}>
           <Spacer />
-          <Button variant="outline" onClick={toggleMyTournaments}>
+          <Button variant="outline" onClick={toggleMyTournaments} pr={3}>
+            My Tournaments
             <styled.span
               style={{
                 color: isMyTournaments
-                  ? token("colors.brand.500")
+                  ? token("colors.green.500")
                   : token("colors.white"),
               }}
             >
               {isMyTournaments ? <RiCheckboxCircleFill /> : <RiCircleLine />}
             </styled.span>
-            My Tournaments
           </Button>
           <LinkButton to="/tournaments/new" size="sm">
-            Create <RiAddCircleFill />
+            Create New <RiAddCircleFill />
           </LinkButton>
         </Flex>
 
@@ -220,7 +221,7 @@ const Page = () => {
               gradientFrom="gray.900"
               gradientTo="black"
             >
-              <Flex>
+              <Flex alignItems="center" gap={1}>
                 <Box>
                   <LinkOverlay to={`/tournaments/${tournament.id}/overview`}>
                     <styled.span fontWeight="medium" fontSize="lg">
@@ -244,10 +245,29 @@ const Page = () => {
                   </Flex>
                 </Box>
                 <Spacer />
+                {tournament.rated && (
+                  <Flex
+                    bgColor="brand.900"
+                    rounded="full"
+                    borderWidth={1}
+                    borderColor="brand.800"
+                    color="brand.400"
+                    pl={2}
+                    pr={2.5}
+                    py={1}
+                    alignItems="center"
+                    gap={1}
+                    fontSize="sm"
+                    fontWeight="medium"
+                  >
+                    <RiVerifiedBadgeFill /> <styled.span>Rated</styled.span>
+                  </Flex>
+                )}
                 <LinkButton
                   variant="ghost"
                   pos="relative"
                   zIndex={3}
+                  size="sm"
                   to={`/tournaments/new?tournamentId=${tournament.id}`}
                 >
                   <RiCheckboxMultipleBlankFill />
@@ -257,6 +277,7 @@ const Page = () => {
                     variant="ghost"
                     pos="relative"
                     zIndex={3}
+                    size="sm"
                     to={`/tournaments-archive/${tournament.id}`}
                   >
                     <RiDeleteBinFill />

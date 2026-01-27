@@ -12,10 +12,11 @@ import {
 } from "react-router";
 import { ClerkProvider } from "@clerk/react-router";
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
+import { Toaster } from "sonner";
 
 import "./index.css";
 import { Header } from "./components/Header";
-import { rootAuthLoader } from "@clerk/react-router/ssr.server";
+import { rootAuthLoader, clerkMiddleware } from "@clerk/react-router/server";
 import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { Button, LinkButton } from "./components/Button";
@@ -28,10 +29,12 @@ import { AppProvider } from "./utils/AppContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { AppName } from "./utils/enums";
+
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -255,6 +258,8 @@ function App({
               <Outlet />
 
               {!isMap && !isEmbed && !isApp && <Footer />}
+
+              <Toaster position="top-center" />
             </EmbedProvider>
           </AppProvider>
         </PostHogProvider>

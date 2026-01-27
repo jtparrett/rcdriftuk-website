@@ -8,7 +8,7 @@ const ButtonStyles = cva({
     px: 4,
     rounded: "xl",
     display: "inline-flex",
-    gap: 2,
+    gap: 1.5,
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "semibold",
@@ -23,6 +23,9 @@ const ButtonStyles = cva({
       cursor: "not-allowed",
     },
     whiteSpace: "nowrap",
+    "& svg": {
+      fontSize: "16px",
+    },
   },
   variants: {
     size: {

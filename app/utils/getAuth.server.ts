@@ -1,4 +1,4 @@
-import { getAuth as getAuthClerk } from "@clerk/react-router/ssr.server";
+import { getAuth as getAuthClerk } from "@clerk/react-router/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 
 const generateNewRequestForClerk = (request: Request) => {

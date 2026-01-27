@@ -1,13 +1,7 @@
 import { prisma } from "./prisma.server";
 import invariant from "./invariant";
-import {
-  QualifyingOrder,
-  QualifyingProcedure,
-  TournamentsState,
-} from "./enums";
-import { sumScores } from "./sumScores";
-import { getQualifyingWaveSize } from "./tournament";
-import { pow2Floor } from "./powFns";
+import { TournamentsState } from "./enums";
+import { findNextIncompleteQualifyingLap } from "./findNextIncompleteQualifyingLap";
 
 export const tournamentAdvanceQualifying = async (
   id: string,
@@ -43,100 +37,10 @@ export const tournamentAdvanceQualifying = async (
     "Judging not complete for current lap",
   );
 
-  let nextQualifyingLap = await prisma.laps.findFirst({
-    where: {
-      driver: {
-        tournamentId: id,
-      },
-      scores: {
-        none: {},
-      },
-    },
-    orderBy:
-      tournament.qualifyingOrder === QualifyingOrder.DRIVERS
-        ? [
-            {
-              tournamentDriverId: "asc",
-            },
-            { id: "asc" },
-          ]
-        : [{ id: "asc" }],
-  });
-
-  if (
-    !nextQualifyingLap &&
-    tournament.qualifyingProcedure === QualifyingProcedure.WAVES &&
-    tournament.nextQualifyingLap &&
-    tournament.nextQualifyingLap.round < tournament.qualifyingLaps
-  ) {
-    const roundDrivers = await prisma.tournamentDrivers.findMany({
-      where: {
-        tournamentId: id,
-        laps: {
-          some: {
-            round: tournament.nextQualifyingLap.round,
-          },
-        },
-      },
-      orderBy: {
-        id: "asc",
-      },
-      include: {
-        laps: {
-          take: 1,
-          where: {
-            round: tournament.nextQualifyingLap.round,
-          },
-          include: {
-            scores: true,
-          },
-        },
-      },
-    });
-
-    const sortedDrivers = roundDrivers.sort((a, b) => {
-      const [aLap] = a.laps;
-      const [bLap] = b.laps;
-
-      const aScore = sumScores(
-        aLap.scores,
-        tournament._count.judges,
-        tournament.scoreFormula,
-        aLap.penalty,
-      );
-
-      const bScore = sumScores(
-        bLap.scores,
-        tournament._count.judges,
-        tournament.scoreFormula,
-        bLap.penalty,
-      );
-
-      return bScore - aScore || a.id - b.id;
-    });
-
-    const waveSize = getQualifyingWaveSize(
-      tournament.qualifyingLaps,
-      tournament.nextQualifyingLap.round,
-    );
-
-    const remainingDrivers = [...sortedDrivers].slice(
-      pow2Floor(tournament.drivers.length) * waveSize,
-    );
-
-    const nextRound = tournament.nextQualifyingLap.round + 1;
-
-    [nextQualifyingLap] = await prisma.laps.createManyAndReturn({
-      data: remainingDrivers
-        .sort((a, b) => a.id - b.id)
-        .map((driver) => {
-          return {
-            tournamentDriverId: driver.id,
-            round: nextRound,
-          };
-        }),
-    });
-  }
+  const nextQualifyingLap = await findNextIncompleteQualifyingLap(
+    id,
+    tournament.qualifyingOrder,
+  );
 
   await prisma.tournaments.update({
     where: {

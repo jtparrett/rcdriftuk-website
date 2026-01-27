@@ -2,50 +2,7 @@ import { TournamentsState } from "~/utils/enums";
 import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
-
-const advanceToNextBattle = async (tournamentId: string) => {
-  const nextBattle = await prisma.tournamentBattles.findFirst({
-    where: {
-      tournamentId,
-      winnerId: null,
-    },
-    orderBy: [
-      { round: "asc" },
-      { bracket: "asc" },
-      {
-        id: "asc",
-      },
-    ],
-    select: {
-      id: true,
-    },
-  });
-
-  if (!nextBattle) {
-    await prisma.tournaments.update({
-      where: {
-        id: tournamentId,
-      },
-      data: {
-        nextBattleId: null,
-        state: TournamentsState.END,
-      },
-    });
-
-    return null;
-  }
-
-  await prisma.tournaments.update({
-    where: {
-      id: tournamentId,
-    },
-    data: {
-      nextBattleId: nextBattle.id,
-    },
-  });
-
-  return null;
-};
+import { commitBattleWinner } from "~/utils/commitBattleWinner";
 
 export const tournamentAdvanceBattles = async (id: string) => {
   const tournament = await prisma.tournaments.findFirst({
@@ -61,16 +18,15 @@ export const tournamentAdvanceBattles = async (id: string) => {
 
   invariant(tournament, "Tournament not found");
 
-  if (!tournament.nextBattleId || !tournament.nextBattle) {
-    // End the comp!
-    await advanceToNextBattle(id);
-
+  if (!tournament.nextBattle) {
+    // battles are over
     return null;
   }
 
+  // Verify all judges have voted before proceeding
   const totalVotes = await prisma.tournamentBattleVotes.findMany({
     where: {
-      battleId: tournament.nextBattleId,
+      battleId: tournament.nextBattle.id,
     },
     select: {
       judgeId: true,
@@ -78,130 +34,55 @@ export const tournamentAdvanceBattles = async (id: string) => {
     distinct: ["judgeId"],
   });
 
-  invariant(totalVotes.length >= tournament.judges.length, "Still judging bro");
+  invariant(
+    totalVotes.length >= tournament.judges.length,
+    "Judging not complete for current battle",
+  );
 
-  const battleVotesLeft = await prisma.tournamentBattleVotes.findMany({
-    where: {
-      battleId: tournament.nextBattleId,
-      winnerId: tournament.nextBattle.driverLeftId,
-    },
-    orderBy: {
-      id: "desc",
-    },
-    select: {
-      judgeId: true,
-    },
-    distinct: ["judgeId"],
-  });
+  // Commit the battle winner
+  const result = await commitBattleWinner(
+    tournament.nextBattle,
+    tournament.judges,
+  );
 
-  const battleVotesRight = await prisma.tournamentBattleVotes.findMany({
-    where: {
-      battleId: tournament.nextBattleId,
-      winnerId: tournament.nextBattle.driverRightId,
-    },
-    orderBy: {
-      id: "desc",
-    },
-    select: {
-      judgeId: true,
-    },
-    distinct: ["judgeId"],
-  });
-
-  const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
-
-  const winnerId =
-    battleVotesLeft.length >= winThreshold
-      ? tournament.nextBattle.driverLeftId
-      : battleVotesRight.length >= winThreshold
-        ? tournament.nextBattle.driverRightId
-        : undefined;
-
-  const loserId =
-    tournament.nextBattle.driverLeftId === winnerId
-      ? tournament.nextBattle.driverRightId
-      : tournament.nextBattle.driverLeftId;
-
-  if (!winnerId) {
+  if (!result) {
     // It's OMT - Delete all votes and go again
     await prisma.tournamentBattleVotes.deleteMany({
       where: {
-        battleId: tournament.nextBattleId,
+        battleId: tournament.nextBattle.id,
       },
     });
 
     return null;
   }
 
-  await prisma.tournamentBattles.update({
+  // Find the next battle without a winner
+  const nextBattle = await prisma.tournamentBattles.findFirst({
     where: {
-      id: tournament.nextBattleId,
+      tournamentId: id,
+      winnerId: null,
     },
-    data: {
-      winnerId,
+    orderBy: [
+      { round: "asc" },
+      { bracket: "asc" },
+      {
+        id: "asc",
+      },
+    ],
+    select: {
+      id: true,
     },
   });
 
-  if (tournament.nextBattle.winnerNextBattleId) {
-    const nextWinnerBattle = await prisma.tournamentBattles.findFirst({
-      where: {
-        id: tournament.nextBattle.winnerNextBattleId,
-      },
-    });
-
-    if (nextWinnerBattle?.driverLeftId === null) {
-      await prisma.tournamentBattles.update({
-        where: {
-          id: nextWinnerBattle.id,
-        },
-        data: {
-          driverLeftId: winnerId,
-        },
-      });
-    } else if (nextWinnerBattle?.driverRightId === null) {
-      await prisma.tournamentBattles.update({
-        where: {
-          id: nextWinnerBattle.id,
-        },
-        data: {
-          driverRightId: winnerId,
-        },
-      });
-    }
-  }
-
-  if (tournament.nextBattle.loserNextBattleId) {
-    const nextLoserBattle = await prisma.tournamentBattles.findFirst({
-      where: {
-        id: tournament.nextBattle.loserNextBattleId,
-      },
-    });
-
-    if (nextLoserBattle?.driverLeftId === null) {
-      await prisma.tournamentBattles.update({
-        where: {
-          id: nextLoserBattle.id,
-        },
-        data: {
-          driverLeftId: loserId,
-        },
-      });
-    } else if (nextLoserBattle?.driverRightId === null) {
-      await prisma.tournamentBattles.update({
-        where: {
-          id: nextLoserBattle.id,
-        },
-        data: {
-          driverRightId: loserId,
-        },
-      });
-    }
-  }
-
-  await advanceToNextBattle(id);
+  await prisma.tournaments.update({
+    where: {
+      id,
+    },
+    data: {
+      nextBattleId: nextBattle?.id ?? null,
+    },
+  });
 
   // After advancing, check if the next battle is a bye run that needs auto-advancement
   await autoAdvanceByeRuns(id);
-
-  return null;
 };

@@ -1,10 +1,5 @@
 import { useUser } from "@clerk/react-router";
-import {
-  BattlesBracket,
-  QualifyingProcedure,
-  TournamentsFormat,
-  TournamentsState,
-} from "~/utils/enums";
+import { BattlesBracket, TournamentsState } from "~/utils/enums";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import {
   Form,
@@ -32,60 +27,62 @@ import { ably as AblyClient } from "~/utils/ably";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { prisma } from "~/utils/prisma.server";
-import { tournamentEndQualifying } from "~/utils/tournamentEndQualifying.server";
 import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
 import {
+  RiBubbleChartLine,
+  RiCheckboxCircleFill,
   RiExchangeLine,
   RiFlagLine,
   RiFullscreenFill,
   RiOpenArmLine,
   RiRemoteControlLine,
+  RiSettings2Line,
   RiShareForwardFill,
+  RiShieldCheckLine,
   RiShuffleLine,
+  RiSwordLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab } from "~/components/Tab";
 import { TabsBar } from "~/components/TabsBar";
-import { getUser, type GetUser } from "~/utils/getUser.server";
+import { getUser } from "~/utils/getUser.server";
 import { useEffect, useState } from "react";
 import pluralize from "pluralize";
 import { AppName } from "~/utils/enums";
 import { tournamentAdvanceQualifying } from "~/utils/tournamentAdvanceQualifying";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { tournamentHasQualifying } from "./tournaments.new";
+import { DashedLine } from "~/components/DashedLine";
+import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
+import { tournamentStart } from "~/utils/tournamentStart";
+import { setQualifyingPositions } from "~/utils/setQualifyingPositions";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
-
-  let user: GetUser | null = null;
   const tournament = await getTournament(id);
 
-  if (!tournament) {
-    throw new Response(null, {
-      status: 404,
-      statusText: "Not Found",
-    });
-  }
+  notFoundInvariant(tournament, "Tournament not found");
+
+  let isJudge = false;
+  let isBattlingDriver = false;
 
   if (userId) {
-    user = await getUser(userId);
-  }
+    const user = await getUser(userId);
 
-  const tournamentJudge = tournament.judges.find(
-    (judge) => judge.user.id === userId,
-  );
-  const isBattlingDriver =
-    !!userId &&
-    (tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
-      tournament.nextBattle?.driverRight?.driverId === user?.driverId);
+    isJudge =
+      tournament.judges.find((judge) => judge.user.id === userId) !== undefined;
+
+    isBattlingDriver =
+      tournament.nextBattle?.driverLeft?.driverId === user?.driverId ||
+      tournament.nextBattle?.driverRight?.driverId === user?.driverId;
+  }
 
   return {
     tournament,
-    tournamentJudge,
+    isJudge,
     isBattlingDriver,
   };
 };
@@ -131,27 +128,62 @@ export const action = async (args: ActionFunctionArgs) => {
     "Protests must be resolved before continuing",
   );
 
-  if (
-    tournament.state === TournamentsState.QUALIFYING &&
-    tournament.nextQualifyingLapId === null
-  ) {
-    await tournamentEndQualifying(id);
+  // Handle START state - transition to QUALIFYING or BATTLES
+  if (tournament.state === TournamentsState.START) {
+    await tournamentStart(id);
 
     publishUpdate();
 
     return redirect(referer);
   }
 
-  if (tournament.state === TournamentsState.QUALIFYING) {
+  if (
+    tournament.state === TournamentsState.QUALIFYING &&
+    tournament.nextQualifyingLapId !== null
+  ) {
     await tournamentAdvanceQualifying(id);
+
+    publishUpdate();
+
+    return redirect(referer);
+  }
+
+  if (
+    tournament.state === TournamentsState.QUALIFYING &&
+    tournament.nextQualifyingLapId === null
+  ) {
+    // Set qualifying positions for all drivers before transitioning
+    await setQualifyingPositions(id);
+
+    // Enter battles state
+    await tournamentSeedBattles(id);
+
+    publishUpdate();
+
+    return redirect(referer);
+  }
+
+  if (
+    tournament.state === TournamentsState.BATTLES &&
+    tournament.nextBattleId !== null
+  ) {
+    await tournamentAdvanceBattles(id);
 
     publishUpdate();
   }
 
-  if (tournament.state === TournamentsState.BATTLES) {
-    await tournamentAdvanceBattles(id);
-
-    publishUpdate();
+  if (
+    tournament.state === TournamentsState.BATTLES &&
+    tournament.nextBattleId === null
+  ) {
+    await prisma.tournaments.update({
+      where: {
+        id,
+      },
+      data: {
+        state: TournamentsState.END,
+      },
+    });
   }
 
   return redirect(referer);
@@ -168,7 +200,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
 };
 
 const TournamentPage = () => {
-  const { tournament, tournamentJudge, isBattlingDriver } =
+  const { tournament, isJudge, isBattlingDriver } =
     useLoaderData<typeof loader>();
   const location = useLocation();
   const transition = useNavigation();
@@ -176,27 +208,17 @@ const TournamentPage = () => {
   const isLoading =
     transition.state === "submitting" || transition.state === "loading";
   const isSubmitting = transition.state === "submitting";
+
+  const isSetupTab = location.pathname.includes("setup");
+  const isJudgeTab = location.pathname.includes("judge");
   const isOverviewTab = location.pathname.includes("overview");
   const isQualifyingTab = location.pathname.includes("qualifying");
   const isBattlesTab = location.pathname.includes("battles");
   const isStandingsTab = location.pathname.includes("standings");
+
   const { user } = useUser();
 
   const isOwner = user?.id === tournament.userId;
-  const winThreshold = Math.floor(tournament.judges.length / 2 + 1);
-
-  const leftVotes =
-    tournament.nextBattle?.BattleVotes.filter(
-      (vote) => vote.winnerId === tournament.nextBattle?.driverLeftId,
-    ) ?? [];
-  const rightVotes =
-    tournament.nextBattle?.BattleVotes.filter(
-      (vote) => vote.winnerId === tournament.nextBattle?.driverRightId,
-    ) ?? [];
-
-  const isOMT =
-    leftVotes.length < winThreshold && rightVotes.length < winThreshold;
-
   const protestingEnabled = tournament.enableProtests;
   const hasProtest = (tournament.nextBattle?.BattleProtests.length ?? 0) > 0;
   const hasUnresolvedProtest =
@@ -205,12 +227,13 @@ const TournamentPage = () => {
     ) ?? false;
 
   const judgingCompleteForNextBattle =
+    tournament.nextBattle === null ||
     (tournament.nextBattle?.BattleVotes.length ?? 0) >=
-    tournament.judges.length;
+      tournament.judges.length;
   const judgingCompleteAt = judgingCompleteForNextBattle
     ? tournament.nextBattle?.BattleVotes.sort(
         (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
-      )[0].updatedAt
+      )[0]?.updatedAt
     : null;
 
   const getProtestSecondsRemaining = () => {
@@ -251,8 +274,8 @@ const TournamentPage = () => {
           <Container maxW={1100} px={2}>
             <Flex alignItems="center" gap={2}>
               <styled.h1
-                fontSize="xl"
-                fontWeight="bold"
+                fontSize="lg"
+                fontWeight="extrabold"
                 overflow="hidden"
                 textOverflow="ellipsis"
                 whiteSpace="nowrap"
@@ -324,34 +347,63 @@ const TournamentPage = () => {
 
       <HiddenEmbed>
         <TabsBar>
+          {isOwner && (
+            <Tab
+              to={`/tournaments/${tournament.id}/setup`}
+              isActive={isSetupTab}
+              data-replace="true"
+              replace
+            >
+              <RiSettings2Line />
+              Setup
+            </Tab>
+          )}
+
+          {isJudge && (
+            <Tab
+              to={`/tournaments/${tournament.id}/judge`}
+              isActive={isJudgeTab}
+              data-replace="true"
+              replace
+            >
+              <RiRemoteControlLine />
+              Judge
+            </Tab>
+          )}
+
           <Tab
             to={`/tournaments/${tournament.id}/overview`}
             isActive={isOverviewTab}
             data-replace="true"
             replace
           >
+            <RiBubbleChartLine />
             Overview
           </Tab>
-          {tournamentHasQualifying(tournament.format) && (
+
+          {tournament.enableQualifying && (
             <Tab
-              to={`/tournaments/${tournament.id}/qualifying/${tournament.qualifyingProcedure === QualifyingProcedure.BEST ? 0 : 1}`}
+              to={`/tournaments/${tournament.id}/qualifying/0`}
               isActive={isQualifyingTab}
               data-replace="true"
               replace
             >
+              <RiShieldCheckLine />
               Qualifying
             </Tab>
           )}
-          <Tab
-            to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
-            isActive={isBattlesTab}
-            data-replace="true"
-            replace
-          >
-            Battles
-          </Tab>
-          {(tournament.state === TournamentsState.END ||
-            tournament.format === TournamentsFormat.EXHIBITION) && (
+          {tournament.enableBattles && (
+            <Tab
+              to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+              isActive={isBattlesTab}
+              data-replace="true"
+              replace
+            >
+              <RiSwordLine />
+              Battles
+            </Tab>
+          )}
+          {tournament.state === TournamentsState.END && (
             <Tab
               to={`/tournaments/${tournament.id}/standings`}
               isActive={isStandingsTab}
@@ -415,6 +467,28 @@ const TournamentPage = () => {
             >
               <Spacer />
 
+              {!tournament.rated &&
+                tournament.ratingRequested &&
+                tournament.state === TournamentsState.END && (
+                  <Flex
+                    alignSelf="center"
+                    color="brand.500"
+                    py={1.5}
+                    pl={4}
+                    pr={2.5}
+                    borderWidth={1}
+                    borderColor="brand.500"
+                    rounded="full"
+                    gap={2}
+                    alignItems="center"
+                  >
+                    <styled.p fontWeight="medium" fontSize="sm">
+                      Rating Pending
+                    </styled.p>
+                    <RiExchangeLine />
+                  </Flex>
+                )}
+
               {isOwner && secondsRemaining > 0 && (
                 <Box
                   rounded="full"
@@ -431,27 +505,6 @@ const TournamentPage = () => {
                 </Box>
               )}
 
-              {isOwner &&
-                tournament.state === TournamentsState.BATTLES &&
-                tournament.format === TournamentsFormat.EXHIBITION &&
-                judgingCompleteForNextBattle &&
-                !isOMT &&
-                !hasUnresolvedProtest && (
-                  <>
-                    <LinkButton
-                      to={`/tournaments/${tournament.id}/battles/create`}
-                    >
-                      Create Next Battle <RiFlagLine />
-                    </LinkButton>
-                    <LinkButton
-                      to={`/tournaments/${tournament.id}/end`}
-                      variant="outline"
-                    >
-                      End Tournament
-                    </LinkButton>
-                  </>
-                )}
-
               {isBattlingDriver &&
                 protestingEnabled &&
                 judgingCompleteForNextBattle &&
@@ -465,46 +518,26 @@ const TournamentPage = () => {
                   </LinkButton>
                 )}
 
-              {isOwner &&
-                tournament.state === TournamentsState.QUALIFYING &&
-                tournament.qualifyingProcedure === QualifyingProcedure.BEST && (
-                  <LinkButton
-                    variant="outline"
-                    to={`/tournaments/${tournament.id}/randomise`}
+              {isOwner && tournament.state === TournamentsState.START && (
+                <Form method="post">
+                  <Button
+                    type="submit"
+                    w={{ base: "full", sm: "auto" }}
+                    disabled={isLoading || isSubmitting}
+                    isLoading={isSubmitting}
                   >
-                    Randomise Qualifying <RiShuffleLine />
-                  </LinkButton>
-                )}
+                    Start Tournament <RiCheckboxCircleFill />
+                  </Button>
+                </Form>
+              )}
 
-              {isOwner &&
-                tournament.state === TournamentsState.END &&
-                tournament.rated === false &&
-                !tournament.ratingRequestedAt && (
-                  <LinkButton
-                    to={`/tournaments/${tournament.id}/request-rating`}
-                  >
-                    Request Rating <RiExchangeLine />
-                  </LinkButton>
-                )}
-
-              {!tournament.rated && tournament.ratingRequestedAt && (
-                <Flex
-                  alignSelf="center"
-                  color="brand.500"
-                  py={1.5}
-                  pl={4}
-                  pr={2.5}
-                  borderWidth={1}
-                  borderColor="brand.500"
-                  rounded="full"
-                  gap={2}
-                  alignItems="center"
+              {isOwner && tournament.state === TournamentsState.QUALIFYING && (
+                <LinkButton
+                  variant="outline"
+                  to={`/tournaments/${tournament.id}/randomise`}
                 >
-                  <styled.p fontWeight="medium" fontSize="sm">
-                    Rating Pending
-                  </styled.p>
-                  <RiExchangeLine />
-                </Flex>
+                  Randomise <RiShuffleLine />
+                </LinkButton>
               )}
 
               {isOwner &&
@@ -542,7 +575,6 @@ const TournamentPage = () => {
               {isOwner &&
                 tournament.state === TournamentsState.BATTLES &&
                 judgingCompleteForNextBattle &&
-                tournament.format !== TournamentsFormat.EXHIBITION &&
                 !hasUnresolvedProtest &&
                 secondsRemaining <= 0 && (
                   <Form method="post">
@@ -552,28 +584,27 @@ const TournamentPage = () => {
                       disabled={isLoading || isSubmitting}
                       isLoading={isSubmitting}
                     >
-                      Start Next Battle <RiFlagLine />
+                      {tournament.nextBattle
+                        ? "Start Next Battle"
+                        : "End Tournament"}{" "}
+                      <RiFlagLine />
                     </Button>
                   </Form>
                 )}
-
-              {tournamentJudge && (
-                <LinkButton
-                  to={`/judge/${tournamentJudge.id}`}
-                  variant="outline"
-                >
-                  Open Judges Remote <RiRemoteControlLine />
-                </LinkButton>
-              )}
             </Flex>
           </Container>
+          {isOwner && tournament.state !== TournamentsState.END && (
+            <Box pt={2}>
+              <DashedLine />
+            </Box>
+          )}
         </Box>
       </HiddenEmbed>
 
       {isEmbed ? (
         <Outlet />
       ) : (
-        <Container pb={12} px={2} maxW={1100}>
+        <Container pb={4} px={2} maxW={1100}>
           <Outlet />
         </Container>
       )}

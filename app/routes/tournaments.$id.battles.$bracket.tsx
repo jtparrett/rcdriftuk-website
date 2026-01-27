@@ -14,12 +14,16 @@ import { Glow } from "~/components/Glow";
 import { sentenceCase } from "change-case";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
+import { getAuth } from "~/utils/getAuth.server";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const id = z.string().parse(params.id);
+export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
   const bracket = z
     .nativeEnum(BattlesBracket)
-    .parse(params.bracket?.toUpperCase());
+    .parse(args.params.bracket?.toUpperCase());
+
+  const { userId } = await getAuth(args);
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
     where: {
@@ -75,10 +79,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return {
-    tournament,
-    bracket,
-  };
+  const isOwner = tournament.userId === userId;
+
+  return { tournament, bracket, isOwner };
 };
 
 type Battle = Awaited<
@@ -146,19 +149,17 @@ export const Driver = ({
         }
         pr={2}
       >
-        <Link to={`/drivers/${driver?.user.driverId}`}>
-          {driver?.user.firstName} {driver?.user.lastName}{" "}
-          {driverNo !== undefined && (
-            <styled.span color="gray.600">({driverNo})</styled.span>
-          )}
-        </Link>
+        {driver?.user.firstName} {driver?.user.lastName}{" "}
+        {driverNo !== undefined && (
+          <styled.span color="gray.600">({driverNo})</styled.span>
+        )}
       </styled.p>
     </Flex>
   );
 };
 
 const TournamentBattlesPage = () => {
-  const { tournament, bracket } = useLoaderData<typeof loader>();
+  const { tournament, bracket, isOwner } = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
   const [searchParams] = useSearchParams();
   const maxBattlesToShow =
@@ -188,10 +189,6 @@ const TournamentBattlesPage = () => {
 
   const battlesInRound = Object.values(battlesByRound).reduce<Battle[][]>(
     (agg, battles) => {
-      if (tournament.format === TournamentsFormat.EXHIBITION) {
-        return [battles];
-      }
-
       const n = Math.log2(battles.length);
       const isOddRound = n - Math.floor(n) !== 0;
 
@@ -217,7 +214,7 @@ const TournamentBattlesPage = () => {
     <>
       <HiddenEmbed>
         {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
-          <TabGroup mb={4}>
+          <TabGroup mb={2}>
             {Object.values(BattlesBracket).map((sub) => {
               return (
                 <Tab
@@ -256,11 +253,6 @@ const TournamentBattlesPage = () => {
           bgRepeat="repeat"
           bgSize="16px"
           bgPosition="center"
-          justifyContent={
-            tournament.format === TournamentsFormat.EXHIBITION
-              ? "center"
-              : undefined
-          }
         >
           {tournament.battles.length <= 0 && (
             <styled.p textAlign="center" w="full">
@@ -271,20 +263,18 @@ const TournamentBattlesPage = () => {
           {battlesInRound.map((battles, i) => {
             return (
               <Box key={i} w={220} flex="none">
-                {tournament.format !== TournamentsFormat.EXHIBITION && (
-                  <styled.p
-                    fontSize="sm"
-                    textAlign="center"
-                    textTransform="uppercase"
-                    fontWeight="bold"
-                  >
-                    {getBracketName(
-                      battles[0].round,
-                      battles[0].bracket,
-                      battles.length,
-                    )}
-                  </styled.p>
-                )}
+                <styled.p
+                  fontSize="sm"
+                  textAlign="center"
+                  textTransform="uppercase"
+                  fontWeight="bold"
+                >
+                  {getBracketName(
+                    battles[0].round,
+                    battles[0].bracket,
+                    battles.length,
+                  )}
+                </styled.p>
 
                 <Flex
                   flexDir="column"
@@ -299,9 +289,7 @@ const TournamentBattlesPage = () => {
                     return (
                       <Fragment key={battle.id}>
                         <Box position="relative" flex="none" zIndex={1}>
-                          {(battles.length <= 1 ||
-                            tournament.format ===
-                              TournamentsFormat.EXHIBITION) && (
+                          {battles.length <= 1 && (
                             <Box
                               pos="absolute"
                               top="50%"
@@ -324,8 +312,19 @@ const TournamentBattlesPage = () => {
                             overflow="hidden"
                             bgColor="gray.950"
                             shadow="0 4px 12px black"
+                            _hover={{
+                              borderColor: "brand.500",
+                            }}
                             zIndex={0}
                           >
+                            {isOwner && (
+                              <LinkOverlay
+                                to={`/tournaments/${tournament.id}/activate/battle/${battle.id}`}
+                              >
+                                <styled.span srOnly>{battle.id}</styled.span>
+                              </LinkOverlay>
+                            )}
+
                             {isNextBattle && <Glow size="sm" />}
                             <Driver
                               driver={battle.driverLeft}
@@ -340,9 +339,7 @@ const TournamentBattlesPage = () => {
                           </Box>
                         </Box>
 
-                        {i % 2 === 0 &&
-                        battles.length > 1 &&
-                        tournament.format !== TournamentsFormat.EXHIBITION ? (
+                        {i % 2 === 0 && battles.length > 1 ? (
                           <Box
                             borderRightWidth={1}
                             borderTopWidth={1}

@@ -1,13 +1,23 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect, useLoaderData } from "react-router";
 import { Outlet, useLocation, useParams } from "react-router";
-import { endOfWeek, format, isThisWeek, parse, startOfWeek } from "date-fns";
+import {
+  add,
+  endOfWeek,
+  format,
+  isThisWeek,
+  parse,
+  startOfWeek,
+  sub,
+} from "date-fns";
 import { Tab } from "~/components/Tab";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import type { Route } from "./+types/calendar.$region";
 import { TabsBar } from "~/components/TabsBar";
 import { AppName, Regions } from "~/utils/enums";
 import { z } from "zod";
+import { LinkButton } from "~/components/Button";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 
 export const meta: Route.MetaFunction = ({ params }) => {
   const today = format(new Date(), "dd-MM-yy");
@@ -73,15 +83,43 @@ const CalendarPage = () => {
 
   const getDate = () => {
     if (increment === "day") {
-      return format(date, "EEEE | MMM do | yyyy");
+      return format(date, "EEEE, do MMMM, yyyy");
     }
 
     if (increment === "week") {
-      return `${format(startWeekDate, "do")}-${format(endWeekDate, "do MMM | yyyy")}`;
+      return `${format(startWeekDate, "do")} / ${format(endWeekDate, "do MMMM, yyyy")}`;
     }
 
     if (increment === "month") {
-      return format(date, "MMMM | yyyy");
+      return format(date, "MMMM, yyyy");
+    }
+  };
+
+  const nextDate = () => {
+    if (increment === "day") {
+      return format(add(date, { days: 1 }), "dd-MM-yy");
+    }
+
+    if (increment === "week") {
+      return format(add(date, { weeks: 1 }), "dd-MM-yy");
+    }
+
+    if (increment === "month") {
+      return format(add(date, { months: 1 }), "dd-MM-yy");
+    }
+  };
+
+  const previousDate = () => {
+    if (increment === "day") {
+      return format(sub(date, { days: 1 }), "dd-MM-yy");
+    }
+
+    if (increment === "week") {
+      return format(sub(date, { weeks: 1 }), "dd-MM-yy");
+    }
+
+    if (increment === "month") {
+      return format(sub(date, { months: 1 }), "dd-MM-yy");
     }
   };
 
@@ -106,14 +144,6 @@ const CalendarPage = () => {
       <Box borderBottomWidth={1} borderColor="gray.900">
         <Container px={2} maxW={1100}>
           <Flex gap={0.5} py={2} alignItems="center">
-            <styled.span
-              flex={1}
-              overflow="hidden"
-              textOverflow="ellipsis"
-              whiteSpace="nowrap"
-            >
-              {getDate()}
-            </styled.span>
             <Tab
               isActive={location.pathname.includes(
                 `/calendar/${params.region}/day`,
@@ -144,11 +174,58 @@ const CalendarPage = () => {
             >
               Month
             </Tab>
+
+            <Spacer />
+
+            <LinkButton
+              size="sm"
+              variant="outline"
+              to={`/calendar/${region}/${increment}/${previousDate()}`}
+              data-replace="true"
+              replace
+              h={10}
+            >
+              <RiArrowLeftSLine />
+            </LinkButton>
+            <LinkButton
+              size="sm"
+              variant="outline"
+              to={`/calendar/${region}/${increment}/${today}`}
+              h={10}
+              data-replace="true"
+              replace
+            >
+              Today
+            </LinkButton>
+            <LinkButton
+              size="sm"
+              variant="outline"
+              to={`/calendar/${region}/${increment}/${nextDate()}`}
+              h={10}
+              data-replace="true"
+              replace
+            >
+              <RiArrowRightSLine />
+            </LinkButton>
           </Flex>
         </Container>
       </Box>
 
       <Container px={2} maxW={1100} py={2}>
+        <Box
+          mx="auto"
+          bgColor="gray.900"
+          rounded="full"
+          py={2}
+          px={4}
+          borderWidth={1}
+          borderColor="gray.800"
+          w="fit-content"
+          textAlign="center"
+        >
+          <styled.p fontWeight="semibold">{getDate()}</styled.p>
+        </Box>
+
         <Outlet />
       </Container>
     </>

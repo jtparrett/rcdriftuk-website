@@ -1,17 +1,10 @@
 import type { Tournaments } from "@prisma/client";
-import {
-  BattlesBracket,
-  QualifyingProcedure,
-  TournamentsFormat,
-  TournamentsState,
-} from "~/utils/enums";
+import { BattlesBracket, TournamentsState } from "~/utils/enums";
 import invariant from "~/utils/invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
-import { pow2Ceil, pow2Floor } from "~/utils/powFns";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
-import { getQualifyingWaveSize } from "~/utils/tournament";
 
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
@@ -35,25 +28,30 @@ const addByeDriverToTournament = async (
 };
 
 // Only run this if you're sure all laps have been judged
-export const tournamentEndQualifying = async (id: string) => {
-  const tournament = await prisma.tournaments.update({
+export const tournamentSeedBattles = async (id: string) => {
+  const tournament = await prisma.tournaments.findUnique({
     where: {
       id,
-    },
-    data: {
-      state: TournamentsState.BATTLES,
-      nextQualifyingLapId: null,
     },
     select: {
       id: true,
       scoreFormula: true,
-      fullInclusion: true,
+      bracketSize: true,
       format: true,
       qualifyingLaps: true,
-      qualifyingProcedure: true,
+      enableBattles: true,
+      enableQualifying: true,
       _count: {
         select: {
           judges: true,
+        },
+      },
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
         },
       },
       drivers: {
@@ -73,17 +71,37 @@ export const tournamentEndQualifying = async (id: string) => {
 
   invariant(tournament, "Missing tournament");
 
+  const judgeIds = tournament.judges.map((j) => j.id);
+
+  await prisma.tournaments.update({
+    where: {
+      id,
+    },
+    data: {
+      state: tournament.enableBattles
+        ? TournamentsState.BATTLES
+        : TournamentsState.END,
+      nextQualifyingLapId: null,
+    },
+  });
+
+  if (!tournament.enableBattles) {
+    return;
+  }
+
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
 
-  const totalBuysToCreate = tournament.fullInclusion
-    ? pow2Ceil(tournament.drivers.length) - tournament.drivers.length
-    : 0;
+  const totalBuysToCreate = Math.max(
+    0,
+    tournament.bracketSize - tournament.drivers.length,
+  );
 
   const driversWithScores = [
     ...tournament.drivers,
-    ...Array.from(new Array(totalBuysToCreate)).map(() => ({
+    ...Array.from(new Array(totalBuysToCreate)).map((_, i) => ({
       id: byeTounamentDriver.id,
       laps: [],
+      tournamentDriverNumber: tournament.drivers.length + i + 1,
     })),
   ].map((driver) => {
     const lapScores = driver.laps.map((lap) =>
@@ -92,68 +110,44 @@ export const tournamentEndQualifying = async (id: string) => {
         tournament._count.judges,
         tournament.scoreFormula,
         lap.penalty,
+        judgeIds,
       ),
     );
 
     // If the driver has no scores, convert them into a BYE run
-    // only if the tournament is not full inclusion
     if (
-      !tournament.fullInclusion &&
       lapScores.every((score) => score === 0) &&
-      tournament.format !== TournamentsFormat.BATTLE_TREE
+      tournament.enableQualifying
     ) {
       return {
         lapScores: [],
         id: byeTounamentDriver.id,
+        tournamentDriverNumber: byeTounamentDriver.tournamentDriverNumber,
       };
     }
 
     return {
       lapScores,
       id: driver.id,
+      tournamentDriverNumber: driver.tournamentDriverNumber,
     };
   });
 
-  let sortedDrivers: { id: number; lapScores: number[] }[];
+  let sortedDrivers = driversWithScores.sort((a, b) => {
+    const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
+      (lapA, lapB) => lapB - lapA,
+    );
+    const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
+      (lapA, lapB) => lapB - lapA,
+    );
 
-  if (tournament.qualifyingProcedure === QualifyingProcedure.WAVES) {
-    // Waves procedure: qualify drivers in waves per round
-    sortedDrivers = [];
-
-    // Process each round in order
-    for (let round = 1; round <= tournament.qualifyingLaps; round++) {
-      // Get drivers sorted by their performance in this specific round
-      const roundDrivers = driversWithScores
-        .filter((driver) => driver.lapScores[round - 1] !== undefined)
-        .sort(
-          (a, b) =>
-            b.lapScores[round - 1] - a.lapScores[round - 1] || a.id - b.id,
-        );
-
-      // Calculate wave size for this round
-      const waveSize = getQualifyingWaveSize(tournament.qualifyingLaps, round);
-      const qualifyingCutOff = pow2Floor(tournament.drivers.length) * waveSize;
-
-      // Take the top drivers from this round that haven't already qualified
-      const newQualifiers = roundDrivers.slice(0, qualifyingCutOff);
-
-      sortedDrivers.push(...newQualifiers);
-    }
-  } else {
-    // Best procedure: sort by best lap score across all rounds
-    sortedDrivers = driversWithScores.sort((a, b) => {
-      const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
-        (lapA, lapB) => lapB - lapA,
-      );
-      const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
-        (lapA, lapB) => lapB - lapA,
-      );
-
-      return (
-        bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
-      );
-    });
-  }
+    return (
+      bestB - bestA ||
+      secondB - secondA ||
+      thirdB - thirdA ||
+      a.tournamentDriverNumber - b.tournamentDriverNumber
+    );
+  });
 
   // Set qualifying positions (exclude bye driver)
   await prisma.$transaction(
@@ -182,10 +176,9 @@ export const tournamentEndQualifying = async (id: string) => {
     },
   });
 
-  const totalDriversWithBuys = pow2Floor(sortedDrivers.length);
   const initialBattleDrivers = sortByInnerOuter(
-    Array.from(new Array(totalDriversWithBuys / 2)).map((_, i) => {
-      let { id: driverLeftId } = sortedDrivers[totalDriversWithBuys - i - 1];
+    Array.from(new Array(tournament.bracketSize / 2)).map((_, i) => {
+      let { id: driverLeftId } = sortedDrivers[tournament.bracketSize - i - 1];
       let { id: driverRightId } = sortedDrivers[i];
 
       return {

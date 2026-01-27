@@ -67,6 +67,8 @@ model EventResponses {
 model Tournaments {
   id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String
+  enableQualifying    Boolean                  @default(true)
+  enableBattles       Boolean                  @default(true)
   archived            Boolean                  @default(false)
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @default(now()) @updatedAt
@@ -77,22 +79,23 @@ model Tournaments {
   userId              String?
   nextQualifyingLapId Int?                     @unique
   liveUrl             String?
+  inviteCode          String?                  @unique
   drivers             TournamentDrivers[]
   judges              TournamentJudges[]
   user                Users?                   @relation(fields: [userId], references: [id])
   nextQualifyingLap   Laps?                    @relation(fields: [nextQualifyingLapId], references: [id])
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?       @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
-  fullInclusion       Boolean                  @default(false)
   enableProtests      Boolean                  @default(false)
   region              Regions?
   rated               Boolean                  @default(false)
-  ratingRequestedAt   DateTime?
+  ratingRequested     Boolean                  @default(false)
   scoreFormula        ScoreFormula             @default(AVERAGED)
   leaderboards        LeaderboardTournaments[]
   qualifyingOrder     QualifyingOrder          @default(DRIVERS)
-  qualifyingProcedure QualifyingProcedure      @default(BEST)
   driverNumbers       TournamentsDriverNumbers @default(NONE)
+  bracketSize         Int                      @default(4)
+  judgingInterface    JudgingInterface         @default(SIMPLE)
 
   @@index([state])
   @@index([archived])
@@ -244,8 +247,10 @@ model Tracks {
   status        TrackStatus   @default(PENDING)
   address       String?
   posts         Posts[]
-  leaderboardId String?       @db.Uuid
-  leaderboard   Leaderboards? @relation(fields: [leaderboardId], references: [id])
+  leaderboardId         String?       @db.Uuid
+  leaderboard           Leaderboards? @relation(fields: [leaderboardId], references: [id])
+  stripeAccountId       String?
+  stripeAccountEnabled  Boolean       @default(false)
 
   @@index([status])
   @@index([types])
@@ -552,11 +557,6 @@ model LeaderboardDrivers {
   @@index([leaderboardId, driverId])
 }
 
-enum QualifyingProcedure {
-  BEST
-  WAVES
-}
-
 enum LeaderboardType {
   TOURNAMENTS
   DRIVERS
@@ -592,8 +592,11 @@ enum TournamentsDriverNumbers {
 enum TournamentsFormat {
   STANDARD
   DOUBLE_ELIMINATION
-  EXHIBITION
-  BATTLE_TREE
+}
+
+enum JudgingInterface {
+  SIMPLE
+  ADVANCED
 }
 
 enum BattlesBracket {
@@ -626,6 +629,12 @@ enum Regions {
 }
 
 enum ScoreFormula {
+  SUM
+  AVERAGE
+  HEAD_JUDGE_1
+  HEAD_JUDGE_2
+  HEAD_JUDGE_3
+  // Legacy values for backward compatibility
   CUMULATIVE
   AVERAGED
 }

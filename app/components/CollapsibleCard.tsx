@@ -2,17 +2,17 @@ import { Box, styled } from "~/styled-system/jsx";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useDisclosure } from "~/utils/useDisclosure";
 
-const Card = styled("div", {
+export const Card = styled("div", {
   base: {
     borderWidth: 1,
     borderColor: "gray.800",
-    rounded: "xl",
+    rounded: "2xl",
     overflow: "hidden",
     bgColor: "gray.900",
   },
 });
 
-const CardHeader = styled("button", {
+export const CardHeader = styled("div", {
   base: {
     w: "full",
     p: 6,
@@ -20,6 +20,8 @@ const CardHeader = styled("button", {
     alignItems: "center",
     justifyContent: "space-between",
     cursor: "pointer",
+    transition: "background-color .2s",
+    borderTopRadius: "2xl",
     _hover: {
       md: {
         bgColor: "gray.800",
@@ -28,7 +30,7 @@ const CardHeader = styled("button", {
   },
 });
 
-const CardContent = styled("div", {
+export const CardContent = styled("div", {
   base: {
     p: 6,
     borderTopWidth: 1,

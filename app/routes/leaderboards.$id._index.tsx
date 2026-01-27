@@ -49,29 +49,22 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
         include: {
           tournament: {
-            include: {
+            select: {
+              id: true,
+              format: true,
+              enableQualifying: true,
+              enableBattles: true,
               battles: {
                 orderBy: [
-                  {
-                    tournament: {
-                      updatedAt: "desc",
-                    },
-                  },
                   { round: "asc" },
                   { bracket: "asc" },
-                  {
-                    id: "asc",
-                  },
+                  { id: "asc" },
                 ],
                 select: {
                   id: true,
                   winnerId: true,
                   bracket: true,
-                  tournament: {
-                    select: {
-                      format: true,
-                    },
-                  },
+                  round: true,
                   driverLeft: {
                     select: {
                       isBye: true,
@@ -104,6 +97,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
                   },
                 },
               },
+              drivers: {
+                select: {
+                  id: true,
+                  qualifyingPosition: true,
+                  isBye: true,
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                      image: true,
+                      driverId: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -116,12 +124,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const isOwner = leaderboard.userId === userId;
 
   if (leaderboard.type === LeaderboardType.TOURNAMENTS) {
-    const standings = getTournamentStandings(
-      leaderboard.tournaments.flatMap(
-        (tournament) => tournament.tournament.battles,
-      ),
-      true,
-    );
+    const tournaments = leaderboard.tournaments.map((t) => t.tournament);
+    const standings = getTournamentStandings(tournaments);
 
     return {
       leaderboard,

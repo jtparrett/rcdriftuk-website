@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { Form } from "react-router";
+import { Form, Link, useLoaderData, useParams } from "react-router";
 import {
   add,
   differenceInWeeks,
@@ -44,13 +44,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
       },
     },
+    select: {
+      stripeAccountEnabled: true,
+    },
   });
 
   if (!track) {
     throw redirect("/");
   }
 
-  return null;
+  return { stripeAccountEnabled: track.stripeAccountEnabled };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -151,6 +154,8 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const CalendarNewPage = () => {
+  const { stripeAccountEnabled } = useLoaderData<typeof loader>();
+  const params = useParams();
   const [startDate, setStartDate] = useState(
     startOfHour(add(new Date(), { days: 1 })),
   );
@@ -255,77 +260,100 @@ const CalendarNewPage = () => {
             </TabGroup>
           </Box>
 
-          <Box>
-            <Label>Enable ticketing</Label>
-            <input
-              type="hidden"
-              name="enableTicketing"
-              value={enableTicketing ? "true" : "false"}
-            />
-
-            <TabGroup>
-              <TabButton
-                type="button"
-                isActive={!enableTicketing}
-                onClick={() => setEnableTicketing(false)}
-              >
-                No
-              </TabButton>
-              <TabButton
-                type="button"
-                isActive={enableTicketing}
-                onClick={() => setEnableTicketing(true)}
-              >
-                Yes
-              </TabButton>
-            </TabGroup>
-          </Box>
-
-          {enableTicketing && (
+          {stripeAccountEnabled ? (
             <>
               <Box>
-                <Label>Ticket Capacity</Label>
-                <Input
-                  name="ticketCapacity"
-                  type="number"
-                  defaultValue={0}
-                  required
-                />
-              </Box>
-
-              <Box>
-                <Label>Ticket Price</Label>
-                <MoneyInput name="ticketPrice" required />
-              </Box>
-
-              <Box>
-                <Label>Ticket Release Date</Label>
-                <Input
-                  name="ticketReleaseDate"
+                <Label>Enable ticketing</Label>
+                <input
                   type="hidden"
-                  required
-                  value={ticketReleaseDate.toISOString()}
+                  name="enableTicketing"
+                  value={enableTicketing ? "true" : "false"}
                 />
-                <DatePicker
-                  value={ticketReleaseDate}
-                  maxDate={sub(startDate, { days: 1 })}
-                  onChange={(date) => setTicketReleaseDate(date)}
-                />
+
+                <TabGroup>
+                  <TabButton
+                    type="button"
+                    isActive={!enableTicketing}
+                    onClick={() => setEnableTicketing(false)}
+                  >
+                    No
+                  </TabButton>
+                  <TabButton
+                    type="button"
+                    isActive={enableTicketing}
+                    onClick={() => setEnableTicketing(true)}
+                  >
+                    Yes
+                  </TabButton>
+                </TabGroup>
               </Box>
 
-              <Box>
-                <Label>Ticket Release Time</Label>
-                <TimePicker
-                  value={ticketReleaseDate}
-                  onChange={(date) => setTicketReleaseDate(date)}
-                />
-              </Box>
+              {enableTicketing && (
+                <>
+                  <Box>
+                    <Label>Ticket Capacity</Label>
+                    <Input
+                      name="ticketCapacity"
+                      type="number"
+                      defaultValue={0}
+                      required
+                    />
+                  </Box>
 
-              <Box>
-                <Label>Early Access Code</Label>
-                <Input name="earlyAccessCode" required />
-              </Box>
+                  <Box>
+                    <Label>Ticket Price</Label>
+                    <MoneyInput name="ticketPrice" required />
+                  </Box>
+
+                  <Box>
+                    <Label>Ticket Release Date</Label>
+                    <Input
+                      name="ticketReleaseDate"
+                      type="hidden"
+                      required
+                      value={ticketReleaseDate.toISOString()}
+                    />
+                    <DatePicker
+                      value={ticketReleaseDate}
+                      maxDate={sub(startDate, { days: 1 })}
+                      onChange={(date) => setTicketReleaseDate(date)}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Label>Ticket Release Time</Label>
+                    <TimePicker
+                      value={ticketReleaseDate}
+                      onChange={(date) => setTicketReleaseDate(date)}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Label>Early Access Code</Label>
+                    <Input name="earlyAccessCode" required />
+                  </Box>
+                </>
+              )}
             </>
+          ) : (
+            <Box
+              bgColor="gray.800"
+              borderRadius="lg"
+              p={4}
+              borderWidth={1}
+              borderColor="gray.700"
+            >
+              <styled.p color="gray.400" fontSize="sm" mb={2}>
+                To enable ticketing for events, you need to connect your Stripe
+                account first.
+              </styled.p>
+              <Link
+                to={`/edit/track/${params.slug}#payments`}
+                style={{ color: "#60a5fa", fontSize: "14px" }}
+              >
+                Set up Stripe Connect in track settings
+              </Link>
+            </Box>
           )}
 
           <Button type="submit">Create Event</Button>

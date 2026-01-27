@@ -1,23 +1,18 @@
 import { styled, Box, Center, Flex } from "~/styled-system/jsx";
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { Fragment } from "react";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
-import { pow2Floor } from "~/utils/powFns";
 import { prisma } from "~/utils/prisma.server";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
 import { getAuth } from "~/utils/getAuth.server";
-import {
-  QualifyingProcedure,
-  TournamentsDriverNumbers,
-  TournamentsFormat,
-} from "~/utils/enums";
+import { TournamentsDriverNumbers } from "~/utils/enums";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 import { token } from "~/styled-system/tokens";
-import { getQualifyingWaveSize } from "~/utils/tournament";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -34,13 +29,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
           judges: true,
         },
       },
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
+        },
+      },
       id: true,
-      fullInclusion: true,
+      enableBattles: true,
+      bracketSize: true,
       format: true,
       qualifyingLaps: true,
       userId: true,
       scoreFormula: true,
-      qualifyingProcedure: true,
       driverNumbers: true,
       nextQualifyingLap: {
         select: {
@@ -92,16 +95,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
   invariant(tournament, "Tournament not found");
 
   const isOwner = tournament?.userId === userId;
+  const judgeIds = tournament.judges.map((j) => j.id);
 
   return {
     run,
     isOwner,
     id: tournament.id,
-    fullInclusion: tournament.fullInclusion,
+    bracketSize: tournament.bracketSize,
+    enableBattles: tournament.enableBattles,
     format: tournament.format,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
-    qualifyingProcedure: tournament.qualifyingProcedure,
     nextQualifyingLap: tournament.nextQualifyingLap,
     totalDrivers: tournament.drivers.length,
     driverNumbers: tournament.driverNumbers,
@@ -118,6 +122,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
               tournament._count.judges,
               tournament.scoreFormula,
               lap.penalty,
+              judgeIds,
             ),
           );
 
@@ -140,7 +145,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
           );
 
           return (
-            bestB - bestA || secondB - secondA || thirdB - thirdA || a.id - b.id
+            bestB - bestA ||
+            secondB - secondA ||
+            thirdB - thirdA ||
+            a.tournamentDriverNumber - b.tournamentDriverNumber
           );
         }
 
@@ -152,7 +160,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
 type Drivers = Awaited<ReturnType<typeof loader>>["drivers"];
 interface TableProps {
   drivers: Drivers;
-  qualifyingCutOff: number;
   startPosition?: number;
   isOwner: boolean;
   getDriverNumber: (driver: Drivers[number]) => number | undefined;
@@ -160,7 +167,6 @@ interface TableProps {
 
 const Table = ({
   drivers,
-  qualifyingCutOff,
   startPosition = 0,
   isOwner,
   getDriverNumber,
@@ -179,11 +185,9 @@ const Table = ({
 
         return (
           <Fragment key={i}>
-            {i + startPosition === qualifyingCutOff &&
-              !tournament.fullInclusion &&
-              (tournament.run === 0 ||
-                tournament.qualifyingProcedure ===
-                  QualifyingProcedure.WAVES) && (
+            {i + startPosition === tournament.bracketSize &&
+              tournament.run === 0 &&
+              tournament.enableBattles && (
                 <Box w="full" h="1px" bgColor="brand.500" />
               )}
             <Flex
@@ -201,6 +205,9 @@ const Table = ({
                 } as React.CSSProperties
               }
               bg="var(--bg)"
+              _hover={{
+                bg: "gray.800",
+              }}
               alignItems="center"
             >
               {isNext && <Glow size="sm" />}
@@ -230,14 +237,20 @@ const Table = ({
                 textOverflow="ellipsis"
                 flex={1}
               >
-                <Link to={`/drivers/${driver.user.driverId}`}>
+                <LinkOverlay
+                  to={
+                    isOwner && driver.lapId
+                      ? `/tournaments/${tournament.id}/activate/lap/${driver.lapId}`
+                      : `/drivers/${driver.user.driverId}`
+                  }
+                >
                   {driver.user.firstName} {driver.user.lastName}{" "}
                   {driverNumber !== undefined && (
                     <styled.span color="gray.600">
                       ({getDriverNumber(driver)})
                     </styled.span>
                   )}
-                </Link>
+                </LinkOverlay>
               </styled.p>
 
               {tournament.run <= 0 && (
@@ -264,15 +277,7 @@ const Table = ({
                   fontFamily="mono"
                   fontSize="sm"
                 >
-                  {isOwner && tournament.run > 0 ? (
-                    <Link
-                      to={`/tournaments/${tournament.id}/lap/${driver.lapId}`}
-                    >
-                      {driver.score?.toFixed(2).padStart(5, "0")}
-                    </Link>
-                  ) : (
-                    driver.score?.toFixed(2).padStart(5, "0")
-                  )}
+                  {driver.score?.toFixed(2).padStart(5, "0")}
                 </styled.p>
               )}
             </Flex>
@@ -289,12 +294,6 @@ const QualifyingPage = () => {
   const driversWithoutBuys = tournament.drivers.filter(
     (driver) => !driver.isBye,
   );
-
-  const waveSize =
-    tournament.qualifyingProcedure === QualifyingProcedure.WAVES
-      ? getQualifyingWaveSize(tournament.qualifyingLaps, tournament.run)
-      : 1;
-  const qualifyingCutOff = pow2Floor(tournament.totalDrivers) * waveSize;
 
   const half = Math.ceil(driversWithoutBuys.length / 2);
 
@@ -313,17 +312,15 @@ const QualifyingPage = () => {
   return (
     <>
       <HiddenEmbed>
-        <TabGroup mb={4}>
-          {tournament.qualifyingProcedure === QualifyingProcedure.BEST && (
-            <Tab
-              to={`/tournaments/${tournament.id}/qualifying/0`}
-              isActive={tournament.run === 0}
-              data-replace="true"
-              replace
-            >
-              Best
-            </Tab>
-          )}
+        <TabGroup mb={2}>
+          <Tab
+            to={`/tournaments/${tournament.id}/qualifying/0`}
+            isActive={tournament.run === 0}
+            data-replace="true"
+            replace
+          >
+            Best
+          </Tab>
           {Array.from(new Array(tournament.qualifyingLaps)).map((_, i) => {
             return (
               <Tab
@@ -366,7 +363,6 @@ const QualifyingPage = () => {
             <>
               <Table
                 drivers={driversWithoutBuys.slice(0, half)}
-                qualifyingCutOff={qualifyingCutOff}
                 isOwner={tournament.isOwner}
                 getDriverNumber={getDriverNumber}
               />
@@ -380,7 +376,6 @@ const QualifyingPage = () => {
 
               <Table
                 drivers={driversWithoutBuys.slice(half)}
-                qualifyingCutOff={qualifyingCutOff}
                 startPosition={half}
                 isOwner={tournament.isOwner}
                 getDriverNumber={getDriverNumber}

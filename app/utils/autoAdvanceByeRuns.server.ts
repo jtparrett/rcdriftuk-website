@@ -2,9 +2,7 @@ import { TournamentsState } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
 
 // Recursively auto-advance bye runs by creating votes for all judges
-export const autoAdvanceByeRuns = async (
-  tournamentId: string,
-): Promise<void> => {
+export const autoAdvanceByeRuns = async (tournamentId: string) => {
   const tournament = await prisma.tournaments.findFirst({
     where: {
       id: tournamentId,
@@ -22,7 +20,7 @@ export const autoAdvanceByeRuns = async (
   });
 
   if (!tournament?.nextBattle) {
-    return;
+    return null;
   }
 
   const { nextBattle, judges } = tournament;
@@ -31,7 +29,7 @@ export const autoAdvanceByeRuns = async (
 
   // If neither driver is a bye, no auto-advancement needed
   if (!isLeftBye && !isRightBye) {
-    return;
+    return null;
   }
 
   // Determine winner: if both are bye runs, left wins; otherwise the non-bye driver wins
@@ -48,7 +46,7 @@ export const autoAdvanceByeRuns = async (
   }
 
   if (!winnerId) {
-    return;
+    return null;
   }
 
   // Create votes for all judges to automatically advance the bye run

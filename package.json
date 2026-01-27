@@ -11,7 +11,8 @@
     "lint": "react-router typegen && tsc",
     "prepare": "panda codegen",
     "compute-ratings": "tsx ./scripts/compute-ratings.ts",
-    "compute-new-ratings": "tsx ./scripts/compute-new-ratings.ts"
+    "compute-new-ratings": "tsx ./scripts/compute-new-ratings.ts",
+    "import-zerofeel-tracks": "tsx ./scripts/import-zerofeel-tracks.ts"
   },
   "dependencies": {
     "@clerk/react-router": "^2.1.4",
@@ -21,8 +22,10 @@
     "@react-router/node": "^7.9.4",
     "@react-router/serve": "^7.9.4",
     "@tanstack/react-query": "^5.81.5",
+    "@types/papaparse": "^5.5.2",
     "@vercel/blob": "^1.0.0",
     "ably": "^2.9.0",
+    "body-scroll-lock": "^4.0.0-beta.0",
     "calendar-link": "^2.8.0",
     "change-case": "^5.4.4",
     "cli-color": "^2.0.4",
@@ -34,6 +37,7 @@
     "mapbox-gl": "^3.12.0",
     "motion": "^12.16.0",
     "number-to-words": "^1.2.4",
+    "papaparse": "^5.5.3",
     "pluralize": "^8.0.0",
     "posthog-js": "^1.261.0",
     "react": "^19.2.3",
@@ -49,6 +53,7 @@
     "resend": "^4.1.1",
     "sharp": "^0.34.1",
     "slugify": "^1.6.6",
+    "sonner": "^2.0.7",
     "stripe": "^17.5.0",
     "uuid": "^11.0.5",
     "zod": "^3.25.51",
@@ -57,6 +62,7 @@
   "devDependencies": {
     "@pandacss/dev": "^0.54.0",
     "@react-router/dev": "^7.9.4",
+    "@types/body-scroll-lock": "^3.1.2",
     "@types/cli-color": "^2.0.6",
     "@types/mapbox-gl": "^3.4.1",
     "@types/number-to-words": "^1.2.3",

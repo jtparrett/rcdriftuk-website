@@ -1,0 +1,1005 @@
+import {
+  JudgingInterface,
+  TournamentsDriverNumbers,
+  TournamentsState,
+} from "~/utils/enums";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import {
+  Form,
+  Link,
+  redirect,
+  useFetcher,
+  useLoaderData,
+  useNavigation,
+} from "react-router";
+import { ChannelProvider, AblyProvider } from "ably/react";
+import pluralize from "pluralize";
+import invariant from "~/utils/invariant";
+import { z } from "zod";
+import { Button } from "~/components/Button";
+import { Glow } from "~/components/Glow";
+import { Label } from "~/components/Label";
+import { Select } from "~/components/Select";
+import {
+  styled,
+  Flex,
+  Spacer,
+  Box,
+  VStack,
+  Container,
+  Center,
+  HStack,
+  Grid,
+} from "~/styled-system/jsx";
+import { createAbly } from "~/utils/ably.server";
+import { ably as AblyClient } from "~/utils/ably";
+import { prisma } from "~/utils/prisma.server";
+import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
+import { useReloader } from "~/utils/useReloader";
+import { css } from "~/styled-system/css";
+import { TabButton, TabGroup } from "~/components/Tab";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { FormControl } from "~/components/FormControl";
+import numberToWords from "number-to-words";
+import { getAuth } from "~/utils/getAuth.server";
+import notFoundInvariant from "~/utils/notFoundInvariant";
+import { getUser } from "~/utils/getUser.server";
+import { useState } from "react";
+
+export const loader = async (args: LoaderFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "User not found");
+
+  const user = await getUser(userId);
+
+  notFoundInvariant(user, "User not found");
+
+  const judge = await prisma.tournamentJudges.findFirst({
+    where: {
+      driverId: user.driverId,
+      tournamentId: id,
+    },
+  });
+
+  notFoundInvariant(judge, "Judge not found");
+
+  const tournament = await prisma.tournaments.findFirst({
+    where: {
+      id,
+    },
+    include: {
+      judges: {
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        where: {
+          id: judge.id,
+        },
+      },
+      nextQualifyingLap: {
+        include: {
+          scores: {
+            where: {
+              judgeId: judge.id,
+            },
+          },
+          driver: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  driverId: true,
+                },
+              },
+              laps: true,
+            },
+          },
+        },
+      },
+      nextBattle: {
+        include: {
+          driverLeft: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  driverId: true,
+                },
+              },
+            },
+          },
+          driverRight: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  driverId: true,
+                },
+              },
+            },
+          },
+          BattleVotes: {
+            where: {
+              judgeId: judge.id,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  invariant(tournament, "Tournament not found");
+  invariant(tournament.judges.length > 0, "No judges found for tournament");
+
+  return {
+    tournament,
+    judge: tournament.judges[0],
+  };
+};
+
+export const action = async (args: ActionFunctionArgs) => {
+  const id = z.string().parse(args.params.id);
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "User not found");
+
+  const user = await getUser(userId);
+
+  notFoundInvariant(user, "User not found");
+
+  const judge = await prisma.tournamentJudges.findFirst({
+    where: {
+      driverId: user.driverId,
+      tournamentId: id,
+    },
+    include: {
+      tournament: true,
+    },
+  });
+
+  notFoundInvariant(judge, "Judge not found");
+
+  const publishUpdate = () => {
+    createAbly(process.env.VITE_ABLY_API_KEY!)
+      .channels.get(judge.tournament.id)
+      .publish("update", new Date().toISOString());
+  };
+
+  if (
+    judge.tournament.state === TournamentsState.QUALIFYING &&
+    judge.tournament.nextQualifyingLapId
+  ) {
+    const formData = await args.request.formData();
+    const score = z.coerce.number().parse(formData.get("score"));
+    const penalty = z.coerce.number().parse(formData.get("penalty"));
+
+    await prisma.$transaction([
+      prisma.laps.update({
+        where: {
+          id: judge.tournament.nextQualifyingLapId,
+        },
+        data: {
+          penalty,
+        },
+      }),
+      prisma.lapScores.upsert({
+        where: {
+          judgeId_lapId: {
+            judgeId: judge.id,
+            lapId: judge.tournament.nextQualifyingLapId,
+          },
+        },
+        update: {
+          score: Math.min(score, judge.points),
+        },
+        create: {
+          judgeId: judge.id,
+          lapId: judge.tournament.nextQualifyingLapId,
+          score: Math.min(score, judge.points),
+        },
+      }),
+    ]);
+  }
+
+  if (
+    judge.tournament.state === TournamentsState.BATTLES &&
+    judge.tournament.nextBattleId
+  ) {
+    const formData = await args.request.formData();
+    const driverId = z.coerce.number().nullable().parse(formData.get("driver"));
+    const isOMT = z.coerce.boolean().parse(formData.get("omt"));
+
+    await prisma.tournamentBattleVotes.upsert({
+      where: {
+        judgeId_battleId: {
+          judgeId: judge.id,
+          battleId: judge.tournament.nextBattleId,
+        },
+      },
+      create: {
+        judgeId: judge.id,
+        battleId: judge.tournament.nextBattleId,
+        winnerId: driverId,
+        omt: isOMT,
+      },
+      update: {
+        winnerId: driverId,
+        omt: isOMT,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  publishUpdate();
+
+  const referer =
+    args.request.headers.get("Referer") ?? `/tournaments/${id}/judge`;
+
+  return redirect(referer);
+};
+
+const formSchema = z.object({
+  penalty: z.coerce.number(),
+  score: z.coerce.number({
+    message: "Score is required",
+  }),
+});
+
+const validationSchema = toFormikValidationSchema(formSchema);
+
+const QualiForm = () => {
+  const { tournament } = useLoaderData<typeof loader>();
+  const transition = useNavigation();
+  const fetcher = useFetcher();
+  const isSubmitting = transition.state !== "idle";
+
+  const formik = useFormik({
+    validationSchema,
+    enableReinitialize: true,
+    initialValues: {
+      penalty: tournament.nextQualifyingLap?.penalty ?? 0,
+      score: tournament.nextQualifyingLap?.scores[0]?.score,
+    },
+    onSubmit: (values) => {
+      const formData = new FormData();
+
+      formData.append("penalty", values.penalty.toString());
+      formData.append("score", values.score?.toString() ?? "");
+
+      fetcher.submit(formData, {
+        method: "POST",
+      });
+    },
+  });
+
+  const submit = () => {
+    setTimeout(formik.handleSubmit, 0);
+  };
+
+  const driverNumber =
+    tournament.driverNumbers === TournamentsDriverNumbers.NONE
+      ? undefined
+      : tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL
+        ? tournament.nextQualifyingLap?.driver?.user.driverId
+        : tournament.nextQualifyingLap?.driver?.tournamentDriverNumber;
+
+  if (tournament.nextQualifyingLap === null) {
+    return (
+      <styled.h2 fontSize="xl" fontWeight="semibold" textAlign="center" mt={4}>
+        Qualifying Complete
+      </styled.h2>
+    );
+  }
+
+  return (
+    <>
+      <Flex mb={6}>
+        <styled.p fontWeight="semibold">
+          {tournament.nextQualifyingLap.driver.user.firstName}{" "}
+          {tournament.nextQualifyingLap.driver.user.lastName}{" "}
+          {driverNumber !== undefined && (
+            <styled.span color="gray.600">({driverNumber})</styled.span>
+          )}
+        </styled.p>
+        <Spacer />
+        <styled.span color="brand.500" fontWeight="bold">
+          {numberToWords.toOrdinal(tournament.nextQualifyingLap.round)}{" "}
+          Qualifying Run
+        </styled.span>
+      </Flex>
+
+      <form onSubmit={formik.handleSubmit}>
+        <VStack alignItems="stretch" gap={4}>
+          <FormControl error={formik.errors.score}>
+            <Label>
+              Score ({formik.values.score}{" "}
+              {pluralize("point", formik.values.score)})
+            </Label>
+
+            <Select
+              name="score"
+              aria-label="score-select"
+              value={formik.values.score ?? ""}
+              onChange={(e) => {
+                formik.setFieldValue("score", Number(e.target.value));
+                submit();
+              }}
+              disabled={isSubmitting}
+            >
+              <option value="">Select a value</option>
+              {Array.from(new Array(tournament.judges[0].points + 1)).map(
+                (_, i) => (
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                ),
+              )}
+            </Select>
+          </FormControl>
+
+          <FormControl error={formik.errors.penalty}>
+            <Label>Penalty</Label>
+
+            <TabGroup>
+              <TabButton
+                type="button"
+                isActive={formik.values.penalty === 0}
+                disabled={isSubmitting}
+                onClick={() => {
+                  formik.setFieldValue("penalty", 0);
+                  submit();
+                }}
+              >
+                None
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={formik.values.penalty === -20}
+                disabled={isSubmitting}
+                onClick={() => {
+                  formik.setFieldValue("penalty", -20);
+                  submit();
+                }}
+              >
+                -20
+              </TabButton>
+              <TabButton
+                type="button"
+                isActive={formik.values.penalty === -40}
+                disabled={isSubmitting}
+                onClick={() => {
+                  formik.setFieldValue("penalty", -40);
+                  submit();
+                }}
+              >
+                -40
+              </TabButton>
+            </TabGroup>
+          </FormControl>
+        </VStack>
+      </form>
+    </>
+  );
+};
+
+interface AdvancedScores {
+  run1: { lead: number; chase: number };
+  run2: { lead: number; chase: number };
+}
+
+const MAX_SCORE = 6;
+
+const ScoreButton = ({
+  score,
+  isActive,
+  onClick,
+}: {
+  score: number;
+  isActive: boolean;
+  onClick: () => void;
+}) => (
+  <Button
+    type="button"
+    size="sm"
+    variant={isActive ? "primary" : "outline"}
+    onClick={onClick}
+    w="full"
+    px={2}
+  >
+    {score}
+  </Button>
+);
+
+const AdvancedJudging = ({
+  leftDriver,
+  rightDriver,
+  leftDriverNumber,
+  rightDriverNumber,
+  leftDriverHigherQualifier,
+  battleVote,
+  driverLeftId,
+  driverRightId,
+}: {
+  leftDriver: {
+    firstName: string | null;
+    lastName: string | null;
+    id: number;
+  } | null;
+  rightDriver: {
+    firstName: string | null;
+    lastName: string | null;
+    id: number;
+  } | null;
+  leftDriverNumber: number | undefined;
+  rightDriverNumber: number | undefined;
+  leftDriverHigherQualifier: boolean;
+  battleVote: { winnerId: number | null; omt: boolean } | undefined;
+  driverLeftId: number | null;
+  driverRightId: number | null;
+}) => {
+  const [activeRun, setActiveRun] = useState<1 | 2>(1);
+  const [scores, setScores] = useState<AdvancedScores>({
+    run1: { lead: MAX_SCORE, chase: MAX_SCORE },
+    run2: { lead: MAX_SCORE, chase: MAX_SCORE },
+  });
+
+  // Higher qualifier leads first in Run 1
+  // If leftDriverHigherQualifier: Run 1 = Left leads, Right chases; Run 2 = Right leads, Left chases
+  // If rightDriverHigherQualifier: Run 1 = Right leads, Left chases; Run 2 = Left leads, Right chases
+  const leftDriverTotal = leftDriverHigherQualifier
+    ? scores.run1.lead + scores.run2.chase
+    : scores.run1.chase + scores.run2.lead;
+  const rightDriverTotal = leftDriverHigherQualifier
+    ? scores.run1.chase + scores.run2.lead
+    : scores.run1.lead + scores.run2.chase;
+
+  const updateScore = (run: 1 | 2, role: "lead" | "chase", value: number) => {
+    setScores((prev) => ({
+      ...prev,
+      [`run${run}`]: {
+        ...prev[`run${run}`],
+        [role]: value,
+      },
+    }));
+  };
+
+  const getWinner = () => {
+    if (leftDriverTotal > rightDriverTotal) return "left";
+    if (rightDriverTotal > leftDriverTotal) return "right";
+    return "tie";
+  };
+
+  const winner = getWinner();
+
+  // Check if the current result matches the existing vote
+  const isAlreadySubmitted =
+    (winner === "left" && battleVote?.winnerId === driverLeftId) ||
+    (winner === "right" && battleVote?.winnerId === driverRightId) ||
+    (winner === "tie" && battleVote?.omt === true);
+
+  return (
+    <VStack gap={4} alignItems="stretch">
+      {/* Run Tabs */}
+      <TabGroup>
+        <TabButton
+          type="button"
+          isActive={activeRun === 1}
+          onClick={() => setActiveRun(1)}
+        >
+          Run 1
+        </TabButton>
+        <TabButton
+          type="button"
+          isActive={activeRun === 2}
+          onClick={() => setActiveRun(2)}
+        >
+          Run 2
+        </TabButton>
+      </TabGroup>
+
+      {/* Scoring UI */}
+      <Box>
+        {activeRun === 1 ? (
+          <VStack gap={4} alignItems="stretch">
+            {/* Run 1: Higher qualifier leads */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Lead:{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.firstName
+                  : rightDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.lastName
+                  : rightDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? leftDriverNumber
+                  : rightDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? leftDriverNumber
+                      : rightDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run1.lead >= score}
+                    onClick={() => updateScore(1, "lead", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+
+            {/* Run 1: Lower qualifier chases */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Chase:{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.firstName
+                  : leftDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.lastName
+                  : leftDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? rightDriverNumber
+                  : leftDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? rightDriverNumber
+                      : leftDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run1.chase >= score}
+                    onClick={() => updateScore(1, "chase", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+          </VStack>
+        ) : (
+          <VStack gap={4} alignItems="stretch">
+            {/* Run 2: Lower qualifier leads */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Lead:{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.firstName
+                  : leftDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? rightDriver?.lastName
+                  : leftDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? rightDriverNumber
+                  : leftDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? rightDriverNumber
+                      : leftDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run2.lead >= score}
+                    onClick={() => updateScore(2, "lead", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+
+            {/* Run 2: Higher qualifier chases */}
+            <Box>
+              <styled.p
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+                color="gray.400"
+              >
+                Chase:{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.firstName
+                  : rightDriver?.firstName}{" "}
+                {leftDriverHigherQualifier
+                  ? leftDriver?.lastName
+                  : rightDriver?.lastName}
+                {(leftDriverHigherQualifier
+                  ? leftDriverNumber
+                  : rightDriverNumber) !== undefined && (
+                  <styled.span color="gray.600">
+                    {" "}
+                    (
+                    {leftDriverHigherQualifier
+                      ? leftDriverNumber
+                      : rightDriverNumber}
+                    )
+                  </styled.span>
+                )}
+              </styled.p>
+              <HStack gap={1}>
+                {Array.from(new Array(MAX_SCORE)).map((_, score) => (
+                  <ScoreButton
+                    key={score}
+                    score={score}
+                    isActive={scores.run2.chase >= score}
+                    onClick={() => updateScore(2, "chase", score)}
+                  />
+                ))}
+              </HStack>
+            </Box>
+          </VStack>
+        )}
+      </Box>
+
+      {/* Score Summary */}
+      <Box
+        bgColor="gray.900"
+        rounded="lg"
+        p={3}
+        borderWidth={1}
+        borderColor="gray.800"
+      >
+        <styled.p fontSize="xs" color="gray.500" mb={2} textAlign="center">
+          Current Totals
+        </styled.p>
+        <Flex justifyContent="space-around">
+          <VStack gap={0}>
+            <styled.span
+              fontSize="lg"
+              fontWeight="bold"
+              color={winner === "left" ? "green.400" : "white"}
+            >
+              {leftDriverTotal}
+            </styled.span>
+            <styled.span fontSize="xs" color="gray.500">
+              {leftDriver?.firstName?.charAt(0)}. {leftDriver?.lastName}
+            </styled.span>
+          </VStack>
+          <styled.span fontSize="lg" color="gray.600" alignSelf="center">
+            vs
+          </styled.span>
+          <VStack gap={0}>
+            <styled.span
+              fontSize="lg"
+              fontWeight="bold"
+              color={winner === "right" ? "green.400" : "white"}
+            >
+              {rightDriverTotal}
+            </styled.span>
+            <styled.span fontSize="xs" color="gray.500">
+              {rightDriver?.firstName?.charAt(0)}. {rightDriver?.lastName}
+            </styled.span>
+          </VStack>
+        </Flex>
+      </Box>
+
+      {/* Submit Winner */}
+      <VStack gap={2} alignItems="stretch">
+        <Button
+          w="full"
+          type="submit"
+          name={winner === "tie" ? "omt" : "driver"}
+          variant="primary"
+          disabled={isAlreadySubmitted}
+          value={
+            winner === "left"
+              ? leftDriver?.id.toString()
+              : winner === "right"
+                ? rightDriver?.id.toString()
+                : "true"
+          }
+        >
+          Submit: {winner === "left" ? leftDriver?.firstName + " Wins" : ""}
+          {winner === "right" ? rightDriver?.firstName + " Wins" : ""}
+          {winner === "tie" ? "OMT" : ""}
+        </Button>
+      </VStack>
+    </VStack>
+  );
+};
+
+const BattleForm = () => {
+  const { tournament } = useLoaderData<typeof loader>();
+  const nextBattle = tournament.nextBattle;
+  const battleVote = nextBattle?.BattleVotes[0];
+
+  const judgingInterface = tournament.judgingInterface;
+
+  const leftDriverHigherQualifier =
+    (nextBattle?.driverLeft?.qualifyingPosition ?? 0) <
+    (nextBattle?.driverRight?.qualifyingPosition ?? 0)
+      ? true
+      : false;
+
+  const leftDriverNumber =
+    tournament.driverNumbers === TournamentsDriverNumbers.NONE
+      ? undefined
+      : tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL
+        ? nextBattle?.driverLeft?.user.driverId
+        : nextBattle?.driverLeft?.tournamentDriverNumber;
+  const rightDriverNumber =
+    tournament.driverNumbers === TournamentsDriverNumbers.NONE
+      ? undefined
+      : tournament.driverNumbers === TournamentsDriverNumbers.UNIVERSAL
+        ? nextBattle?.driverRight?.user.driverId
+        : nextBattle?.driverRight?.tournamentDriverNumber;
+
+  if (!tournament.nextBattle) {
+    return (
+      <styled.h2 fontSize="xl" fontWeight="semibold" textAlign="center" mt={4}>
+        Battles Complete
+      </styled.h2>
+    );
+  }
+
+  return (
+    <>
+      {nextBattle?.winnerId !== null && (
+        <styled.h2 fontSize="xl" textAlign="center" py={20}>
+          Waiting for next battle...
+        </styled.h2>
+      )}
+
+      {nextBattle !== null && nextBattle.winnerId === null && (
+        <VStack gap={4} alignItems="stretch">
+          <Form method="post">
+            {judgingInterface === JudgingInterface.SIMPLE ? (
+              <Flex flexDir="column" gap={4}>
+                <Button
+                  w="full"
+                  type="submit"
+                  name="driver"
+                  value={nextBattle.driverLeft?.id.toString()}
+                  variant={
+                    battleVote?.winnerId === nextBattle.driverLeftId
+                      ? "primary"
+                      : "outline"
+                  }
+                  gap={0.5}
+                >
+                  {nextBattle.driverLeft?.user.firstName}{" "}
+                  {nextBattle.driverLeft?.user.lastName}{" "}
+                  {leftDriverNumber !== undefined && (
+                    <styled.span color="gray.600">
+                      ({leftDriverNumber})
+                    </styled.span>
+                  )}
+                  {leftDriverHigherQualifier && "(Higher Qualifier)"}
+                </Button>
+
+                <Button
+                  w="full"
+                  type="submit"
+                  name="driver"
+                  value={nextBattle.driverRight?.id.toString()}
+                  variant={
+                    battleVote?.winnerId === nextBattle.driverRightId
+                      ? "primary"
+                      : "outline"
+                  }
+                  gap={0.5}
+                >
+                  {nextBattle.driverRight?.user.firstName}{" "}
+                  {nextBattle.driverRight?.user.lastName}{" "}
+                  {rightDriverNumber !== undefined && (
+                    <styled.span color="gray.600">
+                      ({rightDriverNumber})
+                    </styled.span>
+                  )}
+                  {!leftDriverHigherQualifier && "(Higher Qualifier)"}
+                </Button>
+
+                <Button
+                  w="full"
+                  type="submit"
+                  name="omt"
+                  value="true"
+                  variant={battleVote?.omt ? "primary" : "outline"}
+                >
+                  OMT
+                </Button>
+              </Flex>
+            ) : (
+              <AdvancedJudging
+                leftDriver={
+                  nextBattle.driverLeft
+                    ? {
+                        firstName: nextBattle.driverLeft.user.firstName,
+                        lastName: nextBattle.driverLeft.user.lastName,
+                        id: nextBattle.driverLeft.id,
+                      }
+                    : null
+                }
+                rightDriver={
+                  nextBattle.driverRight
+                    ? {
+                        firstName: nextBattle.driverRight.user.firstName,
+                        lastName: nextBattle.driverRight.user.lastName,
+                        id: nextBattle.driverRight.id,
+                      }
+                    : null
+                }
+                leftDriverNumber={leftDriverNumber}
+                rightDriverNumber={rightDriverNumber}
+                leftDriverHigherQualifier={leftDriverHigherQualifier}
+                battleVote={battleVote}
+                driverLeftId={nextBattle.driverLeftId}
+                driverRightId={nextBattle.driverRightId}
+              />
+            )}
+          </Form>
+        </VStack>
+      )}
+    </>
+  );
+};
+
+const JudgePage = () => {
+  const { tournament, judge } = useLoaderData<typeof loader>();
+
+  useReloader();
+  useAblyRealtimeReloader(tournament.id);
+
+  return (
+    <Box
+      borderWidth={1}
+      borderColor="gray.800"
+      rounded="3xl"
+      bgColor="gray.900"
+      p={1}
+    >
+      <Center
+        minH="60dvh"
+        bgImage="url(/dot-bg.svg)"
+        bgRepeat="repeat"
+        bgSize="16px"
+        bgPosition="center"
+        pos="relative"
+        zIndex={1}
+        rounded="2xl"
+        overflow="hidden"
+        borderWidth={1}
+        borderColor="gray.800"
+        bgColor="gray.950"
+        _before={{
+          content: '""',
+          pos: "absolute",
+          inset: 0,
+          bgGradient: "to-t",
+          gradientFrom: "black",
+          gradientVia: "rgba(12, 12, 12, 0)",
+          gradientTo: "rgba(12, 12, 12, 0)",
+          zIndex: -1,
+        }}
+      >
+        <Container w={500} maxW="full">
+          <Box
+            bgColor="black"
+            pos="relative"
+            zIndex={1}
+            p={1}
+            borderWidth={1}
+            borderColor="brand.700"
+            rounded="3xl"
+            shadow="0 12px 32px rgba(236, 26, 85, 0.25)"
+          >
+            <Glow />
+            <Box
+              borderWidth={1}
+              borderColor="brand.700"
+              rounded="2xl"
+              overflow="hidden"
+            >
+              <Flex
+                px={6}
+                py={3}
+                bgGradient="to-b"
+                gradientFrom="brand.500"
+                gradientTo="brand.700"
+              >
+                <styled.h1 fontSize="sm">
+                  {judge.user.firstName} {judge.user.lastName}
+                </styled.h1>
+                <Spacer />
+                <Link
+                  to={`/tournaments/${tournament.id}/overview`}
+                  className={css({
+                    fontSize: "sm",
+                  })}
+                  data-replace="true"
+                  replace
+                >
+                  {tournament.name}
+                </Link>
+              </Flex>
+              <Box p={4} pb={8}>
+                {tournament.state === TournamentsState.START && (
+                  <styled.h2
+                    fontSize="xl"
+                    fontWeight="semibold"
+                    textAlign="center"
+                    mt={4}
+                  >
+                    Waiting to start...
+                  </styled.h2>
+                )}
+
+                {tournament.state === TournamentsState.QUALIFYING && (
+                  <QualiForm />
+                )}
+
+                {tournament.state === TournamentsState.BATTLES && (
+                  <BattleForm />
+                )}
+
+                {tournament.state === TournamentsState.END && (
+                  <styled.h2 textAlign="center" fontSize="xl">
+                    Tournament Complete
+                  </styled.h2>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      </Center>
+    </Box>
+  );
+};
+
+export default () => {
+  const { tournament } = useLoaderData<typeof loader>();
+
+  return (
+    <AblyProvider client={AblyClient}>
+      <ChannelProvider channelName={tournament.id}>
+        <JudgePage />
+      </ChannelProvider>
+    </AblyProvider>
+  );
+};

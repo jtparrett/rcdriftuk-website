@@ -22,7 +22,7 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
       borderColor="gray.900"
     >
       <Container px={2} maxW={1100}>
-        <Box overflowX="auto" w="full">
+        <Box overflowX="auto" w="full" scrollbar="hidden">
           <Flex gap={0.5} py={2} alignItems="center">
             {children}
           </Flex>

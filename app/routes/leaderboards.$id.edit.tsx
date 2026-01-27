@@ -23,6 +23,7 @@ import { useMemo, useState } from "react";
 import { Reorder } from "motion/react";
 import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { Dropdown, Option } from "~/components/Dropdown";
+import { Card } from "~/components/CollapsibleCard";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -479,8 +480,8 @@ const LeaderboardsEditPage = () => {
   return (
     <Container maxW={1100} px={2} py={4}>
       <Box maxW="580px" mx="auto">
-        <styled.h2>Edit Leaderboard Details</styled.h2>
-        <Box p={6} mt={2} rounded="2xl" borderWidth={1} borderColor="gray.800">
+        <styled.h2 mb={2}>Edit Leaderboard Details</styled.h2>
+        <Card p={4}>
           <form onSubmit={formik.handleSubmit}>
             <VStack gap={4} alignItems="stretch">
               <FormControl error={formik.errors.name}>
@@ -551,7 +552,7 @@ const LeaderboardsEditPage = () => {
               </Button>
             </VStack>
           </form>
-        </Box>
+        </Card>
       </Box>
     </Container>
   );

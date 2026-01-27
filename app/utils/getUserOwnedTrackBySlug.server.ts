@@ -28,6 +28,8 @@ export const getUserOwnedTrackBySlug = async (slug: string, userId: string) => {
       lng: true,
       leaderboardId: true,
       region: true,
+      stripeAccountId: true,
+      stripeAccountEnabled: true,
     },
   });
 

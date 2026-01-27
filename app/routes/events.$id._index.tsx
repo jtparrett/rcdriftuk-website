@@ -432,28 +432,18 @@ const Page = () => {
                 </LinkButton>
 
                 {isTrackOwner && event.enableTicketing && (
-                  <>
-                    <LinkButton
-                      w="full"
-                      to={`/events/${event.id}/export`}
-                      variant="outline"
-                      download={`${event.name} Tickets ${format(
-                        new Date(),
-                        "dd-MM-yyyy",
-                      )}.csv`}
-                      target="_blank"
-                    >
-                      Download Attendees <RiDownloadLine />
-                    </LinkButton>
-
-                    <LinkButton
-                      w="full"
-                      to={`/tournaments/new?eventId=${event.id}`}
-                      variant="outline"
-                    >
-                      Create Tournament
-                    </LinkButton>
-                  </>
+                  <LinkButton
+                    w="full"
+                    to={`/events/${event.id}/export`}
+                    variant="outline"
+                    download={`${event.name} Tickets ${format(
+                      new Date(),
+                      "dd-MM-yyyy",
+                    )}.csv`}
+                    target="_blank"
+                  >
+                    Download Attendees <RiDownloadLine />
+                  </LinkButton>
                 )}
 
                 {isTrackOwner && (

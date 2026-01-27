@@ -4,7 +4,7 @@ import { LinkOverlay } from "./LinkOverlay";
 import type { loader } from "~/routes/marketplace._index";
 
 interface Props {
-  product: Awaited<ReturnType<typeof loader>>[number];
+  product: Awaited<ReturnType<typeof loader>>["products"][number];
 }
 
 export const ProductCard = ({ product }: Props) => {

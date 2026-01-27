@@ -4,6 +4,9 @@ import { cva } from "~/styled-system/css";
 
 const TabStyle = cva({
   base: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 1.5,
     px: 3,
     py: 2,
     flex: "none",
@@ -13,6 +16,9 @@ const TabStyle = cva({
     transition: "background-color .3s",
     whiteSpace: "nowrap",
     cursor: "pointer",
+    _disabled: {
+      opacity: 0.5,
+    },
   },
   variants: {
     isActive: {
@@ -32,5 +38,7 @@ export const TabGroup = styled("div", {
     bgColor: "gray.900",
     rounded: "2xl",
     p: 1,
+    borderWidth: 1,
+    borderColor: "gray.800",
   },
 });
