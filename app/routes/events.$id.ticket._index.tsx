@@ -168,9 +168,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   // Verify the track has a connected Stripe account
   const stripeAccountId = event.eventTrack?.stripeAccountId;
-  if (!stripeAccountId) {
-    throw new Response("Track is not set up for payments", { status: 400 });
-  }
+
+  // if (!stripeAccountId) {
+  //   throw new Response("Track is not set up for payments", { status: 400 });
+  // }
 
   const session = await stripe.checkout.sessions.create({
     line_items: [
@@ -193,10 +194,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
       ticketId: ticket.id,
     },
     payment_intent_data: {
-      application_fee_amount: PLATFORM_FEE_AMOUNT,
-      transfer_data: {
-        destination: stripeAccountId,
-      },
+      ...(stripeAccountId && {
+        application_fee_amount: PLATFORM_FEE_AMOUNT,
+        transfer_data: {
+          destination: stripeAccountId,
+        },
+      }),
     },
   });
 
