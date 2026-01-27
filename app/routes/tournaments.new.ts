@@ -11,8 +11,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return redirect("/sign-in");
   }
 
-  const searchParams = new URLSearchParams(args.request.url);
-  const tournamentId = searchParams.get("tournamentId");
+  const url = new URL(args.request.url);
+  const tournamentId = url.searchParams.get("tournamentId");
 
   const getTournamentToCopy = async () => {
     if (!tournamentId) {
