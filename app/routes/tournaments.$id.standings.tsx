@@ -19,6 +19,20 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       format: true,
       enableQualifying: true,
       enableBattles: true,
+      scoreFormula: true,
+      _count: {
+        select: {
+          judges: true,
+        },
+      },
+      judges: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
+        },
+      },
       battles: {
         orderBy: [
           { round: "asc" },
@@ -67,12 +81,27 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
           id: true,
           qualifyingPosition: true,
           isBye: true,
+          tournamentDriverNumber: true,
           user: {
             select: {
               firstName: true,
               lastName: true,
               image: true,
               driverId: true,
+            },
+          },
+          laps: {
+            orderBy: {
+              id: "asc",
+            },
+            select: {
+              penalty: true,
+              scores: {
+                select: {
+                  score: true,
+                  judgeId: true,
+                },
+              },
             },
           },
         },

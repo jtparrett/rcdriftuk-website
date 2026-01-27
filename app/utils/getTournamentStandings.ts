@@ -1,4 +1,5 @@
-import { TournamentsFormat, BattlesBracket } from "./enums";
+import { TournamentsFormat, BattlesBracket, ScoreFormula } from "./enums";
+import { sumScores } from "./sumScores";
 
 type User = {
   firstName: string | null;
@@ -22,11 +23,23 @@ type Battle = {
   round?: number;
 };
 
+type LapScore = {
+  score: number;
+  judgeId: string;
+};
+
+type Lap = {
+  scores: LapScore[];
+  penalty: number;
+};
+
 type TournamentDriver = {
   id: number;
   qualifyingPosition: number | null;
   isBye: boolean;
   user: User;
+  tournamentDriverNumber?: number;
+  laps?: Lap[];
 };
 
 type Tournament = {
@@ -37,6 +50,10 @@ type Tournament = {
   enableBattles: boolean;
   battles: Battle[];
   drivers: TournamentDriver[];
+  // Optional fields for calculating qualifying scores from laps
+  scoreFormula?: ScoreFormula;
+  judges?: { id: string }[];
+  _count?: { judges: number };
 };
 
 type DriverStanding = {
@@ -293,19 +310,82 @@ const getBattleStandings = (
 };
 
 /**
- * Get standings for a single tournament based on qualifying results
+ * Calculate lap scores for a driver using the tournament's scoring formula
+ */
+const calculateDriverLapScores = (
+  driver: TournamentDriver,
+  tournament: Tournament,
+): number[] => {
+  if (!driver.laps || driver.laps.length === 0) {
+    return [];
+  }
+
+  const judgeCount = tournament._count?.judges ?? tournament.judges?.length ?? 0;
+  const judgeIds = tournament.judges?.map((j) => j.id);
+  const scoreFormula = tournament.scoreFormula ?? ScoreFormula.AVERAGE;
+
+  return driver.laps
+    .filter((lap) => lap.scores.length === judgeCount)
+    .map((lap) =>
+      sumScores(
+        lap.scores.map((s) => ({ ...s, visitorId: "", judgeId: s.judgeId, lapId: "" })) as any,
+        judgeCount,
+        scoreFormula,
+        lap.penalty,
+        judgeIds,
+      ),
+    );
+};
+
+/**
+ * Get standings for a single tournament based on qualifying results.
+ * If lap data is available, calculates positions from actual scores.
+ * Otherwise falls back to qualifyingPosition field.
  */
 const getQualifyingStandings = (
   tournament: Tournament,
 ): { driverId: number; position: number; stats: BattleDriverStats }[] => {
   const drivers = tournament.drivers.filter((d) => !d.isBye);
 
-  const sorted = [...drivers].sort((a, b) => {
-    const aPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
-    const bPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
-    if (aPos !== bPos) return aPos - bPos;
-    return a.id - b.id;
-  });
+  // Check if we have lap data to calculate scores from
+  const hasLapData = drivers.some((d) => d.laps && d.laps.length > 0);
+
+  let sorted: typeof drivers;
+
+  if (hasLapData && tournament._count?.judges) {
+    // Calculate scores from laps and sort by best scores (like qualifying table does)
+    const driversWithScores = drivers.map((driver) => ({
+      driver,
+      lapScores: calculateDriverLapScores(driver, tournament),
+    }));
+
+    sorted = driversWithScores
+      .sort((a, b) => {
+        const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
+          (x, y) => y - x,
+        );
+        const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
+          (x, y) => y - x,
+        );
+
+        return (
+          bestB - bestA ||
+          secondB - secondA ||
+          thirdB - thirdA ||
+          (a.driver.tournamentDriverNumber ?? a.driver.id) -
+            (b.driver.tournamentDriverNumber ?? b.driver.id)
+        );
+      })
+      .map((d) => d.driver);
+  } else {
+    // Fall back to qualifyingPosition field
+    sorted = [...drivers].sort((a, b) => {
+      const aPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+      const bPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
+      if (aPos !== bPos) return aPos - bPos;
+      return a.id - b.id;
+    });
+  }
 
   return sorted.map((driver, index) => ({
     driverId: driver.user.driverId,
