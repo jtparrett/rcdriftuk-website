@@ -36,6 +36,7 @@ import {
   TournamentsState,
   getScoreFormulaOptions,
 } from "~/utils/enums";
+import { useParams } from "react-router";
 import { getAuth } from "~/utils/getAuth.server";
 import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
@@ -415,7 +416,9 @@ const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 const Page = () => {
   const { users, tournament } = useLoaderData<typeof loader>();
   const modalRef = useRef<HTMLDialogElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const body = global.document?.body;
+  const params = useParams();
 
   const onOpen = () => {
     disableBodyScroll(body);
@@ -432,6 +435,28 @@ const Page = () => {
     isStartState || tournament.state === TournamentsState.QUALIFYING;
 
   const fetcher = useFetcher();
+  const csvFetcher = useFetcher();
+
+  const handleCsvImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    csvFetcher.submit(formData, {
+      method: "POST",
+      action: `/api/tournaments/${params.id}/import-csv`,
+      encType: "multipart/form-data",
+    });
+
+    // Reset the input so the same file can be selected again
+    event.target.value = "";
+  };
   const isSubmitting = fetcher.state !== "idle";
 
   const formik = useFormik({
@@ -623,9 +648,23 @@ const Page = () => {
                     Shuffle
                     <RiShuffleLine />
                   </Button>
-                  <Button variant="secondary" size="sm" type="button">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={handleCsvImport}
+                    isLoading={csvFetcher.state !== "idle"}
+                    disabled={csvFetcher.state !== "idle"}
+                  >
                     Import CSV <RiFileUploadLine />
                   </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
                 </>
               )}
             </CardHeader>
