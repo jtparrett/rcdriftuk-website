@@ -95,11 +95,15 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
     return null;
   }
 
+  const formattedPrice = event.ticketPrice
+    ? `£${event.ticketPrice.toFixed(2)}`
+    : null;
+
   if (releaseDate && isBeforeRelease) {
     return (
       <>
         <Button disabled w="full" variant="secondary">
-          Buy Ticket <RiTicketFill />
+          Buy Ticket {formattedPrice && `- ${formattedPrice}`} <RiTicketFill />
         </Button>
         {releaseDate && (
           <ClientOnly>
@@ -137,7 +141,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
     <>
       <SignedIn>
         <LinkButton to={`/events/${event.id}/ticket`} w="full">
-          Buy Ticket <RiTicketFill />
+          Buy Ticket {formattedPrice && `- ${formattedPrice}`} <RiTicketFill />
         </LinkButton>
       </SignedIn>
 
@@ -150,7 +154,7 @@ export const EventTicketButton = ({ event, ticket, isSoldOut }: Props) => {
           }
           w="full"
         >
-          Buy Ticket <RiTicketFill />
+          Buy Ticket {formattedPrice && `- ${formattedPrice}`} <RiTicketFill />
         </Button>
       </SignedOut>
     </>

@@ -142,6 +142,38 @@ export async function action(args: ActionFunctionArgs) {
       });
     }
 
+    // Handle Stripe Connect account updates
+    if (event.type === "account.updated") {
+      const account = event.data.object;
+
+      // Check if this is a connected account we know about
+      const track = await prisma.tracks.findFirst({
+        where: {
+          stripeAccountId: account.id,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (track) {
+        // Update the track based on whether the account is fully onboarded
+        const isEnabled =
+          account.charges_enabled &&
+          account.payouts_enabled &&
+          account.details_submitted;
+
+        await prisma.tracks.update({
+          where: { id: track.id },
+          data: { stripeAccountEnabled: isEnabled },
+        });
+
+        console.log(
+          `Updated track ${track.id} stripe status: ${isEnabled ? "enabled" : "disabled"}`,
+        );
+      }
+    }
+
     return new Response("Webhook received", { status: 200 });
   } catch (err) {
     console.error(err);

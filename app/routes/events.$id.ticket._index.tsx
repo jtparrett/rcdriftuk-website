@@ -10,6 +10,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import { getEventDate } from "~/utils/getEventDate";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
+import { PLATFORM_FEE_AMOUNT } from "~/utils/platformFee";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
 
@@ -35,6 +36,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     },
     include: {
+      eventTrack: {
+        select: {
+          stripeAccountId: true,
+        },
+      },
       _count: {
         select: {
           EventTickets: {
@@ -160,6 +166,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
   }
 
+  // Verify the track has a connected Stripe account
+  const stripeAccountId = event.eventTrack?.stripeAccountId;
+  if (!stripeAccountId) {
+    throw new Response("Track is not set up for payments", { status: 400 });
+  }
+
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
@@ -179,6 +191,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
     metadata: {
       userId,
       ticketId: ticket.id,
+    },
+    payment_intent_data: {
+      application_fee_amount: PLATFORM_FEE_AMOUNT,
+      transfer_data: {
+        destination: stripeAccountId,
+      },
     },
   });
 

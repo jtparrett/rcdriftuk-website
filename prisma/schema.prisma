@@ -247,8 +247,10 @@ model Tracks {
   status        TrackStatus   @default(PENDING)
   address       String?
   posts         Posts[]
-  leaderboardId String?       @db.Uuid
-  leaderboard   Leaderboards? @relation(fields: [leaderboardId], references: [id])
+  leaderboardId         String?       @db.Uuid
+  leaderboard           Leaderboards? @relation(fields: [leaderboardId], references: [id])
+  stripeAccountId       String?
+  stripeAccountEnabled  Boolean       @default(false)
 
   @@index([status])
   @@index([types])
