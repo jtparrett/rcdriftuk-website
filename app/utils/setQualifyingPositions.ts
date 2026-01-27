@@ -1,5 +1,6 @@
 import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
+import { sortByQualifyingScores } from "~/utils/sortByQualifyingScores";
 import { sumScores } from "~/utils/sumScores";
 
 /**
@@ -66,21 +67,10 @@ export const setQualifyingPositions = async (id: string) => {
     };
   });
 
-  const sortedDrivers = driversWithScores.sort((a, b) => {
-    const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
-      (lapA, lapB) => lapB - lapA,
-    );
-    const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
-      (lapA, lapB) => lapB - lapA,
-    );
-
-    return (
-      bestB - bestA ||
-      secondB - secondA ||
-      thirdB - thirdA ||
-      a.tournamentDriverNumber - b.tournamentDriverNumber
-    );
-  });
+  const sortedDrivers = sortByQualifyingScores(
+    driversWithScores,
+    (d) => d.tournamentDriverNumber,
+  );
 
   await prisma.$transaction(
     sortedDrivers.map((driver, i) => {

@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { prisma } from "~/utils/prisma.server";
+import { compareQualifyingScores } from "~/utils/sortByQualifyingScores";
 import { sumScores } from "~/utils/sumScores";
 import { Glow } from "~/components/Glow";
 import { getAuth } from "~/utils/getAuth.server";
@@ -137,18 +138,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
       })
       .sort((a, b) => {
         if (run === 0) {
-          const [bestA = -1, secondA = -1, thirdA = -1] = [...a.scores].sort(
-            (lapA, lapB) => lapB - lapA,
-          );
-          const [bestB = -1, secondB = -1, thirdB = -1] = [...b.scores].sort(
-            (lapA, lapB) => lapB - lapA,
-          );
-
-          return (
-            bestB - bestA ||
-            secondB - secondA ||
-            thirdB - thirdA ||
-            a.tournamentDriverNumber - b.tournamentDriverNumber
+          return compareQualifyingScores(
+            a.scores,
+            b.scores,
+            a.tournamentDriverNumber,
+            b.tournamentDriverNumber,
           );
         }
 

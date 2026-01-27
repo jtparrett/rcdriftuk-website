@@ -287,6 +287,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
 const Icon = styled("div", {
   base: {
+    flex: "none",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -713,8 +714,11 @@ const Page = () => {
                 Drivers
               </styled.h2>
               <Spacer />
+            </CardHeader>
+
+            <CardContent p={4} display="flex" flexDir="column" gap={4}>
               {canEditDrivers && (
-                <>
+                <Flex gap={2} mb={2}>
                   <Button
                     variant="secondary"
                     size="sm"
@@ -748,11 +752,9 @@ const Page = () => {
                     onChange={handleFileChange}
                     style={{ display: "none" }}
                   />
-                </>
+                </Flex>
               )}
-            </CardHeader>
 
-            <CardContent p={4} display="flex" flexDir="column" gap={4}>
               <FormControl error={formik.errors.drivers}>
                 {!canEditDrivers && (
                   <styled.p fontSize="sm" color="brand.500" mb={2}>
@@ -955,7 +957,7 @@ const Page = () => {
 
                 <FormControl flex={1} error={formik.errors.bracketSize}>
                   <Label>Bracket Size</Label>
-                  <TabGroup>
+                  <Flex gap={2} flexWrap="wrap">
                     {Object.values(BracketSize).map((item) => {
                       return (
                         <TabButton
@@ -970,7 +972,7 @@ const Page = () => {
                         </TabButton>
                       );
                     })}
-                  </TabGroup>
+                  </Flex>
                 </FormControl>
 
                 <FormControl flex={1} error={formik.errors.enableProtests}>

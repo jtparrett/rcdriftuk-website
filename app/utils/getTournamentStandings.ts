@@ -1,4 +1,5 @@
 import { TournamentsFormat, BattlesBracket, ScoreFormula } from "./enums";
+import { compareQualifyingScores } from "./sortByQualifyingScores";
 import { sumScores } from "./sumScores";
 
 type User = {
@@ -360,22 +361,14 @@ const getQualifyingStandings = (
     }));
 
     sorted = driversWithScores
-      .sort((a, b) => {
-        const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
-          (x, y) => y - x,
-        );
-        const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
-          (x, y) => y - x,
-        );
-
-        return (
-          bestB - bestA ||
-          secondB - secondA ||
-          thirdB - thirdA ||
-          (a.driver.tournamentDriverNumber ?? a.driver.id) -
-            (b.driver.tournamentDriverNumber ?? b.driver.id)
-        );
-      })
+      .sort((a, b) =>
+        compareQualifyingScores(
+          a.lapScores,
+          b.lapScores,
+          a.driver.tournamentDriverNumber ?? a.driver.id,
+          b.driver.tournamentDriverNumber ?? b.driver.id,
+        ),
+      )
       .map((d) => d.driver);
   } else {
     // Fall back to qualifyingPosition field

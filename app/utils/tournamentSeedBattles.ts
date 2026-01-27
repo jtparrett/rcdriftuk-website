@@ -3,6 +3,7 @@ import { BattlesBracket, TournamentsState } from "~/utils/enums";
 import invariant from "~/utils/invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
+import { sortByQualifyingScores } from "~/utils/sortByQualifyingScores";
 import { sumScores } from "~/utils/sumScores";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 
@@ -133,21 +134,10 @@ export const tournamentSeedBattles = async (id: string) => {
     };
   });
 
-  let sortedDrivers = driversWithScores.sort((a, b) => {
-    const [bestA = -1, secondA = -1, thirdA = -1] = [...a.lapScores].sort(
-      (lapA, lapB) => lapB - lapA,
-    );
-    const [bestB = -1, secondB = -1, thirdB = -1] = [...b.lapScores].sort(
-      (lapA, lapB) => lapB - lapA,
-    );
-
-    return (
-      bestB - bestA ||
-      secondB - secondA ||
-      thirdB - thirdA ||
-      a.tournamentDriverNumber - b.tournamentDriverNumber
-    );
-  });
+  let sortedDrivers = sortByQualifyingScores(
+    driversWithScores,
+    (d) => d.tournamentDriverNumber,
+  );
 
   // Set qualifying positions (exclude bye driver)
   await prisma.$transaction(
