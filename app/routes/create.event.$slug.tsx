@@ -159,12 +159,17 @@ const CalendarNewPage = () => {
   const [startDate, setStartDate] = useState(
     startOfHour(add(new Date(), { days: 1 })),
   );
+  const [numberOfDays, setNumberOfDays] = useState(1);
   const [endDate, setEndDate] = useState(
     startOfHour(add(new Date(), { days: 1 })),
   );
   const [enableTicketing, setEnableTicketing] = useState(false);
   const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
   const [rated, setRated] = useState(false);
+
+  const updateEndDate = (newStartDate: Date, days: number) => {
+    setEndDate(add(newStartDate, { days: days - 1 }));
+  };
 
   return (
     <Container maxW={1100} px={4} py={8}>
@@ -177,11 +182,30 @@ const CalendarNewPage = () => {
             <Label>Date</Label>
             <DatePicker
               value={startDate}
+              days={numberOfDays}
               onChange={(date) => {
                 setStartDate(date);
-                setEndDate(date);
+                updateEndDate(date, numberOfDays);
               }}
             />
+          </Box>
+
+          <Box>
+            <Label>Number of Days</Label>
+            <Select
+              value={numberOfDays}
+              onChange={(e) => {
+                const days = parseInt(e.target.value, 10);
+                setNumberOfDays(days);
+                updateEndDate(startDate, days);
+              }}
+            >
+              <option value="1">1 Day</option>
+              <option value="2">2 Days</option>
+              <option value="3">3 Days</option>
+              <option value="4">4 Days</option>
+              <option value="5">5 Days</option>
+            </Select>
           </Box>
 
           <Box flex={1}>

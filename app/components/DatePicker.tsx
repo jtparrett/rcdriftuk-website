@@ -8,24 +8,38 @@ import {
   startOfWeek,
   sub,
   isAfter,
+  isBefore,
+  isEqual,
 } from "date-fns";
 import { useState } from "react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { Box, Flex, styled } from "~/styled-system/jsx";
+import { token } from "~/styled-system/tokens";
 
 interface Props {
   value: Date;
   onChange: (date: Date) => void;
   maxDate?: Date;
+  days?: number;
 }
 
 export const DatePicker = ({
   value = new Date(),
   onChange,
   maxDate,
+  days = 1,
 }: Props) => {
   const [selectedMonth, setSelectedMonth] = useState(startOfMonth(value));
   const monthStartDate = startOfMonth(selectedMonth);
+  const rangeEndDate = add(value, { days: days - 1 });
+
+  const isInRange = (day: Date) => {
+    if (days <= 1) return false;
+    return (
+      isAfter(day, value) &&
+      (isBefore(day, rangeEndDate) || isEqual(day, rangeEndDate))
+    );
+  };
 
   return (
     <Box w="full" rounded="md" overflow="hidden">
@@ -75,9 +89,9 @@ export const DatePicker = ({
               monthStartDate,
               startOfWeek(monthStartDate, {
                 weekStartsOn: 1,
-              })
-            )
-          )
+              }),
+            ),
+          ),
         ).map((_, i) => (
           <Box key={i} bgColor="gray.900" w={`calc(${100 / 7}% - 1px)`}></Box>
         ))}
@@ -88,7 +102,14 @@ export const DatePicker = ({
           });
 
           const isSelected = isSameDay(day, value);
+          const isHighlighted = isInRange(day);
           const isDisabled = maxDate && isAfter(day, maxDate);
+
+          const getBgColor = () => {
+            if (isSelected) return token("colors.brand.500");
+            if (isHighlighted) return token("colors.brand.900");
+            return token("colors.gray.900");
+          };
 
           return (
             <styled.button
@@ -98,7 +119,12 @@ export const DatePicker = ({
               w={`calc(${100 / 7}% - 1px)`}
               textAlign="center"
               py={2}
-              bgColor={isSelected ? "brand.500" : "gray.900"}
+              style={
+                {
+                  "--bg-color": getBgColor(),
+                } as React.CSSProperties
+              }
+              bg="var(--bg-color)"
               onClick={() => !isDisabled && onChange(day)}
               disabled={isDisabled}
               cursor={isDisabled ? "not-allowed" : "pointer"}
