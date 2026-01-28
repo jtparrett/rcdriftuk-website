@@ -43,7 +43,7 @@ export const Carousel = ({ children }: Props) => {
   });
 
   return (
-    <Box pos="relative" w="full">
+    <Box pos="relative" w="full" userSelect="none">
       <Box
         w="full"
         overflow="hidden"
