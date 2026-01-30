@@ -1,4 +1,7 @@
 import { defineConfig } from "@pandacss/dev";
+import { getTheme } from "~/utils/theme";
+
+const theme = getTheme();
 
 export default defineConfig({
   // Whether to use css reset
@@ -39,38 +42,39 @@ export default defineConfig({
           black: {
             value: "#0c0c0c",
           },
+          // Brand colors generated from theme.brandColor using CSS color-mix()
           "brand.50": {
-            value: "#ffe5ec",
+            value: `color-mix(in oklch, ${theme.brandColor} 10%, white)`,
           },
           "brand.100": {
-            value: "#ffc1ce",
+            value: `color-mix(in oklch, ${theme.brandColor} 20%, white)`,
           },
           "brand.200": {
-            value: "#ff95aa",
+            value: `color-mix(in oklch, ${theme.brandColor} 35%, white)`,
           },
           "brand.300": {
-            value: "#ff6887",
+            value: `color-mix(in oklch, ${theme.brandColor} 50%, white)`,
           },
           "brand.400": {
-            value: "#f83b66",
+            value: `color-mix(in oklch, ${theme.brandColor} 75%, white)`,
           },
           "brand.500": {
-            value: "#F20C4E",
+            value: theme.brandColor,
           },
           "brand.600": {
-            value: "#cb0a42",
+            value: `color-mix(in oklch, ${theme.brandColor} 85%, black)`,
           },
           "brand.700": {
-            value: "#a50937",
+            value: `color-mix(in oklch, ${theme.brandColor} 70%, black)`,
           },
           "brand.800": {
-            value: "#7e072b",
+            value: `color-mix(in oklch, ${theme.brandColor} 55%, black)`,
           },
           "brand.900": {
-            value: "#58051f",
+            value: `color-mix(in oklch, ${theme.brandColor} 40%, black)`,
           },
           "brand.950": {
-            value: "#370313",
+            value: `color-mix(in oklch, ${theme.brandColor} 25%, black)`,
           },
           "gray.50": {
             value: "#fafafa",

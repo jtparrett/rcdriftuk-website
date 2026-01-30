@@ -1,8 +1,9 @@
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { LinkButton } from "./Button";
-import { AppName } from "~/utils/enums";
+import { useTheme } from "~/utils/theme";
 
 export const Footer = () => {
+  const theme = useTheme();
   return (
     <Box borderTopWidth={1} borderColor="gray.900" py={8}>
       <Container maxW={1100} px={4}>
@@ -13,10 +14,10 @@ export const Footer = () => {
         >
           <Box>
             <styled.img
-              src="/rcdriftio-light.svg"
+              src={theme?.footerLogoUrl}
               w={120}
               mb={2}
-              alt={AppName}
+              alt={theme?.name}
             />
           </Box>
 

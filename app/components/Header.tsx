@@ -9,8 +9,8 @@ import type { GetUser } from "~/utils/getUser.server";
 import { Menu, UserMenu } from "./Menu";
 import { UserTracks } from "./UserTracks";
 import { NotificationsBadge } from "./NotificationsBadge";
-import { AppName } from "~/utils/enums";
 import { Spinner } from "./Spinner";
+import { useTheme } from "~/utils/theme";
 
 export const HEADER_HEIGHT = 64;
 
@@ -90,6 +90,7 @@ interface Props {
 }
 
 export const Header = ({ user }: Props) => {
+  const theme = useTheme();
   const location = useLocation();
   const menu = useDisclosure();
   const isNavigating = useDelayedLoader();
@@ -119,41 +120,43 @@ export const Header = ({ user }: Props) => {
       <Container maxW={1100} w="full" px={2} h="64px">
         <Flex alignItems="center" h={HEADER_HEIGHT + "px"} gap={1}>
           <Link to="/">
-            <styled.img w={140} src="/rcdriftio.svg" alt={AppName} />
+            <styled.img w={140} src={theme?.logoUrl} alt={theme?.name} />
           </Link>
 
           {isNavigating && <Spinner />}
 
           <Spacer />
 
-          <Box>
-            <Button
-              size="sm"
-              variant={menu.isOpen ? "primary" : "outline"}
-              onClick={() => menu.toggle()}
-              aria-label="Menu"
-              pos="relative"
-              overflow="visible"
-            >
-              <RiMenuFill />
-              Menu
-              {menu.isOpen && (
-                <styled.span
-                  pos="absolute"
-                  top="calc(100% + 9px)"
-                  left="50%"
-                  w={3}
-                  h={3}
-                  transform="translateX(-50%) rotate(45deg)"
-                  bgColor="gray.900"
-                  borderTopWidth={1}
-                  borderLeftWidth={1}
-                  borderColor="gray.800"
-                  borderTopLeftRadius="sm"
-                />
-              )}
-            </Button>
-          </Box>
+          {theme?.showMenu && (
+            <Box>
+              <Button
+                size="sm"
+                variant={menu.isOpen ? "primary" : "outline"}
+                onClick={() => menu.toggle()}
+                aria-label="Menu"
+                pos="relative"
+                overflow="visible"
+              >
+                <RiMenuFill />
+                Menu
+                {menu.isOpen && (
+                  <styled.span
+                    pos="absolute"
+                    top="calc(100% + 9px)"
+                    left="50%"
+                    w={3}
+                    h={3}
+                    transform="translateX(-50%) rotate(45deg)"
+                    bgColor="gray.900"
+                    borderTopWidth={1}
+                    borderLeftWidth={1}
+                    borderColor="gray.800"
+                    borderTopLeftRadius="sm"
+                  />
+                )}
+              </Button>
+            </Box>
+          )}
 
           {user && (
             <>

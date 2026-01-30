@@ -21,7 +21,7 @@ import { CookieBanner } from "./components/CookieBanner";
 import { userPrefs } from "./utils/cookiePolicy.server";
 import { Button, LinkButton } from "./components/Button";
 import { RiHome2Line, RiRefreshLine } from "react-icons/ri";
-import { getUser } from "./utils/getUser.server";
+import { getUser, type GetUser } from "./utils/getUser.server";
 import { Footer } from "./components/Footer";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { EmbedProvider } from "./utils/EmbedContext";
@@ -32,13 +32,15 @@ import type { Route } from "./+types/root";
 import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
-import { AppName } from "./utils/enums";
+import { getTheme } from "./utils/theme";
 
 // export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
 export const meta: Route.MetaFunction = () => {
+  const theme = getTheme();
+
   return [
-    { title: `${AppName} | Driving the Future of RC Drifting` },
+    { title: `${theme?.name} | Driving the Future of RC Drifting` },
     {
       property: "og:image",
       content: "https://rcdrift.io/og-image.jpg",
@@ -65,19 +67,14 @@ export const loader = (args: LoaderFunctionArgs) =>
       POSTHOG_HOST: process.env.POSTHOG_HOST,
     };
 
+    let user: GetUser | null = null;
+
     if (userId) {
-      const user = await getUser(userId);
-      return {
-        user,
-        isEmbed,
-        isApp,
-        hideBanner: cookie.hideBanner,
-        posthog,
-      };
+      user = await getUser(userId);
     }
 
     return {
-      user: null,
+      user,
       isEmbed,
       isApp,
       hideBanner: cookie.hideBanner,
