@@ -226,9 +226,9 @@ export const Header = ({ user }: Props) => {
           <Tab to="/" isActive={location.pathname === "/"}>
             Overview
           </Tab>
-          <Tab to="/sdc">Schedule</Tab>
           <Tab to="/sdc">Standings</Tab>
-          <Tab to="/sdc">Rules & Regs</Tab>
+          <Tab to="https://super-drift.com/rules">Rules & Regs</Tab>
+          <Tab to="https://super-drift.com/">Blog</Tab>
         </TabsBar>
       )}
     </>

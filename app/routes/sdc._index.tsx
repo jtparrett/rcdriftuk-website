@@ -149,7 +149,7 @@ const Page = () => {
             lineHeight="tight"
             fontWeight="medium"
             color="gray.300"
-            maxW={500}
+            maxW={{ base: 320, md: 400 }}
             mx="auto"
             mb={6}
             textWrap="balance"
@@ -201,7 +201,7 @@ const Page = () => {
 
           <Flex justifyContent="center">
             <LinkButton
-              to="https://super-g.com/sdc-2026-registration"
+              to="https://super-drift.com/registration/"
               variant="primary"
             >
               <RiEditFill />
