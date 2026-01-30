@@ -108,13 +108,6 @@ const UserMenuPage = () => {
       </MenuLink>
 
       <UserMenu />
-
-      <MenuLink to="/vtrack">
-        <MenuIcon>
-          <RiGamepadLine />
-        </MenuIcon>
-        Let's Skid!
-      </MenuLink>
     </Box>
   );
 };
