@@ -10,7 +10,12 @@ const Page = () => {
         <Tab to="/standings" isActive={location.pathname === "/standings"}>
           All Standings
         </Tab>
-        <Tab to="/standings/regional">Regional Standings</Tab>
+        <Tab
+          to="/standings/regional"
+          isActive={location.pathname === "/standings/regional"}
+        >
+          Regional Standings
+        </Tab>
       </TabsBar>
       <Outlet />
     </>

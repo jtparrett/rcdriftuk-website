@@ -55,11 +55,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
               enableQualifying: true,
               enableBattles: true,
               battles: {
-                orderBy: [
-                  { round: "asc" },
-                  { bracket: "asc" },
-                  { id: "asc" },
-                ],
+                orderBy: [{ round: "asc" }, { bracket: "asc" }, { id: "asc" }],
                 select: {
                   id: true,
                   winnerId: true,
@@ -136,7 +132,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   return {
     leaderboard,
-    standings: leaderboard.drivers.map((driver) => driver.driver),
+    standings: leaderboard.drivers.map((driver) => ({
+      ...driver.driver,
+      points: null,
+    })),
     isOwner,
   };
 };
@@ -239,6 +238,11 @@ const LeaderboardsPage = () => {
                           {driver.firstName} {driver.lastName}
                         </Flex>
                       </styled.td>
+                      {driver.points !== null && (
+                        <styled.td textAlign="right" fontFamily="mono">
+                          {driver.points}
+                        </styled.td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

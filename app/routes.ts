@@ -14,6 +14,7 @@ const IGNORE_FILE_ROUTES = [
   "routes/sdc.layout.tsx",
   "routes/sdc._index.tsx",
   "routes/sdc.standings.tsx",
+  "routes/sdc.standings.regional.tsx",
 ];
 
 const RCDIO_ROUTES = [index("./routes/_index.tsx")];
@@ -22,6 +23,7 @@ const SDC_ROUTES = [
   index("./routes/sdc._index.tsx"),
   layout("./routes/sdc.layout.tsx", [
     route("/standings", "./routes/sdc.standings.tsx"),
+    route("/standings/regional", "./routes/sdc.standings.regional.tsx"),
   ]),
 ];
 

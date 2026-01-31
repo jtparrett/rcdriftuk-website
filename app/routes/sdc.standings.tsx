@@ -4,6 +4,7 @@ import { Card } from "~/components/CollapsibleCard";
 import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { prisma } from "~/utils/prisma.server";
+import { SDC_USER_ID } from "~/utils/theme";
 
 export const loader = async () => {
   const tournaments = await prisma.tournaments.findMany({
@@ -12,7 +13,7 @@ export const loader = async () => {
       leaderboards: {
         some: {
           leaderboard: {
-            userId: "user_2cXDyVukI5iNEnp2Aox2opAyML5",
+            userId: SDC_USER_ID,
           },
         },
       },

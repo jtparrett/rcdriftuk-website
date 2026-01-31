@@ -23,6 +23,8 @@ const themes = {
   },
 } as const;
 
+export const SDC_USER_ID = "user_2cXDyVukI5iNEnp2Aox2opAyML5";
+
 export const getTheme = () => {
   // Server-side (Node.js) - check process exists before accessing
   if (typeof process !== "undefined" && process.env?.VITE_THEME) {
