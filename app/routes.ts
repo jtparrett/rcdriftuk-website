@@ -1,18 +1,35 @@
-import { type RouteConfig, index } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  index,
+  layout,
+  route,
+} from "@react-router/dev/routes";
 import { flatRoutes } from "@react-router/fs-routes";
 import "dotenv/config";
 
 const theme = process.env.VITE_THEME || "rcdio";
 
+const IGNORE_FILE_ROUTES = [
+  "routes/_index.tsx",
+  "routes/sdc.layout.tsx",
+  "routes/sdc._index.tsx",
+  "routes/sdc.standings.tsx",
+];
+
+const RCDIO_ROUTES = [index("./routes/_index.tsx")];
+
+const SDC_ROUTES = [
+  index("./routes/sdc._index.tsx"),
+  layout("./routes/sdc.layout.tsx", [
+    route("/standings", "./routes/sdc.standings.tsx"),
+  ]),
+];
+
 export default [
-  // Index route based on theme
-  index(
-    theme === "sdc" ? "./routes/sdc._index.tsx" : "./routes/rcdio._index.tsx",
-  ),
-  // All other file-based routes (excluding the theme-specific index routes)
+  ...(theme === "rcdio" ? RCDIO_ROUTES : []),
+  ...(theme === "sdc" ? SDC_ROUTES : []),
+
   ...(await flatRoutes()).filter(
-    (route) =>
-      route.file !== "routes/rcdio._index.tsx" &&
-      route.file !== "routes/sdc._index.tsx",
+    (route) => !IGNORE_FILE_ROUTES.includes(route.file),
   ),
 ] satisfies RouteConfig;

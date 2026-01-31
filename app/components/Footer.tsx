@@ -4,6 +4,7 @@ import { useTheme } from "~/utils/theme";
 
 export const Footer = () => {
   const theme = useTheme();
+
   return (
     <Box borderTopWidth={1} borderColor="gray.900" py={8}>
       <Container maxW={1100} px={4}>
@@ -43,7 +44,8 @@ export const Footer = () => {
           color="gray.600"
           textAlign={{ base: "center", md: "left" }}
         >
-          &copy; {new Date().getFullYear()} RC Drift LTD. All Rights Reserved.
+          &copy; {new Date().getFullYear()} {theme?.coName}. All Rights
+          Reserved.
         </styled.p>
       </Container>
     </Box>
