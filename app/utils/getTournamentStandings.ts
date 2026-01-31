@@ -246,7 +246,7 @@ const getBattleStandings = (
     if (lowerBracketBattles.length > 0) {
       // The Lower Final is the last lower bracket battle (round 1001)
       // The loser of the Lower Final is 3rd place
-      const lowerFinal = lowerBracketBattles[lowerBracketBattles.length - 2];
+      const lowerFinal = lowerBracketBattles[lowerBracketBattles.length - 1];
 
       if (lowerFinal?.winnerId) {
         // The winner of the Lower Final is already in standings as 2nd place
@@ -259,6 +259,26 @@ const getBattleStandings = (
             ? lowerFinal.driverRight?.id
             : lowerFinal.driverLeft?.id;
         moveDriverToStandings(lowerFinalLoserId);
+
+        // 4th place is the loser of the battle where 3rd place won their way into the Lower Final
+        if (lowerFinalLoserId) {
+          // Find all lower bracket battles (excluding Lower Final) where 3rd place was the winner
+          const battlesWonBy3rdPlace = lowerBracketBattles.filter(
+            (b) => b.round !== 1001 && b.winnerId === lowerFinalLoserId,
+          );
+
+          if (battlesWonBy3rdPlace.length > 0) {
+            // Get the most recent one (highest round) - last in array since sorted by round ascending
+            const lowerSemifinal =
+              battlesWonBy3rdPlace[battlesWonBy3rdPlace.length - 1];
+
+            const fourthPlaceId =
+              lowerSemifinal.driverLeft?.id === lowerSemifinal.winnerId
+                ? lowerSemifinal.driverRight?.id
+                : lowerSemifinal.driverLeft?.id;
+            moveDriverToStandings(fourthPlaceId);
+          }
+        }
       }
     }
   } else {
