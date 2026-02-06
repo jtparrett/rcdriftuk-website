@@ -85,7 +85,7 @@ export const action = async (args: ActionFunctionArgs) => {
       link: z.string().optional(),
       repeatWeeks: z.coerce.number(),
       description: z.string().optional(),
-      enableTicketing: z.string().optional(),
+      enableTicketing: z.string().nullish(),
       ticketCapacity: z.coerce.number().nullable(),
       ticketReleaseDate: z.coerce.date().nullable(),
       earlyAccessCode: z.string().nullable(),
