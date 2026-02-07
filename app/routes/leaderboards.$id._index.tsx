@@ -205,7 +205,7 @@ const LeaderboardsPage = () => {
         <Flex flexDir="column" gap={2}>
           {standings.map((driver, i) => (
             <Fragment key={driver.driverId}>
-              {i === cutoff && <Box h="1px" bgColor="red.500" />}
+              {i === cutoff && cutoff > 0 && <Box h="1px" bgColor="red.500" />}
 
               <Card
                 key={driver.driverId}
@@ -213,7 +213,7 @@ const LeaderboardsPage = () => {
                 bgGradient="to-b"
                 gradientFrom="gray.900"
                 gradientTo="black"
-                opacity={i >= cutoff ? 0.5 : 1}
+                opacity={i >= cutoff && cutoff > 0 ? 0.5 : 1}
               >
                 <Flex p={6} alignItems="center" gap={4}>
                   <styled.p

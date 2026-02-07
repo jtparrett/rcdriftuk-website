@@ -512,7 +512,7 @@ const LeaderboardsEditPage = () => {
               </FormControl>
 
               <FormControl>
-                <Label>Cutoff Position</Label>
+                <Label>Qualifying Cutoff Position</Label>
                 <Input
                   type="number"
                   name="cutoff"

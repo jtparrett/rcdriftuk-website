@@ -23,7 +23,7 @@ const themes = {
   },
 } as const;
 
-export const SDC_USER_ID = "user_2cXDyVukI5iNEnp2Aox2opAyML5";
+export const SDC_USER_ID = "user_2cgCizkV9kF2IppRjVwAc6cVNMg";
 
 export const getTheme = () => {
   // Server-side (Node.js) - check process exists before accessing

@@ -1,9 +1,11 @@
-import { RiAddCircleFill } from "react-icons/ri";
+import { format } from "date-fns";
+import { RiAddCircleFill, RiArrowRightSLine } from "react-icons/ri";
 import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkButton } from "~/components/Button";
+import { Card } from "~/components/CollapsibleCard";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { TabsBar } from "~/components/TabsBar";
-import { Container, Flex, Spacer, styled } from "~/styled-system/jsx";
+import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 
@@ -78,24 +80,28 @@ const LeaderboardsPage = () => {
           )}
 
           {leaderboards.map((leaderboard) => (
-            <styled.article
+            <Card
               key={leaderboard.id}
               pos="relative"
-              p={4}
-              rounded="xl"
-              borderWidth="1px"
-              borderColor="gray.800"
-              overflow="hidden"
               bgGradient="to-b"
               gradientFrom="gray.900"
               gradientTo="black"
             >
-              <LinkOverlay to={`/leaderboards/${leaderboard.id}`}>
-                <styled.span fontWeight="medium" fontSize="lg">
-                  {leaderboard.name}
-                </styled.span>
-              </LinkOverlay>
-            </styled.article>
+              <Flex alignItems="center" gap={4} p={6}>
+                <Box flex={1} overflow="hidden">
+                  <LinkOverlay to={`/leaderboards/${leaderboard.id}`}>
+                    <styled.span fontWeight="medium" fontSize="lg">
+                      {leaderboard.name}
+                    </styled.span>
+                  </LinkOverlay>
+                  <styled.p fontSize="sm" color="gray.500">
+                    {format(new Date(leaderboard.createdAt), "MMM d, yyyy")}
+                  </styled.p>
+                </Box>
+
+                <RiArrowRightSLine />
+              </Flex>
+            </Card>
           ))}
         </Flex>
       </Container>
