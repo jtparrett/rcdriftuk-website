@@ -33,6 +33,7 @@ import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { getTheme } from "./utils/theme";
+import { token } from "./styled-system/tokens";
 
 // export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
@@ -223,7 +224,7 @@ function App({
           logoPlacement: "none",
         },
         variables: {
-          colorPrimary: "#ec1a55",
+          colorPrimary: token("colors.brand.500"),
         },
         elements: {
           rootBox: {
