@@ -1,6 +1,7 @@
 import { RiArrowRightSLine } from "react-icons/ri";
 import { useLoaderData } from "react-router";
 import { Card } from "~/components/CollapsibleCard";
+import { LinkOverlay } from "~/components/LinkOverlay";
 import { Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { SDC_USER_ID } from "~/utils/theme";
@@ -30,9 +31,12 @@ const Page = () => {
             bgGradient="to-b"
             gradientFrom="gray.900"
             gradientTo="black"
+            pos="relative"
           >
             <Flex p={6} alignItems="center">
-              <styled.h2 fontWeight="medium">{leaderboard.name}</styled.h2>
+              <LinkOverlay to={`/leaderboards/${leaderboard.id}`}>
+                <styled.h2 fontWeight="medium">{leaderboard.name}</styled.h2>
+              </LinkOverlay>
               <Spacer />
               <RiArrowRightSLine />
             </Flex>
