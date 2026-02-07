@@ -110,6 +110,7 @@ model Tournaments {
 model TournamentDrivers {
   tournamentId           String              @db.Uuid
   qualifyingPosition     Int?
+  finishingPosition      Int?
   createdAt              DateTime            @default(now())
   id                     Int                 @id @default(autoincrement())
   driverId               Int

@@ -27,6 +27,7 @@ import { ably as AblyClient } from "~/utils/ably";
 import { getAuth } from "~/utils/getAuth.server";
 import { getTournament } from "~/utils/getTournament.server";
 import { prisma } from "~/utils/prisma.server";
+import { setTournamentFinishingPositions } from "~/utils/setTournamentFinishingPositions";
 import { tournamentAdvanceBattles } from "~/utils/tournamentAdvanceBattles";
 import { useAblyRealtimeReloader } from "~/utils/useAblyRealtimeReloader";
 import { useReloader } from "~/utils/useReloader";
@@ -184,6 +185,7 @@ export const action = async (args: ActionFunctionArgs) => {
         state: TournamentsState.END,
       },
     });
+    await setTournamentFinishingPositions(id);
   }
 
   return redirect(referer);
@@ -347,7 +349,7 @@ const TournamentPage = () => {
 
       <HiddenEmbed>
         <TabsBar>
-          {isOwner && (
+          {isOwner && tournament.state !== TournamentsState.END && (
             <Tab
               to={`/tournaments/${tournament.id}/setup`}
               isActive={isSetupTab}

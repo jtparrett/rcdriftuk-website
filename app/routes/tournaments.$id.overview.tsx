@@ -21,7 +21,6 @@ import {
   RiArrowRightDoubleFill,
   RiTrophyLine,
 } from "react-icons/ri";
-import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { useIsEmbed } from "~/utils/EmbedContext";
 import { getRankColor, RANKS } from "~/utils/getDriverRank";
 import { css } from "~/styled-system/css";
@@ -43,6 +42,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         select: {
           id: true,
           qualifyingPosition: true,
+          finishingPosition: true,
           isBye: true,
           user: {
             select: {
@@ -53,32 +53,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
             },
           },
         },
-      },
-      battles: {
         orderBy: [
-          { round: "asc" },
-          { bracket: "asc" },
           {
-            id: "asc",
+            finishingPosition: "asc",
+          },
+          {
+            qualifyingPosition: "asc",
           },
         ],
-        include: {
-          tournament: {
-            select: {
-              format: true,
-            },
-          },
-          driverLeft: {
-            include: {
-              user: true,
-            },
-          },
-          driverRight: {
-            include: {
-              user: true,
-            },
-          },
-        },
       },
       nextBattle: {
         include: {
@@ -176,16 +158,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 const FinalResults = () => {
   const tournament = useLoaderData<typeof loader>();
-  const results = getTournamentStandings([
-    {
-      id: tournament.id,
-      format: tournament.format,
-      enableQualifying: tournament.enableQualifying,
-      enableBattles: tournament.enableBattles,
-      battles: tournament.battles,
-      drivers: tournament.drivers,
-    },
-  ]).slice(0, 3);
+  const results = tournament.drivers.slice(0, 3);
 
   return (
     <Flex w={700} maxW="full" flexDir="column" gap={2} p={2} textAlign="left">
@@ -227,8 +200,8 @@ const FinalResults = () => {
           >
             <AspectRatio ratio={1} w="78px" overflow="hidden" flex="none">
               <styled.img
-                src={driver?.image ?? "/blank-driver-right.jpg"}
-                alt={driver?.firstName ?? ""}
+                src={driver?.user.image ?? "/blank-driver-right.jpg"}
+                alt={driver?.user.firstName ?? ""}
               />
             </AspectRatio>
 
@@ -251,7 +224,7 @@ const FinalResults = () => {
                 overflow="hidden"
                 maxW="100%"
               >
-                {driver?.firstName}
+                {driver?.user.firstName}
               </styled.span>{" "}
               <styled.span
                 display="block"
@@ -260,7 +233,7 @@ const FinalResults = () => {
                 overflow="hidden"
                 maxW="100%"
               >
-                {driver?.lastName}
+                {driver?.user.lastName}
               </styled.span>
             </styled.p>
 

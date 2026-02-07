@@ -8,7 +8,6 @@ import { Fragment } from "react";
 import { z } from "zod";
 import { LeaderboardType } from "~/utils/enums";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { getAuth } from "~/utils/getAuth.server";
@@ -35,86 +34,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
           id: "asc",
         },
         include: {
-          driver: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-              driverId: true,
-              team: true,
-            },
-          },
+          driver: true,
         },
       },
       tournaments: {
         orderBy: {
-          id: "asc",
-        },
-        include: {
           tournament: {
-            select: {
-              id: true,
-              format: true,
-              enableQualifying: true,
-              enableBattles: true,
-              battles: {
-                orderBy: [{ round: "asc" }, { bracket: "asc" }, { id: "asc" }],
-                select: {
-                  id: true,
-                  winnerId: true,
-                  bracket: true,
-                  round: true,
-                  driverLeft: {
-                    select: {
-                      isBye: true,
-                      id: true,
-                      qualifyingPosition: true,
-                      user: {
-                        select: {
-                          firstName: true,
-                          lastName: true,
-                          image: true,
-                          driverId: true,
-                          team: true,
-                        },
-                      },
-                    },
-                  },
-                  driverRight: {
-                    select: {
-                      isBye: true,
-                      id: true,
-                      qualifyingPosition: true,
-                      user: {
-                        select: {
-                          firstName: true,
-                          lastName: true,
-                          image: true,
-                          driverId: true,
-                          team: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              drivers: {
-                select: {
-                  id: true,
-                  qualifyingPosition: true,
-                  isBye: true,
-                  user: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      image: true,
-                      driverId: true,
-                      team: true,
-                    },
-                  },
-                },
-              },
-            },
+            createdAt: "asc",
           },
         },
       },
@@ -126,28 +52,47 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const isOwner = leaderboard.userId === userId;
 
   if (leaderboard.type === LeaderboardType.TOURNAMENTS) {
-    const tournaments = leaderboard.tournaments.map((t) => t.tournament);
-    const standings = getTournamentStandings(tournaments);
+    const drivers = await prisma.tournamentDrivers.findMany({
+      where: {
+        tournamentId: {
+          in: leaderboard.tournaments.map((t) => t.tournamentId),
+        },
+        driverId: {
+          not: 0,
+        },
+      },
+      orderBy: [
+        {
+          finishingPosition: "asc",
+        },
+        {
+          qualifyingPosition: "asc",
+        },
+        {
+          id: "asc",
+        },
+      ],
+      include: {
+        user: true,
+      },
+    });
 
     return {
       leaderboard,
-      standings: standings,
+      drivers: drivers.map((d) => d.user),
       isOwner,
     };
   }
 
   return {
     leaderboard,
-    standings: leaderboard.drivers.map((driver) => ({
-      ...driver.driver,
-      points: null,
-    })),
+    drivers: leaderboard.drivers.map((d) => d.driver),
     isOwner,
   };
 };
 
 const LeaderboardsPage = () => {
-  const { leaderboard, standings, isOwner } = useLoaderData<typeof loader>();
+  const { leaderboard, drivers, isOwner } = useLoaderData<typeof loader>();
   const cutoff = leaderboard.cutoff ?? 0;
   const location = useLocation();
 
@@ -196,14 +141,14 @@ const LeaderboardsPage = () => {
       </TabsBar>
 
       <Container maxW={800} px={2} py={4}>
-        {standings.length === 0 && (
+        {drivers.length === 0 && (
           <styled.p textAlign="center" color="gray.500">
             No results here yet
           </styled.p>
         )}
 
         <Flex flexDir="column" gap={2}>
-          {standings.map((driver, i) => (
+          {drivers.map((driver, i) => (
             <Fragment key={driver.driverId}>
               {i === cutoff && cutoff > 0 && <Box h="1px" bgColor="red.500" />}
 
@@ -255,19 +200,6 @@ const LeaderboardsPage = () => {
                       overflow="hidden"
                     >
                       {driver.team}
-                    </styled.p>
-                  </Box>
-
-                  <Box
-                    rounded="full"
-                    bgColor="gray.950"
-                    py={1}
-                    px={2}
-                    borderWidth={1}
-                    borderColor="gray.800"
-                  >
-                    <styled.p fontFamily="mono" fontSize="xs">
-                      {driver.points} Points
                     </styled.p>
                   </Box>
                 </Flex>
