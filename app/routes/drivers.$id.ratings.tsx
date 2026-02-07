@@ -27,6 +27,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       driverId,
     },
     select: {
+      ranked: true,
       lastBattleDate: true,
       driverId: true,
       elo: true,
@@ -136,7 +137,7 @@ const Page = () => {
               <Spacer />
               <styled.span>{elo.toFixed(3)}</styled.span>
               <styled.img
-                src={`/badges/${getDriverRank(1000, 0)}.png`}
+                src={`/badges/${getDriverRank(1000, driver.ranked)}.png`}
                 w={10}
               />
             </Flex>

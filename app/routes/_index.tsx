@@ -587,7 +587,7 @@ const Page = () => {
                               display="inline-block"
                               src={`/badges/${getDriverRank(
                                 driver.elo,
-                                driver.totalBattles,
+                                driver.ranked,
                               )}.png`}
                               alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                             />

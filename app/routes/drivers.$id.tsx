@@ -35,7 +35,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       image: true,
       team: true,
       elo: true,
-      totalBattles: true,
+      ranked: true,
     },
   });
 
@@ -76,7 +76,7 @@ const Page = () => {
   const isPostsTab = location.pathname.endsWith("posts");
 
   const rank = driver
-    ? getDriverRank(driver.elo, driver.totalBattles)
+    ? getDriverRank(driver.elo, driver.ranked)
     : RANKS.UNRANKED;
 
   const isInactive = driver.inactivityPenalty !== 0;

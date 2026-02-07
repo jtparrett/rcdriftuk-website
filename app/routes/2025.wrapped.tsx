@@ -34,7 +34,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const driver = await prisma.users.findFirst({
     where: {
       id: userId,
-      // id: "user_2cm5E7zlTQxg2b98zh6O3Px0c6n",
     },
     select: {
       lastBattleDate: true,
@@ -43,7 +42,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       lastName: true,
       image: true,
       elo: true,
-      totalBattles: true,
+      ranked: true,
     },
   });
 
@@ -199,7 +198,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     .sort((a, b) => b[1] - a[1])[0];
 
   const finalRating = adjustDriverElo(driver.elo, driver.lastBattleDate);
-  const rank = getDriverRank(finalRating, driver.totalBattles);
+  const rank = getDriverRank(finalRating, driver.ranked);
 
   return {
     driver: {
