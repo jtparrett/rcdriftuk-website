@@ -22,11 +22,16 @@ const Page = () => {
   const leaderboards = useLoaderData<typeof loader>();
 
   return (
-    <Container maxW={800} px={4} py={4}>
+    <Container maxW={800} px={2} py={4}>
       <Flex flexDir="column" gap={2}>
         {leaderboards.map((leaderboard) => (
-          <Card key={leaderboard.id}>
-            <Flex px={4} py={6} alignItems="center">
+          <Card
+            key={leaderboard.id}
+            bgGradient="to-b"
+            gradientFrom="gray.900"
+            gradientTo="black"
+          >
+            <Flex p={6} alignItems="center">
               <styled.h2 fontWeight="medium">{leaderboard.name}</styled.h2>
               <Spacer />
               <RiArrowRightSLine />

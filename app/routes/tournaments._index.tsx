@@ -29,6 +29,7 @@ import { z } from "zod";
 import { Regions } from "~/utils/enums";
 import { token } from "~/styled-system/tokens";
 import { useCallback, useState } from "react";
+import { Card } from "~/components/CollapsibleCard";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -209,14 +210,10 @@ const Page = () => {
           )}
 
           {tournaments.map((tournament) => (
-            <Box
+            <Card
               key={tournament.id}
               p={4}
-              rounded="xl"
-              borderWidth="1px"
-              borderColor="gray.800"
               pos="relative"
-              overflow="hidden"
               bgGradient="to-b"
               gradientFrom="gray.900"
               gradientTo="black"
@@ -284,7 +281,7 @@ const Page = () => {
                   </LinkButton>
                 )}
               </Flex>
-            </Box>
+            </Card>
           ))}
         </Flex>
       </Container>

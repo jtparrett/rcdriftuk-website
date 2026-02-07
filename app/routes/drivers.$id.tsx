@@ -16,6 +16,7 @@ import {
   RiListOrdered2,
   RiMessageLine,
   RiSwordLine,
+  RiVipCrown2Line,
 } from "react-icons/ri";
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -69,6 +70,7 @@ const Page = () => {
   const location = useLocation();
 
   const isBattlesTab = location.pathname.endsWith("battles");
+  const isTournamentsTab = location.pathname.endsWith("tournaments");
   const isRatingsTab = location.pathname.endsWith("ratings");
   const isSetupTab = location.pathname.endsWith("setup");
   const isPostsTab = location.pathname.endsWith("posts");
@@ -228,6 +230,15 @@ const Page = () => {
         >
           <RiSwordLine />
           Battles
+        </Tab>
+        <Tab
+          to={`/drivers/${driver.driverId}/tournaments`}
+          isActive={isTournamentsTab}
+          data-replace="true"
+          replace
+        >
+          <RiVipCrown2Line />
+          Tournaments
         </Tab>
         <Tab
           to={`/drivers/${driver.driverId}/ratings`}

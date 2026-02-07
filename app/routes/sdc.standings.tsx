@@ -98,9 +98,19 @@ const Page = () => {
     <Container maxW={800} px={2} py={4}>
       <Flex flexDir="column" gap={2}>
         {standings.map((driver, i) => (
-          <Card key={driver.driverId} pos="relative" overflow="hidden">
-            <Flex p={4} alignItems="center" gap={4}>
-              <styled.p fontWeight="extrabold" fontSize="xl" fontStyle="italic">
+          <Card
+            key={driver.driverId}
+            pos="relative"
+            bgGradient="to-b"
+            gradientFrom="gray.900"
+            gradientTo="black"
+          >
+            <Flex p={6} alignItems="center" gap={4}>
+              <styled.p
+                fontWeight="extrabold"
+                fontSize="2xl"
+                fontStyle="italic"
+              >
                 {i + 1}
               </styled.p>
 
