@@ -6,9 +6,21 @@ import { Box, Container, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { SDC_USER_ID } from "~/utils/theme";
 
+/** Points per finishing position: 1st=16, 2nd=8, 3rd=4, 4th=2, 5th=1, 6th+=0 */
+const POSITION_POINTS: Record<number, number> = {
+  1: 16,
+  2: 8,
+  3: 4,
+  4: 2,
+  5: 1,
+};
+
 export const loader = async () => {
-  const drivers = await prisma.tournamentDrivers.findMany({
+  const rows = await prisma.tournamentDrivers.findMany({
     where: {
+      driverId: {
+        not: 0,
+      },
       tournament: {
         state: TournamentsState.END,
         leaderboards: {
@@ -35,6 +47,36 @@ export const loader = async () => {
       },
     ],
   });
+
+  // Group by driverId, sum points from each finishing position
+  const byDriver = new Map<
+    number,
+    { user: (typeof rows)[0]["user"]; totalPoints: number }
+  >();
+
+  for (const row of rows) {
+    const pos = row.finishingPosition ?? 0;
+    const points = POSITION_POINTS[pos] ?? 0;
+
+    const existing = byDriver.get(row.driverId);
+    if (existing) {
+      existing.totalPoints += points;
+    } else {
+      byDriver.set(row.driverId, {
+        user: row.user,
+        totalPoints: points,
+      });
+    }
+  }
+
+  // Sort by total points descending, then by driverId for stable order
+  const drivers = Array.from(byDriver.entries())
+    .map(([driverId, { user, totalPoints }]) => ({
+      driverId,
+      user,
+      totalPoints,
+    }))
+    .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
 
   return drivers;
 };
@@ -95,6 +137,10 @@ const Page = () => {
                   {driver.user.team}
                 </styled.p>
               </Box>
+
+              <styled.p fontWeight="bold" fontSize="lg">
+                {driver.totalPoints} pts
+              </styled.p>
             </Flex>
           </Card>
         ))}

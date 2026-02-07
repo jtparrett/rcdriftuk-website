@@ -20,6 +20,14 @@ import {
 import { TabsBar } from "~/components/TabsBar";
 import { Card } from "~/components/CollapsibleCard";
 
+export const POSITION_POINTS: Record<number, number> = {
+  1: 16,
+  2: 8,
+  3: 4,
+  4: 2,
+  5: 1,
+};
+
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const { userId } = await getAuth(args);
@@ -52,7 +60,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const isOwner = leaderboard.userId === userId;
 
   if (leaderboard.type === LeaderboardType.TOURNAMENTS) {
-    const drivers = await prisma.tournamentDrivers.findMany({
+    const rows = await prisma.tournamentDrivers.findMany({
       where: {
         tournamentId: {
           in: leaderboard.tournaments.map((t) => t.tournamentId),
@@ -77,16 +85,54 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
+    // Group by driverId, sum points from each finishing position
+    const byDriver = new Map<
+      number,
+      { user: (typeof rows)[0]["user"]; totalPoints: number }
+    >();
+
+    for (const row of rows) {
+      const pos = row.finishingPosition ?? 0;
+      const points = POSITION_POINTS[pos] ?? 0;
+
+      const existing = byDriver.get(row.driverId);
+      if (existing) {
+        existing.totalPoints += points;
+      } else {
+        byDriver.set(row.driverId, {
+          user: row.user,
+          totalPoints: points,
+        });
+      }
+    }
+
+    // Sort by total points descending, then by driverId for stable order
+    const drivers = Array.from(byDriver.entries())
+      .map(([driverId, { user, totalPoints }]) => ({
+        driverId,
+        user,
+        totalPoints,
+      }))
+      .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
+
     return {
       leaderboard,
-      drivers: drivers.map((d) => d.user),
+      drivers,
       isOwner,
     };
   }
 
+  const drivers = leaderboard.drivers.map((d, i) => {
+    return {
+      driverId: d.driverId,
+      user: d.driver,
+      totalPoints: POSITION_POINTS[i + 1] ?? 0,
+    };
+  });
+
   return {
     leaderboard,
-    drivers: leaderboard.drivers.map((d) => d.driver),
+    drivers,
     isOwner,
   };
 };
@@ -179,7 +225,7 @@ const LeaderboardsPage = () => {
                   >
                     <styled.img
                       rounded="full"
-                      src={driver.image ?? "/blank-driver-right.jpg"}
+                      src={driver.user.image ?? "/blank-driver-right.jpg"}
                       w="full"
                       h="full"
                       objectFit="cover"
@@ -189,7 +235,7 @@ const LeaderboardsPage = () => {
                   <Box flex={1} overflow="hidden">
                     <LinkOverlay to={`/drivers/${driver.driverId}`}>
                       <styled.h2 lineHeight={1.1} fontWeight="medium">
-                        {driver.firstName} {driver.lastName}
+                        {driver.user.firstName} {driver.user.lastName}
                       </styled.h2>
                     </LinkOverlay>
                     <styled.p
@@ -199,9 +245,13 @@ const LeaderboardsPage = () => {
                       textOverflow="ellipsis"
                       overflow="hidden"
                     >
-                      {driver.team}
+                      {driver.user.team}
                     </styled.p>
                   </Box>
+
+                  <styled.p fontWeight="bold" fontSize="lg">
+                    {driver.totalPoints} pts
+                  </styled.p>
                 </Flex>
               </Card>
             </Fragment>
