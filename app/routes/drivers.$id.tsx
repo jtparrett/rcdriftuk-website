@@ -11,6 +11,12 @@ import notFoundInvariant from "~/utils/notFoundInvariant";
 import { AppName } from "~/utils/enums";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
+import {
+  RiDashboard2Line,
+  RiListOrdered2,
+  RiMessageLine,
+  RiSwordLine,
+} from "react-icons/ri";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -157,17 +163,6 @@ const Page = () => {
             </Box>
 
             <Flex gap={1} alignItems="center" mb={1}>
-              <styled.span
-                borderWidth={1}
-                borderColor="gray.800"
-                px={2}
-                rounded="full"
-                fontSize="sm"
-                bgColor="black"
-              >
-                Driver #{driver.driverId}
-              </styled.span>
-
               {(driver.inactivityPenalty !== 0 ||
                 driver.lastBattleDate !== null) && (
                 <styled.span
@@ -186,8 +181,15 @@ const Page = () => {
               )}
             </Flex>
 
-            <styled.h1 fontSize="4xl" fontWeight="bold" lineHeight={1.1} mb={3}>
-              {driver.firstName} {driver.lastName}
+            <styled.h1
+              fontSize="4xl"
+              fontWeight="bold"
+              lineHeight={1.1}
+              mb={3}
+              whiteSpace="balance"
+            >
+              {driver.firstName} {driver.lastName}{" "}
+              <styled.span color="gray.500">#{driver.driverId}</styled.span>
             </styled.h1>
 
             {driver.team && (
@@ -218,16 +220,40 @@ const Page = () => {
       </Box>
 
       <TabsBar maxW={800}>
-        <Tab to={`/drivers/${driver.driverId}/battles`} isActive={isBattlesTab}>
+        <Tab
+          to={`/drivers/${driver.driverId}/battles`}
+          isActive={isBattlesTab}
+          data-replace="true"
+          replace
+        >
+          <RiSwordLine />
           Battles
         </Tab>
-        <Tab to={`/drivers/${driver.driverId}/ratings`} isActive={isRatingsTab}>
+        <Tab
+          to={`/drivers/${driver.driverId}/ratings`}
+          isActive={isRatingsTab}
+          data-replace="true"
+          replace
+        >
+          <RiListOrdered2 />
           Ratings
         </Tab>
-        <Tab to={`/drivers/${driver.driverId}/setup`} isActive={isSetupTab}>
+        <Tab
+          to={`/drivers/${driver.driverId}/setup`}
+          isActive={isSetupTab}
+          data-replace="true"
+          replace
+        >
+          <RiDashboard2Line />
           Setup
         </Tab>
-        <Tab to={`/drivers/${driver.driverId}/posts`} isActive={isPostsTab}>
+        <Tab
+          to={`/drivers/${driver.driverId}/posts`}
+          isActive={isPostsTab}
+          data-replace="true"
+          replace
+        >
+          <RiMessageLine />
           Posts
         </Tab>
       </TabsBar>

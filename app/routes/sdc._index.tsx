@@ -1,5 +1,5 @@
 import { redirect } from "react-router";
 
 export const loader = () => {
-  throw redirect("https://super-drift.com");
+  throw redirect("/standings");
 };

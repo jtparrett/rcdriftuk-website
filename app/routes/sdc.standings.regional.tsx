@@ -1,5 +1,7 @@
+import { RiArrowRightSLine } from "react-icons/ri";
 import { useLoaderData } from "react-router";
-import { Container, Flex } from "~/styled-system/jsx";
+import { Card } from "~/components/CollapsibleCard";
+import { Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { SDC_USER_ID } from "~/utils/theme";
 
@@ -20,10 +22,16 @@ const Page = () => {
   const leaderboards = useLoaderData<typeof loader>();
 
   return (
-    <Container maxW={1100} px={4} py={4}>
-      <Flex flexDir="column" gap={4}>
+    <Container maxW={800} px={4} py={4}>
+      <Flex flexDir="column" gap={2}>
         {leaderboards.map((leaderboard) => (
-          <div key={leaderboard.id}>{leaderboard.name}</div>
+          <Card key={leaderboard.id}>
+            <Flex px={4} py={6} alignItems="center">
+              <styled.h2 fontWeight="medium">{leaderboard.name}</styled.h2>
+              <Spacer />
+              <RiArrowRightSLine />
+            </Flex>
+          </Card>
         ))}
       </Flex>
     </Container>

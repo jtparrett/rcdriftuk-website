@@ -11,8 +11,6 @@ import { UserTracks } from "./UserTracks";
 import { NotificationsBadge } from "./NotificationsBadge";
 import { Spinner } from "./Spinner";
 import { useTheme } from "~/utils/theme";
-import { TabsBar } from "./TabsBar";
-import { Tab } from "./Tab";
 
 export const HEADER_HEIGHT = 64;
 

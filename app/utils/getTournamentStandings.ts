@@ -7,6 +7,7 @@ type User = {
   lastName: string | null;
   image: string | null;
   driverId: number;
+  team: string | null;
 };
 
 type Driver = {
@@ -62,6 +63,7 @@ type DriverStanding = {
   firstName: string | null;
   lastName: string | null;
   image: string | null;
+  team: string | null;
   points: number;
   tournamentResults: {
     tournamentId: string;
@@ -130,6 +132,7 @@ type BattleDriverStats = {
   firstName: string | null;
   lastName: string | null;
   image: string | null;
+  team: string | null;
   battleCount: number;
   winCount: number;
   qualifyingPosition: number | null;
@@ -174,6 +177,7 @@ const getBattleStandings = (
         driverId,
         firstName: driver.user.firstName,
         lastName: driver.user.lastName,
+        team: driver.user.team,
         battleCount: 1,
         winCount: isWinner ? 1 : 0,
         qualifyingPosition: driver.qualifyingPosition,
@@ -341,7 +345,8 @@ const calculateDriverLapScores = (
     return [];
   }
 
-  const judgeCount = tournament._count?.judges ?? tournament.judges?.length ?? 0;
+  const judgeCount =
+    tournament._count?.judges ?? tournament.judges?.length ?? 0;
   const judgeIds = tournament.judges?.map((j) => j.id);
   const scoreFormula = tournament.scoreFormula ?? ScoreFormula.AVERAGE;
 
@@ -349,7 +354,12 @@ const calculateDriverLapScores = (
     .filter((lap) => lap.scores.length === judgeCount)
     .map((lap) =>
       sumScores(
-        lap.scores.map((s) => ({ ...s, visitorId: "", judgeId: s.judgeId, lapId: "" })) as any,
+        lap.scores.map((s) => ({
+          ...s,
+          visitorId: "",
+          judgeId: s.judgeId,
+          lapId: "",
+        })) as any,
         judgeCount,
         scoreFormula,
         lap.penalty,
@@ -408,6 +418,7 @@ const getQualifyingStandings = (
       driverId: driver.user.driverId,
       firstName: driver.user.firstName,
       lastName: driver.user.lastName,
+      team: driver.user.team,
       image: driver.user.image,
       battleCount: 0,
       winCount: 0,
@@ -454,6 +465,7 @@ export const getTournamentStandings = (
       firstName: string | null;
       lastName: string | null;
       image: string | null;
+      team: string | null;
       totalPoints: number;
       tournamentResults: {
         tournamentId: string;
@@ -499,6 +511,7 @@ export const getTournamentStandings = (
           firstName: stats.firstName,
           lastName: stats.lastName,
           image: stats.image,
+          team: stats.team,
           totalPoints: points,
           tournamentResults: [
             {
@@ -544,6 +557,7 @@ export const getTournamentStandings = (
     firstName: driver.firstName,
     lastName: driver.lastName,
     image: driver.image,
+    team: driver.team,
     points: driver.totalPoints,
     tournamentResults: driver.tournamentResults,
     // Legacy fields for backward compatibility
