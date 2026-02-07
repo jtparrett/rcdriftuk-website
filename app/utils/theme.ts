@@ -2,6 +2,7 @@ const themes = {
   rcdio: {
     key: "rcdio",
     name: "RCDrift.io",
+    title: "Driving the Future of RC Drifting",
     coName: "RC Drift LTD",
     logoUrl: "/rcdriftio.svg",
     footerLogoUrl: "/rcdriftio-light.svg",
@@ -12,6 +13,7 @@ const themes = {
   sdc: {
     key: "sdc",
     name: "SDC 2026",
+    title: "Super Drift Competition",
     coName: "Project-G Corp",
     logoUrl:
       "https://ngo12if6yyhjvs7m.public.blob.vercel-storage.com/sdc-logo-sm.png",

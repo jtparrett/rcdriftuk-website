@@ -27,6 +27,10 @@ export const loader = async () => {
   return leaderboards;
 };
 
+export const meta = () => {
+  return [{ title: "SDC 2026 - Regional Standings" }];
+};
+
 const Page = () => {
   const leaderboards = useLoaderData<typeof loader>();
 

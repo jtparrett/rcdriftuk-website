@@ -15,6 +15,10 @@ const POSITION_POINTS: Record<number, number> = {
   5: 1,
 };
 
+export const meta = () => {
+  return [{ title: "SDC 2026 - Standings" }];
+};
+
 export const loader = async () => {
   // Get all SDC leaderboards and which tournaments belong to each
   const sdcLeaderboards = await prisma.leaderboards.findMany({
@@ -97,8 +101,7 @@ export const loader = async () => {
       let maxCount = 0;
       for (const [lbId, { points, count }] of boardStats) {
         const better =
-          points > maxPoints ||
-          (points === maxPoints && count > maxCount);
+          points > maxPoints || (points === maxPoints && count > maxCount);
         if (better) {
           maxPoints = points;
           maxCount = count;

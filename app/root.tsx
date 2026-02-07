@@ -41,7 +41,7 @@ export const meta: Route.MetaFunction = () => {
   const theme = getTheme();
 
   return [
-    { title: `${theme?.name} | Driving the Future of RC Drifting` },
+    { title: `${theme?.name} | ${theme?.title}` },
     {
       property: "og:image",
       content: "https://rcdrift.io/og-image.jpg",
@@ -218,6 +218,14 @@ function App({
   return (
     <ClerkProvider
       loaderData={loaderData}
+      localization={{
+        signIn: {
+          start: {
+            title: "Sign in",
+            subtitle: "Welcome back. Sign in to your account to continue.",
+          },
+        },
+      }}
       appearance={{
         baseTheme: dark,
         layout: {
@@ -227,12 +235,23 @@ function App({
           colorPrimary: token("colors.brand.500"),
         },
         elements: {
+          footer: {
+            display: "none",
+          },
           rootBox: {
             margin: "0 auto",
             overflow: "hidden",
           },
           card: {
             margin: 0,
+            backgroundColor: token("colors.gray.900"),
+          },
+          cardBox: {
+            borderWidth: "1px",
+            borderColor: token("colors.gray.700"),
+          },
+          footerPages: {
+            display: "none",
           },
         },
       }}
