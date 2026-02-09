@@ -85,7 +85,7 @@ const Row = ({
   region: Regions;
 }) => {
   const rankTitle = driver
-    ? getDriverRank(driver.elo, driver.totalBattles)
+    ? getDriverRank(driver.elo, driver.ranked)
     : RANKS.UNRANKED;
 
   const elo = region === Regions.ALL ? driver.elo : driver[`elo_${region}`];

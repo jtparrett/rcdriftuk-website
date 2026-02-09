@@ -110,6 +110,7 @@ model Tournaments {
 model TournamentDrivers {
   tournamentId           String              @db.Uuid
   qualifyingPosition     Int?
+  finishingPosition      Int?
   createdAt              DateTime            @default(now())
   id                     Int                 @id @default(autoincrement())
   driverId               Int
@@ -283,7 +284,7 @@ model Users {
   elo_ZA                  Float                @default(1000)
   elo_LA                  Float                @default(1000)
   elo_AP                  Float                @default(1000)
-  totalBattles            Int                  @default(0)
+  ranked                  Boolean              @default(false)
   events                  EventResponses[]
   Tournaments             Tournaments[]
   TournamentJudges        TournamentJudges[]
@@ -304,7 +305,6 @@ model Users {
   Leaderboards            Leaderboards[]
 
   @@index([elo])
-  @@index([totalBattles])
   @@index([archived])
   @@index([lastBattleDate])
   @@index([team])

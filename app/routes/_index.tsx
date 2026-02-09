@@ -1,5 +1,4 @@
 import { Regions, TrackStatus } from "~/utils/enums";
-import type { Route } from "./+types/_index";
 import { Link, useLoaderData } from "react-router";
 import { endOfDay, format, startOfDay } from "date-fns";
 import {
@@ -89,7 +88,7 @@ export const loader = async () => {
   return { events, drivers };
 };
 
-export const meta: Route.MetaFunction = () => {
+export const meta = () => {
   return [
     { title: `${AppName} | Driving the Future of RC Drifting` },
     {
@@ -588,7 +587,7 @@ const Page = () => {
                               display="inline-block"
                               src={`/badges/${getDriverRank(
                                 driver.elo,
-                                driver.totalBattles,
+                                driver.ranked,
                               )}.png`}
                               alt={`${driver.firstName} ${driver.lastName}'s rank badge`}
                             />

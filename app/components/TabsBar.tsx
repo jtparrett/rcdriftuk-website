@@ -2,7 +2,13 @@ import { Box, Container, Flex } from "~/styled-system/jsx";
 import { useIsApp } from "~/utils/AppContext";
 import { useIsEmbed } from "~/utils/EmbedContext";
 
-export const TabsBar = ({ children }: { children: React.ReactNode }) => {
+export const TabsBar = ({
+  children,
+  maxW = 1100,
+}: {
+  children: React.ReactNode;
+  maxW?: number;
+}) => {
   const isApp = useIsApp();
   const isEmbed = useIsEmbed();
 
@@ -21,7 +27,7 @@ export const TabsBar = ({ children }: { children: React.ReactNode }) => {
       borderBottomWidth={1}
       borderColor="gray.900"
     >
-      <Container px={2} maxW={1100}>
+      <Container px={2} maxW={maxW}>
         <Box overflowX="auto" w="full" scrollbar="hidden">
           <Flex gap={0.5} py={2} alignItems="center">
             {children}

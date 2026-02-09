@@ -41,8 +41,8 @@ export const getRankColor = (rank: Values<typeof RANKS>): [string, string] => {
   }
 };
 
-export const getDriverRank = (currentElo: number, totalHistory: number) => {
-  if (totalHistory < 3) {
+export const getDriverRank = (currentElo: number, ranked: boolean) => {
+  if (!ranked) {
     return RANKS.UNRANKED;
   }
 

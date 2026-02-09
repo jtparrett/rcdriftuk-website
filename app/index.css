@@ -32,7 +32,11 @@
 
 .event-dot {
   border-radius: 9999px;
-  background-image: linear-gradient(to bottom, var(--colors-brand\.500), var(--colors-brand\.700));
+  background-image: linear-gradient(
+    to bottom,
+    var(--colors-brand\.500),
+    var(--colors-brand\.700)
+  );
   width: 12px;
   height: 12px;
   position: absolute;

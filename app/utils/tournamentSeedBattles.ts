@@ -6,6 +6,7 @@ import { prisma } from "~/utils/prisma.server";
 import { sortByQualifyingScores } from "~/utils/sortByQualifyingScores";
 import { sumScores } from "~/utils/sumScores";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
+import { setTournamentFinishingPositions } from "./setTournamentFinishingPositions";
 
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
@@ -87,6 +88,7 @@ export const tournamentSeedBattles = async (id: string) => {
   });
 
   if (!tournament.enableBattles) {
+    await setTournamentFinishingPositions(id);
     return;
   }
 

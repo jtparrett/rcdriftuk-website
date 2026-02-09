@@ -38,7 +38,7 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
       elo_AP: true,
       image: true,
       team: true,
-      totalBattles: true,
+      ranked: true,
     },
   });
 

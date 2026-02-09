@@ -7,6 +7,7 @@ type User = {
   lastName: string | null;
   image: string | null;
   driverId: number;
+  team: string | null;
 };
 
 type Driver = {
@@ -57,79 +58,13 @@ type Tournament = {
   _count?: { judges: number };
 };
 
-type DriverStanding = {
-  driverId: number;
-  firstName: string | null;
-  lastName: string | null;
-  image: string | null;
-  points: number;
-  tournamentResults: {
-    tournamentId: string;
-    position: number;
-    points: number;
-  }[];
-  // Legacy fields for backward compatibility
-  id: number;
-  battleCount: number;
-  winCount: number;
-  qualifyingPosition: number | null;
-};
-
-// Professional drifting championship points allocation
-// Based on finishing position only
-const POINTS_BY_POSITION: Record<number, number> = {
-  // Podium
-  1: 100,
-  2: 90,
-  3: 80,
-  4: 70,
-  // Top 8
-  5: 60,
-  6: 50,
-  7: 45,
-  8: 40,
-  // Top 16
-  9: 35,
-  10: 30,
-  11: 28,
-  12: 26,
-  13: 24,
-  14: 22,
-  15: 20,
-  16: 18,
-  // Top 32 / Qualifying only
-  17: 15,
-  18: 14,
-  19: 13,
-  20: 12,
-  21: 11,
-  22: 10,
-  23: 9,
-  24: 8,
-  25: 7,
-  26: 6,
-  27: 5,
-  28: 5,
-  29: 5,
-  30: 5,
-  31: 5,
-  32: 5,
-};
-
-const getPointsForPosition = (position: number): number => {
-  if (position <= 32) {
-    return POINTS_BY_POSITION[position] ?? 5;
-  }
-  // Participation points for positions beyond 32
-  return 2;
-};
-
 type BattleDriverStats = {
   id: number;
   driverId: number;
   firstName: string | null;
   lastName: string | null;
   image: string | null;
+  team: string | null;
   battleCount: number;
   winCount: number;
   qualifyingPosition: number | null;
@@ -174,6 +109,7 @@ const getBattleStandings = (
         driverId,
         firstName: driver.user.firstName,
         lastName: driver.user.lastName,
+        team: driver.user.team,
         battleCount: 1,
         winCount: isWinner ? 1 : 0,
         qualifyingPosition: driver.qualifyingPosition,
@@ -341,7 +277,8 @@ const calculateDriverLapScores = (
     return [];
   }
 
-  const judgeCount = tournament._count?.judges ?? tournament.judges?.length ?? 0;
+  const judgeCount =
+    tournament._count?.judges ?? tournament.judges?.length ?? 0;
   const judgeIds = tournament.judges?.map((j) => j.id);
   const scoreFormula = tournament.scoreFormula ?? ScoreFormula.AVERAGE;
 
@@ -349,7 +286,12 @@ const calculateDriverLapScores = (
     .filter((lap) => lap.scores.length === judgeCount)
     .map((lap) =>
       sumScores(
-        lap.scores.map((s) => ({ ...s, visitorId: "", judgeId: s.judgeId, lapId: "" })) as any,
+        lap.scores.map((s) => ({
+          ...s,
+          visitorId: "",
+          judgeId: s.judgeId,
+          lapId: "",
+        })) as any,
         judgeCount,
         scoreFormula,
         lap.penalty,
@@ -408,6 +350,7 @@ const getQualifyingStandings = (
       driverId: driver.user.driverId,
       firstName: driver.user.firstName,
       lastName: driver.user.lastName,
+      team: driver.user.team,
       image: driver.user.image,
       battleCount: 0,
       winCount: 0,
@@ -419,7 +362,7 @@ const getQualifyingStandings = (
 /**
  * Get standings for a single tournament, using battles if enabled, otherwise qualifying
  */
-const getSingleTournamentStandings = (
+export const getSingleTournamentStandings = (
   tournament: Tournament,
 ): { driverId: number; position: number; stats: BattleDriverStats }[] => {
   // Battles take priority
@@ -433,123 +376,4 @@ const getSingleTournamentStandings = (
   }
 
   return [];
-};
-
-/**
- * Get combined standings across multiple tournaments.
- * Drivers are ranked by total points accumulated across all tournaments.
- * Points are awarded based on finishing position in each tournament.
- */
-export const getTournamentStandings = (
-  tournaments: Tournament[],
-): DriverStanding[] => {
-  if (tournaments.length === 0) {
-    return [];
-  }
-
-  const driverMap = new Map<
-    number,
-    {
-      driverId: number;
-      firstName: string | null;
-      lastName: string | null;
-      image: string | null;
-      totalPoints: number;
-      tournamentResults: {
-        tournamentId: string;
-        position: number;
-        points: number;
-      }[];
-      // Track the best stats for legacy fields
-      bestStats: BattleDriverStats | null;
-      totalBattleCount: number;
-      totalWinCount: number;
-    }
-  >();
-
-  // Process each tournament
-  for (const tournament of tournaments) {
-    const standings = getSingleTournamentStandings(tournament);
-
-    for (const { driverId, position, stats } of standings) {
-      const points = getPointsForPosition(position);
-      const existing = driverMap.get(driverId);
-
-      if (existing) {
-        existing.totalPoints += points;
-        existing.tournamentResults.push({
-          tournamentId: tournament.id,
-          position,
-          points,
-        });
-        existing.totalBattleCount += stats.battleCount;
-        existing.totalWinCount += stats.winCount;
-        // Keep the best qualifying position
-        if (
-          stats.qualifyingPosition !== null &&
-          (existing.bestStats?.qualifyingPosition === null ||
-            existing.bestStats?.qualifyingPosition === undefined ||
-            stats.qualifyingPosition < existing.bestStats.qualifyingPosition)
-        ) {
-          existing.bestStats = stats;
-        }
-      } else {
-        driverMap.set(driverId, {
-          driverId,
-          firstName: stats.firstName,
-          lastName: stats.lastName,
-          image: stats.image,
-          totalPoints: points,
-          tournamentResults: [
-            {
-              tournamentId: tournament.id,
-              position,
-              points,
-            },
-          ],
-          bestStats: stats,
-          totalBattleCount: stats.battleCount,
-          totalWinCount: stats.winCount,
-        });
-      }
-    }
-  }
-
-  // Convert to array and sort by total points (descending)
-  const sortedDrivers = Array.from(driverMap.values()).sort((a, b) => {
-    // Primary: total points (descending)
-    if (b.totalPoints !== a.totalPoints) {
-      return b.totalPoints - a.totalPoints;
-    }
-
-    // Secondary: number of tournament appearances (descending)
-    if (b.tournamentResults.length !== a.tournamentResults.length) {
-      return b.tournamentResults.length - a.tournamentResults.length;
-    }
-
-    // Tertiary: best single tournament position (ascending)
-    const aBestPos = Math.min(...a.tournamentResults.map((r) => r.position));
-    const bBestPos = Math.min(...b.tournamentResults.map((r) => r.position));
-    if (aBestPos !== bBestPos) {
-      return aBestPos - bBestPos;
-    }
-
-    // Finally: total wins (descending)
-    return b.totalWinCount - a.totalWinCount;
-  });
-
-  // Return with all required fields
-  return sortedDrivers.map((driver) => ({
-    driverId: driver.driverId,
-    firstName: driver.firstName,
-    lastName: driver.lastName,
-    image: driver.image,
-    points: driver.totalPoints,
-    tournamentResults: driver.tournamentResults,
-    // Legacy fields for backward compatibility
-    id: driver.bestStats?.id ?? 0,
-    battleCount: driver.totalBattleCount,
-    winCount: driver.totalWinCount,
-    qualifyingPosition: driver.bestStats?.qualifyingPosition ?? null,
-  }));
 };

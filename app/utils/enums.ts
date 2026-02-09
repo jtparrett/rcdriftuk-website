@@ -1,6 +1,6 @@
 import type { Values } from "./values";
 
-export const AppName = "RCDIO";
+export const AppName = "RCDrift.io";
 
 export const TrackTypes = {
   ALL: "ALL",

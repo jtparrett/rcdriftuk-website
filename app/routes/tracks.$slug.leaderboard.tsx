@@ -4,8 +4,8 @@ import { prisma } from "~/utils/prisma.server";
 import { z } from "zod";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { LeaderboardType } from "~/utils/enums";
+import { POSITION_POINTS } from "./leaderboards.$id._index";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -23,89 +23,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
               id: "asc",
             },
             include: {
-              driver: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                  image: true,
-                  driverId: true,
-                },
-              },
+              driver: true,
             },
           },
-          tournaments: {
-            orderBy: {
-              id: "asc",
-            },
-            include: {
-              tournament: {
-                select: {
-                  id: true,
-                  format: true,
-                  enableQualifying: true,
-                  enableBattles: true,
-                  battles: {
-                    orderBy: [
-                      { round: "asc" },
-                      { bracket: "asc" },
-                      { id: "asc" },
-                    ],
-                    select: {
-                      id: true,
-                      winnerId: true,
-                      bracket: true,
-                      round: true,
-                      driverLeft: {
-                        select: {
-                          isBye: true,
-                          id: true,
-                          qualifyingPosition: true,
-                          user: {
-                            select: {
-                              firstName: true,
-                              lastName: true,
-                              image: true,
-                              driverId: true,
-                            },
-                          },
-                        },
-                      },
-                      driverRight: {
-                        select: {
-                          isBye: true,
-                          id: true,
-                          qualifyingPosition: true,
-                          user: {
-                            select: {
-                              firstName: true,
-                              lastName: true,
-                              image: true,
-                              driverId: true,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  drivers: {
-                    select: {
-                      id: true,
-                      qualifyingPosition: true,
-                      isBye: true,
-                      user: {
-                        select: {
-                          firstName: true,
-                          lastName: true,
-                          image: true,
-                          driverId: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          tournaments: true,
         },
       },
     },
@@ -114,41 +35,92 @@ export const loader = async (args: LoaderFunctionArgs) => {
   notFoundInvariant(track, "Track not found");
 
   if (track.leaderboard?.type === LeaderboardType.TOURNAMENTS) {
-    const tournaments = track.leaderboard.tournaments.map((t) => t.tournament);
-    const standings = getTournamentStandings(tournaments);
+    const rows = await prisma.tournamentDrivers.findMany({
+      where: {
+        tournamentId: {
+          in: track.leaderboard.tournaments.map((t) => t.tournamentId),
+        },
+      },
+      orderBy: [
+        {
+          finishingPosition: "asc",
+        },
+        {
+          qualifyingPosition: "asc",
+        },
+        {
+          id: "asc",
+        },
+      ],
+      include: {
+        user: true,
+      },
+    });
+
+    // Group by driverId, sum points from each finishing position
+    const byDriver = new Map<
+      number,
+      { user: (typeof rows)[0]["user"]; totalPoints: number }
+    >();
+
+    for (const row of rows) {
+      const pos = row.finishingPosition ?? 0;
+      const points = POSITION_POINTS[pos] ?? 0;
+
+      const existing = byDriver.get(row.driverId);
+      if (existing) {
+        existing.totalPoints += points;
+      } else {
+        byDriver.set(row.driverId, {
+          user: row.user,
+          totalPoints: points,
+        });
+      }
+    }
+
+    // Sort by total points descending, then by driverId for stable order
+    const drivers = Array.from(byDriver.entries())
+      .map(([driverId, { user, totalPoints }]) => ({
+        driverId,
+        user,
+        totalPoints,
+      }))
+      .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
 
     return {
-      standings,
+      drivers,
       leaderboard: track.leaderboard,
     };
   }
 
   if (track.leaderboard?.type === LeaderboardType.DRIVERS) {
-    const standings = track.leaderboard?.drivers.map((driver) => driver.driver);
-
     return {
-      standings,
+      drivers: track.leaderboard.drivers.map((d, i) => ({
+        driverId: d.driverId,
+        user: d.driver,
+        totalPoints: POSITION_POINTS[i + 1] ?? 0,
+      })),
       leaderboard: track.leaderboard,
     };
   }
 
   return {
-    standings: [],
+    drivers: [],
     leaderboard: track.leaderboard,
   };
 };
 
 const TrackLeaderboardPage = () => {
-  const { standings, leaderboard } = useLoaderData<typeof loader>();
+  const { drivers, leaderboard } = useLoaderData<typeof loader>();
   const cutoff = leaderboard?.cutoff ?? 0;
 
   return (
     <Box p={4}>
-      {standings.length <= 0 && <styled.p>No tournaments here yet...</styled.p>}
+      {drivers.length <= 0 && <styled.p>No tournaments here yet...</styled.p>}
 
       <styled.table w="full">
         <tbody>
-          {standings.map((driver, i) => (
+          {drivers.map((driver, i) => (
             <tr
               key={driver.driverId}
               style={
@@ -168,15 +140,18 @@ const TrackLeaderboardPage = () => {
                   <Box w={8} h={8} rounded="full" overflow="hidden">
                     <styled.img
                       rounded="full"
-                      src={driver.image ?? "/blank-driver-right.jpg"}
+                      src={driver.user.image ?? "/blank-driver-right.jpg"}
                       w="full"
                       h="full"
                       objectFit="cover"
                     />
                   </Box>
                   <LinkOverlay to={`/drivers/${driver.driverId}`} />
-                  {driver.firstName} {driver.lastName}
+                  {driver.user.firstName} {driver.user.lastName}
                 </Flex>
+              </styled.td>
+              <styled.td textAlign="center" fontFamily="mono">
+                {driver.totalPoints} pts
               </styled.td>
             </tr>
           ))}

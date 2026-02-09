@@ -4,116 +4,29 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { TournamentsState } from "~/utils/enums";
 import { prisma } from "~/utils/prisma.server";
-import { getTournamentStandings } from "~/utils/getTournamentStandings";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = z.string().parse(params.id);
 
-  const tournament = await prisma.tournaments.findFirst({
+  const drivers = await prisma.tournamentDrivers.findMany({
     where: {
-      id,
-      state: TournamentsState.END,
+      tournament: {
+        id,
+        state: TournamentsState.END,
+      },
+      driverId: {
+        not: 0,
+      },
     },
-    select: {
-      id: true,
-      format: true,
-      enableQualifying: true,
-      enableBattles: true,
-      scoreFormula: true,
-      _count: {
-        select: {
-          judges: true,
-        },
-      },
-      judges: {
-        orderBy: {
-          createdAt: "asc",
-        },
-        select: {
-          id: true,
-        },
-      },
-      battles: {
-        orderBy: [
-          { round: "asc" },
-          { bracket: "asc" },
-          { id: "asc" },
-        ],
-        select: {
-          id: true,
-          winnerId: true,
-          bracket: true,
-          round: true,
-          driverLeft: {
-            select: {
-              isBye: true,
-              id: true,
-              qualifyingPosition: true,
-              user: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                  image: true,
-                  driverId: true,
-                },
-              },
-            },
-          },
-          driverRight: {
-            select: {
-              isBye: true,
-              id: true,
-              qualifyingPosition: true,
-              user: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                  image: true,
-                  driverId: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      drivers: {
-        select: {
-          id: true,
-          qualifyingPosition: true,
-          isBye: true,
-          tournamentDriverNumber: true,
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-              driverId: true,
-            },
-          },
-          laps: {
-            orderBy: {
-              id: "asc",
-            },
-            select: {
-              penalty: true,
-              scores: {
-                select: {
-                  score: true,
-                  judgeId: true,
-                },
-              },
-            },
-          },
-        },
-      },
+    include: {
+      user: true,
+    },
+    orderBy: {
+      finishingPosition: "asc",
     },
   });
 
-  if (!tournament) {
-    return [];
-  }
-
-  return getTournamentStandings([tournament]);
+  return drivers;
 };
 
 const TournamentStandingsPage = () => {
@@ -130,24 +43,24 @@ const TournamentStandingsPage = () => {
     >
       <styled.table w="full">
         <styled.tbody>
-          {drivers.map((driver, index) => (
+          {drivers.map((driver) => (
             <styled.tr key={driver.id}>
               <styled.td textAlign="center" fontFamily="mono" w={8}>
-                {index + 1}
+                {driver.finishingPosition}
               </styled.td>
               <styled.td py={1} pl={2}>
                 <Flex pos="relative" alignItems="center" gap={2}>
                   <Box w={8} h={8} rounded="full" overflow="hidden">
                     <styled.img
                       rounded="full"
-                      src={driver.image ?? "/blank-driver-right.jpg"}
+                      src={driver.user.image ?? "/blank-driver-right.jpg"}
                       w="full"
                       h="full"
                       objectFit="cover"
                     />
                   </Box>
                   <LinkOverlay to={`/drivers/${driver.driverId}`} />
-                  {driver.firstName} {driver.lastName}
+                  {driver.user.firstName} {driver.user.lastName}
                 </Flex>
               </styled.td>
             </styled.tr>

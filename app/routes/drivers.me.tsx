@@ -21,5 +21,5 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   notFoundInvariant(user, "User not found");
 
-  throw redirect(`/drivers/${user.driverId}`);
+  throw redirect(`/drivers/${user.driverId}/battles`);
 };

@@ -4,10 +4,10 @@ import {
   useLocation,
   type LoaderFunctionArgs,
 } from "react-router";
+import { Fragment } from "react";
 import { z } from "zod";
 import { LeaderboardType } from "~/utils/enums";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { getTournamentStandings } from "~/utils/getTournamentStandings";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { getAuth } from "~/utils/getAuth.server";
@@ -18,6 +18,15 @@ import {
   RiShareForwardFill,
 } from "react-icons/ri";
 import { TabsBar } from "~/components/TabsBar";
+import { Card } from "~/components/CollapsibleCard";
+
+export const POSITION_POINTS: Record<number, number> = {
+  1: 16,
+  2: 8,
+  3: 4,
+  4: 2,
+  5: 1,
+};
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -33,86 +42,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
           id: "asc",
         },
         include: {
-          driver: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-              driverId: true,
-            },
-          },
+          driver: true,
         },
       },
       tournaments: {
         orderBy: {
-          id: "asc",
-        },
-        include: {
           tournament: {
-            select: {
-              id: true,
-              format: true,
-              enableQualifying: true,
-              enableBattles: true,
-              battles: {
-                orderBy: [
-                  { round: "asc" },
-                  { bracket: "asc" },
-                  { id: "asc" },
-                ],
-                select: {
-                  id: true,
-                  winnerId: true,
-                  bracket: true,
-                  round: true,
-                  driverLeft: {
-                    select: {
-                      isBye: true,
-                      id: true,
-                      qualifyingPosition: true,
-                      user: {
-                        select: {
-                          firstName: true,
-                          lastName: true,
-                          image: true,
-                          driverId: true,
-                        },
-                      },
-                    },
-                  },
-                  driverRight: {
-                    select: {
-                      isBye: true,
-                      id: true,
-                      qualifyingPosition: true,
-                      user: {
-                        select: {
-                          firstName: true,
-                          lastName: true,
-                          image: true,
-                          driverId: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              drivers: {
-                select: {
-                  id: true,
-                  qualifyingPosition: true,
-                  isBye: true,
-                  user: {
-                    select: {
-                      firstName: true,
-                      lastName: true,
-                      image: true,
-                      driverId: true,
-                    },
-                  },
-                },
-              },
-            },
+            createdAt: "asc",
           },
         },
       },
@@ -124,31 +60,91 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const isOwner = leaderboard.userId === userId;
 
   if (leaderboard.type === LeaderboardType.TOURNAMENTS) {
-    const tournaments = leaderboard.tournaments.map((t) => t.tournament);
-    const standings = getTournamentStandings(tournaments);
+    const rows = await prisma.tournamentDrivers.findMany({
+      where: {
+        tournamentId: {
+          in: leaderboard.tournaments.map((t) => t.tournamentId),
+        },
+        driverId: {
+          not: 0,
+        },
+      },
+      orderBy: [
+        {
+          finishingPosition: "asc",
+        },
+        {
+          qualifyingPosition: "asc",
+        },
+        {
+          id: "asc",
+        },
+      ],
+      include: {
+        user: true,
+      },
+    });
+
+    // Group by driverId, sum points from each finishing position
+    const byDriver = new Map<
+      number,
+      { user: (typeof rows)[0]["user"]; totalPoints: number }
+    >();
+
+    for (const row of rows) {
+      const pos = row.finishingPosition ?? 0;
+      const points = POSITION_POINTS[pos] ?? 0;
+
+      const existing = byDriver.get(row.driverId);
+      if (existing) {
+        existing.totalPoints += points;
+      } else {
+        byDriver.set(row.driverId, {
+          user: row.user,
+          totalPoints: points,
+        });
+      }
+    }
+
+    // Sort by total points descending, then by driverId for stable order
+    const drivers = Array.from(byDriver.entries())
+      .map(([driverId, { user, totalPoints }]) => ({
+        driverId,
+        user,
+        totalPoints,
+      }))
+      .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
 
     return {
       leaderboard,
-      standings: standings,
+      drivers,
       isOwner,
     };
   }
 
+  const drivers = leaderboard.drivers.map((d, i) => {
+    return {
+      driverId: d.driverId,
+      user: d.driver,
+      totalPoints: POSITION_POINTS[i + 1] ?? 0,
+    };
+  });
+
   return {
     leaderboard,
-    standings: leaderboard.drivers.map((driver) => driver.driver),
+    drivers,
     isOwner,
   };
 };
 
 const LeaderboardsPage = () => {
-  const { leaderboard, standings, isOwner } = useLoaderData<typeof loader>();
+  const { leaderboard, drivers, isOwner } = useLoaderData<typeof loader>();
   const cutoff = leaderboard.cutoff ?? 0;
   const location = useLocation();
 
   return (
     <>
-      <TabsBar>
+      <TabsBar maxW={800}>
         <styled.h1
           fontSize="lg"
           fontWeight="extrabold"
@@ -190,62 +186,77 @@ const LeaderboardsPage = () => {
         </LinkButton>
       </TabsBar>
 
-      <Container maxW={1100} px={2} py={4}>
-        <Box maxW={640}>
-          <styled.div
-            bgColor="gray.900"
-            rounded="xl"
-            p={4}
-            borderWidth={1}
-            borderColor="gray.800"
-          >
-            {standings.length === 0 && (
-              <styled.p textAlign="center" color="gray.500">
-                No results here yet
-              </styled.p>
-            )}
+      <Container maxW={800} px={2} py={4}>
+        {drivers.length === 0 && (
+          <styled.p textAlign="center" color="gray.500">
+            No results here yet
+          </styled.p>
+        )}
 
-            {standings.length > 0 && (
-              <styled.table w="full">
-                <tbody>
-                  {standings.map((driver, i) => (
-                    <tr
-                      key={driver.driverId}
-                      style={
-                        cutoff > 0
-                          ? {
-                              opacity: i >= cutoff ? 0.5 : 1,
-                              borderTop:
-                                i === cutoff ? "1px solid red" : undefined,
-                            }
-                          : undefined
-                      }
+        <Flex flexDir="column" gap={2}>
+          {drivers.map((driver, i) => (
+            <Fragment key={driver.driverId}>
+              {i === cutoff && cutoff > 0 && <Box h="1px" bgColor="red.500" />}
+
+              <Card
+                key={driver.driverId}
+                pos="relative"
+                bgGradient="to-b"
+                gradientFrom="gray.900"
+                gradientTo="black"
+                opacity={i >= cutoff && cutoff > 0 ? 0.5 : 1}
+              >
+                <Flex p={6} alignItems="center" gap={4}>
+                  <styled.p
+                    fontWeight="extrabold"
+                    fontSize="2xl"
+                    fontStyle="italic"
+                  >
+                    {i + 1}
+                  </styled.p>
+
+                  <Box
+                    w={10}
+                    h={10}
+                    rounded="full"
+                    overflow="hidden"
+                    borderWidth={1}
+                    borderColor="gray.400"
+                  >
+                    <styled.img
+                      rounded="full"
+                      src={driver.user.image ?? "/blank-driver-right.jpg"}
+                      w="full"
+                      h="full"
+                      objectFit="cover"
+                    />
+                  </Box>
+
+                  <Box flex={1} overflow="hidden">
+                    <LinkOverlay to={`/drivers/${driver.driverId}`}>
+                      <styled.h2 lineHeight={1.1} fontWeight="medium">
+                        {driver.user.firstName} {driver.user.lastName}
+                      </styled.h2>
+                    </LinkOverlay>
+                    <styled.p
+                      fontSize="sm"
+                      color="gray.500"
+                      whiteSpace="nowrap"
+                      textOverflow="ellipsis"
+                      overflow="hidden"
                     >
-                      <styled.td textAlign="center" fontFamily="mono">
-                        {i + 1}
-                      </styled.td>
-                      <styled.td py={1} pl={2}>
-                        <Flex pos="relative" alignItems="center" gap={2}>
-                          <Box w={8} h={8} rounded="full" overflow="hidden">
-                            <styled.img
-                              rounded="full"
-                              src={driver.image ?? "/blank-driver-right.jpg"}
-                              w="full"
-                              h="full"
-                              objectFit="cover"
-                            />
-                          </Box>
-                          <LinkOverlay to={`/drivers/${driver.driverId}`} />
-                          {driver.firstName} {driver.lastName}
-                        </Flex>
-                      </styled.td>
-                    </tr>
-                  ))}
-                </tbody>
-              </styled.table>
-            )}
-          </styled.div>
-        </Box>
+                      {driver.user.team}
+                    </styled.p>
+                  </Box>
+
+                  <styled.p fontWeight="bold" fontSize="lg">
+                    {driver.totalPoints} pts
+                  </styled.p>
+                </Flex>
+              </Card>
+            </Fragment>
+          ))}
+        </Flex>
       </Container>
     </>
   );
