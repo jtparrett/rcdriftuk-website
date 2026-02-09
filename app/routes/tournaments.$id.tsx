@@ -44,6 +44,7 @@ import {
   RiShieldCheckLine,
   RiShuffleLine,
   RiSwordLine,
+  RiDownloadLine,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
@@ -531,6 +532,17 @@ const TournamentPage = () => {
                     Start Tournament <RiCheckboxCircleFill />
                   </Button>
                 </Form>
+              )}
+
+              {tournament.state === TournamentsState.END && (
+                <LinkButton
+                  variant="outline"
+                  to={`/api/tournaments/${tournament.id}/export`}
+                  download
+                  target="_blank"
+                >
+                  Export Results <RiDownloadLine />
+                </LinkButton>
               )}
 
               {isOwner && tournament.state === TournamentsState.QUALIFYING && (
