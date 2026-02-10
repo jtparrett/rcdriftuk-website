@@ -159,7 +159,7 @@ model Laps {
   id                 Int               @id @default(autoincrement())
   tournamentDriverId Int
   scores             LapScores[]
-  driver             TournamentDrivers @relation(fields: [tournamentDriverId], references: [id])
+  driver             TournamentDrivers @relation(fields: [tournamentDriverId], references: [id], onDelete: Cascade)
   tournament         Tournaments?
   penalty            Int               @default(0)
   round              Int               @default(1)

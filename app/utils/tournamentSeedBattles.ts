@@ -11,6 +11,13 @@ import { setTournamentFinishingPositions } from "./setTournamentFinishingPositio
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
 ) => {
+  await prisma.tournamentDrivers.deleteMany({
+    where: {
+      tournamentId: tournament.id,
+      driverId: 0,
+    },
+  });
+
   const byeTounamentDirver = await prisma.tournamentDrivers.create({
     data: {
       isBye: true,
