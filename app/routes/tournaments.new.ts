@@ -22,7 +22,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return prisma.tournaments.findFirst({
       where: { id: tournamentId },
       include: {
-        drivers: true,
+        drivers: {
+          orderBy: {
+            tournamentDriverNumber: "asc",
+          },
+        },
         judges: true,
       },
     });
