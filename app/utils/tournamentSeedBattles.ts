@@ -101,17 +101,19 @@ export const tournamentSeedBattles = async (id: string) => {
 
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
 
+  // Exclude the old bye driver (just deleted) so we never reference its id in updates
+  const realDrivers = tournament.drivers.filter((d) => !d.isBye);
   const totalBuysToCreate = Math.max(
     0,
-    tournament.bracketSize - tournament.drivers.length,
+    tournament.bracketSize - realDrivers.length,
   );
 
   const driversWithScores = [
-    ...tournament.drivers,
+    ...realDrivers,
     ...Array.from(new Array(totalBuysToCreate)).map((_, i) => ({
       id: byeTounamentDriver.id,
       laps: [],
-      tournamentDriverNumber: tournament.drivers.length + i + 1,
+      tournamentDriverNumber: realDrivers.length + i + 1,
     })),
   ].map((driver) => {
     const lapScores = driver.laps.map((lap) =>
