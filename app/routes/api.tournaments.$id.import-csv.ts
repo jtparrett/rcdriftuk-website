@@ -59,61 +59,174 @@ export const action = async (args: ActionFunctionArgs) => {
     throw new Response("CSV file is empty", { status: 400 });
   }
 
-  // Find the driver ID column (try various common names)
+  const headers = parseResult.meta.fields || [];
+
+  // Detect available columns
   const driverIdColumnNames = [
     "driver id",
     "driverid",
     "driver_id",
     "id",
-    "Driver ID",
   ];
-  const headers = parseResult.meta.fields || [];
-  const driverIdColumn = headers.find((h) => driverIdColumnNames.includes(h));
+  const firstNameColumnNames = [
+    "first name",
+    "firstname",
+    "first_name",
+    "first",
+  ];
+  const lastNameColumnNames = [
+    "last name",
+    "lastname",
+    "last_name",
+    "last",
+    "surname",
+  ];
+  const nameColumnNames = ["name", "driver name", "drivername", "driver"];
 
-  if (!driverIdColumn) {
+  const driverIdColumn = headers.find((h) => driverIdColumnNames.includes(h));
+  const firstNameColumn = headers.find((h) =>
+    firstNameColumnNames.includes(h),
+  );
+  const lastNameColumn = headers.find((h) => lastNameColumnNames.includes(h));
+  const nameColumn = headers.find((h) => nameColumnNames.includes(h));
+
+  const hasDriverIdColumn = !!driverIdColumn;
+  const hasNameColumns = !!(firstNameColumn || nameColumn);
+
+  if (!hasDriverIdColumn && !hasNameColumns) {
     throw new Response(
-      "CSV must have a 'Driver ID' column. Found columns: " +
+      "CSV must have either a 'Driver ID' column, or 'First Name'/'Last Name' columns (or a 'Name' column). Found columns: " +
         headers.join(", "),
       { status: 400 },
     );
   }
 
-  // Parse driver IDs from CSV
+  // Track drivers already in the tournament to avoid duplicates
   const existingDriverIds = new Set(tournament.drivers.map((d) => d.driverId));
-  const parsedDriverIds: number[] = [];
+  const seenDriverIds = new Set<number>();
 
-  for (const row of parseResult.data) {
-    const driverIdStr = row[driverIdColumn]?.trim();
+  // Collect ordered driver IDs — one per CSV row
+  const driverIds: number[] = [];
 
-    if (!driverIdStr) continue;
+  if (hasDriverIdColumn) {
+    // ── Strategy 1: Match by driver ID column ──
+    // Collect all candidate IDs first, then batch-verify
+    const rowDriverIds: (number | null)[] = [];
 
-    const driverId = Number(driverIdStr);
-
-    if (isNaN(driverId) || driverId <= 0) {
-      continue; // Skip invalid driver IDs
+    for (const row of parseResult.data) {
+      const driverIdStr = row[driverIdColumn!]?.trim();
+      if (!driverIdStr) {
+        rowDriverIds.push(null);
+        continue;
+      }
+      const parsed = Number(driverIdStr);
+      rowDriverIds.push(isNaN(parsed) || parsed <= 0 ? null : parsed);
     }
 
-    // Skip if driver is already in the tournament or already parsed
-    if (existingDriverIds.has(driverId)) {
-      continue;
-    }
+    // Batch-verify which driver IDs exist in the database
+    const candidateIds = rowDriverIds.filter(
+      (id): id is number => id !== null,
+    );
+    const existingUsers = await prisma.users.findMany({
+      where: { driverId: { in: candidateIds } },
+      select: { driverId: true },
+    });
+    const validDriverIds = new Set(existingUsers.map((u) => u.driverId));
 
-    parsedDriverIds.push(driverId);
-    existingDriverIds.add(driverId); // Prevent duplicates within the CSV
+    for (const driverId of rowDriverIds) {
+      if (driverId === null) continue;
+      if (existingDriverIds.has(driverId) || seenDriverIds.has(driverId))
+        continue;
+      if (!validDriverIds.has(driverId)) continue;
+
+      driverIds.push(driverId);
+      seenDriverIds.add(driverId);
+    }
+  } else {
+    // ── Strategy 2: Match by name, create if not found ──
+    // Fetch all non-archived users for name matching
+    const allUsers = await prisma.users.findMany({
+      where: { archived: false },
+      select: {
+        driverId: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    for (const row of parseResult.data) {
+      let firstName: string | undefined;
+      let lastName: string | undefined;
+
+      if (firstNameColumn) {
+        firstName = row[firstNameColumn]?.trim();
+        lastName = lastNameColumn ? row[lastNameColumn]?.trim() : undefined;
+      } else if (nameColumn) {
+        // Split a full name into first/last
+        const parts = row[nameColumn]?.trim().split(/\s+/) || [];
+        firstName = parts[0];
+        lastName = parts.length > 1 ? parts.slice(1).join(" ") : undefined;
+      }
+
+      if (!firstName) continue;
+
+      // Try to find a matching user (case-insensitive)
+      const matches = allUsers.filter((u) => {
+        const firstMatch =
+          u.firstName?.toLowerCase() === firstName!.toLowerCase();
+        if (!firstMatch) return false;
+
+        if (lastName) {
+          return u.lastName?.toLowerCase() === lastName.toLowerCase();
+        }
+
+        // Single name — match firstName only
+        return true;
+      });
+
+      let matchedDriverId: number | undefined;
+
+      if (matches.length === 1) {
+        matchedDriverId = matches[0].driverId;
+      } else if (matches.length > 1) {
+        // Multiple matches — prefer exact firstName+lastName, or firstName with null lastName for single names
+        const exactMatch = lastName
+          ? matches.find(
+              (u) => u.lastName?.toLowerCase() === lastName!.toLowerCase(),
+            )
+          : matches.find((u) => !u.lastName);
+
+        matchedDriverId = exactMatch
+          ? exactMatch.driverId
+          : matches[0].driverId;
+      }
+
+      if (matchedDriverId) {
+        // Skip if already in tournament or already seen in this CSV
+        if (
+          existingDriverIds.has(matchedDriverId) ||
+          seenDriverIds.has(matchedDriverId)
+        )
+          continue;
+
+        driverIds.push(matchedDriverId);
+        seenDriverIds.add(matchedDriverId);
+      } else {
+        // No match — create a new driver
+        const newUser = await prisma.users.create({
+          data: {
+            firstName,
+            lastName: lastName || null,
+          },
+        });
+
+        driverIds.push(newUser.driverId);
+        seenDriverIds.add(newUser.driverId);
+      }
+    }
   }
 
-  // Batch verify which drivers exist in the database
-  const existingUsers = await prisma.users.findMany({
-    where: {
-      driverId: { in: parsedDriverIds },
-    },
-    select: { driverId: true },
-  });
-
-  const validDriverIds = new Set(existingUsers.map((u) => u.driverId));
-  const driverIds = parsedDriverIds.filter((id) => validDriverIds.has(id));
-
-  // Add the drivers to the tournament
+  // Add the drivers to the tournament (order is preserved)
   if (driverIds.length > 0) {
     await tournamentAddDrivers(id, driverIds, {
       createLaps: tournament.state !== TournamentsState.START,
