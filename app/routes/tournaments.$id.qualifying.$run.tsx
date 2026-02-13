@@ -20,6 +20,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const run = z.coerce.number().parse(args.params.run);
   const { userId } = await getAuth(args);
 
+  const url = new URL(args.request.url);
+  const pageParam = url.searchParams.get("page");
+  const pageSizeParam = url.searchParams.get("pageSize");
+
+  const page = pageParam ? z.coerce.number().int().min(1).parse(pageParam) : null;
+  const pageSize = pageSizeParam ? z.coerce.number().int().min(1).parse(pageSizeParam) : null;
+
   const tournament = await prisma.tournaments.findFirst({
     where: {
       id,
@@ -98,19 +105,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const isOwner = tournament?.userId === userId;
   const judgeIds = tournament.judges.map((j) => j.id);
 
-  return {
-    run,
-    isOwner,
-    id: tournament.id,
-    bracketSize: tournament.bracketSize,
-    enableBattles: tournament.enableBattles,
-    format: tournament.format,
-    qualifyingLaps: tournament.qualifyingLaps,
-    nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
-    nextQualifyingLap: tournament.nextQualifyingLap,
-    totalDrivers: tournament.drivers.length,
-    driverNumbers: tournament.driverNumbers,
-    drivers: tournament.drivers
+  const sortedDrivers = tournament.drivers
       .filter(
         (driver) => run === 0 || driver.laps.some((lap) => lap.round === run),
       )
@@ -147,7 +142,28 @@ export const loader = async (args: LoaderFunctionArgs) => {
         }
 
         return (b.score ?? 0) - (a.score ?? 0) || a.id - b.id;
-      }),
+      });
+
+  const isPaginated = page !== null && pageSize !== null;
+  const startPosition = isPaginated ? (page - 1) * pageSize : 0;
+  const paginatedDrivers = isPaginated
+    ? sortedDrivers.slice(startPosition, startPosition + pageSize)
+    : sortedDrivers;
+
+  return {
+    run,
+    isOwner,
+    id: tournament.id,
+    bracketSize: tournament.bracketSize,
+    enableBattles: tournament.enableBattles,
+    format: tournament.format,
+    qualifyingLaps: tournament.qualifyingLaps,
+    nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
+    nextQualifyingLap: tournament.nextQualifyingLap,
+    totalDrivers: tournament.drivers.length,
+    driverNumbers: tournament.driverNumbers,
+    drivers: paginatedDrivers,
+    startPosition,
   };
 };
 
@@ -290,6 +306,7 @@ const QualifyingPage = () => {
   );
 
   const half = Math.ceil(driversWithoutBuys.length / 2);
+  const startPosition = tournament.startPosition;
 
   const getDriverNumber = (driver: Drivers[number]) => {
     if (tournament.driverNumbers === TournamentsDriverNumbers.NONE) {
@@ -357,6 +374,7 @@ const QualifyingPage = () => {
             <>
               <Table
                 drivers={driversWithoutBuys.slice(0, half)}
+                startPosition={startPosition}
                 isOwner={tournament.isOwner}
                 getDriverNumber={getDriverNumber}
               />
@@ -370,7 +388,7 @@ const QualifyingPage = () => {
 
               <Table
                 drivers={driversWithoutBuys.slice(half)}
-                startPosition={half}
+                startPosition={startPosition + half}
                 isOwner={tournament.isOwner}
                 getDriverNumber={getDriverNumber}
               />
