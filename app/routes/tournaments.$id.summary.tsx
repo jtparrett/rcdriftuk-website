@@ -102,8 +102,9 @@ const TournamentsSummaryPage = () => {
               transform="skewX(-16deg)"
             >
               {tournament.nextQualifyingLap?.driver.user?.firstName}{" "}
-              {tournament.nextQualifyingLap?.driver.user?.lastName} qualifying
-              run {tournament.nextQualifyingLap?.round}
+              {tournament.nextQualifyingLap?.driver.user?.lastName}{" "}
+              <styled.span fontWeight="medium">qualifying</styled.span> run{" "}
+              {tournament.nextQualifyingLap?.round}
             </styled.p>
           </Box>
         </Flex>
