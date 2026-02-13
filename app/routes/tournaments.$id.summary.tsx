@@ -52,13 +52,62 @@ const TournamentsSummaryPage = () => {
 
   if (tournament.state === TournamentsState.QUALIFYING) {
     return (
-      <Box>
-        <styled.p>
-          Now: {tournament.nextQualifyingLap?.driver.user?.firstName}{" "}
-          {tournament.nextQualifyingLap?.driver.user?.lastName} qualifying run{" "}
-          {tournament.nextQualifyingLap?.round}
-        </styled.p>
-      </Box>
+      <Flex
+        pos="relative"
+        h="100dvh"
+        w="100dvw"
+        justifyContent="flex-end"
+        alignItems="flex-start"
+        overflow="hidden"
+      >
+        <Flex pt={4} pr={4} mr={-12}>
+          <Box
+            bgGradient="to-b"
+            gradientFrom="brand.500"
+            gradientTo="brand.700"
+            transform="skewX(16deg)"
+            px={4}
+            py={3}
+            flex="none"
+            borderTopLeftRadius="lg"
+            borderBottomLeftRadius="lg"
+            borderTopRightRadius="lg"
+            mr={-2}
+            pos="relative"
+            zIndex={2}
+          >
+            <styled.p
+              fontSize="lg"
+              fontWeight="semibold"
+              transform="skewX(-16deg)"
+            >
+              NOW
+            </styled.p>
+          </Box>
+          <Box
+            transform="skewX(16deg)"
+            bgGradient="to-b"
+            gradientFrom="gray.800"
+            gradientTo="gray.900"
+            flex="none"
+            w="fit-content"
+            pl={6}
+            pr={14}
+            py={3}
+            borderRightRadius="lg"
+          >
+            <styled.p
+              fontSize="lg"
+              fontWeight="semibold"
+              transform="skewX(-16deg)"
+            >
+              {tournament.nextQualifyingLap?.driver.user?.firstName}{" "}
+              {tournament.nextQualifyingLap?.driver.user?.lastName} qualifying
+              run {tournament.nextQualifyingLap?.round}
+            </styled.p>
+          </Box>
+        </Flex>
+      </Flex>
     );
   }
 
@@ -115,12 +164,12 @@ const TournamentsSummaryPage = () => {
             >
               {tournament.nextBattle?.driverLeft?.user?.firstName}{" "}
               {tournament.nextBattle?.driverLeft?.user?.lastName}{" "}
-              <styled.span fontSize="sm" fontFamily="mono" color="brand.500">
+              <styled.span fontSize="sm" fontFamily="mono" color="gray.500">
                 (#{tournament.nextBattle?.driverLeft?.user?.driverId})
               </styled.span>{" "}
               vs {tournament.nextBattle?.driverRight?.user?.firstName}{" "}
               {tournament.nextBattle?.driverRight?.user?.lastName}
-              <styled.span fontSize="sm" fontFamily="mono" color="brand.500">
+              <styled.span fontSize="sm" fontFamily="mono" color="gray.500">
                 (#{tournament.nextBattle?.driverRight?.user?.driverId})
               </styled.span>
             </styled.p>
