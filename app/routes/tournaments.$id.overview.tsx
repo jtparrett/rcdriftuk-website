@@ -649,7 +649,7 @@ const TournamentsOverviewPage = () => {
                       <>
                         <RightInfoBox>
                           <styled.p
-                            fontSize={{ base: "4xl", md: "6xl" }}
+                            fontSize={{ base: "4xl", md: "100px" }}
                             fontWeight="black"
                             pr={10}
                           >
