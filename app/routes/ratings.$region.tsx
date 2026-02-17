@@ -84,11 +84,8 @@ const Row = ({
   driver: Awaited<ReturnType<LoaderData>>["drivers"][number];
   region: Regions;
 }) => {
-  const rankTitle = driver
-    ? getDriverRank(driver.elo, driver.ranked)
-    : RANKS.UNRANKED;
-
   const elo = region === Regions.ALL ? driver.elo : driver[`elo_${region}`];
+  const rankTitle = driver ? getDriverRank(elo, driver.ranked) : RANKS.UNRANKED;
   const [bg, hover] = getRankColor(rankTitle);
 
   return (
