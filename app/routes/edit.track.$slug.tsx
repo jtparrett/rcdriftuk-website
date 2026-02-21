@@ -82,6 +82,7 @@ export const action = async (args: ActionFunctionArgs) => {
       lng: z.coerce.number(),
       leaderboardId: z.string().optional(),
       region: z.nativeEnum(Regions),
+      status: z.enum(["ACTIVE", "CLOSED"]).optional(),
     })
     .parse(Object.fromEntries(formData.entries()));
 

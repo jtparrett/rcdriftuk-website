@@ -15,7 +15,7 @@ import { useFormik } from "formik";
 import { FormControl } from "./FormControl";
 import { useFetcher } from "react-router";
 import { resizeImage } from "~/utils/resizeImage";
-import type { Leaderboards } from "@prisma/client";
+import type { Leaderboards, TrackStatus } from "@prisma/client";
 import { Select } from "./Select";
 import { Regions } from "~/utils/enums";
 import { TabButton, TabGroup } from "./Tab";
@@ -37,6 +37,11 @@ interface Props {
   defaultOwners?: OwnerEntry[];
 }
 
+const STATUS_OPTIONS: { value: TrackStatus; label: string }[] = [
+  { value: "ACTIVE", label: "Open" },
+  { value: "CLOSED", label: "Closed" },
+];
+
 const formSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
@@ -48,6 +53,7 @@ const formSchema = z.object({
   cover: z.union([z.instanceof(File), z.string()]).optional(),
   leaderboardId: z.string().optional(),
   region: z.nativeEnum(Regions),
+  status: z.enum(["ACTIVE", "CLOSED"]).optional(),
   owners: z.array(
     z.object({
       userId: z.string(),
@@ -97,6 +103,10 @@ export const TrackForm = ({
       cover: track?.cover ?? "",
       leaderboardId: track?.leaderboardId ?? "",
       region: track?.region ?? Regions.UK,
+      status:
+        track?.status === "ACTIVE" || track?.status === "CLOSED"
+          ? track.status
+          : undefined,
       owners: initialOwners,
     },
     onSubmit: async (values) => {
@@ -124,6 +134,10 @@ export const TrackForm = ({
       formData.append("lng", values.lng.toString());
       formData.append("leaderboardId", values.leaderboardId ?? "");
       formData.append("region", values.region);
+
+      if (values.status) {
+        formData.append("status", values.status);
+      }
 
       for (const owner of values.owners) {
         formData.append("ownerUserIds", owner.userId);
@@ -253,32 +267,11 @@ export const TrackForm = ({
           />
         </FormControl>
 
-        {(leaderboards?.length ?? 0) > 0 && (
-          <>
-            <Divider borderColor="gray.800" />
-            <FormControl error={formik.errors.leaderboardId}>
-              <Label>Leaderboard</Label>
-              <Select
-                name="leaderboardId"
-                value={formik.values.leaderboardId}
-                onChange={formik.handleChange}
-              >
-                <option value="">Select an option...</option>
-                {leaderboards?.map((leaderboard) => (
-                  <option key={leaderboard.id} value={leaderboard.id}>
-                    {leaderboard.name}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          </>
-        )}
-
         <Divider borderColor="gray.800" />
 
         <FormControl error={formik.errors.region}>
           <Label>Region</Label>
-          <TabGroup p={0}>
+          <TabGroup>
             {Object.values(Regions).map((item) => {
               if (item === Regions.ALL) {
                 return null;
@@ -297,6 +290,27 @@ export const TrackForm = ({
             })}
           </TabGroup>
         </FormControl>
+
+        {track && (
+          <>
+            <Divider borderColor="gray.800" />
+            <FormControl>
+              <Label>Status</Label>
+              <TabGroup>
+                {STATUS_OPTIONS.map((option) => (
+                  <TabButton
+                    type="button"
+                    key={option.value}
+                    isActive={formik.values.status === option.value}
+                    onClick={() => formik.setFieldValue("status", option.value)}
+                  >
+                    {option.label}
+                  </TabButton>
+                ))}
+              </TabGroup>
+            </FormControl>
+          </>
+        )}
 
         <Divider borderColor="gray.800" />
 
@@ -428,6 +442,27 @@ export const TrackForm = ({
         </Box>
 
         <Divider borderColor="gray.800" />
+
+        {(leaderboards?.length ?? 0) > 0 && (
+          <>
+            <FormControl error={formik.errors.leaderboardId}>
+              <Label>Leaderboard</Label>
+              <Select
+                name="leaderboardId"
+                value={formik.values.leaderboardId}
+                onChange={formik.handleChange}
+              >
+                <option value="">Select an option...</option>
+                {leaderboards?.map((leaderboard) => (
+                  <option key={leaderboard.id} value={leaderboard.id}>
+                    {leaderboard.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            <Divider borderColor="gray.800" />
+          </>
+        )}
 
         <Button
           type="submit"
