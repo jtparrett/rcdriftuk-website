@@ -28,6 +28,7 @@ model Events {
   earlyAccessCode   String?
   ticketPrice       Float?
   rated             Boolean          @default(false)
+  allowedRanks      String[]         @default([])
 
   @@index([startDate])
   @@index([endDate])

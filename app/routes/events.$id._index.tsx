@@ -34,6 +34,8 @@ import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { google } from "calendar-link";
 import type { Route } from "./+types/events.$id._index";
 import { AppName } from "~/utils/enums";
+import { getDriverRank } from "~/utils/getDriverRank";
+import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
@@ -65,6 +67,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   let isAttending = false;
   let ticket: GetUserEventTicket = null;
+  let userRank: string | null = null;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -76,6 +79,18 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
     isAttending = !!userEventResponse;
     ticket = await getUserEventTicket(id, userId);
+
+    if (event.allowedRanks.length > 0) {
+      const user = await prisma.users.findFirst({
+        where: { id: userId },
+        select: { elo: true, ranked: true, lastBattleDate: true },
+      });
+
+      if (user) {
+        const adjustedElo = adjustDriverElo(user.elo, user.lastBattleDate);
+        userRank = getDriverRank(adjustedElo, user.ranked);
+      }
+    }
   }
 
   const isSoldOut = isEventSoldOut(event);
@@ -85,6 +100,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isAttending,
     ticket,
     isSoldOut,
+    userRank,
   };
 };
 
@@ -120,7 +136,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending, ticket, isSoldOut } =
+  const { event, isAttending, ticket, isSoldOut, userRank } =
     useLoaderData<typeof loader>();
   const startDate = useMemo(() => new Date(event.startDate), [event]);
   const endDate = useMemo(() => new Date(event.endDate), [event]);
@@ -192,12 +208,12 @@ const Page = () => {
               {getEventDate(startDate, endDate)}
             </styled.p>
 
-            <styled.h1 fontSize="3xl" fontWeight="extrabold">
+            <styled.h1 fontSize="3xl" fontWeight="extrabold" lineHeight={1.1}>
               {event.name}
             </styled.h1>
 
             {event.description && (
-              <Box mb={4}>
+              <Box mb={4} mt={2}>
                 <Markdown>{event.description}</Markdown>
               </Box>
             )}
@@ -345,6 +361,7 @@ const Page = () => {
                           : null
                       }
                       isSoldOut={isSoldOut}
+                      userRank={userRank}
                     />
                   </Box>
                 </>
@@ -443,6 +460,16 @@ const Page = () => {
                     target="_blank"
                   >
                     Download Attendees <RiDownloadLine />
+                  </LinkButton>
+                )}
+
+                {isTrackOwner && (
+                  <LinkButton
+                    w="full"
+                    variant="outline"
+                    to={`/events/${event.id}/edit`}
+                  >
+                    Edit Event
                   </LinkButton>
                 )}
 

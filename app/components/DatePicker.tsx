@@ -42,8 +42,14 @@ export const DatePicker = ({
   };
 
   return (
-    <Box w="full" rounded="md" overflow="hidden">
-      <Flex alignItems="center" py={2} bgColor="gray.900" mb="1px">
+    <Box
+      w="full"
+      rounded="md"
+      overflow="hidden"
+      borderWidth={1}
+      borderColor="gray.800"
+    >
+      <Flex alignItems="center" py={2} mb="1px">
         <styled.button
           color="inherit"
           type="button"
@@ -69,7 +75,7 @@ export const DatePicker = ({
         </styled.button>
       </Flex>
 
-      <Flex bgColor="gray.900" mb="1px">
+      <Flex mb="1px">
         {["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"].map((day) => (
           <styled.span
             w={`${100 / 7}%`}

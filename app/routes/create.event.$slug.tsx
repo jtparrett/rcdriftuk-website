@@ -1,30 +1,18 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { Form, Link, useLoaderData, useParams } from "react-router";
+import { useLoaderData, useParams } from "react-router";
 import {
   add,
   differenceInWeeks,
   endOfYear,
-  format,
   parseISO,
-  startOfHour,
-  sub,
 } from "date-fns";
-import { useState } from "react";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
-import { Button } from "~/components/Button";
-import { DatePicker } from "~/components/DatePicker";
-import { Input } from "~/components/Input";
-import { Label } from "~/components/Label";
-import { MoneyInput } from "~/components/MoneyInput";
-import { Select } from "~/components/Select";
-import { Textarea } from "~/components/Textarea";
-import { TimePicker } from "~/components/TimePicker";
-import { styled, Box, Flex, Container } from "~/styled-system/jsx";
+import { styled, Container } from "~/styled-system/jsx";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
-import { TabButton, TabGroup } from "~/components/Tab";
+import { EventForm } from "~/components/EventForm";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -64,19 +52,6 @@ export const action = async (args: ActionFunctionArgs) => {
 
   invariant(userId, "User not found");
 
-  const name = body.get("name");
-  const startDate = body.get("startDate");
-  const endDate = body.get("endDate");
-  const link = body.get("link");
-  const repeatWeeks = body.get("repeatWeeks");
-  const description = body.get("description");
-  const enableTicketing = body.get("enableTicketing");
-  const ticketCapacity = body.get("ticketCapacity");
-  const ticketReleaseDate = body.get("ticketReleaseDate");
-  const earlyAccessCode = body.get("earlyAccessCode");
-  const ticketPrice = body.get("ticketPrice");
-  const rated = body.get("rated");
-
   const data = z
     .object({
       name: z.string(),
@@ -86,25 +61,27 @@ export const action = async (args: ActionFunctionArgs) => {
       repeatWeeks: z.coerce.number(),
       description: z.string().optional(),
       enableTicketing: z.string().nullish(),
-      ticketCapacity: z.coerce.number().nullable(),
-      ticketReleaseDate: z.coerce.date().nullable(),
+      ticketCapacity: z.preprocess((v) => (v ? Number(v) : null), z.number().nullable()),
+      ticketReleaseDate: z.preprocess((v) => (v ? new Date(v as string) : null), z.date().nullable()),
       earlyAccessCode: z.string().nullable(),
-      ticketPrice: z.coerce.number().nullable(),
+      ticketPrice: z.preprocess((v) => (v ? Number(v) : null), z.number().nullable()),
       rated: z.string().optional(),
+      allowedRanks: z.array(z.string()).default([]),
     })
     .parse({
-      name,
-      startDate,
-      endDate,
-      link,
-      repeatWeeks,
-      description,
-      enableTicketing,
-      ticketCapacity,
-      ticketReleaseDate,
-      earlyAccessCode,
-      ticketPrice,
-      rated,
+      name: body.get("name"),
+      startDate: body.get("startDate"),
+      endDate: body.get("endDate"),
+      link: body.get("link"),
+      repeatWeeks: body.get("repeatWeeks"),
+      description: body.get("description"),
+      enableTicketing: body.get("enableTicketing"),
+      ticketCapacity: body.get("ticketCapacity"),
+      ticketReleaseDate: body.get("ticketReleaseDate"),
+      earlyAccessCode: body.get("earlyAccessCode"),
+      ticketPrice: body.get("ticketPrice"),
+      rated: body.get("rated"),
+      allowedRanks: body.getAll("allowedRanks"),
     });
 
   const startDateNoZone = parseISO(data.startDate);
@@ -146,6 +123,7 @@ export const action = async (args: ActionFunctionArgs) => {
         earlyAccessCode: data.earlyAccessCode,
         ticketPrice: data.ticketPrice,
         rated: data.rated === "true",
+        allowedRanks: data.allowedRanks,
       };
     }),
   });
@@ -156,233 +134,18 @@ export const action = async (args: ActionFunctionArgs) => {
 const CalendarNewPage = () => {
   const { stripeAccountEnabled } = useLoaderData<typeof loader>();
   const params = useParams();
-  const [startDate, setStartDate] = useState(
-    startOfHour(add(new Date(), { days: 1 })),
-  );
-  const [numberOfDays, setNumberOfDays] = useState(1);
-  const [endDate, setEndDate] = useState(
-    startOfHour(add(new Date(), { days: 1 })),
-  );
-  const [enableTicketing, setEnableTicketing] = useState(false);
-  const [ticketReleaseDate, setTicketReleaseDate] = useState(new Date());
-  const [rated, setRated] = useState(false);
-
-  const updateEndDate = (newStartDate: Date, days: number) => {
-    setEndDate(add(newStartDate, { days: days - 1 }));
-  };
 
   return (
     <Container maxW={1100} px={4} py={8}>
       <styled.h1 fontSize="3xl" fontWeight="extrabold" mb={4}>
         Create an event
       </styled.h1>
-      <Form method="post">
-        <Flex flexDir="column" maxW={500} gap={4}>
-          <Box>
-            <Label>Date</Label>
-            <DatePicker
-              value={startDate}
-              days={numberOfDays}
-              onChange={(date) => {
-                setStartDate(date);
-                updateEndDate(date, numberOfDays);
-              }}
-            />
-          </Box>
-
-          <Box>
-            <Label>Number of Days</Label>
-            <Select
-              value={numberOfDays}
-              onChange={(e) => {
-                const days = parseInt(e.target.value, 10);
-                setNumberOfDays(days);
-                updateEndDate(startDate, days);
-              }}
-            >
-              <option value="1">1 Day</option>
-              <option value="2">2 Days</option>
-              <option value="3">3 Days</option>
-              <option value="4">4 Days</option>
-              <option value="5">5 Days</option>
-            </Select>
-          </Box>
-
-          <Box flex={1}>
-            <Label>Start Time</Label>
-            <Input
-              type="hidden"
-              name="startDate"
-              required
-              value={format(startDate, "yyyy-MM-dd'T'HH:mm:ss'Z'")}
-            />
-            <TimePicker
-              value={startDate}
-              onChange={(date) => {
-                setStartDate(date);
-              }}
-            />
-          </Box>
-
-          <Box flex={1}>
-            <Label>End Time</Label>
-            <Input
-              type="hidden"
-              name="endDate"
-              required
-              value={format(endDate, "yyyy-MM-dd'T'HH:mm:ss'Z'")}
-            />
-            <TimePicker value={endDate} onChange={(date) => setEndDate(date)} />
-          </Box>
-
-          <Box>
-            <Label>Repeat Event</Label>
-            <Select name="repeatWeeks">
-              <option value="0">Never</option>
-              <option value="1">Weekly</option>
-              <option value="2">Bi-Weekly</option>
-            </Select>
-          </Box>
-
-          <Box>
-            <Label>Name</Label>
-            <Input name="name" required />
-          </Box>
-
-          <Box>
-            <Label>Link (https://)</Label>
-            <Input name="link" />
-          </Box>
-
-          <Box>
-            <Label>Description</Label>
-            <Textarea name="description" />
-          </Box>
-
-          <Box>
-            <Label>Is this a rated tournament?</Label>
-            <input
-              type="hidden"
-              name="rated"
-              value={rated ? "true" : "false"}
-            />
-            <TabGroup>
-              <TabButton
-                type="button"
-                isActive={!rated}
-                onClick={() => setRated(false)}
-              >
-                No
-              </TabButton>
-              <TabButton
-                type="button"
-                isActive={rated}
-                onClick={() => setRated(true)}
-              >
-                Yes
-              </TabButton>
-            </TabGroup>
-          </Box>
-
-          {stripeAccountEnabled ? (
-            <>
-              <Box>
-                <Label>Enable ticketing</Label>
-                <input
-                  type="hidden"
-                  name="enableTicketing"
-                  value={enableTicketing ? "true" : "false"}
-                />
-
-                <TabGroup>
-                  <TabButton
-                    type="button"
-                    isActive={!enableTicketing}
-                    onClick={() => setEnableTicketing(false)}
-                  >
-                    No
-                  </TabButton>
-                  <TabButton
-                    type="button"
-                    isActive={enableTicketing}
-                    onClick={() => setEnableTicketing(true)}
-                  >
-                    Yes
-                  </TabButton>
-                </TabGroup>
-              </Box>
-
-              {enableTicketing && (
-                <>
-                  <Box>
-                    <Label>Ticket Capacity</Label>
-                    <Input
-                      name="ticketCapacity"
-                      type="number"
-                      defaultValue={0}
-                      required
-                    />
-                  </Box>
-
-                  <Box>
-                    <Label>Ticket Price</Label>
-                    <MoneyInput name="ticketPrice" required />
-                  </Box>
-
-                  <Box>
-                    <Label>Ticket Release Date</Label>
-                    <Input
-                      name="ticketReleaseDate"
-                      type="hidden"
-                      required
-                      value={ticketReleaseDate.toISOString()}
-                    />
-                    <DatePicker
-                      value={ticketReleaseDate}
-                      maxDate={sub(startDate, { days: 1 })}
-                      onChange={(date) => setTicketReleaseDate(date)}
-                    />
-                  </Box>
-
-                  <Box>
-                    <Label>Ticket Release Time</Label>
-                    <TimePicker
-                      value={ticketReleaseDate}
-                      onChange={(date) => setTicketReleaseDate(date)}
-                    />
-                  </Box>
-
-                  <Box>
-                    <Label>Early Access Code</Label>
-                    <Input name="earlyAccessCode" required />
-                  </Box>
-                </>
-              )}
-            </>
-          ) : (
-            <Box
-              bgColor="gray.800"
-              borderRadius="lg"
-              p={4}
-              borderWidth={1}
-              borderColor="gray.700"
-            >
-              <styled.p color="gray.400" fontSize="sm" mb={2}>
-                To enable ticketing for events, you need to connect your Stripe
-                account first.
-              </styled.p>
-              <Link
-                to={`/edit/track/${params.slug}#payments`}
-                style={{ color: "#60a5fa", fontSize: "14px" }}
-              >
-                Set up Stripe Connect in track settings
-              </Link>
-            </Box>
-          )}
-
-          <Button type="submit">Create Event</Button>
-        </Flex>
-      </Form>
+      <EventForm
+        stripeAccountEnabled={stripeAccountEnabled}
+        stripeSetupLink={`/edit/track/${params.slug}#payments`}
+        showRepeatEvent
+        submitLabel="Create Event"
+      />
     </Container>
   );
 };
