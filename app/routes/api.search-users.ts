@@ -16,6 +16,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return [];
   }
 
+  const parts = query.split(/\s+/).filter(Boolean);
+
   const users = await prisma.users.findMany({
     where: {
       AND: [
@@ -24,28 +26,30 @@ export const loader = async (args: LoaderFunctionArgs) => {
             not: 0,
           },
         },
-        {
+        ...parts.map((part) => ({
           OR: [
             {
               firstName: {
-                contains: query,
-                mode: "insensitive",
+                contains: part,
+                mode: "insensitive" as const,
               },
             },
             {
               lastName: {
-                contains: query,
-                mode: "insensitive",
+                contains: part,
+                mode: "insensitive" as const,
               },
             },
           ],
-        },
+        })),
       ],
     },
     select: {
+      id: true,
       driverId: true,
       firstName: true,
       lastName: true,
+      image: true,
     },
     take: 15,
     orderBy: [

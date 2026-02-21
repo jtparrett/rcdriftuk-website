@@ -30,6 +30,20 @@ export const getUserOwnedTrackBySlug = async (slug: string, userId: string) => {
       region: true,
       stripeAccountId: true,
       stripeAccountEnabled: true,
+      Owners: {
+        select: {
+          userId: true,
+          user: {
+            select: {
+              id: true,
+              driverId: true,
+              firstName: true,
+              lastName: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
   });
 

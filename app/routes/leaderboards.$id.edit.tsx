@@ -18,12 +18,12 @@ import { Button } from "~/components/Button";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { LeaderboardType, TournamentsState } from "~/utils/enums";
 import { capitalCase } from "change-case";
-import { getUsers } from "~/utils/getUsers.server";
 import { useMemo, useState } from "react";
 import { Reorder } from "motion/react";
 import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { Dropdown, Option } from "~/components/Dropdown";
 import { Card } from "~/components/CollapsibleCard";
+import { useUserSearch } from "~/hooks/useUserSearch";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -37,14 +37,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
       userId,
     },
     include: {
-      drivers: true,
+      drivers: {
+        include: {
+          driver: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
       tournaments: true,
     },
   });
 
   notFoundInvariant(leaderboard, "Leaderboard not found");
-
-  const users = await getUsers();
 
   const tournaments = await prisma.tournaments.findMany({
     where: {
@@ -62,7 +69,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   return {
     leaderboard,
-    users,
     tournaments,
   };
 };
@@ -75,7 +81,7 @@ export const action = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const formData = await args.request.formData();
 
-  const data = formSchema.parse({
+  const data = actionSchema.parse({
     name: formData.get("name"),
     type: formData.get("type"),
     cutoff: Number(formData.get("cutoff")),
@@ -136,7 +142,7 @@ export const action = async (args: LoaderFunctionArgs) => {
   return redirect(`/leaderboards/${id}`);
 };
 
-const formSchema = z.object({
+const actionSchema = z.object({
   name: z.string().min(1),
   type: z.nativeEnum(LeaderboardType),
   cutoff: z.number(),
@@ -144,7 +150,21 @@ const formSchema = z.object({
   drivers: z.array(z.number()),
 });
 
-const validationSchema = toFormikValidationSchema(formSchema);
+const clientSchema = z.object({
+  name: z.string().min(1),
+  type: z.nativeEnum(LeaderboardType),
+  cutoff: z.number(),
+  tournaments: z.array(z.string()),
+  drivers: z.array(
+    z.object({
+      driverId: z.number(),
+      firstName: z.string().nullable().optional(),
+      lastName: z.string().nullable().optional(),
+    }),
+  ),
+});
+
+const validationSchema = toFormikValidationSchema(clientSchema);
 
 const TournamentsForm = ({
   value,
@@ -293,26 +313,28 @@ const TournamentsForm = ({
   );
 };
 
+interface DriverEntry {
+  driverId: number;
+  firstName?: string | null;
+  lastName?: string | null;
+}
+
 const PeopleForm = ({
   value,
   onChange,
 }: {
-  value: number[];
-  onChange: (value: number[]) => void;
+  value: DriverEntry[];
+  onChange: (value: DriverEntry[]) => void;
 }) => {
-  const { users } = useLoaderData<typeof loader>();
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
 
-  const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        !value.includes(user.driverId) &&
-        `${user.firstName} ${user.lastName}`
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-    );
-  }, [users, value, search]);
+  const { data: searchResults = [], isLoading } = useUserSearch(search);
+
+  const selectedIds = new Set(value.map((v) => v.driverId));
+  const filteredResults = searchResults.filter(
+    (u) => !selectedIds.has(u.driverId),
+  );
 
   return (
     <Box>
@@ -336,15 +358,15 @@ const PeopleForm = ({
               marginBottom: "-1px",
             }}
           >
-            {value.map((userId, i) => {
-              const user = users.find((user) =>
-                typeof userId === "string" ? false : user.driverId === userId,
-              );
+            {value.map((entry, i) => {
+              const displayName = entry.firstName
+                ? `${entry.firstName} ${entry.lastName ?? ""}`.trim()
+                : `Driver #${entry.driverId}`;
 
               return (
                 <Reorder.Item
-                  key={userId}
-                  value={userId}
+                  key={entry.driverId}
+                  value={entry}
                   style={{ listStyle: "none" }}
                   whileDrag={{
                     zIndex: 1000,
@@ -372,8 +394,7 @@ const PeopleForm = ({
                       overflow="hidden"
                       py={1}
                     >
-                      {i + 1}.{" "}
-                      {user ? `${user.firstName} ${user.lastName}` : userId}
+                      {i + 1}. {displayName}
                     </styled.p>
 
                     <Box p={1}>
@@ -400,7 +421,7 @@ const PeopleForm = ({
       <Box pos="relative">
         <Input
           placeholder="Type to search..."
-          onBlur={(_e) => {
+          onBlur={() => {
             setTimeout(() => {
               const active = document.activeElement;
               const listbox = document.querySelector('[role="listbox"]');
@@ -415,23 +436,48 @@ const PeopleForm = ({
         />
         {focused && search.length > 0 && (
           <Dropdown role="listbox">
-            {filteredUsers.length === 0 && (
+            {isLoading && (
+              <styled.p px={2} py={1} color="gray.500">
+                Searching...
+              </styled.p>
+            )}
+
+            {!isLoading && filteredResults.length === 0 && (
               <styled.p px={2} py={1} fontWeight="semibold">
                 No results found
               </styled.p>
             )}
 
-            {filteredUsers.map((user) => {
+            {filteredResults.map((user) => {
               return (
                 <Option
                   key={user.driverId}
                   type="button"
                   onClick={() => {
-                    onChange([...value, user.driverId]);
+                    onChange([
+                      ...value,
+                      {
+                        driverId: user.driverId,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                      },
+                    ]);
                     setSearch("");
                   }}
                 >
-                  {user.firstName} {user.lastName}
+                  <Flex alignItems="center" gap={2}>
+                    <styled.img
+                      src={user.image ?? "/blank-driver-right.jpg"}
+                      alt={user.firstName ?? ""}
+                      w={6}
+                      h={6}
+                      rounded="full"
+                      objectFit="cover"
+                    />
+                    <styled.span>
+                      {user.firstName} {user.lastName}
+                    </styled.span>
+                  </Flex>
                 </Option>
               );
             })}
@@ -452,7 +498,11 @@ const LeaderboardsEditPage = () => {
       name: leaderboard.name,
       type: leaderboard.type,
       cutoff: leaderboard.cutoff ?? 0,
-      drivers: leaderboard.drivers.map((driver) => driver.driverId),
+      drivers: leaderboard.drivers.map((driver) => ({
+        driverId: driver.driverId,
+        firstName: driver.driver.firstName,
+        lastName: driver.driver.lastName,
+      })),
       tournaments: leaderboard.tournaments.map(
         (tournament) => tournament.tournamentId,
       ),
@@ -465,7 +515,7 @@ const LeaderboardsEditPage = () => {
       formData.append("cutoff", values.cutoff.toString());
 
       values.drivers.forEach((driver) => {
-        formData.append("drivers", driver.toString());
+        formData.append("drivers", driver.driverId.toString());
       });
       values.tournaments.forEach((tournament) => {
         formData.append("tournaments", tournament);

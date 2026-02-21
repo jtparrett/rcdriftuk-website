@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
+import { redirect, useLoaderData } from "react-router";
 import { z } from "zod";
 import { TrackForm } from "~/components/TrackForm";
 import { styled, Container, Box } from "~/styled-system/jsx";
@@ -21,7 +21,31 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return redirect("/sign-in");
   }
 
-  return null;
+  const currentUser = await prisma.users.findFirst({
+    where: { id: userId },
+    select: {
+      id: true,
+      driverId: true,
+      firstName: true,
+      lastName: true,
+      image: true,
+    },
+  });
+
+  if (!currentUser || !currentUser.id) {
+    return redirect("/sign-in");
+  }
+
+  return {
+    currentUserId: userId,
+    currentUser: {
+      userId: currentUser.id,
+      driverId: currentUser.driverId,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      image: currentUser.image,
+    },
+  };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -32,6 +56,15 @@ export const action = async (args: ActionFunctionArgs) => {
 
   if (!userId) {
     throw redirect("/sign-in");
+  }
+
+  const ownerUserIds = z
+    .array(z.string().min(1))
+    .min(1, "At least one owner is required")
+    .parse(formData.getAll("ownerUserIds"));
+
+  if (!ownerUserIds.includes(userId)) {
+    ownerUserIds.push(userId);
   }
 
   const data = z
@@ -65,9 +98,7 @@ export const action = async (args: ActionFunctionArgs) => {
       image: imageUrl,
       cover: coverUrl,
       Owners: {
-        create: {
-          userId,
-        },
+        create: ownerUserIds.map((uid) => ({ userId: uid })),
       },
     },
   });
@@ -76,6 +107,8 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const TracksNewPage = () => {
+  const { currentUserId, currentUser } = useLoaderData<typeof loader>();
+
   return (
     <Container maxW={1100} px={4} py={8}>
       <Box
@@ -89,7 +122,10 @@ const TracksNewPage = () => {
           <styled.h1 fontWeight="bold">Register a new Track</styled.h1>
         </Box>
         <Box p={6}>
-          <TrackForm />
+          <TrackForm
+            currentUserId={currentUserId}
+            defaultOwners={[currentUser]}
+          />
         </Box>
       </Box>
     </Container>

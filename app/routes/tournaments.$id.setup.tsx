@@ -41,7 +41,6 @@ import {
 } from "~/utils/enums";
 import { useParams } from "react-router";
 import { getAuth } from "~/utils/getAuth.server";
-import { getUsers } from "~/utils/getUsers.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { prisma } from "~/utils/prisma.server";
 import { tournamentCreateBattles } from "~/utils/tournamentCreateBattles";
@@ -95,7 +94,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
   notFoundInvariant(userId, "User not found");
 
   const id = z.string().parse(args.params.id);
-  const users = await getUsers();
 
   const tournament = await prisma.tournaments.findUnique({
     where: {
@@ -107,14 +105,33 @@ export const loader = async (args: LoaderFunctionArgs) => {
         orderBy: {
           tournamentDriverNumber: "asc",
         },
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              image: true,
+            },
+          },
+        },
       },
-      judges: true,
+      judges: {
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
   });
 
   notFoundInvariant(tournament, "Tournament not found");
 
-  return { users, tournament };
+  return { tournament };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
@@ -302,12 +319,6 @@ const Icon = styled("div", {
   },
 });
 
-type User = {
-  driverId: number;
-  firstName: string | null;
-  lastName: string | null;
-};
-
 // Map legacy values to new equivalents
 const mapLegacyFormula = (formula: ScoreFormula): ScoreFormula => {
   if (formula === ScoreFormula.CUMULATIVE) return ScoreFormula.SUM;
@@ -316,32 +327,28 @@ const mapLegacyFormula = (formula: ScoreFormula): ScoreFormula => {
 };
 
 const ScoreFormulaSelect = ({
-  judgeCount,
-  users,
-  judgeIds,
+  judges,
   value,
   onChange,
   error,
 }: {
-  judgeCount: number;
-  users: User[];
-  judgeIds: string[];
+  judges: { driverId: string; firstName?: string | null; lastName?: string | null }[];
   value: ScoreFormula;
   onChange: (value: ScoreFormula) => void;
   error?: string;
 }) => {
+  const judgeCount = judges.length;
+
   // Map legacy values to their new equivalents
   const normalizedValue = mapLegacyFormula(value);
 
   // Get judge names in order (format: "FirstName L.")
-  const judgeNames = judgeIds
-    .map((id) => {
-      const user = users.find((u) => u.driverId.toString() === id);
-      if (!user?.firstName) return `Judge ${id}`;
-      const lastInitial = user.lastName?.charAt(0).toUpperCase();
-      return lastInitial ? `${user.firstName} ${lastInitial}` : user.firstName;
-    })
-    .slice(0, judgeCount);
+  const judgeNames = judges
+    .map((judge) => {
+      if (!judge.firstName) return `Judge ${judge.driverId}`;
+      const lastInitial = judge.lastName?.charAt(0).toUpperCase();
+      return lastInitial ? `${judge.firstName} ${lastInitial}` : judge.firstName;
+    });
 
   const options = getScoreFormulaOptions(judgeCount, judgeNames);
 
@@ -418,7 +425,7 @@ const ScoreFormulaSelect = ({
 const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 const Page = () => {
-  const { users, tournament } = useLoaderData<typeof loader>();
+  const { tournament } = useLoaderData<typeof loader>();
   const modalRef = useRef<HTMLDialogElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const body = global.document?.body;
@@ -492,10 +499,16 @@ const Page = () => {
       enableBattles: tournament.enableBattles ?? false,
       judges: tournament.judges.map((judge) => ({
         driverId: judge.driverId.toString(),
+        firstName: judge.user.firstName,
+        lastName: judge.user.lastName,
+        image: judge.user.image,
         points: judge.points,
       })),
       drivers: tournament.drivers.map((driver) => ({
         driverId: driver.driverId.toString(),
+        firstName: driver.user.firstName,
+        lastName: driver.user.lastName,
+        image: driver.user.image,
       })),
       bracketSize: tournament.bracketSize ?? BracketSize.TOP_4,
       enableProtests: tournament.enableProtests ?? false,
@@ -633,7 +646,6 @@ const Page = () => {
               )}
 
               <PeopleForm
-                users={users}
                 value={formik.values.judges}
                 onChange={(value) => formik.setFieldValue("judges", value)}
                 name="judges"
@@ -762,7 +774,6 @@ const Page = () => {
                   </styled.p>
                 )}
                 <PeopleForm
-                  users={users}
                   value={formik.values.drivers}
                   onChange={(value) => formik.setFieldValue("drivers", value)}
                   name="drivers"
@@ -877,9 +888,7 @@ const Page = () => {
                 </FormControl>
 
                 <ScoreFormulaSelect
-                  judgeCount={formik.values.judges.length}
-                  users={users}
-                  judgeIds={formik.values.judges.map((j) => j.driverId)}
+                  judges={formik.values.judges}
                   value={formik.values.scoreFormula}
                   onChange={(value) =>
                     formik.setFieldValue("scoreFormula", value)

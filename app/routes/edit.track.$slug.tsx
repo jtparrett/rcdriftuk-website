@@ -47,6 +47,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return {
     track,
     leaderboards,
+    currentUserId: userId,
   };
 };
 
@@ -63,6 +64,11 @@ export const action = async (args: ActionFunctionArgs) => {
 
   const clonedRequest = args.request.clone();
   const formData = await clonedRequest.formData();
+
+  const ownerUserIds = z
+    .array(z.string().min(1))
+    .min(1, "At least one owner is required")
+    .parse(formData.getAll("ownerUserIds"));
 
   const data = z
     .object({
@@ -111,11 +117,31 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
+  const currentOwners = track.Owners.map((o) => o.userId);
+  const toAdd = ownerUserIds.filter((id) => !currentOwners.includes(id));
+  const toRemove = currentOwners.filter((id) => !ownerUserIds.includes(id));
+
+  if (toAdd.length > 0) {
+    await prisma.trackOwners.createMany({
+      data: toAdd.map((uid) => ({ trackId: track.id, userId: uid })),
+      skipDuplicates: true,
+    });
+  }
+
+  if (toRemove.length > 0) {
+    await prisma.trackOwners.deleteMany({
+      where: {
+        trackId: track.id,
+        userId: { in: toRemove },
+      },
+    });
+  }
+
   return redirect(`/tracks/${args.params.slug}`);
 };
 
 const TracksEditPage = () => {
-  const { track, leaderboards } = useLoaderData<typeof loader>();
+  const { track, leaderboards, currentUserId } = useLoaderData<typeof loader>();
   const params = useParams();
   const fetcher = useFetcher<{ url: string }>();
 
@@ -150,7 +176,7 @@ const TracksEditPage = () => {
           </styled.h1>
         </Box>
         <Box p={6}>
-          <TrackForm track={track} leaderboards={leaderboards} />
+          <TrackForm track={track} leaderboards={leaderboards} currentUserId={currentUserId} />
         </Box>
       </Box>
 

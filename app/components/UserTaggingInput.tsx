@@ -1,14 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Box } from "~/styled-system/jsx";
+import { Box, Flex, styled } from "~/styled-system/jsx";
 import { Textarea } from "./Textarea";
 import { Dropdown, Option } from "./Dropdown";
-
-interface User {
-  driverId: number;
-  firstName: string | null;
-  lastName: string | null;
-}
+import { useUserSearch, type SearchUser } from "~/hooks/useUserSearch";
 
 interface MentionInfo {
   start: number;
@@ -20,14 +14,12 @@ const findCurrentMention = (
   text: string,
   cursorPosition: number,
 ): MentionInfo | null => {
-  // Find the last @ before the cursor position
   let atIndex = -1;
   for (let i = cursorPosition - 1; i >= 0; i--) {
     if (text[i] === "@") {
       atIndex = i;
       break;
     }
-    // If we hit a space or newline, stop looking
     if (text[i] === " " || text[i] === "\n") {
       break;
     }
@@ -35,7 +27,6 @@ const findCurrentMention = (
 
   if (atIndex === -1) return null;
 
-  // Find the end of the mention (space, newline, or end of string)
   let endIndex = cursorPosition;
   for (let i = atIndex + 1; i < text.length; i++) {
     if (text[i] === " " || text[i] === "\n") {
@@ -55,25 +46,6 @@ const findCurrentMention = (
     end: endIndex,
     query,
   };
-};
-
-const useUserSearch = (query: string) => {
-  return useQuery({
-    queryKey: ["users", "search", query],
-    queryFn: async () => {
-      if (!query) return [];
-
-      const response = await fetch(
-        `/api/search-users?q=${encodeURIComponent(query)}`,
-      );
-      if (!response.ok) {
-        throw new Error("Failed to search users");
-      }
-
-      return response.json() as Promise<User[]>;
-    },
-    enabled: query.length > 0,
-  });
 };
 
 export const UserTaggingInput = ({
@@ -124,7 +96,7 @@ export const UserTaggingInput = ({
     }
   };
 
-  const handleUserSelect = (user: User) => {
+  const handleUserSelect = (user: SearchUser) => {
     if (!currentMention) return;
 
     const userName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
@@ -210,7 +182,19 @@ export const UserTaggingInput = ({
               type="button"
               onClick={() => handleUserSelect(user)}
             >
-              {user.firstName} {user.lastName}
+              <Flex alignItems="center" gap={2}>
+                <styled.img
+                  src={user.image ?? "/blank-driver-right.jpg"}
+                  alt={user.firstName ?? ""}
+                  w={6}
+                  h={6}
+                  rounded="full"
+                  objectFit="cover"
+                />
+                <styled.span>
+                  {user.firstName} {user.lastName}
+                </styled.span>
+              </Flex>
             </Option>
           ))}
         </Dropdown>

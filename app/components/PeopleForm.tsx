@@ -1,27 +1,32 @@
 import { styled, Box, Flex } from "~/styled-system/jsx";
 import { Input } from "./Input";
 import { Button } from "./Button";
-import type { GetUsers } from "~/utils/getUsers.server";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { Dropdown, Option } from "./Dropdown";
 import { Reorder } from "motion/react";
 import pluralize from "pluralize";
+import { useUserSearch } from "~/hooks/useUserSearch";
+
+export interface PersonEntry {
+  driverId: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  image?: string | null;
+  points?: number;
+  isNew?: boolean;
+}
 
 interface PeopleFormProps {
-  users: GetUsers;
   name: string;
   allowNewDrivers?: boolean;
   allowPoints?: boolean;
   disabled?: boolean;
-  onChange: (
-    value: { driverId: string; points?: number; isNew?: boolean }[],
-  ) => void;
-  value: { driverId: string; points?: number; isNew?: boolean }[];
+  onChange: (value: PersonEntry[]) => void;
+  value: PersonEntry[];
 }
 
 export const PeopleForm = ({
-  users,
   value,
   onChange,
   name,
@@ -32,15 +37,12 @@ export const PeopleForm = ({
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
 
-  const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        !value.some((v) => v.driverId === user.driverId.toString()) &&
-        `${user.firstName} ${user.lastName}`
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-    );
-  }, [users, value, search]);
+  const { data: searchResults = [], isLoading } = useUserSearch(search);
+
+  const selectedDriverIds = new Set(value.map((v) => v.driverId));
+  const filteredResults = searchResults.filter(
+    (u) => !selectedDriverIds.has(u.driverId.toString()),
+  );
 
   return (
     <Box>
@@ -67,9 +69,9 @@ export const PeopleForm = ({
             {value
               .filter((p) => p.driverId !== "0")
               .map((person, i) => {
-                const user = users.find(
-                  (user) => user.driverId.toString() === person.driverId,
-                );
+                const displayName = person.firstName
+                  ? `${person.firstName} ${person.lastName ?? ""}`.trim()
+                  : null;
 
                 return (
                   <Reorder.Item
@@ -95,6 +97,16 @@ export const PeopleForm = ({
                     >
                       {!disabled && <RiDraggable size={16} />}
 
+                      <styled.img
+                        src={person.image ?? "/blank-driver-right.jpg"}
+                        alt={displayName ?? ""}
+                        w={5}
+                        h={5}
+                        rounded="full"
+                        objectFit="cover"
+                        flexShrink={0}
+                      />
+
                       <styled.p
                         flex={1}
                         userSelect="none"
@@ -103,9 +115,9 @@ export const PeopleForm = ({
                         overflow="hidden"
                         py={1}
                       >
-                        {user ? (
+                        {displayName ? (
                           <>
-                            {user.firstName} {user.lastName}{" "}
+                            {displayName}{" "}
                             <styled.span
                               color="gray.500"
                               fontSize="sm"
@@ -114,7 +126,7 @@ export const PeopleForm = ({
                               #{person.driverId}
                             </styled.span>
                           </>
-                        ) : (
+                        ) : person.isNew ? (
                           <>
                             {person.driverId}{" "}
                             <styled.span
@@ -123,6 +135,17 @@ export const PeopleForm = ({
                               verticalAlign="middle"
                             >
                               (new)
+                            </styled.span>
+                          </>
+                        ) : (
+                          <>
+                            Driver{" "}
+                            <styled.span
+                              color="gray.500"
+                              fontSize="sm"
+                              verticalAlign="middle"
+                            >
+                              #{person.driverId}
                             </styled.span>
                           </>
                         )}
@@ -200,7 +223,7 @@ export const PeopleForm = ({
         <Box pos="relative">
           <Input
             placeholder="Type to search for people..."
-            onBlur={(_e) => {
+            onBlur={() => {
               setTimeout(() => {
                 const active = document.activeElement;
                 const listbox = document.querySelector('[role="listbox"]');
@@ -215,7 +238,21 @@ export const PeopleForm = ({
           />
           {focused && search.length > 0 && (
             <Dropdown role="listbox">
-              {filteredUsers.map((user) => {
+              {isLoading && (
+                <styled.p px={2} py={1} color="gray.500">
+                  Searching...
+                </styled.p>
+              )}
+
+              {!isLoading &&
+                filteredResults.length === 0 &&
+                !allowNewDrivers && (
+                  <styled.p px={2} py={1} fontWeight="semibold">
+                    No results found
+                  </styled.p>
+                )}
+
+              {filteredResults.map((user) => {
                 return (
                   <Option
                     key={user.driverId}
@@ -225,25 +262,35 @@ export const PeopleForm = ({
                         ...value,
                         {
                           driverId: user.driverId.toString(),
+                          firstName: user.firstName,
+                          lastName: user.lastName,
+                          image: user.image,
                           points: 100,
                         },
                       ]);
                       setSearch("");
                     }}
                   >
-                    {user.firstName} {user.lastName} (#{user.driverId})
+                    <Flex alignItems="center" gap={2}>
+                      <styled.img
+                        src={user.image ?? "/blank-driver-right.jpg"}
+                        alt={user.firstName ?? ""}
+                        w={6}
+                        h={6}
+                        rounded="full"
+                        objectFit="cover"
+                      />
+                      <styled.span>
+                        {user.firstName} {user.lastName}
+                      </styled.span>
+                    </Flex>
                   </Option>
                 );
               })}
 
-              {!allowNewDrivers && filteredUsers.length === 0 && (
-                <styled.p px={2} py={1} fontWeight="semibold">
-                  No results found
-                </styled.p>
-              )}
-
               {allowNewDrivers &&
-                filteredUsers.length === 0 &&
+                !isLoading &&
+                filteredResults.length === 0 &&
                 search
                   .trim()
                   .split(" ")
