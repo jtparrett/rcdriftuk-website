@@ -18,6 +18,7 @@ export const getEvent = async (id: string, userId?: string) => {
       endDate: true,
       ticketCapacity: true,
       ticketPrice: true,
+      allowedRanks: true,
       cover: true,
       name: true,
       link: true,

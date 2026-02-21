@@ -13,6 +13,8 @@ import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { PLATFORM_FEE_AMOUNT } from "~/utils/platformFee";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
+import { getDriverRank } from "~/utils/getDriverRank";
+import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -70,6 +72,24 @@ export const loader = async (args: LoaderFunctionArgs) => {
       status: 404,
       statusText: "Not Found",
     });
+  }
+
+  if (event.allowedRanks.length > 0) {
+    const user = await prisma.users.findFirst({
+      where: { id: userId },
+      select: { elo: true, ranked: true, lastBattleDate: true },
+    });
+
+    if (user) {
+      const adjustedElo = adjustDriverElo(user.elo, user.lastBattleDate);
+      const userRank = getDriverRank(adjustedElo, user.ranked);
+
+      if (!event.allowedRanks.includes(userRank)) {
+        throw redirect(`/events/${event.id}`);
+      }
+    } else {
+      throw redirect(`/events/${event.id}`);
+    }
   }
 
   let ticket = await getUserEventTicket(event.id, userId);
