@@ -135,7 +135,6 @@ export const DriverCard = ({
   const id = rawId.replace(/:/g, "");
   const rank = getDriverRank(elo, ranked);
   const theme = getCardTheme(rank);
-  const eloDisplay = Math.round(elo);
   const isLeft = side === "left";
 
   const photoPath = isLeft ? LEFT_PHOTO : RIGHT_PHOTO;
@@ -153,6 +152,7 @@ export const DriverCard = ({
       w="full"
       className={css({ aspectRatio: "378.7 / 616.4" })}
       style={{
+        containerType: "inline-size",
         filter: `drop-shadow(0 0 20px ${theme.glow}) drop-shadow(0 12px 32px rgba(0,0,0,0.5))`,
       }}
     >
@@ -258,12 +258,14 @@ export const DriverCard = ({
             right={isLeft ? undefined : "4%"}
             left={isLeft ? "4%" : undefined}
             fontWeight="black"
-            fontSize="3xl"
             lineHeight={1}
             opacity={0.6}
             fontStyle="italic"
-            textShadow="0 2px 10px rgba(0,0,0,0.9)"
             zIndex={3}
+            style={{
+              fontSize: "12cqi",
+              textShadow: "0 0.8cqi 4cqi rgba(0,0,0,0.9)",
+            }}
           >
             #{driverNo}
           </styled.span>
@@ -282,31 +284,37 @@ export const DriverCard = ({
           <styled.p
             fontWeight="black"
             textTransform="uppercase"
-            fontSize="2xl"
             lineHeight={1}
             letterSpacing="tight"
-            textShadow="0 2px 10px rgba(0,0,0,0.9)"
+            style={{
+              fontSize: "10cqi",
+              textShadow: "0 0.8cqi 4cqi rgba(0,0,0,0.9)",
+            }}
           >
             {firstName}
           </styled.p>
           <styled.p
             fontWeight="bold"
             textTransform="uppercase"
-            fontSize="sm"
             lineHeight={1.15}
             opacity={0.7}
-            textShadow="0 1px 6px rgba(0,0,0,0.9)"
-            mt={0.5}
+            style={{
+              fontSize: "5.8cqi",
+              textShadow: "0 0.4cqi 2.5cqi rgba(0,0,0,0.9)",
+              marginTop: "0.4cqi",
+            }}
           >
             {lastName}
           </styled.p>
           {team && (
             <styled.p
-              fontSize="xs"
               opacity={0.4}
-              mt={0.5}
               lineHeight={1.1}
-              textShadow="0 1px 4px rgba(0,0,0,0.8)"
+              style={{
+                fontSize: "5cqi",
+                textShadow: "0 0.4cqi 1.6cqi rgba(0,0,0,0.8)",
+                marginTop: "0.4cqi",
+              }}
             >
               {team}
             </styled.p>
@@ -326,21 +334,23 @@ export const DriverCard = ({
         >
           <styled.img
             src={`/badges/${rank}.png`}
-            w={9}
-            h={9}
             display="block"
             style={{
-              filter: `drop-shadow(0 2px 8px rgba(0,0,0,0.7))`,
+              width: "15cqi",
+              height: "15cqi",
+              filter: "drop-shadow(0 0.8cqi 3cqi rgba(0,0,0,0.7))",
             }}
           />
           <styled.p
             fontWeight="extrabold"
-            fontSize="2xs"
             textTransform="uppercase"
             letterSpacing="widest"
-            style={{ color: theme.accent }}
-            textShadow="0 1px 4px rgba(0,0,0,0.8)"
-            mt={-0.5}
+            style={{
+              color: theme.accent,
+              fontSize: "4cqi",
+              textShadow: "0 0.4cqi 1.6cqi rgba(0,0,0,0.8)",
+              marginTop: "-0.4cqi",
+            }}
           >
             {capitalCase(rank)}
           </styled.p>
