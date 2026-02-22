@@ -205,7 +205,6 @@ const TournamentsOverviewPage = () => {
                 judges={tournament.judges}
                 scoreFormula={tournament.scoreFormula}
                 driverNumbers={tournament.driverNumbers}
-                isEmbed={isEmbed}
               />
             )}
 

@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { capitalCase } from "change-case";
 import { getDriverRank, getRankColor, RANKS } from "~/utils/getDriverRank";
 import type { Values } from "~/utils/values";
+import { token } from "~/styled-system/tokens";
 
 const LEFT_PHOTO =
   "M375.7,358l-36.6-36.6-.9-.9V58.7L282.6,3H3v554.8l55.7,55.7h190.2l126.9-126.9v-128.5Z";
