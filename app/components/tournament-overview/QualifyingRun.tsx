@@ -30,7 +30,7 @@ export const QualifyingRun = ({
   );
 
   return (
-    <Flex w="fit-content" align="center">
+    <Flex w="fit-content" align="flex-end">
       <motion.div
         initial={{ x: -80, opacity: 0, filter: "blur(8px)" }}
         animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
@@ -56,7 +56,14 @@ export const QualifyingRun = ({
       </motion.div>
 
       {qualiJudgingComplete && (
-        <Box ml={-40} pl={40} bgColor="gray.900" textAlign="center">
+        <Box
+          ml={-40}
+          pl={44}
+          bgColor="gray.900"
+          textAlign="center"
+          borderWidth={1.5}
+          borderColor="gray.400"
+        >
           <Box mb={1} bgColor="gray.800" py={2}>
             <styled.p fontWeight="semibold">
               {numberToWords.toOrdinal(lap.round).toUpperCase()} QUALIFYING RUN
@@ -64,16 +71,22 @@ export const QualifyingRun = ({
           </Box>
 
           <Box bgColor="gray.800" mb={1}>
-            <styled.p
-              fontSize={{ base: "4xl", md: "128px" }}
-              fontWeight="black"
-              fontStyle="italic"
-              letterSpacing="tight"
-              lineHeight={1.1}
-              p={10}
-            >
-              {score}
-            </styled.p>
+            <Box p={10}>
+              <styled.p
+                fontSize={{ base: "80px", md: "128px" }}
+                fontWeight="black"
+                fontStyle="italic"
+                lineHeight={1.1}
+                bgGradient="to-b"
+                gradientFrom="white"
+                gradientTo="gray.500"
+                backgroundClip="text"
+                color="transparent"
+                textShadow="0 0 10px rgba(0,0,0,0.2)"
+              >
+                {score}
+              </styled.p>
+            </Box>
 
             <Flex justify="space-around" alignItems="flex-end">
               {Array.from(new Array(99)).map((_, i) => {

@@ -34,47 +34,21 @@ export const BattleView = ({
         : undefined;
 
   return (
-    <Flex
-      overflow="hidden"
-      pos="relative"
-      zIndex={0}
-      align="center"
-      py={4}
-      px={2}
-      gap={0}
-      w="full"
-      _after={{
-        content: '""',
-        pos: "absolute",
-        w: 0.5,
-        h: "full",
-        left: "50%",
-        bgGradient: "to-b",
-        gradientFrom: "gray.300",
-        gradientTo: "gray.900",
-        transform: "skewX(-10deg)",
-      }}
-    >
+    <Flex overflow="hidden" pos="relative" zIndex={0} w="full" maxW={800}>
       <Flex
+        maxW="240px"
         flex={1}
-        justify="center"
-        align="center"
-        p={2}
         transition="all 0.4s ease-in-out"
         style={{
-          opacity:
-            winnerId === battle.driverLeftId || !battleJudgingComplete
-              ? 1
-              : 0.35,
           transform:
             winnerId === battle.driverLeftId
-              ? "scale(1.05)"
+              ? "scale(1)"
               : winnerId && winnerId !== battle.driverLeftId
-                ? "scale(0.92)"
+                ? "scale(0.9)"
                 : "scale(1)",
           filter:
             winnerId && winnerId !== battle.driverLeftId
-              ? "saturate(0.3)"
+              ? "saturate(0)"
               : "saturate(1)",
         }}
       >
@@ -101,12 +75,27 @@ export const BattleView = ({
       </Flex>
 
       <Flex
-        w="140px"
-        flex="none"
+        flex={1}
         justifyContent="center"
         flexDir="column"
         pos="relative"
-        zIndex={2}
+        zIndex={-1}
+        bgColor="gray.900"
+        borderTopWidth={2}
+        borderBottomWidth={2}
+        borderColor="gray.500"
+        mx={-40}
+        px={40}
+        my="4%"
+        _after={{
+          content: '""',
+          pos: "absolute",
+          w: 0.5,
+          h: "full",
+          left: "50%",
+          bgColor: "gray.500",
+          transform: "skewX(-11deg)",
+        }}
       >
         {!battleJudgingComplete && (
           <motion.div
@@ -145,8 +134,8 @@ export const BattleView = ({
                 vote.winnerId === null
                   ? "0%"
                   : vote.winnerId === battle.driverLeftId
-                    ? "-50%"
-                    : "50%";
+                    ? "-25%"
+                    : "25%";
 
               return (
                 <motion.div
@@ -207,25 +196,19 @@ export const BattleView = ({
       </Flex>
 
       <Flex
+        maxW="240px"
         flex={1}
-        justify="center"
-        align="center"
-        p={2}
         transition="all 0.4s ease-in-out"
         style={{
-          opacity:
-            winnerId === battle.driverRightId || !battleJudgingComplete
-              ? 1
-              : 0.35,
           transform:
             winnerId === battle.driverRightId
-              ? "scale(1.05)"
+              ? "scale(1)"
               : winnerId && winnerId !== battle.driverRightId
-                ? "scale(0.92)"
+                ? "scale(0.9)"
                 : "scale(1)",
           filter:
             winnerId && winnerId !== battle.driverRightId
-              ? "saturate(0.3)"
+              ? "saturate(0)"
               : "saturate(1)",
         }}
       >
