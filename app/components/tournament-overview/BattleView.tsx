@@ -1,6 +1,5 @@
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { motion } from "motion/react";
-import { css } from "~/styled-system/css";
 import { RiArrowLeftDoubleFill, RiArrowRightDoubleFill } from "react-icons/ri";
 import { DriverCard } from "~/components/DriverCard";
 import { getDriverNumber } from "~/utils/getDriverNumber";
@@ -34,33 +33,33 @@ export const BattleView = ({
         : undefined;
 
   return (
-    <Flex overflow="hidden" pos="relative" zIndex={0} w="full" maxW={800}>
+    <Flex
+      overflow="hidden"
+      pos="relative"
+      zIndex={0}
+      px={4}
+      w="full"
+      maxW="800px"
+      containerType="inline-size"
+    >
       <Flex
-        maxW="240px"
         flex={1}
+        maxW="30cqi"
         transition="all 0.4s ease-in-out"
         style={{
           transform:
             winnerId === battle.driverLeftId
               ? "scale(1)"
               : winnerId && winnerId !== battle.driverLeftId
-                ? "scale(0.9)"
+                ? "scale(0.88)"
                 : "scale(1)",
           filter:
             winnerId && winnerId !== battle.driverLeftId
-              ? "saturate(0)"
-              : "saturate(1)",
+              ? "brightness(0.3)"
+              : "brightness(1)",
         }}
       >
-        <motion.div
-          initial={{ x: -100, opacity: 0, filter: "blur(8px)" }}
-          animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.4,
-            ease: "easeOut",
-          }}
-          className={css({ w: "full", maxW: "240px" })}
-        >
+        <Box w="30cqi">
           <DriverCard
             side="left"
             firstName={battle.driverLeft?.user.firstName}
@@ -71,7 +70,7 @@ export const BattleView = ({
             ranked={battle.driverLeft?.user.ranked}
             team={battle.driverLeft?.user.team}
           />
-        </motion.div>
+        </Box>
       </Flex>
 
       <Flex
@@ -81,12 +80,12 @@ export const BattleView = ({
         pos="relative"
         zIndex={-1}
         bgColor="gray.900"
+        borderColor="gray.500"
+        my="4.5%"
         borderTopWidth={2}
         borderBottomWidth={2}
-        borderColor="gray.500"
-        mx={-40}
-        px={40}
-        my="4%"
+        mx="-20cqi"
+        px="20cqi"
         _after={{
           content: '""',
           pos: "absolute",
@@ -95,6 +94,7 @@ export const BattleView = ({
           left: "50%",
           bgColor: "gray.500",
           transform: "skewX(-11deg)",
+          zIndex: -1,
         }}
       >
         {!battleJudgingComplete && (
@@ -110,11 +110,11 @@ export const BattleView = ({
             <styled.p
               textAlign="center"
               color="gray.500"
-              fontSize="2xl"
               fontWeight="black"
               fontStyle="italic"
               textTransform="uppercase"
               letterSpacing="wider"
+              fontSize="3cqi"
             >
               vs
             </styled.p>
@@ -147,22 +147,24 @@ export const BattleView = ({
                     delay: 0.1 * i,
                   }}
                 >
-                  <Box w="fit-content" mx="auto" textAlign="center" mb={0.5}>
+                  <Box
+                    w="fit-content"
+                    mx="auto"
+                    textAlign="center"
+                    mb="0.25cqi"
+                  >
                     <styled.p
                       fontWeight="bold"
-                      fontSize="xs"
                       w="full"
                       whiteSpace="nowrap"
                       textOverflow="ellipsis"
                       overflow="hidden"
-                      display={{
-                        base: "none",
-                        md: "block",
-                      }}
+                      display={{ base: "none", md: "block" }}
+                      fontSize="1.5cqi"
                     >
                       Judge {i + 1}
                     </styled.p>
-                    <Flex align="center" justify="center">
+                    <Flex align="center" justify="center" fontSize="2.25cqi">
                       <Box
                         style={{
                           opacity: winnerDirection === "left" ? 1 : 0.3,
@@ -172,7 +174,6 @@ export const BattleView = ({
                       </Box>
                       <styled.p
                         lineHeight={1}
-                        fontSize={{ base: "sm", md: "lg" }}
                         fontWeight="extrabold"
                         fontStyle="italic"
                         textTransform="uppercase"
@@ -196,31 +197,23 @@ export const BattleView = ({
       </Flex>
 
       <Flex
-        maxW="240px"
         flex={1}
+        maxW="30cqi"
         transition="all 0.4s ease-in-out"
         style={{
           transform:
             winnerId === battle.driverRightId
               ? "scale(1)"
               : winnerId && winnerId !== battle.driverRightId
-                ? "scale(0.9)"
+                ? "scale(0.88)"
                 : "scale(1)",
           filter:
             winnerId && winnerId !== battle.driverRightId
-              ? "saturate(0)"
-              : "saturate(1)",
+              ? "brightness(0.3)"
+              : "brightness(1)",
         }}
       >
-        <motion.div
-          initial={{ x: 100, opacity: 0, filter: "blur(8px)" }}
-          animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.4,
-            ease: "easeOut",
-          }}
-          className={css({ w: "full", maxW: "240px" })}
-        >
+        <Box w="30cqi">
           <DriverCard
             side="right"
             firstName={battle.driverRight?.user.firstName}
@@ -231,7 +224,7 @@ export const BattleView = ({
             ranked={battle.driverRight?.user.ranked}
             team={battle.driverRight?.user.team}
           />
-        </motion.div>
+        </Box>
       </Flex>
     </Flex>
   );

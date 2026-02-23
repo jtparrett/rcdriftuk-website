@@ -263,10 +263,8 @@ export const DriverCard = ({
             opacity={0.6}
             fontStyle="italic"
             zIndex={3}
-            style={{
-              fontSize: "12cqi",
-              textShadow: "0 0.8cqi 4cqi rgba(0,0,0,0.9)",
-            }}
+            fontSize="12cqi"
+            textShadow="0 0.8cqi 4cqi rgba(0,0,0,0.9)"
           >
             #{driverNo}
           </styled.span>
@@ -287,10 +285,8 @@ export const DriverCard = ({
             textTransform="uppercase"
             lineHeight={1}
             letterSpacing="tight"
-            style={{
-              fontSize: "10cqi",
-              textShadow: "0 0.8cqi 4cqi rgba(0,0,0,0.9)",
-            }}
+            fontSize="10cqi"
+            textShadow="0 0.8cqi 4cqi rgba(0,0,0,0.9)"
           >
             {firstName}
           </styled.p>
@@ -299,11 +295,9 @@ export const DriverCard = ({
             textTransform="uppercase"
             lineHeight={1.15}
             opacity={0.7}
-            style={{
-              fontSize: "5.8cqi",
-              textShadow: "0 0.4cqi 2.5cqi rgba(0,0,0,0.9)",
-              marginTop: "0.4cqi",
-            }}
+            fontSize="5.8cqi"
+            textShadow="0 0.4cqi 2.5cqi rgba(0,0,0,0.9)"
+            mt="0.4cqi"
           >
             {lastName}
           </styled.p>
@@ -311,11 +305,9 @@ export const DriverCard = ({
             <styled.p
               opacity={0.4}
               lineHeight={1.1}
-              style={{
-                fontSize: "5cqi",
-                textShadow: "0 0.4cqi 1.6cqi rgba(0,0,0,0.8)",
-                marginTop: "0.4cqi",
-              }}
+              fontSize="5cqi"
+              textShadow="0 0.4cqi 1.6cqi rgba(0,0,0,0.8)"
+              mt="0.4cqi"
             >
               {team}
             </styled.p>
@@ -336,21 +328,19 @@ export const DriverCard = ({
           <styled.img
             src={`/badges/${rank}.png`}
             display="block"
-            style={{
-              width: "15cqi",
-              height: "15cqi",
-              filter: "drop-shadow(0 0.8cqi 3cqi rgba(0,0,0,0.7))",
-            }}
+            w="15cqi"
+            h="15cqi"
+            filter="drop-shadow(0 0.8cqi 3cqi rgba(0,0,0,0.7))"
           />
           <styled.p
             fontWeight="extrabold"
             textTransform="uppercase"
             letterSpacing="widest"
+            fontSize="4cqi"
+            textShadow="0 0.4cqi 1.6cqi rgba(0,0,0,0.8)"
+            mt="-0.4cqi"
             style={{
               color: theme.accent,
-              fontSize: "4cqi",
-              textShadow: "0 0.4cqi 1.6cqi rgba(0,0,0,0.8)",
-              marginTop: "-0.4cqi",
             }}
           >
             {capitalCase(rank)}
