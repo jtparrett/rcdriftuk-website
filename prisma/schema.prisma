@@ -38,21 +38,23 @@ model Events {
 }
 
 model EventTickets {
-  id        Int          @id @default(autoincrement())
-  eventId   String       @db.Uuid
-  event     Events       @relation(fields: [eventId], references: [id])
-  userId    String?
-  user      Users?       @relation(fields: [userId], references: [id])
-  status    TicketStatus @default(PENDING)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @default(now()) @updatedAt
-  sessionId String?
+  id              Int          @id @default(autoincrement())
+  eventId         String       @db.Uuid
+  event           Events       @relation(fields: [eventId], references: [id])
+  userId          String?
+  user            Users?       @relation(fields: [userId], references: [id])
+  status          TicketStatus @default(PENDING)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
+  sessionId       String?
+  paymentIntentId String?
 
   @@unique([eventId, userId])
   @@index([eventId])
   @@index([userId])
   @@index([status])
   @@index([sessionId])
+  @@index([paymentIntentId])
 }
 
 model EventResponses {
