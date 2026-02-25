@@ -1,10 +1,9 @@
 /**
  * Migration script: Convert existing event ticketing fields to EventTicketTypes.
  *
- * RUN THIS BEFORE removing the old columns from the database.
- * Order of operations:
- *   1. Run this script:  npx tsx scripts/migrate-ticket-types.ts
- *   2. Then apply schema: npx prisma db push
+ * Run AFTER prisma db push (schema must already have EventTicketTypes table).
+ *   1. npx prisma db push
+ *   2. npx tsx scripts/migrate-ticket-types.ts
  *
  * Safe to run multiple times — skips events that already have ticket types.
  */
@@ -14,40 +13,13 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Step 1: Create EventTicketTypes table if it doesn't exist
-  await prisma.$executeRaw`
-    CREATE TABLE IF NOT EXISTS "EventTicketTypes" (
-      "id" SERIAL PRIMARY KEY,
-      "eventId" UUID NOT NULL REFERENCES "Events"("id") ON DELETE CASCADE,
-      "name" TEXT NOT NULL,
-      "price" DOUBLE PRECISION NOT NULL,
-      "releaseDate" TIMESTAMP(3) NOT NULL,
-      "allowedRanks" TEXT[] DEFAULT '{}',
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT NOW(),
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT NOW()
-    )
-  `;
-
-  await prisma.$executeRaw`
-    CREATE INDEX IF NOT EXISTS "EventTicketTypes_eventId_idx" ON "EventTicketTypes"("eventId")
-  `;
-
-  await prisma.$executeRaw`
-    ALTER TABLE "EventTickets"
-    ADD COLUMN IF NOT EXISTS "ticketTypeId" INTEGER REFERENCES "EventTicketTypes"("id")
-  `;
-
-  await prisma.$executeRaw`
-    CREATE INDEX IF NOT EXISTS "EventTickets_ticketTypeId_idx" ON "EventTickets"("ticketTypeId")
-  `;
-
-  // Step 2: Delete all CANCELLED tickets globally — they're no longer a valid state
+  // Step 1: Delete all CANCELLED tickets globally — they're no longer a valid state
   const deletedCancelled = await prisma.$executeRaw`
     DELETE FROM "EventTickets" WHERE "status" = 'CANCELLED'
   `;
   console.log(`Deleted ${deletedCancelled} cancelled tickets`);
 
-  // Step 3: Delete stale PENDING tickets (no payment, older than 15 minutes)
+  // Step 2: Delete stale PENDING tickets (no Stripe session, older than 15 minutes)
   const deletedPending = await prisma.$executeRaw`
     DELETE FROM "EventTickets"
     WHERE "status" = 'PENDING'
@@ -56,7 +28,7 @@ async function main() {
   `;
   console.log(`Deleted ${deletedPending} stale pending tickets`);
 
-  // Step 4: Migrate events that had ticketing enabled.
+  // Step 3: Migrate events that had ticketing enabled.
   // Include ALL events with tickets (past and future) so that confirmed/refunded
   // tickets from past events keep their ticket type link intact.
   const events: Array<{
@@ -103,8 +75,7 @@ async function main() {
     );
   }
 
-  // Step 5: Verify no orphaned tickets remain (tickets without a ticket type
-  // that belong to an event that was migrated)
+  // Step 4: Verify no orphaned tickets remain
   const orphaned: Array<{ count: bigint }> = await prisma.$queryRaw`
     SELECT COUNT(*) as count FROM "EventTickets"
     WHERE "ticketTypeId" IS NULL

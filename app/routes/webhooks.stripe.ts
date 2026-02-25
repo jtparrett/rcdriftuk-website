@@ -46,6 +46,8 @@ export async function action(args: ActionFunctionArgs) {
         if (session.payment_intent) {
           await stripe.refunds.create({
             payment_intent: session.payment_intent as string,
+            reverse_transfer: true,
+            refund_application_fee: true,
           });
         }
         console.error(
