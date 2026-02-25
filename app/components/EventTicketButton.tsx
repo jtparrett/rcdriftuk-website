@@ -35,7 +35,6 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
         end: releaseDate,
       });
 
-      // Convert months to days (approximate)
       const totalDays = (duration.months ?? 0) * 30 + (duration.days ?? 0);
 
       const newTimeUntilRelease = {
@@ -69,9 +68,10 @@ const CountdownDisplay = ({ releaseDate }: { releaseDate: Date }) => {
       fontFamily="mono"
       fontWeight="semibold"
       mt={2}
+      fontSize="sm"
     >
       Tickets release in{" "}
-      <styled.span fontSize="lg">
+      <styled.span fontSize="md">
         {timeUntilRelease.days}d {timeUntilRelease.hours}hr{" "}
         {timeUntilRelease.minutes}min {timeUntilRelease.seconds}s
       </styled.span>
@@ -85,12 +85,12 @@ const AllowedRanksBadges = ({
   allowedRanks: string[];
 }) => {
   return (
-    <Box mb={3}>
+    <Box mb={2}>
       <styled.p
         fontSize="xs"
         color="gray.400"
         fontWeight="semibold"
-        mb={1.5}
+        mb={1}
         textTransform="uppercase"
         letterSpacing="wider"
       >
@@ -103,7 +103,7 @@ const AllowedRanksBadges = ({
             alignItems="center"
             gap={1}
             px={2}
-            py={1}
+            py={0.5}
             rounded="lg"
             bgColor="gray.800"
             borderWidth={1}
@@ -112,8 +112,8 @@ const AllowedRanksBadges = ({
             <styled.img
               src={`/badges/${rank}.png`}
               alt={rank}
-              w={4}
-              h={4}
+              w={3.5}
+              h={3.5}
             />
             <styled.span fontSize="xs" fontWeight="semibold">
               {rank.charAt(0).toUpperCase() + rank.slice(1)}
@@ -125,52 +125,117 @@ const AllowedRanksBadges = ({
   );
 };
 
-export const EventTicketButton = ({
+const TicketTypeCard = ({
+  event,
+  ticketType,
+  userRank,
+}: {
+  event: NonNullable<GetEvent>;
+  ticketType: NonNullable<GetEvent>["ticketTypes"][number];
+  userRank?: string | null;
+}) => {
+  const clerk = useClerk();
+
+  const releaseDate = toZonedTime(new Date(ticketType.releaseDate), "UTC");
+  const isBeforeRelease = isBefore(
+    toZonedTime(new Date(), "Europe/London"),
+    releaseDate,
+  );
+
+  const allowedRanks = ticketType.allowedRanks ?? [];
+  const hasRankRestriction = allowedRanks.length > 0;
+  const userRankAllowed =
+    !hasRankRestriction ||
+    (userRank != null && allowedRanks.includes(userRank));
+
+  const formattedPrice = `£${ticketType.price.toFixed(2)}`;
+
+  return (
+    <Box borderWidth={1} borderColor="gray.800" rounded="xl" p={4}>
+      <Flex justifyContent="space-between" alignItems="center" mb={2}>
+        <styled.span fontWeight="semibold">{ticketType.name}</styled.span>
+        <styled.span fontWeight="bold" color="brand.500">
+          {formattedPrice}
+        </styled.span>
+      </Flex>
+
+      {hasRankRestriction ? (
+        <AllowedRanksBadges allowedRanks={allowedRanks} />
+      ) : (
+        <styled.p
+          fontSize="xs"
+          color="gray.500"
+          mb={2}
+        >
+          Open to all ranks
+        </styled.p>
+      )}
+
+      {isBeforeRelease ? (
+        <>
+          <Button disabled w="full" variant="secondary">
+            Buy Ticket - {formattedPrice} <RiTicketFill />
+          </Button>
+          <ClientOnly>
+            <CountdownDisplay releaseDate={releaseDate} />
+          </ClientOnly>
+        </>
+      ) : hasRankRestriction && !userRankAllowed ? (
+        <>
+          <SignedIn>
+            <Button disabled w="full" variant="secondary">
+              Not available for your rank <RiTicketFill />
+            </Button>
+          </SignedIn>
+          <SignedOut>
+            <Button
+              onClick={() =>
+                clerk.openSignIn({
+                  redirectUrl: `/events/${event.id}`,
+                })
+              }
+              w="full"
+            >
+              Sign in to check eligibility <RiTicketFill />
+            </Button>
+          </SignedOut>
+        </>
+      ) : (
+        <>
+          <SignedIn>
+            <LinkButton
+              to={`/events/${event.id}/ticket?ticketTypeId=${ticketType.id}`}
+              w="full"
+            >
+              Buy Ticket - {formattedPrice} <RiTicketFill />
+            </LinkButton>
+          </SignedIn>
+          <SignedOut>
+            <Button
+              onClick={() =>
+                clerk.openSignIn({
+                  redirectUrl: `/events/${event.id}/ticket?ticketTypeId=${ticketType.id}`,
+                })
+              }
+              w="full"
+            >
+              Buy Ticket - {formattedPrice} <RiTicketFill />
+            </Button>
+          </SignedOut>
+        </>
+      )}
+    </Box>
+  );
+};
+
+export const EventTicketSection = ({
   event,
   ticket,
   isSoldOut,
   userRank,
 }: Props) => {
-  const clerk = useClerk();
-
-  // We write this as london time in the db, but it's stored as UTC
-  const releaseDate = event?.ticketReleaseDate
-    ? toZonedTime(new Date(event.ticketReleaseDate), "UTC")
-    : null;
-
-  const isBeforeRelease = releaseDate
-    ? isBefore(toZonedTime(new Date(), "Europe/London"), releaseDate)
-    : false;
-
-  if (!event || !event.enableTicketing) {
+  if (!event || event.ticketTypes.length === 0) {
     return null;
-  }
-
-  const allowedRanks = event.allowedRanks ?? [];
-  const hasRankRestriction = allowedRanks.length > 0;
-  const userRankAllowed =
-    !hasRankRestriction || (userRank != null && allowedRanks.includes(userRank));
-
-  const formattedPrice = event.ticketPrice
-    ? `£${event.ticketPrice.toFixed(2)}`
-    : null;
-
-  if (releaseDate && isBeforeRelease) {
-    return (
-      <>
-        {hasRankRestriction && (
-          <AllowedRanksBadges allowedRanks={allowedRanks} />
-        )}
-        <Button disabled w="full" variant="secondary">
-          Buy Ticket {formattedPrice && `- ${formattedPrice}`} <RiTicketFill />
-        </Button>
-        {releaseDate && (
-          <ClientOnly>
-            <CountdownDisplay releaseDate={releaseDate} />
-          </ClientOnly>
-        )}
-      </>
-    );
   }
 
   if (
@@ -179,81 +244,37 @@ export const EventTicketButton = ({
       ticket.status === TicketStatus.PENDING)
   ) {
     return (
-      <>
-        {hasRankRestriction && (
-          <AllowedRanksBadges allowedRanks={allowedRanks} />
-        )}
+      <Box>
         <LinkButton to={`/events/${event.id}/ticket`} w="full">
           {ticket.status === TicketStatus.CONFIRMED
             ? "View Ticket"
             : "Continue With Ticket"}
           <RiTicketFill />
         </LinkButton>
-      </>
+      </Box>
     );
   }
 
   if (isSoldOut) {
     return (
-      <>
-        {hasRankRestriction && (
-          <AllowedRanksBadges allowedRanks={allowedRanks} />
-        )}
+      <Box>
         <Button disabled w="full">
           Sold out <RiTicketFill />
         </Button>
-      </>
-    );
-  }
-
-  if (hasRankRestriction && !userRankAllowed) {
-    return (
-      <>
-        <AllowedRanksBadges allowedRanks={allowedRanks} />
-        <SignedIn>
-          <Button disabled w="full" variant="secondary">
-            Not available for your rank <RiTicketFill />
-          </Button>
-        </SignedIn>
-        <SignedOut>
-          <Button
-            onClick={() =>
-              clerk.openSignIn({
-                redirectUrl: `/events/${event.id}`,
-              })
-            }
-            w="full"
-          >
-            Sign in to check eligibility <RiTicketFill />
-          </Button>
-        </SignedOut>
-      </>
+      </Box>
     );
   }
 
   return (
-    <>
-      {hasRankRestriction && (
-        <AllowedRanksBadges allowedRanks={allowedRanks} />
-      )}
-      <SignedIn>
-        <LinkButton to={`/events/${event.id}/ticket`} w="full">
-          Buy Ticket {formattedPrice && `- ${formattedPrice}`} <RiTicketFill />
-        </LinkButton>
-      </SignedIn>
-
-      <SignedOut>
-        <Button
-          onClick={() =>
-            clerk.openSignIn({
-              redirectUrl: `/events/${event.id}/ticket`,
-            })
-          }
-          w="full"
-        >
-          Buy Ticket {formattedPrice && `- ${formattedPrice}`} <RiTicketFill />
-        </Button>
-      </SignedOut>
-    </>
+    <Flex flexDir="column" gap={3}>
+      {event.ticketTypes.map((ticketType) => (
+        <TicketTypeCard
+          key={ticketType.id}
+          event={event}
+          ticketType={ticketType}
+          userRank={userRank}
+        />
+      ))}
+    </Flex>
   );
 };

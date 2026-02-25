@@ -62,7 +62,6 @@ export type TrackStatus = Values<typeof TrackStatus>;
 export const TicketStatus = {
   PENDING: "PENDING",
   CONFIRMED: "CONFIRMED",
-  CANCELLED: "CANCELLED",
   REFUNDED: "REFUNDED",
 } as const;
 

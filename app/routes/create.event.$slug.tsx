@@ -14,6 +14,16 @@ import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { EventForm } from "~/components/EventForm";
 
+const ticketTypeSchema = z.array(
+  z.object({
+    id: z.number().optional(),
+    name: z.string(),
+    price: z.string(),
+    releaseDate: z.string(),
+    allowedRanks: z.array(z.string()).default([]),
+  }),
+);
+
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const { userId } = await getAuth(args);
@@ -60,13 +70,12 @@ export const action = async (args: ActionFunctionArgs) => {
       link: z.string().optional(),
       repeatWeeks: z.coerce.number(),
       description: z.string().optional(),
-      enableTicketing: z.string().nullish(),
-      ticketCapacity: z.preprocess((v) => (v ? Number(v) : null), z.number().nullable()),
-      ticketReleaseDate: z.preprocess((v) => (v ? new Date(v as string) : null), z.date().nullable()),
-      earlyAccessCode: z.string().nullable(),
-      ticketPrice: z.preprocess((v) => (v ? Number(v) : null), z.number().nullable()),
+      ticketCapacity: z.preprocess(
+        (v) => (v ? Number(v) : null),
+        z.number().nullable(),
+      ),
+      ticketTypes: z.string().default("[]"),
       rated: z.string().optional(),
-      allowedRanks: z.array(z.string()).default([]),
     })
     .parse({
       name: body.get("name"),
@@ -75,14 +84,18 @@ export const action = async (args: ActionFunctionArgs) => {
       link: body.get("link"),
       repeatWeeks: body.get("repeatWeeks"),
       description: body.get("description"),
-      enableTicketing: body.get("enableTicketing"),
       ticketCapacity: body.get("ticketCapacity"),
-      ticketReleaseDate: body.get("ticketReleaseDate"),
-      earlyAccessCode: body.get("earlyAccessCode"),
-      ticketPrice: body.get("ticketPrice"),
+      ticketTypes: body.get("ticketTypes"),
       rated: body.get("rated"),
-      allowedRanks: body.getAll("allowedRanks"),
     });
+
+  const ticketTypes = ticketTypeSchema.parse(JSON.parse(data.ticketTypes));
+
+  if (ticketTypes.length > 0 && (!data.ticketCapacity || data.ticketCapacity <= 0)) {
+    throw new Response("Ticket capacity is required when ticket types are added", {
+      status: 400,
+    });
+  }
 
   const startDateNoZone = parseISO(data.startDate);
   const endDateNoZone = parseISO(data.endDate);
@@ -101,7 +114,7 @@ export const action = async (args: ActionFunctionArgs) => {
   const diff = differenceInWeeks(endOfYear(startDateNoZone), startDateNoZone);
   const arrayLength = data.repeatWeeks === 0 ? 1 : diff / data.repeatWeeks + 1;
 
-  const [firstEvent] = await prisma.events.createManyAndReturn({
+  const events = await prisma.events.createManyAndReturn({
     data: Array.from({ length: arrayLength }).map((_, i) => {
       const repeatStartDate = add(startDateNoZone, {
         weeks: i * data.repeatWeeks,
@@ -115,20 +128,29 @@ export const action = async (args: ActionFunctionArgs) => {
         startDate: repeatStartDate,
         endDate: repeatEndDate,
         description: data.description,
-        enableTicketing: data.enableTicketing === "true",
         ticketCapacity: data.ticketCapacity,
-        ticketReleaseDate: data.ticketReleaseDate
-          ? data.ticketReleaseDate
-          : null,
-        earlyAccessCode: data.earlyAccessCode,
-        ticketPrice: data.ticketPrice,
         rated: data.rated === "true",
-        allowedRanks: data.allowedRanks,
       };
     }),
   });
 
-  return redirect(`/events/${firstEvent.id}`);
+  if (ticketTypes.length > 0) {
+    const ticketTypeRecords = events.flatMap((event) =>
+      ticketTypes.map((tt) => ({
+        eventId: event.id,
+        name: tt.name,
+        price: parseFloat(tt.price),
+        releaseDate: new Date(tt.releaseDate),
+        allowedRanks: tt.allowedRanks,
+      })),
+    );
+
+    await prisma.eventTicketTypes.createMany({
+      data: ticketTypeRecords,
+    });
+  }
+
+  return redirect(`/events/${events[0].id}`);
 };
 
 const CalendarNewPage = () => {

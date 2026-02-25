@@ -32,6 +32,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
           eventTrack: true,
         },
       },
+      ticketType: {
+        select: {
+          name: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -41,14 +46,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return tickets;
 };
 
-const getStatusColor = (status: TicketStatus) => {
+const getStatusColor = (status: string) => {
   switch (status) {
     case TicketStatus.CONFIRMED:
       return [token("colors.green.900"), token("colors.green.500")];
     case TicketStatus.PENDING:
       return [token("colors.yellow.900"), token("colors.yellow.500")];
-    case TicketStatus.CANCELLED:
-      return [token("colors.red.900"), token("colors.red.500")];
     case TicketStatus.REFUNDED:
       return [token("colors.purple.900"), token("colors.purple.500")];
     default:
@@ -56,14 +59,12 @@ const getStatusColor = (status: TicketStatus) => {
   }
 };
 
-const getStatusText = (status: TicketStatus) => {
+const getStatusText = (status: string) => {
   switch (status) {
     case TicketStatus.CONFIRMED:
       return "Confirmed";
     case TicketStatus.PENDING:
       return "Pending";
-    case TicketStatus.CANCELLED:
-      return "Cancelled";
     case TicketStatus.REFUNDED:
       return "Refunded";
     default:
@@ -131,6 +132,11 @@ export default function TicketsPage() {
                         <styled.h2 fontSize="xl" fontWeight="semibold" mt={2}>
                           {ticket.event.name}
                         </styled.h2>
+                        {ticket.ticketType && (
+                          <styled.p fontSize="xs" color="gray.400" fontWeight="semibold">
+                            {ticket.ticketType.name}
+                          </styled.p>
+                        )}
 
                         <styled.p fontSize="sm" color="gray.500">
                           {getEventDate(

@@ -22,6 +22,8 @@ import { TimePicker } from "~/components/TimePicker";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { styled, Box, Divider, Flex } from "~/styled-system/jsx";
 import { Card } from "~/components/CollapsibleCard";
+import { useState, useEffect } from "react";
+import { RiArrowDownSLine, RiDeleteBinLine, RiAddLine } from "react-icons/ri";
 
 export interface EventFormDefaults {
   name?: string;
@@ -30,12 +32,14 @@ export interface EventFormDefaults {
   link?: string | null;
   description?: string | null;
   rated?: boolean;
-  enableTicketing?: boolean;
   ticketCapacity?: number | null;
-  ticketPrice?: number | null;
-  ticketReleaseDate?: Date | null;
-  earlyAccessCode?: string | null;
-  allowedRanks?: string[];
+  ticketTypes?: Array<{
+    id: number;
+    name: string;
+    price: number;
+    releaseDate: Date;
+    allowedRanks: string[];
+  }>;
 }
 
 interface Props {
@@ -47,29 +51,46 @@ interface Props {
   cancelLink?: string;
 }
 
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  startDate: z.date(),
-  numberOfDays: z.coerce.number(),
-  endDate: z.date(),
-  link: z.string(),
-  description: z.string(),
-  rated: z.boolean(),
-  enableTicketing: z.boolean(),
-  ticketCapacity: z.coerce.number().optional().default(0),
-  ticketPrice: z.string().optional().default(""),
-  ticketReleaseDate: z.date().optional(),
-  earlyAccessCode: z.string().optional().default(""),
-  allowedRanks: z.array(z.string()).optional().default([]),
-  repeatWeeks: z.string(),
-});
+const formSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    startDate: z.date(),
+    numberOfDays: z.coerce.number(),
+    endDate: z.date(),
+    link: z.string(),
+    description: z.string(),
+    rated: z.boolean(),
+    ticketCapacity: z.coerce.number().optional().default(0),
+    ticketTypes: z.array(
+      z.object({
+        id: z.number().optional(),
+        name: z.string().min(1, "Name is required"),
+        price: z.string().min(1, "Price is required"),
+        releaseDate: z.date(),
+        allowedRanks: z.array(z.string()),
+      }),
+    ),
+    repeatWeeks: z.string(),
+  })
+  .refine(
+    (data) => data.ticketTypes.length === 0 || (data.ticketCapacity ?? 0) > 0,
+    {
+      message: "Ticket capacity is required when ticket types are added",
+      path: ["ticketCapacity"],
+    },
+  );
 
 const validationSchema = toFormikValidationSchema(formSchema);
 
 type FormValues = z.infer<typeof formSchema>;
 
-const getError = (formik: { touched: Record<string, unknown>; errors: Record<string, unknown> }, field: keyof FormValues) => {
-  return formik.touched[field] ? (formik.errors[field] as string | undefined) : undefined;
+const getError = (
+  formik: { touched: Record<string, unknown>; errors: Record<string, unknown> },
+  field: keyof FormValues,
+) => {
+  return formik.touched[field]
+    ? (formik.errors[field] as string | undefined)
+    : undefined;
 };
 
 export const EventForm = ({
@@ -81,6 +102,21 @@ export const EventForm = ({
   cancelLink,
 }: Props) => {
   const fetcher = useFetcher();
+  const [openTicketTypes, setOpenTicketTypes] = useState<Set<number>>(
+    () => new Set<number>(),
+  );
+
+  const toggleTicketType = (index: number) => {
+    setOpenTicketTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
 
   const defaultStart =
     defaults.startDate ?? startOfHour(add(new Date(), { days: 1 }));
@@ -101,15 +137,14 @@ export const EventForm = ({
       link: defaults.link ?? "",
       description: defaults.description ?? "",
       rated: defaults.rated ?? false,
-      enableTicketing: defaults.enableTicketing ?? false,
       ticketCapacity: defaults.ticketCapacity ?? 0,
-      ticketPrice:
-        defaults.ticketPrice != null && defaults.ticketPrice > 0
-          ? defaults.ticketPrice.toFixed(2)
-          : "",
-      ticketReleaseDate: defaults.ticketReleaseDate ?? new Date(),
-      earlyAccessCode: defaults.earlyAccessCode ?? "",
-      allowedRanks: defaults.allowedRanks ?? [],
+      ticketTypes: (defaults.ticketTypes ?? []).map((t) => ({
+        id: t.id,
+        name: t.name,
+        price: t.price > 0 ? t.price.toFixed(2) : "",
+        releaseDate: t.releaseDate,
+        allowedRanks: t.allowedRanks,
+      })),
       repeatWeeks: "0",
     },
     onSubmit: (values) => {
@@ -128,25 +163,21 @@ export const EventForm = ({
       formData.append("description", values.description);
       formData.append("rated", values.rated ? "true" : "false");
       formData.append(
-        "enableTicketing",
-        values.enableTicketing ? "true" : "false",
+        "ticketCapacity",
+        (values.ticketCapacity ?? 0).toString(),
       );
-
-      if (values.enableTicketing) {
-        formData.append("ticketCapacity", (values.ticketCapacity ?? 0).toString());
-        formData.append("ticketPrice", values.ticketPrice ?? "");
-        if (values.ticketReleaseDate) {
-          formData.append(
-            "ticketReleaseDate",
-            values.ticketReleaseDate.toISOString(),
-          );
-        }
-        formData.append("earlyAccessCode", values.earlyAccessCode ?? "");
-
-        for (const rank of values.allowedRanks ?? []) {
-          formData.append("allowedRanks", rank);
-        }
-      }
+      formData.append(
+        "ticketTypes",
+        JSON.stringify(
+          values.ticketTypes.map((t) => ({
+            id: t.id,
+            name: t.name,
+            price: t.price,
+            releaseDate: t.releaseDate.toISOString(),
+            allowedRanks: t.allowedRanks,
+          })),
+        ),
+      );
 
       if (showRepeatEvent) {
         formData.append("repeatWeeks", values.repeatWeeks);
@@ -156,8 +187,75 @@ export const EventForm = ({
     },
   });
 
+  const getTicketTypeError = (
+    index: number,
+    field: string,
+  ): string | undefined => {
+    if (formik.submitCount === 0) return undefined;
+    const errors = formik.errors.ticketTypes;
+    if (!Array.isArray(errors)) return undefined;
+    const typeErrors = errors[index];
+    if (!typeErrors || typeof typeErrors === "string") return undefined;
+    return (typeErrors as Record<string, string>)[field];
+  };
+
+  const ticketTypeHasErrors = (index: number): boolean => {
+    if (formik.submitCount === 0) return false;
+    const errors = formik.errors.ticketTypes;
+    if (!Array.isArray(errors)) return false;
+    const typeErrors = errors[index];
+    return !!typeErrors && typeof typeErrors !== "string";
+  };
+
+  useEffect(() => {
+    if (formik.submitCount > 0 && Array.isArray(formik.errors.ticketTypes)) {
+      const indicesWithErrors = new Set<number>();
+      formik.errors.ticketTypes.forEach((err, i) => {
+        if (err && typeof err !== "string") {
+          indicesWithErrors.add(i);
+        }
+      });
+      if (indicesWithErrors.size > 0) {
+        setOpenTicketTypes((prev) => {
+          const next = new Set(prev);
+          for (const i of indicesWithErrors) next.add(i);
+          return next;
+        });
+      }
+    }
+  }, [formik.submitCount]);
+
   const updateEndDate = (newStartDate: Date, days: number) => {
     formik.setFieldValue("endDate", add(newStartDate, { days: days - 1 }));
+  };
+
+  const addTicketType = () => {
+    const newIndex = formik.values.ticketTypes.length;
+    formik.setFieldValue("ticketTypes", [
+      ...formik.values.ticketTypes,
+      {
+        name: "",
+        price: "",
+        releaseDate: sub(formik.values.startDate, { days: 7 }),
+        allowedRanks: [],
+      },
+    ]);
+    setOpenTicketTypes((prev) => new Set(prev).add(newIndex));
+  };
+
+  const removeTicketType = (index: number) => {
+    formik.setFieldValue(
+      "ticketTypes",
+      formik.values.ticketTypes.filter((_, i) => i !== index),
+    );
+    setOpenTicketTypes((prev) => {
+      const next = new Set<number>();
+      for (const i of prev) {
+        if (i < index) next.add(i);
+        else if (i > index) next.add(i - 1);
+      }
+      return next;
+    });
   };
 
   return (
@@ -279,97 +377,213 @@ export const EventForm = ({
           <Divider borderColor="gray.800" />
 
           {stripeAccountEnabled ? (
-            <>
+            <Flex flexDir="column" gap={4}>
+              <styled.h3 fontWeight="bold" fontSize="lg">
+                Ticketing
+              </styled.h3>
+
+              <FormControl error={getError(formik, "ticketCapacity")}>
+                <Label>Ticket Capacity</Label>
+                <Input
+                  name="ticketCapacity"
+                  type="number"
+                  min={1}
+                  value={formik.values.ticketCapacity || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder="e.g. 50"
+                />
+                <styled.p color="gray.500" fontSize="xs" mt={1}>
+                  Maximum tickets across all ticket types for this event.
+                </styled.p>
+              </FormControl>
+
               <Box>
-                <Label>Enable ticketing</Label>
-                <TabGroup>
-                  <TabButton
-                    type="button"
-                    isActive={!formik.values.enableTicketing}
-                    onClick={() =>
-                      formik.setFieldValue("enableTicketing", false)
-                    }
-                  >
-                    No
-                  </TabButton>
-                  <TabButton
-                    type="button"
-                    isActive={formik.values.enableTicketing}
-                    onClick={() =>
-                      formik.setFieldValue("enableTicketing", true)
-                    }
-                  >
-                    Yes
-                  </TabButton>
-                </TabGroup>
+                <Label mb={2}>Ticket Types</Label>
+
+                <Flex flexDir="column" gap={2}>
+                  {formik.values.ticketTypes.map((ticketType, index) => {
+                    const isOpen = openTicketTypes.has(index);
+                    return (
+                      <Box
+                        key={index}
+                        borderWidth={1}
+                        borderColor={
+                          ticketTypeHasErrors(index)
+                            ? "brand.500"
+                            : isOpen
+                              ? "gray.600"
+                              : "gray.800"
+                        }
+                        rounded="xl"
+                        overflow="hidden"
+                        transition="border-color .2s"
+                      >
+                        <styled.button
+                          type="button"
+                          onClick={() => toggleTicketType(index)}
+                          w="full"
+                          p={4}
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          cursor="pointer"
+                          _hover={{ bgColor: "gray.800" }}
+                          transition="background-color .2s"
+                        >
+                          <Box flex={1} textAlign="left">
+                            <styled.span fontWeight="semibold" fontSize="sm">
+                              {ticketType.name ||
+                                `Ticket Type ${index + 1}`}
+                            </styled.span>
+                            {ticketType.price && (
+                              <styled.span
+                                color="gray.400"
+                                fontSize="sm"
+                                ml={2}
+                              >
+                                £{ticketType.price}
+                              </styled.span>
+                            )}
+                            {!isOpen && ticketTypeHasErrors(index) && (
+                              <styled.span
+                                color="brand.500"
+                                fontSize="xs"
+                                ml={2}
+                              >
+                                — has errors
+                              </styled.span>
+                            )}
+                          </Box>
+                          <Box
+                            transform={
+                              isOpen ? "rotate(180deg)" : "none"
+                            }
+                            transition="transform 0.2s"
+                            color="gray.400"
+                          >
+                            <RiArrowDownSLine size={20} />
+                          </Box>
+                        </styled.button>
+
+                        {isOpen && (
+                          <Box
+                            p={4}
+                            borderTopWidth={1}
+                            borderColor="gray.800"
+                          >
+                            <Flex flexDir="column" gap={4}>
+                              <FormControl
+                                error={getTicketTypeError(index, "name")}
+                              >
+                                <Label>Name</Label>
+                                <Input
+                                  value={ticketType.name}
+                                  onChange={(e) =>
+                                    formik.setFieldValue(
+                                      `ticketTypes.${index}.name`,
+                                      e.target.value,
+                                    )
+                                  }
+                                  placeholder="e.g. General Admission"
+                                />
+                              </FormControl>
+
+                              <FormControl
+                                error={getTicketTypeError(index, "price")}
+                              >
+                                <Label>Price</Label>
+                                <MoneyInput
+                                  key={`money-${index}-${ticketType.id ?? "new"}`}
+                                  initialValue={
+                                    ticketType.price
+                                      ? parseFloat(ticketType.price)
+                                      : null
+                                  }
+                                  onValueChange={(val) =>
+                                    formik.setFieldValue(
+                                      `ticketTypes.${index}.price`,
+                                      val,
+                                    )
+                                  }
+                                />
+                              </FormControl>
+
+                              <FormControl>
+                                <Label>Release Date</Label>
+                                <DatePicker
+                                  value={ticketType.releaseDate}
+                                  maxDate={sub(formik.values.startDate, {
+                                    days: 1,
+                                  })}
+                                  onChange={(date) =>
+                                    formik.setFieldValue(
+                                      `ticketTypes.${index}.releaseDate`,
+                                      date,
+                                    )
+                                  }
+                                />
+                              </FormControl>
+
+                              <FormControl>
+                                <Label>Release Time</Label>
+                                <TimePicker
+                                  value={ticketType.releaseDate}
+                                  onChange={(date) =>
+                                    formik.setFieldValue(
+                                      `ticketTypes.${index}.releaseDate`,
+                                      date,
+                                    )
+                                  }
+                                />
+                              </FormControl>
+
+                              <Box>
+                                <Label>Restrict by Driver Rank</Label>
+                                <RankSelector
+                                  selectedRanks={ticketType.allowedRanks}
+                                  onChange={(ranks) =>
+                                    formik.setFieldValue(
+                                      `ticketTypes.${index}.allowedRanks`,
+                                      ranks,
+                                    )
+                                  }
+                                />
+                              </Box>
+
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => removeTicketType(index)}
+                              >
+                                <RiDeleteBinLine /> Remove
+                              </Button>
+                            </Flex>
+                          </Box>
+                        )}
+                      </Box>
+                    );
+                  })}
+                </Flex>
+
+                {formik.values.ticketTypes.length === 0 && (
+                  <styled.p color="gray.500" fontSize="sm" mb={2}>
+                    No ticket types added. Add one to enable ticketing for
+                    this event.
+                  </styled.p>
+                )}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addTicketType}
+                  mt={2}
+                  w="full"
+                >
+                  <RiAddLine /> Add Ticket Type
+                </Button>
               </Box>
-
-              {formik.values.enableTicketing && (
-                <>
-                  <FormControl error={getError(formik, "ticketCapacity")}>
-                    <Label>Ticket Capacity</Label>
-                    <Input
-                      name="ticketCapacity"
-                      type="number"
-                      value={formik.values.ticketCapacity}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                  </FormControl>
-
-                  <FormControl error={getError(formik, "ticketPrice")}>
-                    <Label>Ticket Price</Label>
-                    <MoneyInput
-                      initialValue={defaults.ticketPrice}
-                      onValueChange={(val) =>
-                        formik.setFieldValue("ticketPrice", val)
-                      }
-                    />
-                  </FormControl>
-
-                  <FormControl error={getError(formik, "ticketReleaseDate")}>
-                    <Label>Ticket Release Date</Label>
-                    <DatePicker
-                      value={formik.values.ticketReleaseDate ?? new Date()}
-                      maxDate={sub(formik.values.startDate, { days: 1 })}
-                      onChange={(date) =>
-                        formik.setFieldValue("ticketReleaseDate", date)
-                      }
-                    />
-                  </FormControl>
-
-                  <FormControl error={getError(formik, "ticketReleaseDate")}>
-                    <Label>Ticket Release Time</Label>
-                    <TimePicker
-                      value={formik.values.ticketReleaseDate ?? new Date()}
-                      onChange={(date) =>
-                        formik.setFieldValue("ticketReleaseDate", date)
-                      }
-                    />
-                  </FormControl>
-
-                  <FormControl error={getError(formik, "earlyAccessCode")}>
-                    <Label>Early Access Code</Label>
-                    <Input
-                      name="earlyAccessCode"
-                      value={formik.values.earlyAccessCode}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                  </FormControl>
-
-                  <Box>
-                    <Label>Restrict by Driver Rank</Label>
-                    <RankSelector
-                      selectedRanks={formik.values.allowedRanks}
-                      onChange={(ranks) =>
-                        formik.setFieldValue("allowedRanks", ranks)
-                      }
-                    />
-                  </Box>
-                </>
-              )}
-            </>
+            </Flex>
           ) : stripeSetupLink ? (
             <Box
               bgColor="gray.800"

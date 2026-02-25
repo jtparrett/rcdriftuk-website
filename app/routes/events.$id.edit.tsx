@@ -8,6 +8,16 @@ import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
 import { EventForm } from "~/components/EventForm";
 
+const ticketTypeSchema = z.array(
+  z.object({
+    id: z.number().optional(),
+    name: z.string(),
+    price: z.string(),
+    releaseDate: z.string(),
+    allowedRanks: z.array(z.string()).default([]),
+  }),
+);
+
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const id = z.string().parse(params.id);
@@ -34,12 +44,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
       link: true,
       description: true,
       rated: true,
-      enableTicketing: true,
       ticketCapacity: true,
-      ticketPrice: true,
-      ticketReleaseDate: true,
-      earlyAccessCode: true,
-      allowedRanks: true,
+      ticketTypes: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          releaseDate: true,
+          allowedRanks: true,
+        },
+        orderBy: { releaseDate: "asc" },
+      },
       eventTrack: {
         select: {
           stripeAccountEnabled: true,
@@ -73,6 +88,9 @@ export const action = async (args: ActionFunctionArgs) => {
         },
       },
     },
+    include: {
+      ticketTypes: { select: { id: true } },
+    },
   });
 
   if (!event) {
@@ -89,12 +107,11 @@ export const action = async (args: ActionFunctionArgs) => {
       link: z.string().optional(),
       description: z.string().optional(),
       rated: z.string().optional(),
-      enableTicketing: z.string().nullish(),
-      ticketCapacity: z.preprocess((v) => (v ? Number(v) : null), z.number().nullable()),
-      ticketPrice: z.preprocess((v) => (v ? Number(v) : null), z.number().nullable()),
-      ticketReleaseDate: z.preprocess((v) => (v ? new Date(v as string) : null), z.date().nullable()),
-      earlyAccessCode: z.string().nullable(),
-      allowedRanks: z.array(z.string()).default([]),
+      ticketCapacity: z.preprocess(
+        (v) => (v ? Number(v) : null),
+        z.number().nullable(),
+      ),
+      ticketTypes: z.string().default("[]"),
     })
     .parse({
       name: formData.get("name"),
@@ -103,13 +120,17 @@ export const action = async (args: ActionFunctionArgs) => {
       link: formData.get("link"),
       description: formData.get("description"),
       rated: formData.get("rated"),
-      enableTicketing: formData.get("enableTicketing"),
       ticketCapacity: formData.get("ticketCapacity"),
-      ticketPrice: formData.get("ticketPrice"),
-      ticketReleaseDate: formData.get("ticketReleaseDate"),
-      earlyAccessCode: formData.get("earlyAccessCode"),
-      allowedRanks: formData.getAll("allowedRanks"),
+      ticketTypes: formData.get("ticketTypes"),
     });
+
+  const ticketTypes = ticketTypeSchema.parse(JSON.parse(data.ticketTypes));
+
+  if (ticketTypes.length > 0 && (!data.ticketCapacity || data.ticketCapacity <= 0)) {
+    throw new Response("Ticket capacity is required when ticket types are added", {
+      status: 400,
+    });
+  }
 
   const startDateParsed = parseISO(data.startDate);
   const endDateParsed = parseISO(data.endDate);
@@ -123,14 +144,63 @@ export const action = async (args: ActionFunctionArgs) => {
       link: data.link,
       description: data.description,
       rated: data.rated === "true",
-      enableTicketing: data.enableTicketing === "true",
       ticketCapacity: data.ticketCapacity,
-      ticketPrice: data.ticketPrice,
-      ticketReleaseDate: data.ticketReleaseDate,
-      earlyAccessCode: data.earlyAccessCode,
-      allowedRanks: data.allowedRanks,
     },
   });
+
+  const existingTypeIds = event.ticketTypes.map((t) => t.id);
+  const incomingTypeIds = ticketTypes
+    .filter((t) => t.id !== undefined)
+    .map((t) => t.id!);
+
+  const toDelete = existingTypeIds.filter(
+    (id) => !incomingTypeIds.includes(id),
+  );
+
+  if (toDelete.length > 0) {
+    await prisma.eventTickets.deleteMany({
+      where: {
+        ticketTypeId: { in: toDelete },
+        status: { notIn: ["CONFIRMED"] },
+      },
+    });
+
+    await prisma.eventTickets.updateMany({
+      where: {
+        ticketTypeId: { in: toDelete },
+        status: "CONFIRMED",
+      },
+      data: { ticketTypeId: null },
+    });
+
+    await prisma.eventTicketTypes.deleteMany({
+      where: { id: { in: toDelete } },
+    });
+  }
+
+  for (const tt of ticketTypes) {
+    if (tt.id) {
+      await prisma.eventTicketTypes.update({
+        where: { id: tt.id },
+        data: {
+          name: tt.name,
+          price: parseFloat(tt.price),
+          releaseDate: new Date(tt.releaseDate),
+          allowedRanks: tt.allowedRanks,
+        },
+      });
+    } else {
+      await prisma.eventTicketTypes.create({
+        data: {
+          eventId: id,
+          name: tt.name,
+          price: parseFloat(tt.price),
+          releaseDate: new Date(tt.releaseDate),
+          allowedRanks: tt.allowedRanks,
+        },
+      });
+    }
+  }
 
   return redirect(`/events/${id}`);
 };
@@ -151,14 +221,14 @@ const EventEditPage = () => {
           link: event.link,
           description: event.description,
           rated: event.rated,
-          enableTicketing: event.enableTicketing,
           ticketCapacity: event.ticketCapacity,
-          ticketPrice: event.ticketPrice,
-          ticketReleaseDate: event.ticketReleaseDate
-            ? new Date(event.ticketReleaseDate)
-            : null,
-          earlyAccessCode: event.earlyAccessCode,
-          allowedRanks: event.allowedRanks,
+          ticketTypes: event.ticketTypes.map((t) => ({
+            id: t.id,
+            name: t.name,
+            price: t.price,
+            releaseDate: new Date(t.releaseDate),
+            allowedRanks: t.allowedRanks,
+          })),
         }}
         stripeAccountEnabled={
           event.eventTrack?.stripeAccountEnabled ?? false

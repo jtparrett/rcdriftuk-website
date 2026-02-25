@@ -21,20 +21,16 @@ model Events {
   description       String?
   responses         EventResponses[]
   eventTrack        Tracks?          @relation(fields: [trackId], references: [id])
-  enableTicketing   Boolean          @default(false)
   ticketCapacity    Int?
   EventTickets      EventTickets[]
-  ticketReleaseDate DateTime?
   earlyAccessCode   String?
-  ticketPrice       Float?
   rated             Boolean          @default(false)
-  allowedRanks      String[]         @default([])
+  ticketTypes       EventTicketTypes[]
 
   @@index([startDate])
   @@index([endDate])
   @@index([trackId])
   @@index([startDate, endDate])
-  @@index([enableTicketing, startDate])
 }
 
 model EventTickets {
@@ -48,6 +44,8 @@ model EventTickets {
   updatedAt       DateTime     @default(now()) @updatedAt
   sessionId       String?
   paymentIntentId String?
+  ticketTypeId    Int?
+  ticketType      EventTicketTypes? @relation(fields: [ticketTypeId], references: [id])
 
   @@unique([eventId, userId])
   @@index([eventId])
@@ -55,6 +53,22 @@ model EventTickets {
   @@index([status])
   @@index([sessionId])
   @@index([paymentIntentId])
+  @@index([ticketTypeId])
+}
+
+model EventTicketTypes {
+  id           Int            @id @default(autoincrement())
+  eventId      String         @db.Uuid
+  event        Events         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name         String
+  price        Float
+  releaseDate  DateTime
+  allowedRanks String[]       @default([])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+  tickets      EventTickets[]
+
+  @@index([eventId])
 }
 
 model EventResponses {

@@ -27,7 +27,7 @@ import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
 import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
 import { getEvent } from "~/utils/getEvent.server";
-import { EventTicketButton } from "~/components/EventTicketButton";
+import { EventTicketSection } from "~/components/EventTicketButton";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
@@ -80,7 +80,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isAttending = !!userEventResponse;
     ticket = await getUserEventTicket(id, userId);
 
-    if (event.allowedRanks.length > 0) {
+    const hasAnyRankRestriction = event.ticketTypes.some(
+      (t) => t.allowedRanks.length > 0,
+    );
+
+    if (hasAnyRankRestriction) {
       const user = await prisma.users.findFirst({
         where: { id: userId },
         select: { elo: true, ranked: true, lastBattleDate: true },
@@ -144,6 +148,7 @@ const Page = () => {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const isTrackOwner = (event.eventTrack?.Owners.length ?? 0) > 0;
+  const hasTicketing = event.ticketTypes.length > 0;
 
   const CalendarLink = () => {
     return (
@@ -218,7 +223,7 @@ const Page = () => {
               </Box>
             )}
 
-            {!event.enableTicketing && (
+            {!hasTicketing && (
               <>
                 <styled.p color="gray.500" fontSize="sm">
                   Duration:{" "}
@@ -282,7 +287,7 @@ const Page = () => {
             )}
 
             <Flex gap={2} pt={2} flexDir={{ base: "column", md: "row" }}>
-              {!event.enableTicketing && (
+              {!hasTicketing && (
                 <>
                   <SignedIn>
                     <Form method="post">
@@ -334,19 +339,20 @@ const Page = () => {
               <CalendarLink />
             </Flex>
 
-            {event.enableTicketing &&
+            {hasTicketing &&
               isBefore(new Date(), new Date(event.endDate)) && (
                 <>
                   <Divider mt={4} borderColor="gray.800" />
                   <Box pt={4}>
-                    <EventTicketButton
+                    <EventTicketSection
                       event={{
                         ...event,
                         startDate,
                         endDate,
-                        ticketReleaseDate: event.ticketReleaseDate
-                          ? new Date(event.ticketReleaseDate)
-                          : null,
+                        ticketTypes: event.ticketTypes.map((t) => ({
+                          ...t,
+                          releaseDate: new Date(t.releaseDate),
+                        })),
                       }}
                       ticket={
                         ticket
@@ -448,7 +454,7 @@ const Page = () => {
                   View Profile
                 </LinkButton>
 
-                {isTrackOwner && event.enableTicketing && (
+                {isTrackOwner && hasTicketing && (
                   <LinkButton
                     w="full"
                     to={`/events/${event.id}/export`}

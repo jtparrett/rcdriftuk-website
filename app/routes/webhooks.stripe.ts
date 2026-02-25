@@ -28,7 +28,7 @@ export async function action(args: ActionFunctionArgs) {
       const session = event.data.object;
       const ticketId = session.metadata?.ticketId;
 
-      const ticket = await prisma.eventTickets.findUniqueOrThrow({
+      const ticket = await prisma.eventTickets.findUnique({
         where: {
           id: Number(ticketId),
         },
@@ -42,28 +42,17 @@ export async function action(args: ActionFunctionArgs) {
         },
       });
 
-      // Check if the ticket has expired
-      if (ticket.status === TicketStatus.CANCELLED) {
-        // Refund the payment if reservation expired
+      if (!ticket) {
         if (session.payment_intent) {
           await stripe.refunds.create({
             payment_intent: session.payment_intent as string,
           });
         }
-
-        await prisma.eventTickets.update({
-          where: {
-            id: Number(ticketId),
-          },
-          data: {
-            status: TicketStatus.REFUNDED,
-            paymentIntentId: session.payment_intent as string | undefined,
-          },
-        });
-
-        console.error("Reservation expired after payment succeeded.");
-        return new Response("Payment refunded due to expiration.", {
-          status: 400,
+        console.error(
+          `[stripe-webhook] Ticket ${ticketId} not found (deleted). Payment refunded.`,
+        );
+        return new Response("Ticket not found, payment refunded.", {
+          status: 200,
         });
       }
 

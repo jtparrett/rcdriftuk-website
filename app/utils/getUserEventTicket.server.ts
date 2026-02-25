@@ -14,6 +14,13 @@ export const getUserEventTicket = async (eventId: string, userId: string) => {
       id: true,
       status: true,
       sessionId: true,
+      ticketType: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+        },
+      },
       event: {
         select: {
           id: true,
