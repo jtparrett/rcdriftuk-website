@@ -1,7 +1,6 @@
 import { TicketStatus } from "~/utils/enums";
-import { useLoaderData } from "react-router";
+import { useLoaderData, redirect } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
-import invariant from "~/utils/invariant";
 import { z } from "zod";
 import { getAuth } from "~/utils/getAuth.server";
 import { prisma } from "~/utils/prisma.server";
@@ -14,7 +13,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const url = new URL(args.request.url);
   const ticketId = z.string().parse(url.searchParams.get("ticketId"));
 
-  invariant(userId, "User is not signed in");
+  if (!userId) {
+    throw redirect("/sign-in");
+  }
 
   const ticket = await prisma.eventTickets.findUnique({
     where: {
@@ -26,7 +27,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
-  invariant(ticket, "Ticket not found");
+  if (!ticket) {
+    throw redirect(`/events/${args.params.id}`);
+  }
 
   return ticket;
 };

@@ -39,6 +39,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
               driverId: true,
             },
           },
+          ticketType: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
     },
@@ -53,12 +58,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   const csvRows = [
-    ["Driver ID", "First Name", "Last Name", "Purchase Date"].join(","),
+    ["Driver ID", "First Name", "Last Name", "Ticket Type", "Purchase Date"].join(","),
     ...event.EventTickets.map((ticket) =>
       [
         String(ticket.user?.driverId ?? 0),
         ticket.user?.firstName ?? "",
         ticket.user?.lastName ?? "",
+        ticket.ticketType?.name ?? "General",
         new Date(ticket.updatedAt).toLocaleDateString(),
       ].join(","),
     ),

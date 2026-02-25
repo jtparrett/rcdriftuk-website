@@ -6,7 +6,6 @@ type Params = Pick<NonNullable<GetEvent>, "ticketCapacity"> & {
 
 export const isEventSoldOut = (event: Params | null) => {
   const { ticketCapacity, _count } = event ?? {};
-  return ticketCapacity !== null && ticketCapacity !== undefined
-    ? (_count?.EventTickets ?? ticketCapacity) >= ticketCapacity
-    : false;
+  if (!ticketCapacity || ticketCapacity <= 0) return false;
+  return (_count?.EventTickets ?? 0) >= ticketCapacity;
 };

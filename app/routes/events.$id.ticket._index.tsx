@@ -13,69 +13,24 @@ import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import { PLATFORM_FEE_AMOUNT } from "~/utils/platformFee";
 import { prisma } from "~/utils/prisma.server";
 import { stripe } from "~/utils/stripe.server";
+import { getDriverRank } from "~/utils/getDriverRank";
+import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
+import { z } from "zod";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const { userId } = await getAuth(args);
   const url = new URL(args.request.url);
   const earlyAccessCode = url.searchParams.get("code");
+  const ticketTypeIdParam = url.searchParams.get("ticketTypeId");
 
   if (!userId) {
     throw redirect("/sign-in");
   }
 
-  const event = await prisma.events.findUnique({
-    where: {
-      id: params.id,
-      enableTicketing: true,
-      ticketPrice: {
-        not: null,
-      },
-      ticketReleaseDate: {
-        not: null,
-      },
-    },
-    include: {
-      eventTrack: {
-        select: {
-          stripeAccountId: true,
-        },
-      },
-      _count: {
-        select: {
-          EventTickets: {
-            where: {
-              status: {
-                notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  // This is because we set the time in UK TIME
-  // even tho it's stored in UTC in the DB
-  const londonTimeNow = toZonedTime(new Date(), "Europe/London");
-  const isBeforeRelease = event?.ticketReleaseDate
-    ? isBefore(londonTimeNow, event.ticketReleaseDate)
-    : false;
-
-  if (
-    !event ||
-    (isBeforeRelease && earlyAccessCode !== event.earlyAccessCode)
-  ) {
-    throw new Response(null, {
-      status: 404,
-      statusText: "Not Found",
-    });
-  }
-
-  let ticket = await getUserEventTicket(event.id, userId);
+  let ticket = await getUserEventTicket(params.id!, userId);
 
   if (ticket?.status === TicketStatus.CONFIRMED) {
-    // Show ticket page
     return ticket;
   }
 
@@ -90,6 +45,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
           id: true,
           status: true,
           sessionId: true,
+          ticketType: {
+            select: { id: true, name: true, price: true },
+          },
           event: {
             select: {
               id: true,
@@ -98,11 +56,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
               cover: true,
               startDate: true,
               endDate: true,
-              eventTrack: {
-                select: {
-                  name: true,
-                },
-              },
+              eventTrack: { select: { name: true } },
             },
           },
         },
@@ -112,66 +66,121 @@ export const loader = async (args: LoaderFunctionArgs) => {
     }
 
     if (session.status === "expired") {
-      await prisma.eventTickets.update({
-        where: { id: ticket.id },
-        data: { status: TicketStatus.CANCELLED },
-      });
-
-      throw redirect(`/events/${event.id}`);
+      await prisma.eventTickets.delete({ where: { id: ticket.id } });
+      throw redirect(`/events/${params.id}`);
     }
 
-    throw redirect(session.url ?? `/events/${event.id}`);
+    throw redirect(session.url ?? `/events/${params.id}`);
   }
 
-  const isSoldOut = isEventSoldOut(event);
-
-  // Check if sold out
-  if (isSoldOut && ticket?.status !== TicketStatus.PENDING) {
-    if (ticket) {
-      await prisma.eventTickets.update({
-        where: { id: ticket.id },
-        data: { status: TicketStatus.CANCELLED },
-      });
-    }
-
-    throw redirect(`/events/${event.id}`);
+  // Delete any stale ticket (REFUNDED, orphaned PENDING) so user can start fresh
+  if (ticket) {
+    await prisma.eventTickets.delete({ where: { id: ticket.id } });
+    ticket = null;
   }
 
-  if (!ticket) {
-    ticket = await prisma.eventTickets.create({
-      data: {
-        eventId: event.id,
-        userId,
-      },
-      select: {
-        id: true,
-        status: true,
-        sessionId: true,
-        event: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            cover: true,
-            startDate: true,
-            endDate: true,
-            eventTrack: {
-              select: {
-                name: true,
+  if (!ticketTypeIdParam) {
+    throw redirect(`/events/${params.id}`);
+  }
+
+  const ticketTypeId = z.coerce.number().positive().parse(ticketTypeIdParam);
+
+  const ticketType = await prisma.eventTicketTypes.findUnique({
+    where: { id: ticketTypeId },
+    include: {
+      event: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          cover: true,
+          startDate: true,
+          endDate: true,
+          ticketCapacity: true,
+          earlyAccessCode: true,
+          eventTrack: {
+            select: {
+              stripeAccountId: true,
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              EventTickets: {
+                where: {
+                  status: { notIn: [TicketStatus.REFUNDED] },
+                },
               },
             },
           },
         },
       },
-    });
+    },
+  });
+
+  if (!ticketType || ticketType.event.id !== params.id) {
+    throw new Response(null, { status: 404, statusText: "Not Found" });
   }
 
-  // Verify the track has a connected Stripe account
-  const stripeAccountId = event.eventTrack?.stripeAccountId;
+  const event = ticketType.event;
 
-  // if (!stripeAccountId) {
-  //   throw new Response("Track is not set up for payments", { status: 400 });
-  // }
+  const londonTimeNow = toZonedTime(new Date(), "Europe/London");
+  const isBeforeRelease = isBefore(londonTimeNow, ticketType.releaseDate);
+
+  if (isBeforeRelease && earlyAccessCode !== event.earlyAccessCode) {
+    throw new Response(null, { status: 404, statusText: "Not Found" });
+  }
+
+  if (ticketType.allowedRanks.length > 0) {
+    const user = await prisma.users.findFirst({
+      where: { id: userId },
+      select: { elo: true, ranked: true, lastBattleDate: true },
+    });
+
+    if (user) {
+      const adjustedElo = adjustDriverElo(user.elo, user.lastBattleDate);
+      const userRank = getDriverRank(adjustedElo, user.ranked);
+
+      if (!ticketType.allowedRanks.includes(userRank)) {
+        throw redirect(`/events/${event.id}`);
+      }
+    } else {
+      throw redirect(`/events/${event.id}`);
+    }
+  }
+
+  if (isEventSoldOut(event)) {
+    throw redirect(`/events/${event.id}`);
+  }
+
+  ticket = await prisma.eventTickets.create({
+    data: {
+      eventId: event.id,
+      userId,
+      ticketTypeId: ticketType.id,
+    },
+    select: {
+      id: true,
+      status: true,
+      sessionId: true,
+      ticketType: {
+        select: { id: true, name: true, price: true },
+      },
+      event: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          cover: true,
+          startDate: true,
+          endDate: true,
+          eventTrack: { select: { name: true } },
+        },
+      },
+    },
+  });
+
+  const stripeAccountId = event.eventTrack?.stripeAccountId;
 
   const session = await stripe.checkout.sessions.create({
     line_items: [
@@ -179,9 +188,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
         price_data: {
           currency: "gbp",
           product_data: {
-            name: event.name,
+            name: `${event.name} - ${ticketType.name}`,
           },
-          unit_amount: Math.round((event.ticketPrice ?? 0) * 100),
+          unit_amount: Math.round(ticketType.price * 100),
         },
         quantity: 1,
       },
@@ -258,6 +267,11 @@ const Page = () => {
           <styled.h1 fontWeight="bold" fontSize="xl">
             {ticket.event.name}
           </styled.h1>
+          {ticket.ticketType && (
+            <styled.p fontSize="sm" color="gray.500" fontWeight="semibold">
+              {ticket.ticketType.name}
+            </styled.p>
+          )}
           <styled.p fontSize="sm" color="gray.600">
             {getEventDate(
               new Date(ticket.event.startDate),

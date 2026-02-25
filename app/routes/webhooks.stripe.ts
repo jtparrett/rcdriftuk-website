@@ -28,7 +28,7 @@ export async function action(args: ActionFunctionArgs) {
       const session = event.data.object;
       const ticketId = session.metadata?.ticketId;
 
-      const ticket = await prisma.eventTickets.findUniqueOrThrow({
+      const ticket = await prisma.eventTickets.findUnique({
         where: {
           id: Number(ticketId),
         },
@@ -42,37 +42,29 @@ export async function action(args: ActionFunctionArgs) {
         },
       });
 
-      // Check if the ticket has expired
-      if (ticket.status === TicketStatus.CANCELLED) {
-        // Refund the payment if reservation expired
+      if (!ticket) {
         if (session.payment_intent) {
           await stripe.refunds.create({
             payment_intent: session.payment_intent as string,
+            reverse_transfer: true,
+            refund_application_fee: true,
           });
         }
-
-        await prisma.eventTickets.update({
-          where: {
-            id: Number(ticketId),
-          },
-          data: {
-            status: TicketStatus.REFUNDED,
-          },
-        });
-
-        console.error("Reservation expired after payment succeeded.");
-        return new Response("Payment refunded due to expiration.", {
-          status: 400,
+        console.error(
+          `[stripe-webhook] Ticket ${ticketId} not found (deleted). Payment refunded.`,
+        );
+        return new Response("Ticket not found, payment refunded.", {
+          status: 200,
         });
       }
 
-      // Update ticket status to confirmed
       await prisma.eventTickets.update({
         where: {
           id: Number(ticketId),
         },
         data: {
           status: TicketStatus.CONFIRMED,
+          paymentIntentId: session.payment_intent as string | undefined,
         },
       });
 
@@ -125,21 +117,62 @@ export async function action(args: ActionFunctionArgs) {
       }
     }
 
-    if (event.type === "charge.refunded") {
+    if (
+      event.type === "charge.refunded" ||
+      event.type === "charge.dispute.created"
+    ) {
       const charge = event.data.object;
-      const sessions = await stripe.checkout.sessions.list({
-        payment_intent: charge.payment_intent as string,
+      const paymentIntentId =
+        typeof charge.payment_intent === "string"
+          ? charge.payment_intent
+          : null;
+
+      if (!paymentIntentId) {
+        console.error(
+          `[stripe-webhook] ${event.type}: missing payment_intent on charge ${charge.id}`,
+        );
+        return new Response("Missing payment_intent", { status: 200 });
+      }
+
+      // Try direct lookup first, fall back to session list
+      let ticket = await prisma.eventTickets.findFirst({
+        where: { paymentIntentId },
       });
-      const ticketId = sessions.data[0].metadata?.ticketId;
+
+      if (!ticket) {
+        const sessions = await stripe.checkout.sessions.list({
+          payment_intent: paymentIntentId,
+        });
+        const ticketId = sessions.data[0]?.metadata?.ticketId;
+        if (ticketId) {
+          ticket = await prisma.eventTickets.findUnique({
+            where: { id: Number(ticketId) },
+          });
+        }
+      }
+
+      if (!ticket) {
+        console.error(
+          `[stripe-webhook] ${event.type}: could not find ticket for payment_intent ${paymentIntentId}`,
+        );
+        return new Response("Ticket not found", { status: 200 });
+      }
+
+      if (ticket.status === TicketStatus.REFUNDED) {
+        return new Response("Already refunded", { status: 200 });
+      }
 
       await prisma.eventTickets.update({
-        where: {
-          id: Number(ticketId),
-        },
+        where: { id: ticket.id },
         data: {
           status: TicketStatus.REFUNDED,
+          paymentIntentId,
         },
       });
+
+      console.log(
+        `[stripe-webhook] ${event.type}: ticket ${ticket.id} marked as REFUNDED`,
+      );
     }
 
     // Handle Stripe Connect account updates
@@ -176,7 +209,7 @@ export async function action(args: ActionFunctionArgs) {
 
     return new Response("Webhook received", { status: 200 });
   } catch (err) {
-    console.error(err);
-    return new Response("Webhook error", { status: 400 });
+    console.error("[stripe-webhook] Error processing webhook:", err);
+    return new Response("Webhook error", { status: 500 });
   }
 }

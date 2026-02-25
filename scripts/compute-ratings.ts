@@ -5,7 +5,7 @@ import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.
 import { prisma } from "~/utils/prisma.server";
 
 /** Set to false to only compute ratings for battles that don't have ELO yet (incremental). Override with env: COMPUTE_FULL_RATINGS=false */
-const COMPUTE_FULL_RATINGS = true;
+const COMPUTE_FULL_RATINGS = false;
 
 const MAJOR_MULTIPLIER = 1.5;
 

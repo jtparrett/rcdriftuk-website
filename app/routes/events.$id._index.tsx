@@ -27,13 +27,15 @@ import { getAuth } from "~/utils/getAuth.server";
 import { Markdown } from "~/components/Markdown";
 import { clearPendingTickets } from "~/utils/clearPendingTickets.server";
 import { getEvent } from "~/utils/getEvent.server";
-import { EventTicketButton } from "~/components/EventTicketButton";
+import { EventTicketSection } from "~/components/EventTicketButton";
 import { isEventSoldOut } from "~/utils/isEventSoldOut";
 import type { GetUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { getUserEventTicket } from "~/utils/getUserEventTicket.server";
 import { google } from "calendar-link";
 import type { Route } from "./+types/events.$id._index";
 import { AppName } from "~/utils/enums";
+import { getDriverRank } from "~/utils/getDriverRank";
+import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
@@ -65,6 +67,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   let isAttending = false;
   let ticket: GetUserEventTicket = null;
+  let userRank: string | null = null;
 
   if (userId) {
     const userEventResponse = await prisma.eventResponses.findFirst({
@@ -76,6 +79,22 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
     isAttending = !!userEventResponse;
     ticket = await getUserEventTicket(id, userId);
+
+    const hasAnyRankRestriction = event.ticketTypes.some(
+      (t) => t.allowedRanks.length > 0,
+    );
+
+    if (hasAnyRankRestriction) {
+      const user = await prisma.users.findFirst({
+        where: { id: userId },
+        select: { elo: true, ranked: true, lastBattleDate: true },
+      });
+
+      if (user) {
+        const adjustedElo = adjustDriverElo(user.elo, user.lastBattleDate);
+        userRank = getDriverRank(adjustedElo, user.ranked);
+      }
+    }
   }
 
   const isSoldOut = isEventSoldOut(event);
@@ -85,6 +104,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isAttending,
     ticket,
     isSoldOut,
+    userRank,
   };
 };
 
@@ -120,7 +140,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 const Page = () => {
-  const { event, isAttending, ticket, isSoldOut } =
+  const { event, isAttending, ticket, isSoldOut, userRank } =
     useLoaderData<typeof loader>();
   const startDate = useMemo(() => new Date(event.startDate), [event]);
   const endDate = useMemo(() => new Date(event.endDate), [event]);
@@ -128,6 +148,7 @@ const Page = () => {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const isTrackOwner = (event.eventTrack?.Owners.length ?? 0) > 0;
+  const hasTicketing = event.ticketTypes.length > 0;
 
   const CalendarLink = () => {
     return (
@@ -192,17 +213,17 @@ const Page = () => {
               {getEventDate(startDate, endDate)}
             </styled.p>
 
-            <styled.h1 fontSize="3xl" fontWeight="extrabold">
+            <styled.h1 fontSize="3xl" fontWeight="extrabold" lineHeight={1.1}>
               {event.name}
             </styled.h1>
 
             {event.description && (
-              <Box mb={4}>
+              <Box mb={4} mt={2}>
                 <Markdown>{event.description}</Markdown>
               </Box>
             )}
 
-            {!event.enableTicketing && (
+            {!hasTicketing && (
               <>
                 <styled.p color="gray.500" fontSize="sm">
                   Duration:{" "}
@@ -266,7 +287,7 @@ const Page = () => {
             )}
 
             <Flex gap={2} pt={2} flexDir={{ base: "column", md: "row" }}>
-              {!event.enableTicketing && (
+              {!hasTicketing && (
                 <>
                   <SignedIn>
                     <Form method="post">
@@ -318,19 +339,20 @@ const Page = () => {
               <CalendarLink />
             </Flex>
 
-            {event.enableTicketing &&
+            {hasTicketing &&
               isBefore(new Date(), new Date(event.endDate)) && (
                 <>
                   <Divider mt={4} borderColor="gray.800" />
                   <Box pt={4}>
-                    <EventTicketButton
+                    <EventTicketSection
                       event={{
                         ...event,
                         startDate,
                         endDate,
-                        ticketReleaseDate: event.ticketReleaseDate
-                          ? new Date(event.ticketReleaseDate)
-                          : null,
+                        ticketTypes: event.ticketTypes.map((t) => ({
+                          ...t,
+                          releaseDate: new Date(t.releaseDate),
+                        })),
                       }}
                       ticket={
                         ticket
@@ -345,6 +367,7 @@ const Page = () => {
                           : null
                       }
                       isSoldOut={isSoldOut}
+                      userRank={userRank}
                     />
                   </Box>
                 </>
@@ -431,7 +454,7 @@ const Page = () => {
                   View Profile
                 </LinkButton>
 
-                {isTrackOwner && event.enableTicketing && (
+                {isTrackOwner && hasTicketing && (
                   <LinkButton
                     w="full"
                     to={`/events/${event.id}/export`}
@@ -443,6 +466,16 @@ const Page = () => {
                     target="_blank"
                   >
                     Download Attendees <RiDownloadLine />
+                  </LinkButton>
+                )}
+
+                {isTrackOwner && (
+                  <LinkButton
+                    w="full"
+                    variant="outline"
+                    to={`/events/${event.id}/edit`}
+                  >
+                    Edit Event
                   </LinkButton>
                 )}
 

@@ -12,23 +12,30 @@ export const getEvent = async (id: string, userId?: string) => {
     },
     select: {
       id: true,
-      enableTicketing: true,
-      ticketReleaseDate: true,
       startDate: true,
       endDate: true,
       ticketCapacity: true,
-      ticketPrice: true,
       cover: true,
       name: true,
       link: true,
       description: true,
+      ticketTypes: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          releaseDate: true,
+          allowedRanks: true,
+        },
+        orderBy: { releaseDate: "asc" },
+      },
       _count: {
         select: {
           responses: true,
           EventTickets: {
             where: {
               status: {
-                notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
+                notIn: [TicketStatus.REFUNDED],
               },
             },
           },

@@ -55,12 +55,16 @@ export const loader = async () => {
     },
     include: {
       eventTrack: true,
+      ticketTypes: {
+        select: { releaseDate: true },
+        orderBy: { releaseDate: "asc" },
+      },
       _count: {
         select: {
           EventTickets: {
             where: {
               status: {
-                notIn: [TicketStatus.CANCELLED, TicketStatus.REFUNDED],
+                notIn: [TicketStatus.REFUNDED],
               },
             },
           },
@@ -164,10 +168,9 @@ const Page = () => {
                               <EventTicketStatus
                                 isSoldOut={isSoldOut}
                                 event={{
-                                  ...event,
-                                  ticketReleaseDate: event.ticketReleaseDate
-                                    ? new Date(event.ticketReleaseDate)
-                                    : null,
+                                  ticketTypes: event.ticketTypes.map((t) => ({
+                                    releaseDate: new Date(t.releaseDate),
+                                  })),
                                 }}
                               />
                             </Box>
