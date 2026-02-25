@@ -175,8 +175,6 @@ const TournamentsOverviewPage = () => {
           zIndex={1}
           rounded="2xl"
           overflow="hidden"
-          borderWidth={1}
-          borderColor="gray.800"
           bgColor="gray.950"
           _before={{
             content: '""',
