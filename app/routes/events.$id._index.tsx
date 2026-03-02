@@ -87,12 +87,28 @@ export const loader = async (args: LoaderFunctionArgs) => {
     if (hasAnyRankRestriction) {
       const user = await prisma.users.findFirst({
         where: { id: userId },
-        select: { elo: true, ranked: true, lastBattleDate: true },
+        select: {
+          elo_UK: true,
+          elo_EU: true,
+          elo_NA: true,
+          elo_ZA: true,
+          elo_LA: true,
+          elo_AP: true,
+          ranked: true,
+          lastBattleDate: true,
+        },
       });
 
       if (user) {
-        const adjustedElo = adjustDriverElo(user.elo, user.lastBattleDate);
-        userRank = getDriverRank(adjustedElo, user.ranked);
+        const bestRegionalElo = Math.max(
+          adjustDriverElo(user.elo_UK, user.lastBattleDate),
+          adjustDriverElo(user.elo_EU, user.lastBattleDate),
+          adjustDriverElo(user.elo_NA, user.lastBattleDate),
+          adjustDriverElo(user.elo_ZA, user.lastBattleDate),
+          adjustDriverElo(user.elo_LA, user.lastBattleDate),
+          adjustDriverElo(user.elo_AP, user.lastBattleDate),
+        );
+        userRank = getDriverRank(bestRegionalElo, user.ranked);
       }
     }
   }
