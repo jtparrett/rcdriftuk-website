@@ -10,6 +10,7 @@
     "start": "react-router-serve build/server/index.js",
     "lint": "react-router typegen && tsc",
     "prepare": "panda codegen",
+    "approve-ratings": "tsx ./scripts/approve-ratings.ts",
     "compute-ratings": "tsx ./scripts/compute-ratings.ts",
     "compute-new-ratings": "tsx ./scripts/compute-new-ratings.ts",
     "import-zerofeel-tracks": "tsx ./scripts/import-zerofeel-tracks.ts"
