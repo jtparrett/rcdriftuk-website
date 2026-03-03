@@ -20,6 +20,14 @@ export const loader = async (args: LoaderFunctionArgs) => {
           driverId,
         },
       },
+      OR: [
+        {
+          rated: true,
+        },
+        {
+          ratingRequested: true,
+        },
+      ],
     },
     orderBy: {
       createdAt: "desc",

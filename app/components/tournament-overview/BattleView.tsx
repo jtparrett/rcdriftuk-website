@@ -4,6 +4,7 @@ import { RiArrowLeftDoubleFill, RiArrowRightDoubleFill } from "react-icons/ri";
 import { DriverCard } from "~/components/DriverCard";
 import { getDriverNumber } from "~/utils/getDriverNumber";
 import type { OverviewLoaderData } from "~/routes/tournaments.$id.overview";
+import { getBestRegionalElo } from "~/utils/getBestRegionalElo";
 
 interface BattleViewProps {
   battle: NonNullable<OverviewLoaderData["nextBattle"]>;
@@ -66,7 +67,7 @@ export const BattleView = ({
             lastName={battle.driverLeft?.user.lastName}
             image={battle.driverLeft?.user.image}
             driverNo={getDriverNumber(battle.driverLeft, driverNumbers)}
-            elo={battle.driverLeft?.user.elo}
+            elo={battle.driverLeft?.user ? getBestRegionalElo(battle.driverLeft.user).bestElo : undefined}
             ranked={battle.driverLeft?.user.ranked}
             team={battle.driverLeft?.user.team}
           />
@@ -220,7 +221,7 @@ export const BattleView = ({
             lastName={battle.driverRight?.user.lastName}
             image={battle.driverRight?.user.image}
             driverNo={getDriverNumber(battle.driverRight, driverNumbers)}
-            elo={battle.driverRight?.user.elo}
+            elo={battle.driverRight?.user ? getBestRegionalElo(battle.driverRight.user).bestElo : undefined}
             ranked={battle.driverRight?.user.ranked}
             team={battle.driverRight?.user.team}
           />

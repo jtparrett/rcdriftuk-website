@@ -84,7 +84,7 @@ const Row = ({
   driver: Awaited<ReturnType<LoaderData>>["drivers"][number];
   region: Regions;
 }) => {
-  const elo = region === Regions.ALL ? driver.elo : driver[`elo_${region}`];
+  const elo = region === Regions.ALL ? driver.bestElo : driver[`elo_${region}`];
   const rankTitle = driver ? getDriverRank(elo, driver.ranked) : RANKS.UNRANKED;
   const [bg, hover] = getRankColor(rankTitle);
 
@@ -212,6 +212,11 @@ const Row = ({
             shadow="inset 0 -1px 0 rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(0, 0, 0, 0.5)"
           >
             {elo.toFixed(3)}
+            {region === Regions.ALL && (
+              <styled.span color="gray.400" ml={1}>
+                {driver.bestRegion}
+              </styled.span>
+            )}
           </styled.span>
           <styled.span flex="none" textAlign="right">
             <styled.img

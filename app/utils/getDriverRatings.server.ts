@@ -1,35 +1,64 @@
+import { Prisma } from "@prisma/client";
 import { Regions } from "~/utils/enums";
 import { prisma } from "./prisma.server";
 import { adjustDriverElo } from "./adjustDriverElo.server";
+import { getBestRegionalElo } from "./getBestRegionalElo";
+
+const PENALTY_SQL = `
+  CASE
+    WHEN u."lastBattleDate" IS NULL THEN 0
+    WHEN EXTRACT(EPOCH FROM (NOW() - u."lastBattleDate")) / (60 * 60 * 24 * 365.25) < 0.5 THEN 0
+    ELSE FLOOR((EXTRACT(EPOCH FROM (NOW() - u."lastBattleDate")) / (60 * 60 * 24 * 365.25) - 0.5) * -200)
+  END`;
 
 export const getDriverRatings = async (region: Regions, limit?: number) => {
+  const sortExpr =
+    region !== Regions.ALL
+      ? Prisma.raw(
+          `(u."elo_${region}" + ${PENALTY_SQL}) DESC`,
+        )
+      : Prisma.raw(
+          `(GREATEST(u."elo_UK", u."elo_EU", u."elo_NA", u."elo_ZA", u."elo_LA", u."elo_AP") + ${PENALTY_SQL}) DESC`,
+        );
+
+  const regionFilter =
+    region !== Regions.ALL
+      ? Prisma.sql`AND t."region" = ${region}::"Regions"`
+      : Prisma.raw("");
+
+  const limitClause =
+    limit !== undefined ? Prisma.sql`LIMIT ${limit}` : Prisma.raw("");
+
+  const sortedIds = await prisma.$queryRaw<Array<{ driverId: number }>>`
+    SELECT u."driverId"
+    FROM "Users" u
+    WHERE u."driverId" != 0
+      AND EXISTS (
+        SELECT 1 FROM "TournamentDrivers" td
+        JOIN "Tournaments" t ON td."tournamentId" = t."id"
+        WHERE td."driverId" = u."driverId"
+          AND t."rated" = true
+          ${regionFilter}
+      )
+    ORDER BY ${sortExpr}
+    ${limitClause}
+  `;
+
+  const driverIds = sortedIds.map((r) => r.driverId);
+  if (driverIds.length === 0) {
+    return [];
+  }
+
   const users = await prisma.users.findMany({
     where: {
-      driverId: {
-        not: 0,
-      },
-      TournamentDrivers: {
-        some: {
-          tournament: {
-            rated: true,
-            ...(region !== Regions.ALL && { region }),
-          },
-        },
-      },
+      driverId: { in: driverIds },
     },
-    orderBy: {
-      ...(region === Regions.ALL
-        ? { elo: "desc" }
-        : { [`elo_${region}`]: "desc" }),
-    },
-    take: limit,
     select: {
       id: true,
       lastBattleDate: true,
       driverId: true,
       firstName: true,
       lastName: true,
-      elo: true,
       elo_UK: true,
       elo_EU: true,
       elo_NA: true,
@@ -42,22 +71,22 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
     },
   });
 
-  return users
-    .map((user) => ({
-      ...user,
-      elo: adjustDriverElo(user.elo, user.lastBattleDate),
-      elo_UK: adjustDriverElo(user.elo_UK, user.lastBattleDate),
-      elo_EU: adjustDriverElo(user.elo_EU, user.lastBattleDate),
-      elo_NA: adjustDriverElo(user.elo_NA, user.lastBattleDate),
-      elo_ZA: adjustDriverElo(user.elo_ZA, user.lastBattleDate),
-      elo_LA: adjustDriverElo(user.elo_LA, user.lastBattleDate),
-      elo_AP: adjustDriverElo(user.elo_AP, user.lastBattleDate),
-    }))
-    .sort((a, b) => {
-      if (region === Regions.ALL) {
-        return b.elo - a.elo;
-      }
-      return b[`elo_${region}`] - a[`elo_${region}`];
+  const usersById = new Map(users.map((u) => [u.driverId, u]));
+
+  return driverIds
+    .map((id) => usersById.get(id)!)
+    .map((user) => {
+      const adjusted = {
+        ...user,
+        elo_UK: adjustDriverElo(user.elo_UK, user.lastBattleDate),
+        elo_EU: adjustDriverElo(user.elo_EU, user.lastBattleDate),
+        elo_NA: adjustDriverElo(user.elo_NA, user.lastBattleDate),
+        elo_ZA: adjustDriverElo(user.elo_ZA, user.lastBattleDate),
+        elo_LA: adjustDriverElo(user.elo_LA, user.lastBattleDate),
+        elo_AP: adjustDriverElo(user.elo_AP, user.lastBattleDate),
+      };
+      const { bestElo, bestRegion } = getBestRegionalElo(adjusted);
+      return { ...adjusted, bestElo, bestRegion };
     })
     .map((driver, rank) => ({
       ...driver,

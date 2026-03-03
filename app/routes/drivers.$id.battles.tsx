@@ -59,6 +59,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
           id: true,
           createdAt: true,
           name: true,
+          region: true,
         },
       },
       driverLeft: {
@@ -100,11 +101,11 @@ const Page = () => {
 
         const isExpanded = expandedBattles.includes(battle.id.toString());
         const startingElo = isWinner
-          ? battle?.winnerStartingElo ?? 1000
-          : battle?.loserStartingElo ?? 1000;
+          ? battle?.winnerRegionalStartingElo ?? 1000
+          : battle?.loserRegionalStartingElo ?? 1000;
         const endingElo = isWinner
-          ? battle?.winnerElo ?? 1000
-          : battle?.loserElo ?? 1000;
+          ? battle?.winnerRegionalElo ?? 1000
+          : battle?.loserRegionalElo ?? 1000;
         const pointsChange = endingElo - startingElo;
 
         const inactivityPenalty = isWinner
@@ -116,12 +117,12 @@ const Page = () => {
           : battle?.winnerInactivityPenalty ?? 0;
 
         const opponentStartingElo = isWinner
-          ? battle?.loserStartingElo ?? 1000
-          : battle?.winnerStartingElo ?? 1000;
+          ? battle?.loserRegionalStartingElo ?? 1000
+          : battle?.winnerRegionalStartingElo ?? 1000;
 
         const opponentElo = isWinner
-          ? battle?.loserElo ?? 1000
-          : battle?.winnerElo ?? 1000;
+          ? battle?.loserRegionalElo ?? 1000
+          : battle?.winnerRegionalElo ?? 1000;
 
         const opponentPointsChange = opponentElo - opponentStartingElo;
 
@@ -183,6 +184,7 @@ const Page = () => {
                 {formatDistanceToNow(battle.createdAt, {
                   addSuffix: true,
                 })}
+                {battle.tournament.region && `, ${battle.tournament.region}`}
               </styled.span>
 
               <Flex p={4} alignItems="center" gap={3}>

@@ -579,14 +579,14 @@ const Page = () => {
                             </Link>
                           </styled.td>
                           <styled.td textAlign="right" fontFamily="mono">
-                            {driver.elo.toFixed(3)}
+                            {driver.bestElo.toFixed(3)}
                           </styled.td>
                           <styled.td textAlign="center">
                             <styled.img
                               w={8}
                               display="inline-block"
                               src={`/badges/${getDriverRank(
-                                driver.elo,
+                                driver.bestElo,
                                 driver.ranked,
                               )}.png`}
                               alt={`${driver.firstName} ${driver.lastName}'s rank badge`}

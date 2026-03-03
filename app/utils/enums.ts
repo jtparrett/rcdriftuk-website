@@ -79,6 +79,19 @@ export const Regions = {
 
 export type Regions = Values<typeof Regions>;
 
+const REGION_NAMES: Record<string, string> = {
+  ALL: "Global",
+  UK: "United Kingdom",
+  EU: "Europe",
+  NA: "North America",
+  ZA: "South Africa",
+  LA: "Latin America",
+  AP: "Asia Pacific",
+};
+
+export const getRegionName = (region: string): string =>
+  REGION_NAMES[region] ?? region;
+
 export const ScoreFormula = {
   SUM: "SUM",
   AVERAGE: "AVERAGE",

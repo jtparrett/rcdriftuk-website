@@ -14,6 +14,7 @@ import { getUser } from "~/utils/getUser.server";
 import { prisma } from "~/utils/prisma.server";
 import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 import { getDriverRank } from "~/utils/getDriverRank";
+import { getBestRegionalElo } from "~/utils/getBestRegionalElo";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { LinkButton } from "~/components/Button";
 import type { Route } from "./+types/2025.wrapped";
@@ -41,7 +42,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
       firstName: true,
       lastName: true,
       image: true,
-      elo: true,
+      elo_UK: true,
+      elo_EU: true,
+      elo_NA: true,
+      elo_ZA: true,
+      elo_LA: true,
+      elo_AP: true,
       ranked: true,
     },
   });
@@ -197,13 +203,24 @@ export const loader = async (args: LoaderFunctionArgs) => {
     .map(([region, tournamentSet]) => [region, tournamentSet.size] as const)
     .sort((a, b) => b[1] - a[1])[0];
 
-  const finalRating = adjustDriverElo(driver.elo, driver.lastBattleDate);
+  const adjusted = {
+    elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
+    elo_EU: adjustDriverElo(driver.elo_EU, driver.lastBattleDate),
+    elo_NA: adjustDriverElo(driver.elo_NA, driver.lastBattleDate),
+    elo_ZA: adjustDriverElo(driver.elo_ZA, driver.lastBattleDate),
+    elo_LA: adjustDriverElo(driver.elo_LA, driver.lastBattleDate),
+    elo_AP: adjustDriverElo(driver.elo_AP, driver.lastBattleDate),
+  };
+  const { bestElo, bestRegion } = getBestRegionalElo(adjusted);
+  const finalRating = bestElo;
   const rank = getDriverRank(finalRating, driver.ranked);
 
   return {
     driver: {
       ...driver,
-      elo: finalRating,
+      ...adjusted,
+      bestElo,
+      bestRegion,
     },
     stats: {
       totalTournaments,

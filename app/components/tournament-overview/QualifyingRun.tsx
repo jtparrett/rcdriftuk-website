@@ -4,6 +4,7 @@ import { DriverCard } from "~/components/DriverCard";
 import { sumScores } from "~/utils/sumScores";
 import { getDriverNumber } from "~/utils/getDriverNumber";
 import type { OverviewLoaderData } from "~/routes/tournaments.$id.overview";
+import { getBestRegionalElo } from "~/utils/getBestRegionalElo";
 
 interface QualifyingRunProps {
   lap: NonNullable<OverviewLoaderData["nextQualifyingLap"]>;
@@ -36,7 +37,7 @@ export const QualifyingRun = ({
           lastName={lap.driver.user.lastName}
           image={lap.driver.user.image}
           driverNo={getDriverNumber(lap.driver, driverNumbers)}
-          elo={lap.driver.user.elo}
+          elo={getBestRegionalElo(lap.driver.user).bestElo}
           ranked={lap.driver.user.ranked}
           team={lap.driver.user.team}
         />

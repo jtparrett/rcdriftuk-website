@@ -9,6 +9,7 @@ import { adjustDriverElo } from "~/utils/adjustDriverElo.server";
 import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { AppName } from "~/utils/enums";
+import { getBestRegionalElo } from "~/utils/getBestRegionalElo";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
 import {
@@ -34,16 +35,33 @@ export const loader = async (args: LoaderFunctionArgs) => {
       lastName: true,
       image: true,
       team: true,
-      elo: true,
+      elo_UK: true,
+      elo_EU: true,
+      elo_NA: true,
+      elo_ZA: true,
+      elo_LA: true,
+      elo_AP: true,
       ranked: true,
     },
   });
 
   notFoundInvariant(driver, "Driver not found");
 
+  const adjusted = {
+    elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
+    elo_EU: adjustDriverElo(driver.elo_EU, driver.lastBattleDate),
+    elo_NA: adjustDriverElo(driver.elo_NA, driver.lastBattleDate),
+    elo_ZA: adjustDriverElo(driver.elo_ZA, driver.lastBattleDate),
+    elo_LA: adjustDriverElo(driver.elo_LA, driver.lastBattleDate),
+    elo_AP: adjustDriverElo(driver.elo_AP, driver.lastBattleDate),
+  };
+  const { bestElo, bestRegion } = getBestRegionalElo(adjusted);
+
   return {
     ...driver,
-    elo: adjustDriverElo(driver.elo, driver.lastBattleDate),
+    ...adjusted,
+    bestElo,
+    bestRegion,
     inactivityPenalty: calculateInactivityPenaltyOverPeriod(
       driver.lastBattleDate,
       new Date(),
@@ -76,7 +94,7 @@ const Page = () => {
   const isPostsTab = location.pathname.endsWith("posts");
 
   const rank = driver
-    ? getDriverRank(driver.elo, driver.ranked)
+    ? getDriverRank(driver.bestElo, driver.ranked)
     : RANKS.UNRANKED;
 
   const isInactive = driver.inactivityPenalty !== 0;
@@ -119,7 +137,9 @@ const Page = () => {
           <Flex>
             <Spacer />
             <Flex
-              p={1}
+              py={1}
+              pl={4}
+              pr={2}
               rounded="full"
               bg="gray.950"
               borderWidth={1}
@@ -128,9 +148,12 @@ const Page = () => {
               alignItems="center"
               gap={1}
             >
-              <styled.span fontSize="md" fontWeight="medium" pl={2}>
-                {driver.elo.toFixed(3)}
-              </styled.span>
+              <styled.p fontSize="md" fontWeight="medium" fontFamily="mono">
+                {driver.bestElo.toFixed(3)}
+                <styled.span color="gray.400" ml={1}>
+                  {driver.bestRegion}
+                </styled.span>
+              </styled.p>
               <Box w={8} h={8} perspective="200px">
                 <styled.img
                   src={`/badges/${rank}.png`}
