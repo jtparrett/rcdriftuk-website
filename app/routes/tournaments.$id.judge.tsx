@@ -944,7 +944,7 @@ const JudgePage = () => {
                 gradientTo="brand.700"
               >
                 <styled.h1 fontSize="sm">
-                  {judge.user.firstName} {judge.user.lastName}
+                  {judge.alias}
                 </styled.h1>
                 <Spacer />
                 <Link

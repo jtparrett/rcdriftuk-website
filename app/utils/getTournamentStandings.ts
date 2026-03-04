@@ -338,7 +338,7 @@ const getQualifyingStandings = (
       const aPos = a.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
       const bPos = b.qualifyingPosition ?? Number.MAX_SAFE_INTEGER;
       if (aPos !== bPos) return aPos - bPos;
-      return a.id - b.id;
+      return (a.tournamentDriverNumber ?? a.id) - (b.tournamentDriverNumber ?? b.id);
     });
   }
 

@@ -74,10 +74,14 @@ export const getTournament = (id: string) => {
             },
           },
         },
+        orderBy: {
+          sortOrder: "asc",
+        },
         select: {
           id: true,
           driverId: true,
           points: true,
+          alias: true,
           user: {
             select: {
               id: true,

@@ -138,6 +138,9 @@ export const BattleView = ({
                     ? "-25%"
                     : "25%";
 
+              const judgeLabel =
+                vote.judge?.alias || `Judge ${i + 1}`;
+
               return (
                 <motion.div
                   key={i}
@@ -163,7 +166,7 @@ export const BattleView = ({
                       display={{ base: "none", md: "block" }}
                       fontSize="1.5cqi"
                     >
-                      Judge {i + 1}
+                      {judgeLabel}
                     </styled.p>
                     <Flex align="center" justify="center" fontSize="2.25cqi">
                       <Box
