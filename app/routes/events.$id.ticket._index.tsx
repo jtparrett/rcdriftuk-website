@@ -126,7 +126,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const londonTimeNow = toZonedTime(new Date(), "Europe/London");
   const isBeforeRelease = isBefore(londonTimeNow, ticketType.releaseDate);
-  const hasEarlyAccess = earlyAccessCode === event.earlyAccessCode;
+  const hasEarlyAccess =
+    event.earlyAccessCode != null && earlyAccessCode === event.earlyAccessCode;
 
   if (isBeforeRelease && !hasEarlyAccess) {
     throw new Response(null, { status: 404, statusText: "Not Found" });
