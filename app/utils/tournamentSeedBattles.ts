@@ -57,7 +57,7 @@ export const tournamentSeedBattles = async (id: string) => {
       },
       judges: {
         orderBy: {
-          createdAt: "asc",
+          sortOrder: "asc",
         },
         select: {
           id: true,

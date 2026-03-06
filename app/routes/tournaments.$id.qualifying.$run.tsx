@@ -39,7 +39,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
       judges: {
         orderBy: {
-          createdAt: "asc",
+          sortOrder: "asc",
         },
         select: {
           id: true,
@@ -141,7 +141,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
           );
         }
 
-        return (b.score ?? 0) - (a.score ?? 0) || a.id - b.id;
+        return (b.score ?? 0) - (a.score ?? 0) || a.tournamentDriverNumber - b.tournamentDriverNumber;
       });
 
   const isPaginated = page !== null && pageSize !== null;

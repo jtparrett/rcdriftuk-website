@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react";
 import numberToWords from "number-to-words";
+import { useMotionValue, useSpring } from "motion/react";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { DriverCard } from "~/components/DriverCard";
 import { sumScores } from "~/utils/sumScores";
@@ -29,6 +31,25 @@ export const QualifyingRun = ({
     judges.map((j) => j.id),
   );
 
+  const scoreRef = useRef<HTMLParagraphElement>(null);
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { duration: 1500, bounce: 0 });
+
+  useEffect(() => {
+    if (qualiJudgingComplete) {
+      motionValue.set(score);
+    }
+  }, [qualiJudgingComplete, score, motionValue]);
+
+  useEffect(() => {
+    const unsubscribe = springValue.on("change", (latest) => {
+      if (scoreRef.current) {
+        scoreRef.current.textContent = latest.toFixed(2);
+      }
+    });
+    return unsubscribe;
+  }, [springValue]);
+
   return (
     <Flex w="full" maxW="600px" containerType="inline-size" px="2.7cqi">
       <Box flex="none" w="40cqi">
@@ -43,7 +64,8 @@ export const QualifyingRun = ({
         />
       </Box>
 
-      <Box
+      <Flex
+        direction="column"
         bgColor="gray.900"
         textAlign="center"
         borderColor="gray.400"
@@ -60,10 +82,11 @@ export const QualifyingRun = ({
           </styled.p>
         </Box>
 
-        <Box bgColor="gray.800" mb="0.7cqi">
-          <Box p="6.7cqi">
+        <Flex flex={1} direction="column" justify="center" bgColor="gray.800" mb="0.7cqi" overflow="hidden">
+          <Box p="4cqi 2cqi">
             {qualiJudgingComplete && (
               <styled.p
+                ref={scoreRef}
                 fontWeight="black"
                 fontStyle="italic"
                 lineHeight={1.1}
@@ -73,33 +96,58 @@ export const QualifyingRun = ({
                 backgroundClip="text"
                 color="transparent"
                 textShadow="0 0 10px rgba(0,0,0,0.2)"
-                fontSize="21.3cqi"
+                fontSize="15cqi"
+                fontVariantNumeric="tabular-nums"
+                whiteSpace="nowrap"
               >
-                {score}
+                0.00
               </styled.p>
             )}
           </Box>
-        </Box>
-
-        {lap.penalty < 0 && (
-          <styled.p color="brand.500" fontSize="2.3cqi">
-            Penalty: {lap.penalty}
-          </styled.p>
-        )}
+        </Flex>
 
         <Flex gap="0.7cqi">
-          {lap.scores.map((score, i) => (
-            <Box key={i} flex={1} bgColor="gray.800" p="1.3cqi 4cqi">
-              <styled.p fontWeight="semibold" fontSize="2.3cqi">
-                JUDGE {String.fromCharCode(65 + i)}
+          {judges.map((judge, i) => {
+            const judgeLabel =
+              judge.alias || `JUDGE ${String.fromCharCode(65 + i)}`;
+            const judgeScore = lap.scores.find((s) => s.judgeId === judge.id);
+
+            return (
+              <Box key={judge.id} flex={1} bgColor="gray.800" p="1.3cqi 4cqi">
+                <styled.p
+                  fontWeight="semibold"
+                  fontSize="2.3cqi"
+                  textTransform="uppercase"
+                >
+                  {judgeLabel}
+                </styled.p>
+                <styled.p
+                  fontWeight="extrabold"
+                  fontSize="3.3cqi"
+                  fontVariantNumeric="tabular-nums"
+                >
+                  {qualiJudgingComplete ? judgeScore?.score ?? "—" : "—"}
+                </styled.p>
+              </Box>
+            );
+          })}
+
+          {lap.penalty < 0 && (
+            <Box flex={1} bgColor="brand.500" color="white" p="1.3cqi 4cqi">
+              <styled.p
+                fontWeight="semibold"
+                fontSize="2.3cqi"
+                textTransform="uppercase"
+              >
+                PENALTY
               </styled.p>
               <styled.p fontWeight="extrabold" fontSize="3.3cqi">
-                {score.score}
+                {lap.penalty}
               </styled.p>
             </Box>
-          ))}
+          )}
         </Flex>
-      </Box>
+      </Flex>
     </Flex>
   );
 };

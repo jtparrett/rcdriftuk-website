@@ -126,12 +126,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const londonTimeNow = toZonedTime(new Date(), "Europe/London");
   const isBeforeRelease = isBefore(londonTimeNow, ticketType.releaseDate);
+  const hasEarlyAccess = earlyAccessCode === event.earlyAccessCode;
 
-  if (isBeforeRelease && earlyAccessCode !== event.earlyAccessCode) {
+  if (isBeforeRelease && !hasEarlyAccess) {
     throw new Response(null, { status: 404, statusText: "Not Found" });
   }
 
-  if (ticketType.allowedRanks.length > 0) {
+  if (ticketType.allowedRanks.length > 0 && !hasEarlyAccess) {
     const user = await prisma.users.findFirst({
       where: { id: userId },
       select: {

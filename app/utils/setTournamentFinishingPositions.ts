@@ -22,7 +22,7 @@ async function getTournamentForStandings(tournamentId: string) {
       },
       judges: {
         orderBy: {
-          createdAt: "asc",
+          sortOrder: "asc",
         },
         select: {
           id: true,

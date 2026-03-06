@@ -13,14 +13,12 @@ export interface PersonEntry {
   firstName?: string | null;
   lastName?: string | null;
   image?: string | null;
-  points?: number;
   isNew?: boolean;
 }
 
 interface PeopleFormProps {
   name: string;
   allowNewDrivers?: boolean;
-  allowPoints?: boolean;
   disabled?: boolean;
   onChange: (value: PersonEntry[]) => void;
   value: PersonEntry[];
@@ -31,7 +29,6 @@ export const PeopleForm = ({
   onChange,
   name,
   allowNewDrivers = false,
-  allowPoints = false,
   disabled = false,
 }: PeopleFormProps) => {
   const [focused, setFocused] = useState(false);
@@ -151,39 +148,6 @@ export const PeopleForm = ({
                         )}
                       </styled.p>
 
-                      {allowPoints && (
-                        <styled.select
-                          name={name + "Points"}
-                          fontSize="sm"
-                          borderWidth={1}
-                          borderColor="gray.800"
-                          rounded="sm"
-                          fontFamily="mono"
-                          value={person.points}
-                          disabled={disabled}
-                          onChange={(e) => {
-                            onChange(
-                              value.map((p, index) =>
-                                index === i
-                                  ? {
-                                      ...p,
-                                      points: Number(e.target.value),
-                                    }
-                                  : p,
-                              ),
-                            );
-                          }}
-                        >
-                          {Array.from({ length: 10 }, (_, i) => i + 1).map(
-                            (points) => (
-                              <option key={points} value={points * 10}>
-                                {points * 10} Max Points
-                              </option>
-                            ),
-                          )}
-                        </styled.select>
-                      )}
-
                       {!disabled && (
                         <Box p={1}>
                           <Button
@@ -265,7 +229,6 @@ export const PeopleForm = ({
                           firstName: user.firstName,
                           lastName: user.lastName,
                           image: user.image,
-                          points: 100,
                         },
                       ]);
                       setSearch("");
@@ -302,7 +265,6 @@ export const PeopleForm = ({
                         ...value,
                         {
                           driverId: search.trim(),
-                          points: 100,
                           isNew: true,
                         },
                       ]);

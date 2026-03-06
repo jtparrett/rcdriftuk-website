@@ -26,6 +26,7 @@ import { Label } from "~/components/Label";
 import { Select } from "~/components/Select";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { PeopleForm } from "~/components/PeopleForm";
+import { JudgesForm } from "~/components/JudgesForm";
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import {
@@ -70,6 +71,7 @@ export const tournamentFormSchema = z.object({
       z.object({
         driverId: z.string(),
         points: z.coerce.number(),
+        alias: z.string().min(1, "Alias is required"),
       }),
     )
     .min(1, "Please add at least one judge to the tournament"),
@@ -116,6 +118,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
       },
       judges: {
+        orderBy: {
+          sortOrder: "asc",
+        },
         include: {
           user: {
             select: {
@@ -257,12 +262,14 @@ export const action = async (args: ActionFunctionArgs) => {
       where: { tournamentId: id },
     });
 
-    // Create all judges fresh
+    // Create all judges fresh with explicit sort order
     await prisma.tournamentJudges.createMany({
-      data: data.judges.map((judge) => ({
+      data: data.judges.map((judge, index) => ({
         tournamentId: id,
         driverId: Number(judge.driverId),
         points: judge.points,
+        sortOrder: index,
+        alias: judge.alias,
       })),
     });
   }
@@ -332,7 +339,7 @@ const ScoreFormulaSelect = ({
   onChange,
   error,
 }: {
-  judges: { driverId: string; firstName?: string | null; lastName?: string | null }[];
+  judges: { driverId: string; alias: string }[];
   value: ScoreFormula;
   onChange: (value: ScoreFormula) => void;
   error?: string;
@@ -342,13 +349,9 @@ const ScoreFormulaSelect = ({
   // Map legacy values to their new equivalents
   const normalizedValue = mapLegacyFormula(value);
 
-  // Get judge names in order (format: "FirstName L.")
-  const judgeNames = judges
-    .map((judge) => {
-      if (!judge.firstName) return `Judge ${judge.driverId}`;
-      const lastInitial = judge.lastName?.charAt(0).toUpperCase();
-      return lastInitial ? `${judge.firstName} ${lastInitial}` : judge.firstName;
-    });
+  const judgeNames = judges.map(
+    (judge) => judge.alias || `Judge ${judge.driverId}`,
+  );
 
   const options = getScoreFormulaOptions(judgeCount, judgeNames);
 
@@ -391,17 +394,7 @@ const ScoreFormulaSelect = ({
   return (
     <FormControl flex={1} error={error}>
       <Label>Score Formula</Label>
-      <Select
-        value={effectiveValue}
-        onChange={(e) => onChange(e.target.value as ScoreFormula)}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}: {option.formula}
-          </option>
-        ))}
-      </Select>
-      <styled.p fontSize="sm" color="gray.500" mt={1}>
+      <styled.p fontSize="sm" color="gray.500" mb={2}>
         {judgeNames.length > 0 && (
           <>
             Where{" "}
@@ -418,6 +411,16 @@ const ScoreFormulaSelect = ({
           </>
         )}
       </styled.p>
+      <Select
+        value={effectiveValue}
+        onChange={(e) => onChange(e.target.value as ScoreFormula)}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}: {option.formula}
+          </option>
+        ))}
+      </Select>
     </FormControl>
   );
 };
@@ -503,6 +506,7 @@ const Page = () => {
         lastName: judge.user.lastName,
         image: judge.user.image,
         points: judge.points,
+        alias: judge.alias ?? "",
       })),
       drivers: tournament.drivers.map((driver) => ({
         driverId: driver.driverId.toString(),
@@ -637,7 +641,14 @@ const Page = () => {
               </TabGroup>
             </FormControl>
 
-            <FormControl flex={1} error={formik.errors.judges}>
+            <FormControl
+              flex={1}
+              error={
+                typeof formik.errors.judges === "string"
+                  ? formik.errors.judges
+                  : undefined
+              }
+            >
               <Label>Tournament Judges</Label>
               {!isStartState && (
                 <styled.p fontSize="sm" color="brand.500" mb={2}>
@@ -645,12 +656,17 @@ const Page = () => {
                 </styled.p>
               )}
 
-              <PeopleForm
+              <JudgesForm
                 value={formik.values.judges}
                 onChange={(value) => formik.setFieldValue("judges", value)}
-                name="judges"
-                allowPoints
                 disabled={!isStartState}
+                errors={
+                  Array.isArray(formik.errors.judges)
+                    ? (formik.errors.judges.map((e) =>
+                        typeof e === "object" ? e : undefined,
+                      ) as { alias?: string }[])
+                    : undefined
+                }
               />
             </FormControl>
 

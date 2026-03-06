@@ -156,6 +156,8 @@ model TournamentJudges {
   scores       LapScores[]
   BattleVotes  TournamentBattleVotes[]
   points       Int                     @default(100)
+  sortOrder    Int                     @default(0)
+  alias        String?
 
   @@unique([tournamentId, driverId])
 }

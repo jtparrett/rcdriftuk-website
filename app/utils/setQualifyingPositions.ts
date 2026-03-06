@@ -21,7 +21,7 @@ export const setQualifyingPositions = async (id: string) => {
       },
       judges: {
         orderBy: {
-          createdAt: "asc",
+          sortOrder: "asc",
         },
         select: {
           id: true,

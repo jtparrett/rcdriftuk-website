@@ -27,7 +27,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
             tournamentDriverNumber: "asc",
           },
         },
-        judges: true,
+        judges: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+        },
       },
     });
   };
@@ -65,10 +69,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
     );
 
     await prisma.tournamentJudges.createMany({
-      data: tournamentToClone.judges.map((judge) => ({
+      data: tournamentToClone.judges.map((judge, index) => ({
         tournamentId: tournament.id,
         driverId: judge.driverId,
         points: judge.points,
+        sortOrder: index,
+        alias: judge.alias,
       })),
     });
   }

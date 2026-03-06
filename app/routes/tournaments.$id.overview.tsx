@@ -19,7 +19,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     include: {
       judges: {
         orderBy: {
-          createdAt: "asc",
+          sortOrder: "asc",
         },
       },
       drivers: {
