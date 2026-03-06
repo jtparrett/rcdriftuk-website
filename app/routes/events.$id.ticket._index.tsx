@@ -168,6 +168,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   if (isEventSoldOut(event)) {
+    console.log("Event is sold out");
     throw redirect(`/events/${event.id}`);
   }
 
@@ -241,6 +242,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
   });
 
+  console.log("Redirecting to session URL", session.url);
   throw redirect(session.url ?? `/events/${event.id}`);
 };
 
