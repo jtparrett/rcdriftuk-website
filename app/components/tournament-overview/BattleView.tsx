@@ -26,12 +26,13 @@ export const BattleView = ({
   const battleVotesRight = battle.BattleVotes.filter(
     (vote) => vote.winnerId === battle.driverRightId,
   );
-  const winnerId =
-    battleVotesLeft.length >= winThreshold
+  const winnerId = battleJudgingComplete
+    ? battleVotesLeft.length >= winThreshold
       ? battle.driverLeftId
       : battleVotesRight.length >= winThreshold
         ? battle.driverRightId
-        : undefined;
+        : undefined
+    : undefined;
 
   return (
     <Flex

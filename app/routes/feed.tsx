@@ -1,6 +1,6 @@
 import { RiArrowRightLine, RiInformationFill } from "react-icons/ri";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { PostCard } from "~/components/PostCard";
 import {
@@ -89,6 +89,22 @@ const FeedPage = () => {
       return lastPost.id;
     },
   });
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.setQueryData(["feed-posts"], {
+      pages: [{ posts }],
+      pageParams: [null],
+    });
+
+    for (const post of posts) {
+      queryClient.setQueryData(["post", post.id, "likes"], {
+        totalPostLikes: post._count.likes,
+        userLiked: (post.likes?.length ?? 0) > 0,
+      });
+    }
+  }, [posts, queryClient]);
 
   // Flatten all pages into a single array of posts
   const allPosts = data?.pages.flatMap((page) => page.posts) ?? [];
