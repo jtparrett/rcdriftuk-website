@@ -86,9 +86,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
               {
                 rated: true,
               },
-              {
-                ratingRequested: true,
-              },
             ]),
       ],
       archived: false,

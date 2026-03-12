@@ -88,6 +88,7 @@ export const tournamentFormSchema = z.object({
   bracketSize: z.nativeEnum(BracketSize),
   ratingRequested: z.boolean(),
   judgingInterface: z.nativeEnum(JudgingInterface),
+  disqualifyZeros: z.boolean(),
 });
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -154,6 +155,7 @@ export const action = async (args: ActionFunctionArgs) => {
       state: true,
       format: true,
       bracketSize: true,
+      disqualifyZeros: true,
     },
   });
 
@@ -180,6 +182,7 @@ export const action = async (args: ActionFunctionArgs) => {
       bracketSize: data.bracketSize,
       ratingRequested: data.ratingRequested,
       judgingInterface: data.judgingInterface,
+      disqualifyZeros: data.disqualifyZeros,
     },
     include: {
       judges: true,
@@ -277,7 +280,8 @@ export const action = async (args: ActionFunctionArgs) => {
   const shouldUpdateBattles =
     tournament.enableBattles &&
     (currentTournament.format !== data.format ||
-      currentTournament.bracketSize !== data.bracketSize);
+      currentTournament.bracketSize !== data.bracketSize ||
+      currentTournament.disqualifyZeros !== data.disqualifyZeros);
 
   if (shouldUpdateBattles) {
     await tournamentCreateBattles(id);
@@ -524,6 +528,7 @@ const Page = () => {
       driverNumbers: tournament.driverNumbers ?? TournamentsDriverNumbers.NONE,
       ratingRequested: tournament.ratingRequested ?? false,
       judgingInterface: tournament.judgingInterface ?? JudgingInterface.SIMPLE,
+      disqualifyZeros: tournament.disqualifyZeros ?? true,
     },
     async onSubmit(values) {
       await fetcher.submit(JSON.stringify(values), {
@@ -911,6 +916,32 @@ const Page = () => {
                   }
                   error={formik.errors.scoreFormula}
                 />
+
+                <FormControl flex={1}>
+                  <Label>
+                    Disqualify drivers who score 0 in qualifying?
+                  </Label>
+                  <TabGroup>
+                    <TabButton
+                      isActive={!formik.values.disqualifyZeros}
+                      onClick={() =>
+                        formik.setFieldValue("disqualifyZeros", false)
+                      }
+                      type="button"
+                    >
+                      No
+                    </TabButton>
+                    <TabButton
+                      isActive={formik.values.disqualifyZeros}
+                      onClick={() =>
+                        formik.setFieldValue("disqualifyZeros", true)
+                      }
+                      type="button"
+                    >
+                      Yes
+                    </TabButton>
+                  </TabGroup>
+                </FormControl>
 
                 <SaveButton />
               </CardContent>

@@ -50,6 +50,7 @@ export const tournamentSeedBattles = async (id: string) => {
       qualifyingLaps: true,
       enableBattles: true,
       enableQualifying: true,
+      disqualifyZeros: true,
       _count: {
         select: {
           judges: true,
@@ -126,10 +127,10 @@ export const tournamentSeedBattles = async (id: string) => {
       ),
     );
 
-    // If the driver has no scores, convert them into a BYE run
     if (
       lapScores.every((score) => score === 0) &&
-      tournament.enableQualifying
+      tournament.enableQualifying &&
+      tournament.disqualifyZeros
     ) {
       return {
         lapScores: [],

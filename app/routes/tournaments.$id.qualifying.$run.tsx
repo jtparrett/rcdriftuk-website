@@ -1,6 +1,6 @@
 import { styled, Box, Center, Flex } from "~/styled-system/jsx";
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { Fragment } from "react";
 import invariant from "~/utils/invariant";
 import { z } from "zod";
@@ -13,7 +13,6 @@ import { TournamentsDriverNumbers } from "~/utils/enums";
 import { HiddenEmbed } from "~/utils/EmbedContext";
 import { Tab, TabGroup } from "~/components/Tab";
 import { token } from "~/styled-system/tokens";
-import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -46,6 +45,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
         },
       },
       id: true,
+      state: true,
       enableBattles: true,
       bracketSize: true,
       format: true,
@@ -110,25 +110,29 @@ export const loader = async (args: LoaderFunctionArgs) => {
         (driver) => run === 0 || driver.laps.some((lap) => lap.round === run),
       )
       .map((driver) => {
-        const lapScores = driver.laps
+        const scoredLaps = driver.laps
           .filter((lap) => lap.scores.length === tournament._count.judges)
-          .map((lap) =>
-            sumScores(
+          .map((lap) => ({
+            score: sumScores(
               lap.scores,
               tournament._count.judges,
               tournament.scoreFormula,
               lap.penalty,
               judgeIds,
             ),
-          );
+            lapId: lap.id,
+          }));
 
+        const lapScores = scoredLaps.map((l) => l.score);
         const best = lapScores.length > 0 ? Math.max(...lapScores) : null;
+        const sortedScoreLaps = [...scoredLaps].sort((a, b) => b.score - a.score);
 
         return {
           ...driver,
           score: [best, ...lapScores][run],
           lapId: driver.laps[run - 1]?.id,
-          scores: lapScores.sort((a, b) => b - a),
+          scores: sortedScoreLaps.map((l) => l.score),
+          scoreLaps: sortedScoreLaps,
         };
       })
       .sort((a, b) => {
@@ -153,6 +157,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return {
     run,
     isOwner,
+    isQualifying: tournament.state === "QUALIFYING",
     id: tournament.id,
     bracketSize: tournament.bracketSize,
     enableBattles: tournament.enableBattles,
@@ -247,34 +252,36 @@ const Table = ({
                 textOverflow="ellipsis"
                 flex={1}
               >
-                <LinkOverlay
-                  to={
-                    isOwner && driver.lapId
-                      ? `/tournaments/${tournament.id}/activate/lap/${driver.lapId}`
-                      : `/drivers/${driver.user.driverId}`
-                  }
-                >
+                <Link to={`/drivers/${driver.user.driverId}`}>
                   {driver.user.firstName} {driver.user.lastName}{" "}
                   {driverNumber !== undefined && (
                     <styled.span color="gray.600">
                       ({getDriverNumber(driver)})
                     </styled.span>
                   )}
-                </LinkOverlay>
+                </Link>
               </styled.p>
 
               {tournament.run <= 0 && (
                 <>
-                  {driver.scores.map((score, i) => (
+                  {driver.scoreLaps.map((scoreLap, i) => (
                     <styled.p
                       fontWeight="semibold"
                       textAlign="right"
-                      key={score}
+                      key={scoreLap.lapId}
                       opacity={i <= 0 ? 1 : 0.5}
                       fontFamily="mono"
                       fontSize="sm"
                     >
-                      {score?.toFixed(2).padStart(5, "0")}
+                      {isOwner && tournament.isQualifying ? (
+                        <Link
+                          to={`/tournaments/${tournament.id}/activate/lap/${scoreLap.lapId}`}
+                        >
+                          {scoreLap.score?.toFixed(2).padStart(5, "0")}
+                        </Link>
+                      ) : (
+                        scoreLap.score?.toFixed(2).padStart(5, "0")
+                      )}
                     </styled.p>
                   ))}
                 </>
@@ -287,7 +294,15 @@ const Table = ({
                   fontFamily="mono"
                   fontSize="sm"
                 >
-                  {driver.score?.toFixed(2).padStart(5, "0")}
+                  {isOwner && tournament.isQualifying && driver.lapId ? (
+                    <Link
+                      to={`/tournaments/${tournament.id}/activate/lap/${driver.lapId}`}
+                    >
+                      {driver.score?.toFixed(2).padStart(5, "0")}
+                    </Link>
+                  ) : (
+                    driver.score?.toFixed(2).padStart(5, "0")
+                  )}
                 </styled.p>
               )}
             </Flex>

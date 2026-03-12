@@ -97,13 +97,6 @@ const FeedPage = () => {
       pages: [{ posts }],
       pageParams: [null],
     });
-
-    for (const post of posts) {
-      queryClient.setQueryData(["post", post.id, "likes"], {
-        totalPostLikes: post._count.likes,
-        userLiked: (post.likes?.length ?? 0) > 0,
-      });
-    }
   }, [posts, queryClient]);
 
   // Flatten all pages into a single array of posts
