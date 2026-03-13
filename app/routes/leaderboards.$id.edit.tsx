@@ -699,7 +699,7 @@ const LeaderboardsEditPage = () => {
     <Container maxW={1100} px={2} py={4}>
       <Box maxW="580px" mx="auto">
         <styled.h2 mb={2}>Edit Leaderboard Details</styled.h2>
-        <Card p={4}>
+        <Card p={4} overflow="visible">
           <form onSubmit={formik.handleSubmit}>
             <VStack gap={4} alignItems="stretch">
               <FormControl error={formik.errors.name}>
