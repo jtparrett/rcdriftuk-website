@@ -5,7 +5,7 @@ export const Input = styled("input", {
     py: 2,
     px: 4,
     borderWidth: 1,
-    borderColor: "gray.800",
+    borderColor: "gray.700",
     bgColor: "gray.800",
     rounded: "xl",
     color: "white",

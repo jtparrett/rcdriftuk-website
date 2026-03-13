@@ -131,7 +131,7 @@ export const Header = ({ user }: Props) => {
             <Box>
               <Button
                 size="sm"
-                variant={menu.isOpen ? "primary" : "outline"}
+                variant={menu.isOpen ? "primary" : "secondary"}
                 onClick={() => menu.toggle()}
                 aria-label="Menu"
                 pos="relative"
@@ -166,7 +166,7 @@ export const Header = ({ user }: Props) => {
                   pos="relative"
                   w={10}
                   h={10}
-                  variant="outline"
+                  variant="secondary"
                   px={0}
                   py={0}
                 >
@@ -181,7 +181,7 @@ export const Header = ({ user }: Props) => {
                 pos="relative"
                 w={10}
                 h={10}
-                variant="outline"
+                variant="secondary"
                 px={0}
                 py={0}
               >
@@ -210,7 +210,7 @@ export const Header = ({ user }: Props) => {
           )}
 
           <SignedOut>
-            <LinkButton variant="outline" size="md" to="/sign-in">
+            <LinkButton variant="secondary" size="md" to="/sign-in">
               Sign In
             </LinkButton>
           </SignedOut>

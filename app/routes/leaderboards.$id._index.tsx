@@ -159,7 +159,7 @@ const LeaderboardsPage = () => {
         {isOwner && (
           <LinkButton
             to={`/leaderboards/${leaderboard.id}/edit`}
-            variant="outline"
+            variant="secondary"
             py={1.5}
           >
             Edit <RiEditCircleFill />
@@ -167,7 +167,7 @@ const LeaderboardsPage = () => {
         )}
         <Button
           px={2}
-          variant="outline"
+          variant="secondary"
           onClick={() => {
             navigator.share({
               url: `https://rcdrift.io/leaderboards/${leaderboard.id}`,
@@ -180,7 +180,7 @@ const LeaderboardsPage = () => {
           to={location.pathname + "?embed=true"}
           px={2}
           target="_blank"
-          variant="outline"
+          variant="secondary"
         >
           <RiFullscreenFill />
         </LinkButton>

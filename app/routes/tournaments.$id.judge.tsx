@@ -412,7 +412,7 @@ const ScoreButton = ({
   <Button
     type="button"
     size="sm"
-    variant={isActive ? "primary" : "outline"}
+    variant={isActive ? "primary" : "secondary"}
     onClick={onClick}
     w="full"
     px={2}
@@ -799,7 +799,7 @@ const BattleForm = () => {
                   variant={
                     battleVote?.winnerId === nextBattle.driverLeftId
                       ? "primary"
-                      : "outline"
+                      : "secondary"
                   }
                   gap={0.5}
                 >
@@ -821,7 +821,7 @@ const BattleForm = () => {
                   variant={
                     battleVote?.winnerId === nextBattle.driverRightId
                       ? "primary"
-                      : "outline"
+                      : "secondary"
                   }
                   gap={0.5}
                 >
@@ -840,7 +840,7 @@ const BattleForm = () => {
                   type="submit"
                   name="omt"
                   value="true"
-                  variant={battleVote?.omt ? "primary" : "outline"}
+                  variant={battleVote?.omt ? "primary" : "secondary"}
                 >
                   OMT
                 </Button>
@@ -943,9 +943,7 @@ const JudgePage = () => {
                 gradientFrom="brand.500"
                 gradientTo="brand.700"
               >
-                <styled.h1 fontSize="sm">
-                  {judge.alias}
-                </styled.h1>
+                <styled.h1 fontSize="sm">{judge.alias}</styled.h1>
                 <Spacer />
                 <Link
                   to={`/tournaments/${tournament.id}/overview`}

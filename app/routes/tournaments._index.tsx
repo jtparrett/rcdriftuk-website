@@ -186,7 +186,7 @@ const Page = () => {
 
         <Flex gap={2} mb={2}>
           <Spacer />
-          <Button variant="outline" onClick={toggleMyTournaments} pr={3}>
+          <Button variant="secondary" onClick={toggleMyTournaments} pr={3}>
             My Tournaments
             <styled.span
               style={{

@@ -125,7 +125,7 @@ const TrackPage = () => {
               <LinkButton
                 w="full"
                 to={track?.url}
-                variant="outline"
+                variant="secondary"
                 target="_blank"
                 size="sm"
               >
@@ -160,7 +160,7 @@ const TrackPage = () => {
                 w="full"
                 mt={2}
                 to={`https://www.google.com/maps?q=${track.address ?? `${track.lat},${track.lng}`}`}
-                variant="outline"
+                variant="secondary"
                 target="_blank"
                 size="sm"
               >
@@ -171,7 +171,7 @@ const TrackPage = () => {
             {isOwner && (
               <Box p={4} borderTopWidth={1} borderColor="gray.800">
                 <LinkButton
-                  variant="outline"
+                  variant="secondary"
                   w="full"
                   mb={2}
                   size="sm"
@@ -180,7 +180,7 @@ const TrackPage = () => {
                   Edit Track <RiEditCircleFill />
                 </LinkButton>
                 <LinkButton
-                  variant="outline"
+                  variant="secondary"
                   w="full"
                   size="sm"
                   to={`/create/event/${track?.slug}`}

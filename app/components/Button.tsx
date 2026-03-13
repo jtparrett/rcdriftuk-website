@@ -12,7 +12,7 @@ const ButtonStyles = cva({
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "semibold",
-    transition: "all .2s",
+    transition: "all .18s",
     cursor: "pointer",
     fontSize: "sm",
     color: "white !important",
@@ -58,20 +58,21 @@ const ButtonStyles = cva({
     variant: {
       primary: {
         bgColor: "brand.600",
-        borderColor: "brand.600",
+        borderColor: "brand.500",
         _hover: {
           md: {
-            bgColor: "brand.700",
-            borderColor: "brand.700",
+            bgColor: "brand.500",
           },
         },
       },
       secondary: {
-        bgColor: "gray.800",
+        color: "gray.200",
+        bgColor: "gray.900",
         borderColor: "gray.800",
         _hover: {
           md: {
-            bgColor: "gray.700",
+            bgColor: "gray.800",
+            color: "white",
             borderColor: "gray.700",
           },
         },
@@ -83,16 +84,6 @@ const ButtonStyles = cva({
           md: {
             bgColor: "gray.800",
             borderColor: "gray.800",
-          },
-        },
-      },
-      outline: {
-        bg: "transparent",
-        borderWidth: 1,
-        borderColor: "gray.800",
-        _hover: {
-          md: {
-            bgColor: "gray.800",
           },
         },
       },

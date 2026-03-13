@@ -138,7 +138,7 @@ export function ErrorBoundary() {
           <LinkButton to="/app">
             Go Home <RiHome2Line />
           </LinkButton>
-          <Button onClick={() => window.location.reload()} variant="outline">
+          <Button onClick={() => window.location.reload()} variant="secondary">
             Reload <RiRefreshLine />
           </Button>
         </Flex>

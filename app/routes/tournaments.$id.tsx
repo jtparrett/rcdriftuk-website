@@ -536,7 +536,7 @@ const TournamentPage = () => {
 
               {tournament.state === TournamentsState.END && (
                 <LinkButton
-                  variant="outline"
+                  variant="secondary"
                   to={`/api/tournaments/${tournament.id}/export`}
                   download
                   target="_blank"
@@ -547,7 +547,7 @@ const TournamentPage = () => {
 
               {isOwner && tournament.state === TournamentsState.QUALIFYING && (
                 <LinkButton
-                  variant="outline"
+                  variant="secondary"
                   to={`/tournaments/${tournament.id}/randomise`}
                 >
                   Randomise <RiShuffleLine />

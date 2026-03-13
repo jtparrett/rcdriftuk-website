@@ -433,8 +433,7 @@ export const EventForm = ({
                         >
                           <Box flex={1} textAlign="left">
                             <styled.span fontWeight="semibold" fontSize="sm">
-                              {ticketType.name ||
-                                `Ticket Type ${index + 1}`}
+                              {ticketType.name || `Ticket Type ${index + 1}`}
                             </styled.span>
                             {ticketType.price && (
                               <styled.span
@@ -456,9 +455,7 @@ export const EventForm = ({
                             )}
                           </Box>
                           <Box
-                            transform={
-                              isOpen ? "rotate(180deg)" : "none"
-                            }
+                            transform={isOpen ? "rotate(180deg)" : "none"}
                             transition="transform 0.2s"
                             color="gray.400"
                           >
@@ -467,11 +464,7 @@ export const EventForm = ({
                         </styled.button>
 
                         {isOpen && (
-                          <Box
-                            p={4}
-                            borderTopWidth={1}
-                            borderColor="gray.800"
-                          >
+                          <Box p={4} borderTopWidth={1} borderColor="gray.800">
                             <Flex flexDir="column" gap={4}>
                               <FormControl
                                 error={getTicketTypeError(index, "name")}
@@ -568,14 +561,14 @@ export const EventForm = ({
 
                 {formik.values.ticketTypes.length === 0 && (
                   <styled.p color="gray.500" fontSize="sm" mb={2}>
-                    No ticket types added. Add one to enable ticketing for
-                    this event.
+                    No ticket types added. Add one to enable ticketing for this
+                    event.
                   </styled.p>
                 )}
 
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   onClick={addTicketType}
                   mt={2}
                   w="full"
@@ -593,8 +586,8 @@ export const EventForm = ({
               borderColor="gray.700"
             >
               <styled.p color="gray.400" fontSize="sm" mb={2}>
-                To enable ticketing for events, you need to connect your
-                Stripe account first.
+                To enable ticketing for events, you need to connect your Stripe
+                account first.
               </styled.p>
               <Link
                 to={stripeSetupLink}

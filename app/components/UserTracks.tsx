@@ -15,7 +15,7 @@ export const UserTracks = ({ user }: { user: GetUser }) => {
         {(user?.Tracks.length ?? 0) <= 0 && (
           <LinkButton
             to="/tracks/new"
-            variant="outline"
+            variant="secondary"
             size="xs"
             fontSize="xs"
           >

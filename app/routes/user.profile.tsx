@@ -201,7 +201,13 @@ const UserProfilePage = () => {
             </form>
           </Box>
 
-          <LinkButton to="/user/delete" variant="outline" w="full" mt={6}>
+          <LinkButton
+            to="/user/delete"
+            variant="secondary"
+            color="brand.500"
+            w="full"
+            mt={6}
+          >
             Delete My Account
           </LinkButton>
         </Box>

@@ -179,7 +179,7 @@ const CalendarPage = () => {
 
             <LinkButton
               size="sm"
-              variant="outline"
+              variant="secondary"
               to={`/calendar/${region}/${increment}/${previousDate()}`}
               data-replace="true"
               replace
@@ -189,7 +189,7 @@ const CalendarPage = () => {
             </LinkButton>
             <LinkButton
               size="sm"
-              variant="outline"
+              variant="secondary"
               to={`/calendar/${region}/${increment}/${today}`}
               h={10}
               data-replace="true"
@@ -199,7 +199,7 @@ const CalendarPage = () => {
             </LinkButton>
             <LinkButton
               size="sm"
-              variant="outline"
+              variant="secondary"
               to={`/calendar/${region}/${increment}/${nextDate()}`}
               h={10}
               data-replace="true"

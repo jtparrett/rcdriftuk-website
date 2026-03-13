@@ -918,9 +918,7 @@ const Page = () => {
                 />
 
                 <FormControl flex={1}>
-                  <Label>
-                    Disqualify drivers who score 0 in qualifying?
-                  </Label>
+                  <Label>Disqualify drivers who score 0 in qualifying?</Label>
                   <TabGroup>
                     <TabButton
                       isActive={!formik.values.disqualifyZeros}
@@ -1013,7 +1011,14 @@ const Page = () => {
 
                 <FormControl flex={1} error={formik.errors.bracketSize}>
                   <Label>Bracket Size</Label>
-                  <Flex gap={2} flexWrap="wrap">
+                  <Flex
+                    gap={2}
+                    flexWrap="wrap"
+                    borderWidth={1}
+                    borderColor="gray.700"
+                    rounded="2xl"
+                    p={1}
+                  >
                     {Object.values(BracketSize).map((item) => {
                       return (
                         <TabButton

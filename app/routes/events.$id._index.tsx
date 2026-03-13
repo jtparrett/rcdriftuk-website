@@ -177,7 +177,7 @@ const Page = () => {
           location: event.eventTrack?.name,
         })}
         target="_blank"
-        variant="outline"
+        variant="secondary"
       >
         Add to Calendar <RiCalendarLine />
       </LinkButton>
@@ -343,7 +343,7 @@ const Page = () => {
                   target={
                     event.link.includes("/tournaments") ? undefined : "_blank"
                   }
-                  variant="outline"
+                  variant="secondary"
                 >
                   {event.link.includes("/tournaments")
                     ? "View Results"
@@ -355,39 +355,38 @@ const Page = () => {
               <CalendarLink />
             </Flex>
 
-            {hasTicketing &&
-              isBefore(new Date(), new Date(event.endDate)) && (
-                <>
-                  <Divider mt={4} borderColor="gray.800" />
-                  <Box pt={4}>
-                    <EventTicketSection
-                      event={{
-                        ...event,
-                        startDate,
-                        endDate,
-                        ticketTypes: event.ticketTypes.map((t) => ({
-                          ...t,
-                          releaseDate: new Date(t.releaseDate),
-                        })),
-                      }}
-                      ticket={
-                        ticket
-                          ? {
-                              ...ticket,
-                              event: {
-                                ...ticket.event,
-                                startDate,
-                                endDate,
-                              },
-                            }
-                          : null
-                      }
-                      isSoldOut={isSoldOut}
-                      userRank={userRank}
-                    />
-                  </Box>
-                </>
-              )}
+            {hasTicketing && isBefore(new Date(), new Date(event.endDate)) && (
+              <>
+                <Divider mt={4} borderColor="gray.800" />
+                <Box pt={4}>
+                  <EventTicketSection
+                    event={{
+                      ...event,
+                      startDate,
+                      endDate,
+                      ticketTypes: event.ticketTypes.map((t) => ({
+                        ...t,
+                        releaseDate: new Date(t.releaseDate),
+                      })),
+                    }}
+                    ticket={
+                      ticket
+                        ? {
+                            ...ticket,
+                            event: {
+                              ...ticket.event,
+                              startDate,
+                              endDate,
+                            },
+                          }
+                        : null
+                    }
+                    isSoldOut={isSoldOut}
+                    userRank={userRank}
+                  />
+                </Box>
+              </>
+            )}
 
             {isAfter(new Date(), new Date(event.endDate)) && (
               <>
@@ -474,7 +473,7 @@ const Page = () => {
                   <LinkButton
                     w="full"
                     to={`/events/${event.id}/export`}
-                    variant="outline"
+                    variant="secondary"
                     download={`${event.name} Tickets ${format(
                       new Date(),
                       "dd-MM-yyyy",
@@ -488,7 +487,7 @@ const Page = () => {
                 {isTrackOwner && (
                   <LinkButton
                     w="full"
-                    variant="outline"
+                    variant="secondary"
                     to={`/events/${event.id}/edit`}
                   >
                     Edit Event
@@ -498,7 +497,7 @@ const Page = () => {
                 {isTrackOwner && (
                   <LinkButton
                     w="full"
-                    variant="outline"
+                    variant="secondary"
                     to={`/events/${event.id}/delete`}
                     color="brand.500"
                   >
