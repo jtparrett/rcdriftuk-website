@@ -134,12 +134,20 @@ const Page = () => {
     <Box pos="relative" zIndex={1} w="full" overflow="hidden">
       <Box
         w="full"
-        bgImage="url(/bg.png)"
-        bgSize={{ base: "240%", md: "130%" }}
-        bgPosition="center"
-        bgRepeat="no-repeat"
         pos="relative"
         zIndex={0}
+        _before={{
+          content: '""',
+          pos: "absolute",
+          inset: 0,
+          bgImage: "url(/bg.png)",
+          bgSize: { base: "300%", md: "130%" },
+          bgPosition: "center",
+          bgRepeat: "no-repeat",
+          zIndex: -2,
+          opacity: 0,
+          animation: "fadeIn 2.5s 1.2s ease-out forwards",
+        }}
         _after={{
           content: '""',
           pos: "absolute",
@@ -160,7 +168,14 @@ const Page = () => {
           alignItems="center"
         >
           <Box w="fit-content" mx="auto">
-            <Box pos="relative" mx="auto" w="fit-content" rounded="full">
+            <Box
+              pos="relative"
+              mx="auto"
+              w="fit-content"
+              rounded="full"
+              opacity={0}
+              animation="fadeIn 2s 0.8s ease-out forwards"
+            >
               <Link to="/2026">
                 <styled.span
                   borderWidth={1}
@@ -232,6 +247,8 @@ const Page = () => {
               flexDir={{ base: "column", sm: "row" }}
               px={6}
               mx="auto"
+              opacity={0}
+              animation="fadeIn 2s 0.8s ease-out forwards"
             >
               <SignedOut>
                 <LinkButton to="/getting-started">

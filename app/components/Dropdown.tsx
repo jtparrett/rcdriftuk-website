@@ -28,7 +28,9 @@ export const Option = styled("button", {
     textAlign: "left",
     color: "gray.200",
     _hover: {
-      bgColor: "gray.700",
+      md: {
+        bgColor: "gray.700",
+      },
     },
   },
 });

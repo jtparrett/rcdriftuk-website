@@ -141,6 +141,14 @@ export default defineConfig({
             strokeDashoffset: "-200px",
           },
         },
+        fadeIn: {
+          "0%": {
+            opacity: 0,
+          },
+          "100%": {
+            opacity: 1,
+          },
+        },
         flash: {
           "100%": {
             opacity: 0,

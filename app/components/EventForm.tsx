@@ -428,7 +428,7 @@ export const EventForm = ({
                           alignItems="center"
                           gap={2}
                           cursor="pointer"
-                          _hover={{ bgColor: "gray.800" }}
+                          _hover={{ md: { bgColor: "gray.800" } }}
                           transition="background-color .2s"
                         >
                           <Box flex={1} textAlign="left">
