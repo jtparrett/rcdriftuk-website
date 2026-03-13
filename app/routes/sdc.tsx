@@ -1,10 +1,7 @@
-import { Outlet, useLocation } from "react-router";
-import { Tab } from "~/components/Tab";
-import { TabsBar } from "~/components/TabsBar";
+import { Outlet } from "react-router";
 import { Box, Container, styled } from "~/styled-system/jsx";
 
 const Page = () => {
-  const location = useLocation();
   return (
     <>
       <Box
@@ -29,17 +26,6 @@ const Page = () => {
         </Container>
       </Box>
 
-      <TabsBar maxW={800}>
-        <Tab to="/standings" isActive={location.pathname === "/standings"}>
-          Overall Standings
-        </Tab>
-        <Tab
-          to="/standings/regional"
-          isActive={location.pathname === "/standings/regional"}
-        >
-          Regional Standings
-        </Tab>
-      </TabsBar>
       <Outlet />
     </>
   );

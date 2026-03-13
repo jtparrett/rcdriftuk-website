@@ -13,9 +13,11 @@ const TabStyle = cva({
     rounded: "xl",
     fontWeight: "semibold",
     fontSize: "sm",
-    transition: "background-color .3s",
+    transition: "all .18s",
     whiteSpace: "nowrap",
     cursor: "pointer",
+    borderWidth: 1,
+    borderColor: "transparent",
     _disabled: {
       opacity: 0.5,
     },
@@ -24,6 +26,7 @@ const TabStyle = cva({
     isActive: {
       true: {
         bgColor: "gray.800",
+        borderColor: "gray.700",
       },
     },
   },
