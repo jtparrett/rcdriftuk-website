@@ -6,14 +6,7 @@ import { Link, useLoaderData } from "react-router";
 import { Box, Center, Container, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { SDC_USER_ID } from "~/utils/theme";
-
-const POSITION_POINTS: Record<number, number> = {
-  1: 16,
-  2: 8,
-  3: 4,
-  4: 2,
-  5: 1,
-};
+import { getPositionPoints } from "~/utils/leaderboardPoints";
 
 export const loader = async () => {
   const leaderboards = await prisma.leaderboards.findMany({
@@ -39,6 +32,10 @@ export const loader = async () => {
   });
 
   return leaderboards.map((lb) => {
+    const pointsConfig = getPositionPoints(lb.positionPoints);
+    const tqPoints = lb.tqPoints;
+    const participationPoints = lb.participationPoints;
+
     const driverPoints = new Map<
       number,
       {
@@ -49,7 +46,14 @@ export const loader = async () => {
 
     for (const lt of lb.tournaments) {
       for (const driver of lt.tournament.drivers) {
-        const pts = POSITION_POINTS[driver.finishingPosition ?? 0] ?? 0;
+        let pts =
+          (pointsConfig[driver.finishingPosition ?? 0] ?? 0) +
+          participationPoints;
+
+        if (tqPoints > 0 && driver.qualifyingPosition === 1) {
+          pts += tqPoints;
+        }
+
         const existing = driverPoints.get(driver.driverId);
         if (existing) {
           existing.points += pts;
@@ -226,8 +230,9 @@ const Page = () => {
                       fontSize="sm"
                       color="gray.300"
                       whiteSpace="nowrap"
+                      fontVariantNumeric="tabular-nums"
                     >
-                      {driver.points} pts
+                      {driver.points.toFixed(1)} pts
                     </styled.span>
                   </Flex>
                 ))}

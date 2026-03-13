@@ -2,7 +2,15 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { FormControl } from "~/components/FormControl";
 import { Label } from "~/components/Label";
-import { Box, Container, Flex, styled, VStack } from "~/styled-system/jsx";
+import {
+  Box,
+  Container,
+  Divider,
+  Flex,
+  Grid,
+  styled,
+  VStack,
+} from "~/styled-system/jsx";
 import { z } from "zod";
 import {
   redirect,
@@ -18,12 +26,14 @@ import { Button } from "~/components/Button";
 import { TabButton, TabGroup } from "~/components/Tab";
 import { LeaderboardType, TournamentsState } from "~/utils/enums";
 import { capitalCase } from "change-case";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Reorder } from "motion/react";
 import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { Dropdown, Option } from "~/components/Dropdown";
 import { Card } from "~/components/CollapsibleCard";
 import { useUserSearch } from "~/hooks/useUserSearch";
+import { getPositionPoints } from "~/utils/leaderboardPoints";
+import { Switch } from "~/components/Switch";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -81,10 +91,23 @@ export const action = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
   const formData = await args.request.formData();
 
+  const positionPointsRaw = formData.get("positionPoints");
+  let positionPoints: Record<string, number> | null = null;
+  if (positionPointsRaw && typeof positionPointsRaw === "string") {
+    try {
+      positionPoints = JSON.parse(positionPointsRaw);
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+
   const data = actionSchema.parse({
     name: formData.get("name"),
     type: formData.get("type"),
     cutoff: Number(formData.get("cutoff")),
+    tqPoints: Number(formData.get("tqPoints") ?? 0),
+    participationPoints: Number(formData.get("participationPoints") ?? 0),
+    positionPoints,
     tournaments: formData.getAll("tournaments"),
     drivers: formData.getAll("drivers").map((driver) => Number(driver)),
   });
@@ -119,6 +142,9 @@ export const action = async (args: LoaderFunctionArgs) => {
         name: data.name,
         type: data.type,
         cutoff: data.cutoff,
+        tqPoints: data.tqPoints,
+        participationPoints: data.participationPoints,
+        positionPoints: data.positionPoints ?? undefined,
       },
     }),
 
@@ -146,6 +172,9 @@ const actionSchema = z.object({
   name: z.string().min(1),
   type: z.nativeEnum(LeaderboardType),
   cutoff: z.number(),
+  tqPoints: z.number().min(0).max(100),
+  participationPoints: z.number().min(0).max(100),
+  positionPoints: z.record(z.string(), z.number()).nullable(),
   tournaments: z.array(z.string()),
   drivers: z.array(z.number()),
 });
@@ -154,6 +183,9 @@ const clientSchema = z.object({
   name: z.string().min(1),
   type: z.nativeEnum(LeaderboardType),
   cutoff: z.number(),
+  tqPoints: z.number().min(0).max(100),
+  participationPoints: z.number().min(0).max(100),
+  positionPoints: z.record(z.string(), z.number()),
   tournaments: z.array(z.string()),
   drivers: z.array(
     z.object({
@@ -165,6 +197,122 @@ const clientSchema = z.object({
 });
 
 const validationSchema = toFormikValidationSchema(clientSchema);
+
+const REPEAT_DELAY = 400;
+const REPEAT_INTERVAL = 80;
+
+const NumberStepper = ({
+  value,
+  onChange,
+  min = 0,
+  max = 100,
+  step = 0.5,
+  label,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  step?: number;
+  max?: number;
+  label: string;
+}) => {
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const valueRef = useRef(value);
+  valueRef.current = value;
+
+  const stopRepeating = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    timeoutRef.current = null;
+    intervalRef.current = null;
+  }, []);
+
+  const startRepeating = useCallback(
+    (delta: number) => {
+      const tick = () => {
+        const raw = valueRef.current + delta;
+        const next = Math.max(min, Math.min(max, Math.round(raw * 10) / 10));
+        onChange(next);
+      };
+      tick();
+      timeoutRef.current = setTimeout(() => {
+        intervalRef.current = setInterval(tick, REPEAT_INTERVAL);
+      }, REPEAT_DELAY);
+    },
+    [min, max, onChange],
+  );
+
+  return (
+    <Flex alignItems="center" w="full" gap={1} px={1}>
+      <styled.span
+        fontSize="2xs"
+        color="gray.500"
+        fontWeight="bold"
+        flexShrink={0}
+      >
+        {label}
+      </styled.span>
+      <styled.button
+        type="button"
+        onPointerDown={() => startRepeating(-step)}
+        onPointerUp={stopRepeating}
+        onPointerLeave={stopRepeating}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        w={6}
+        h={6}
+        rounded="md"
+        bgColor="gray.800"
+        color="gray.400"
+        cursor="pointer"
+        flexShrink={0}
+        fontSize="sm"
+        fontWeight="bold"
+        userSelect="none"
+        _hover={{ bgColor: "gray.700", color: "white" }}
+        _active={{ bgColor: "gray.600" }}
+      >
+        -
+      </styled.button>
+      <styled.span
+        fontSize="xs"
+        fontWeight="semibold"
+        textAlign="center"
+        flex={1}
+        userSelect="none"
+        color={value > 0 ? "white" : "gray.600"}
+        fontVariantNumeric="tabular-nums"
+      >
+        {value.toFixed(1)}
+      </styled.span>
+      <styled.button
+        type="button"
+        onPointerDown={() => startRepeating(step)}
+        onPointerUp={stopRepeating}
+        onPointerLeave={stopRepeating}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        w={6}
+        h={6}
+        rounded="md"
+        bgColor="gray.800"
+        color="gray.400"
+        cursor="pointer"
+        flexShrink={0}
+        fontSize="sm"
+        fontWeight="bold"
+        userSelect="none"
+        _hover={{ bgColor: "gray.700", color: "white" }}
+        _active={{ bgColor: "gray.600" }}
+      >
+        +
+      </styled.button>
+    </Flex>
+  );
+};
 
 const TournamentsForm = ({
   value,
@@ -492,12 +640,21 @@ const LeaderboardsEditPage = () => {
   const fetcher = useFetcher();
   const { leaderboard } = useLoaderData<typeof loader>();
 
+  const savedPoints = getPositionPoints(leaderboard.positionPoints);
+  const initialPositionPoints: Record<string, number> = {};
+  for (let i = 1; i <= 32; i++) {
+    initialPositionPoints[String(i)] = savedPoints[i] ?? 0;
+  }
+
   const formik = useFormik({
     validationSchema,
     initialValues: {
       name: leaderboard.name,
       type: leaderboard.type,
       cutoff: leaderboard.cutoff ?? 0,
+      tqPoints: leaderboard.tqPoints,
+      participationPoints: leaderboard.participationPoints,
+      positionPoints: initialPositionPoints,
       drivers: leaderboard.drivers.map((driver) => ({
         driverId: driver.driverId,
         firstName: driver.driver.firstName,
@@ -513,6 +670,17 @@ const LeaderboardsEditPage = () => {
       formData.append("name", values.name);
       formData.append("type", values.type);
       formData.append("cutoff", values.cutoff.toString());
+      formData.append("tqPoints", values.tqPoints.toString());
+      formData.append(
+        "participationPoints",
+        values.participationPoints.toString(),
+      );
+
+      const filteredPoints: Record<string, number> = {};
+      for (const [pos, pts] of Object.entries(values.positionPoints)) {
+        if (pts > 0) filteredPoints[pos] = pts;
+      }
+      formData.append("positionPoints", JSON.stringify(filteredPoints));
 
       values.drivers.forEach((driver) => {
         formData.append("drivers", driver.driverId.toString());
@@ -561,15 +729,120 @@ const LeaderboardsEditPage = () => {
                 </TabGroup>
               </FormControl>
 
+              <Divider borderColor="gray.800" />
+
               <FormControl>
-                <Label>Qualifying Cutoff Position</Label>
-                <Input
-                  type="number"
-                  name="cutoff"
-                  onChange={formik.handleChange}
-                  value={formik.values.cutoff}
-                />
+                <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                  <Label mb={0}>Qualifying Cutoff Position</Label>
+                  <Switch
+                    checked={formik.values.cutoff > 0}
+                    onChange={(on) => {
+                      formik.setFieldValue("cutoff", on ? 1 : 0);
+                    }}
+                  />
+                </Flex>
+                {formik.values.cutoff > 0 && (
+                  <Input
+                    type="number"
+                    name="cutoff"
+                    min={1}
+                    onChange={formik.handleChange}
+                    value={formik.values.cutoff}
+                  />
+                )}
               </FormControl>
+
+              <Divider borderColor="gray.800" />
+
+              <FormControl>
+                <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                  <Label mb={0}>Top Qualifier (TQ) Bonus Points</Label>
+                  <Switch
+                    checked={formik.values.tqPoints > 0}
+                    onChange={(on) => {
+                      formik.setFieldValue("tqPoints", on ? 1 : 0);
+                    }}
+                  />
+                </Flex>
+                {formik.values.tqPoints > 0 && (
+                  <>
+                    <Input
+                      type="number"
+                      name="tqPoints"
+                      min={1}
+                      max={100}
+                      onChange={formik.handleChange}
+                      value={formik.values.tqPoints}
+                    />
+                    <styled.p fontSize="xs" color="gray.500" mt={1}>
+                      Bonus points awarded to the top qualifier in each
+                      tournament
+                    </styled.p>
+                  </>
+                )}
+              </FormControl>
+
+              <Divider borderColor="gray.800" />
+
+              <FormControl>
+                <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                  <Label mb={0}>Participation Bonus</Label>
+                  <Switch
+                    checked={formik.values.participationPoints > 0}
+                    onChange={(on) => {
+                      formik.setFieldValue("participationPoints", on ? 1 : 0);
+                    }}
+                  />
+                </Flex>
+                {formik.values.participationPoints > 0 && (
+                  <>
+                    <Input
+                      type="number"
+                      name="participationPoints"
+                      min={1}
+                      max={100}
+                      onChange={formik.handleChange}
+                      value={formik.values.participationPoints}
+                    />
+                    <styled.p fontSize="xs" color="gray.500" mt={1}>
+                      Bonus points awarded to every driver in each tournament
+                    </styled.p>
+                  </>
+                )}
+              </FormControl>
+
+              <Divider borderColor="gray.800" />
+
+              <FormControl>
+                <Label>Points Distribution</Label>
+                <styled.p fontSize="xs" color="gray.500" mb={2}>
+                  Set points awarded for each finishing position (1-32). Leave
+                  at 0 for no points.
+                </styled.p>
+                <Grid columns={4} gap={1.5}>
+                  {Array.from({ length: 32 }, (_, i) => i + 1).map((pos) => (
+                    <Box
+                      key={pos}
+                      bgColor="gray.900"
+                      rounded="lg"
+                      py={1.5}
+                      px={1}
+                      borderWidth={1}
+                      borderColor="gray.800"
+                    >
+                      <NumberStepper
+                        label={`P${pos}`}
+                        value={formik.values.positionPoints[String(pos)] ?? 0}
+                        onChange={(v) =>
+                          formik.setFieldValue(`positionPoints.${pos}`, v)
+                        }
+                      />
+                    </Box>
+                  ))}
+                </Grid>
+              </FormControl>
+
+              <Divider borderColor="gray.800" />
 
               {formik.values.type === LeaderboardType.TOURNAMENTS && (
                 <FormControl>

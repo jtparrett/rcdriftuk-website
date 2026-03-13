@@ -19,14 +19,7 @@ import {
 } from "react-icons/ri";
 import { TabsBar } from "~/components/TabsBar";
 import { Card } from "~/components/CollapsibleCard";
-
-export const POSITION_POINTS: Record<number, number> = {
-  1: 16,
-  2: 8,
-  3: 4,
-  4: 2,
-  5: 1,
-};
+import { getPositionPoints } from "~/utils/leaderboardPoints";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -59,6 +52,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const isOwner = leaderboard.userId === userId;
 
+  const pointsConfig = getPositionPoints(leaderboard.positionPoints);
+  const tqPoints = leaderboard.tqPoints;
+  const participationPoints = leaderboard.participationPoints;
+
   if (leaderboard.type === LeaderboardType.TOURNAMENTS) {
     const rows = await prisma.tournamentDrivers.findMany({
       where: {
@@ -85,7 +82,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    // Group by driverId, sum points from each finishing position
     const byDriver = new Map<
       number,
       { user: (typeof rows)[0]["user"]; totalPoints: number }
@@ -93,7 +89,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
     for (const row of rows) {
       const pos = row.finishingPosition ?? 0;
-      const points = POSITION_POINTS[pos] ?? 0;
+      let points = (pointsConfig[pos] ?? 0) + participationPoints;
+
+      if (tqPoints > 0 && row.qualifyingPosition === 1) {
+        points += tqPoints;
+      }
 
       const existing = byDriver.get(row.driverId);
       if (existing) {
@@ -106,7 +106,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       }
     }
 
-    // Sort by total points descending, then by driverId for stable order
     const drivers = Array.from(byDriver.entries())
       .map(([driverId, { user, totalPoints }]) => ({
         driverId,
@@ -126,7 +125,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return {
       driverId: d.driverId,
       user: d.driver,
-      totalPoints: POSITION_POINTS[i + 1] ?? 0,
+      totalPoints: pointsConfig[i + 1] ?? 0,
     };
   });
 
@@ -249,8 +248,12 @@ const LeaderboardsPage = () => {
                     </styled.p>
                   </Box>
 
-                  <styled.p fontWeight="bold" fontSize="lg">
-                    {driver.totalPoints} pts
+                  <styled.p
+                    fontWeight="bold"
+                    fontSize="lg"
+                    fontVariantNumeric="tabular-nums"
+                  >
+                    {driver.totalPoints.toFixed(1)} pts
                   </styled.p>
                 </Flex>
               </Card>

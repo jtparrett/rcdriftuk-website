@@ -5,7 +5,7 @@ import { z } from "zod";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { LeaderboardType } from "~/utils/enums";
-import { POSITION_POINTS } from "./leaderboards.$id._index";
+import { getPositionPoints } from "~/utils/leaderboardPoints";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
@@ -35,6 +35,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
   notFoundInvariant(track, "Track not found");
 
   if (track.leaderboard?.type === LeaderboardType.TOURNAMENTS) {
+    const pointsConfig = getPositionPoints(track.leaderboard.positionPoints);
+    const tqPoints = track.leaderboard.tqPoints;
+    const participationPoints = track.leaderboard.participationPoints;
+
     const rows = await prisma.tournamentDrivers.findMany({
       where: {
         tournamentId: {
@@ -57,7 +61,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
     });
 
-    // Group by driverId, sum points from each finishing position
     const byDriver = new Map<
       number,
       { user: (typeof rows)[0]["user"]; totalPoints: number }
@@ -65,7 +68,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
     for (const row of rows) {
       const pos = row.finishingPosition ?? 0;
-      const points = POSITION_POINTS[pos] ?? 0;
+      let points = (pointsConfig[pos] ?? 0) + participationPoints;
+
+      if (tqPoints > 0 && row.qualifyingPosition === 1) {
+        points += tqPoints;
+      }
 
       const existing = byDriver.get(row.driverId);
       if (existing) {
@@ -78,7 +85,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       }
     }
 
-    // Sort by total points descending, then by driverId for stable order
     const drivers = Array.from(byDriver.entries())
       .map(([driverId, { user, totalPoints }]) => ({
         driverId,
@@ -94,11 +100,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   if (track.leaderboard?.type === LeaderboardType.DRIVERS) {
+    const pointsConfig = getPositionPoints(track.leaderboard.positionPoints);
     return {
       drivers: track.leaderboard.drivers.map((d, i) => ({
         driverId: d.driverId,
         user: d.driver,
-        totalPoints: POSITION_POINTS[i + 1] ?? 0,
+        totalPoints: pointsConfig[i + 1] ?? 0,
       })),
       leaderboard: track.leaderboard,
     };
@@ -150,8 +157,12 @@ const TrackLeaderboardPage = () => {
                   {driver.user.firstName} {driver.user.lastName}
                 </Flex>
               </styled.td>
-              <styled.td textAlign="center" fontFamily="mono">
-                {driver.totalPoints} pts
+              <styled.td
+                textAlign="center"
+                fontFamily="mono"
+                fontVariantNumeric="tabular-nums"
+              >
+                {driver.totalPoints.toFixed(1)} pts
               </styled.td>
             </tr>
           ))}

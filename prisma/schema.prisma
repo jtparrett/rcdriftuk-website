@@ -538,17 +538,20 @@ model ThreadMessages {
 }
 
 model Leaderboards {
-  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  createdAt   DateTime                 @default(now())
-  updatedAt   DateTime                 @default(now()) @updatedAt
-  userId      String
-  cutoff      Int?
-  user        Users                    @relation(fields: [userId], references: [id])
-  type        LeaderboardType          @default(TOURNAMENTS)
-  tournaments LeaderboardTournaments[]
-  drivers     LeaderboardDrivers[]
-  tracks      Tracks[]
+  id             String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @default(now()) @updatedAt
+  userId         String
+  cutoff         Int?
+  positionPoints      Json?
+  tqPoints            Int                      @default(2)
+  participationPoints Int                      @default(2)
+  user           Users                    @relation(fields: [userId], references: [id])
+  type           LeaderboardType          @default(TOURNAMENTS)
+  tournaments    LeaderboardTournaments[]
+  drivers        LeaderboardDrivers[]
+  tracks         Tracks[]
 }
 
 model LeaderboardTournaments {
