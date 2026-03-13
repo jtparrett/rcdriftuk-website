@@ -1,7 +1,7 @@
 import { SignIn } from "@clerk/react-router";
 import { Link } from "react-router";
 import { css } from "~/styled-system/css";
-import { Container, Flex, styled } from "~/styled-system/jsx";
+import { Container, styled } from "~/styled-system/jsx";
 
 export default function SignInPage() {
   return (

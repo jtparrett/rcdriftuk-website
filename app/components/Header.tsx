@@ -189,7 +189,7 @@ export const Header = ({ user }: Props) => {
                 <styled.span srOnly>Inbox</styled.span>
               </LinkButton> */}
 
-              <Link to={`/drivers/${user.driverId}`}>
+              <Link to={theme.key === "sdc" ? "/user/profile" : `/drivers/${user.driverId}`}>
                 <styled.div
                   w={10}
                   h={10}

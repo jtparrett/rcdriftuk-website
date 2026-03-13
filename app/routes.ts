@@ -2,6 +2,7 @@ import {
   type RouteConfig,
   index,
   layout,
+  route,
 } from "@react-router/dev/routes";
 import { flatRoutes } from "@react-router/fs-routes";
 import "dotenv/config";
@@ -12,13 +13,19 @@ const IGNORE_FILE_ROUTES = [
   "routes/_index.tsx",
   "routes/sdc.tsx",
   "routes/sdc.standings.regional.tsx",
+  "routes/sdc.tournaments.tsx",
+  "routes/tournaments._index.tsx",
 ];
 
-const RCDIO_ROUTES = [index("./routes/_index.tsx")];
+const RCDIO_ROUTES = [
+  index("./routes/_index.tsx"),
+  route("tournaments", "./routes/tournaments._index.tsx"),
+];
 
 const SDC_ROUTES = [
   layout("./routes/sdc.tsx", [
     index("./routes/sdc.standings.regional.tsx"),
+    route("tournaments", "./routes/sdc.tournaments.tsx"),
   ]),
 ];
 
