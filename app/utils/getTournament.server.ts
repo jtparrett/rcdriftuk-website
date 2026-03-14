@@ -67,13 +67,6 @@ export const getTournament = (id: string) => {
         },
       },
       judges: {
-        where: {
-          user: {
-            id: {
-              not: null,
-            },
-          },
-        },
         orderBy: {
           sortOrder: "asc",
         },

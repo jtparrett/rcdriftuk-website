@@ -237,6 +237,15 @@ export const action = async (args: ActionFunctionArgs) => {
   // Handle driver changes (only if allowed)
   if (canEditDrivers) {
     if (removedDrivers.length > 0) {
+      // Clear nextQualifyingLapId first to avoid FK constraint when deleting
+      // laps that may be referenced as the active qualifying lap
+      if (tournament.state === TournamentsState.QUALIFYING) {
+        await prisma.tournaments.update({
+          where: { id },
+          data: { nextQualifyingLapId: null },
+        });
+      }
+
       await tournamentRemoveDrivers(id, removedDrivers.map(Number));
     }
 
