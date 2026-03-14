@@ -272,6 +272,7 @@ model Tracks {
   leaderboard           Leaderboards? @relation(fields: [leaderboardId], references: [id])
   stripeAccountId       String?
   stripeAccountEnabled  Boolean       @default(false)
+  reviews               TrackReviews[]
 
   @@index([status])
   @@index([types])
@@ -286,6 +287,22 @@ model TrackOwners {
   user    Users  @relation(fields: [userId], references: [id])
 
   @@unique([trackId, userId])
+}
+
+model TrackReviews {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  stars     Int
+  content   String
+  trackId   String   @db.Uuid
+  userId    String
+  track     Tracks   @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([trackId, userId])
+  @@index([trackId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Users {
@@ -325,6 +342,7 @@ model Users {
   Leaderboards            Leaderboards[]
   claimTargets            ProfileClaimRequests[] @relation("ClaimTarget")
   claimRequesters         ProfileClaimRequests[] @relation("ClaimRequester")
+  TrackReviews            TrackReviews[]
 
   @@index([elo])
   @@index([archived])

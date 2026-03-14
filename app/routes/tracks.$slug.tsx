@@ -218,6 +218,14 @@ const TrackPage = () => {
             >
               Posts
             </Tab>
+            <Tab
+              to={`/tracks/${track?.slug}/reviews`}
+              isActive={tab === "reviews"}
+              data-replace="true"
+              replace
+            >
+              Reviews
+            </Tab>
             {track?.types.includes(TrackTypes.SHOPS) && (
               <Tab
                 to={`/tracks/${track?.slug}/products`}
