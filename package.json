@@ -13,7 +13,8 @@
     "approve-ratings": "tsx ./scripts/approve-ratings.ts",
     "compute-ratings": "tsx ./scripts/compute-ratings.ts",
     "compute-new-ratings": "tsx ./scripts/compute-new-ratings.ts",
-    "import-zerofeel-tracks": "tsx ./scripts/import-zerofeel-tracks.ts"
+    "import-zerofeel-tracks": "tsx ./scripts/import-zerofeel-tracks.ts",
+    "approve-claims": "tsx ./scripts/approve-claims.ts"
   },
   "dependencies": {
     "@clerk/react-router": "^2.1.4",

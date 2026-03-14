@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs } from "react-router";
-import { Outlet, useLoaderData, useLocation } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Outlet, useFetcher, useLoaderData, useLocation } from "react-router";
 import { z } from "zod";
 import { Box, Container, styled, Flex, Spacer } from "~/styled-system/jsx";
 import { getDriverRank, RANKS } from "~/utils/getDriverRank";
@@ -12,6 +12,10 @@ import { AppName } from "~/utils/enums";
 import { getBestRegionalElo } from "~/utils/getBestRegionalElo";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
+import { Button } from "~/components/Button";
+import { SignedIn } from "@clerk/react-router";
+import { getAuth } from "~/utils/getAuth.server";
+import invariant from "~/utils/invariant";
 import {
   RiDashboard2Line,
   RiListOrdered2,
@@ -23,6 +27,7 @@ import {
 export const loader = async (args: LoaderFunctionArgs) => {
   const { params } = args;
   const driverId = z.coerce.number().parse(params.id);
+  const { userId } = await getAuth(args);
 
   const driver = await prisma.users.findFirst({
     where: {
@@ -31,6 +36,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     select: {
       lastBattleDate: true,
       driverId: true,
+      id: true,
       firstName: true,
       lastName: true,
       image: true,
@@ -47,6 +53,19 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   notFoundInvariant(driver, "Driver not found");
 
+  const isUnclaimed = driver.id === null;
+
+  let hasPendingClaim = false;
+  let isCurrentUserRequester = false;
+  if (isUnclaimed) {
+    const existingClaim = await prisma.profileClaimRequests.findUnique({
+      where: { driverId },
+      select: { userId: true },
+    });
+    hasPendingClaim = !!existingClaim;
+    isCurrentUserRequester = !!userId && existingClaim?.userId === userId;
+  }
+
   const adjusted = {
     elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
     elo_EU: adjustDriverElo(driver.elo_EU, driver.lastBattleDate),
@@ -62,11 +81,49 @@ export const loader = async (args: LoaderFunctionArgs) => {
     ...adjusted,
     bestElo,
     bestRegion,
+    isUnclaimed,
+    hasPendingClaim,
+    isCurrentUserRequester,
+    isSignedIn: !!userId,
     inactivityPenalty: calculateInactivityPenaltyOverPeriod(
       driver.lastBattleDate,
       new Date(),
     ),
   };
+};
+
+export const action = async (args: ActionFunctionArgs) => {
+  const { params } = args;
+  const driverId = z.coerce.number().parse(params.id);
+  const { userId } = await getAuth(args);
+
+  notFoundInvariant(userId, "You must be signed in to claim a profile");
+
+  const driver = await prisma.users.findFirst({
+    where: { driverId },
+    select: { id: true },
+  });
+
+  notFoundInvariant(driver, "Driver not found");
+  notFoundInvariant(driver.id === null, "This profile is already claimed");
+
+  const existingClaim = await prisma.profileClaimRequests.findUnique({
+    where: { driverId },
+  });
+
+  notFoundInvariant(
+    !existingClaim,
+    "A claim request already exists for this profile",
+  );
+
+  await prisma.profileClaimRequests.create({
+    data: {
+      driverId,
+      userId,
+    },
+  });
+
+  return { success: true };
 };
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -101,6 +158,8 @@ const Page = () => {
 
   return (
     <>
+      {driver.isUnclaimed && <ClaimProfileBanner driver={driver} />}
+
       <Box
         pos="relative"
         zIndex={1}
@@ -298,6 +357,53 @@ const Page = () => {
         </Container>
       </Box>
     </>
+  );
+};
+
+const ClaimProfileBanner = ({
+  driver,
+}: {
+  driver: ReturnType<typeof useLoaderData<typeof loader>>;
+}) => {
+  const fetcher = useFetcher();
+  const isSubmitting = fetcher.state !== "idle";
+
+  if (driver.hasPendingClaim) {
+    return (
+      <Box bg="gray.900" py={2} px={4} textAlign="center">
+        <styled.p fontSize="sm" color="gray.400">
+          {driver.isCurrentUserRequester
+            ? "Your claim request is pending approval."
+            : "Someone has already requested to claim this profile."}
+        </styled.p>
+      </Box>
+    );
+  }
+
+  return (
+    <SignedIn>
+      <Box bg="brand.600" py={2}>
+        <Container maxW={800} px={4}>
+          <Flex alignItems="center" justifyContent="space-between" gap={3}>
+            <styled.p fontSize="sm" fontWeight="medium" color="white">
+              Is this you? Claim this profile.
+            </styled.p>
+            <fetcher.Form method="post">
+              <Button
+                type="submit"
+                variant="secondary"
+                size="xs"
+                disabled={isSubmitting}
+                isLoading={isSubmitting}
+                flexShrink={0}
+              >
+                {isSubmitting ? "Requesting..." : "Claim Profile"}
+              </Button>
+            </fetcher.Form>
+          </Flex>
+        </Container>
+      </Box>
+    </SignedIn>
   );
 };
 

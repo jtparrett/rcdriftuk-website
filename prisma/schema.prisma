@@ -323,6 +323,8 @@ model Users {
   threads                 ThreadUsers[]
   leaderboards            LeaderboardDrivers[]
   Leaderboards            Leaderboards[]
+  claimTargets            ProfileClaimRequests[] @relation("ClaimTarget")
+  claimRequesters         ProfileClaimRequests[] @relation("ClaimRequester")
 
   @@index([elo])
   @@index([archived])
@@ -625,6 +627,18 @@ enum JudgingInterface {
 enum BattlesBracket {
   UPPER
   LOWER
+}
+
+model ProfileClaimRequests {
+  id        Int      @id @default(autoincrement())
+  driverId  Int
+  userId    String
+  createdAt DateTime @default(now())
+  driver    Users    @relation("ClaimTarget", fields: [driverId], references: [driverId])
+  user      Users    @relation("ClaimRequester", fields: [userId], references: [id])
+
+  @@unique([driverId])
+  @@index([userId])
 }
 
 enum TrackStatus {
