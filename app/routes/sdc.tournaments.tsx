@@ -67,7 +67,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
       ...nameFilter,
       leaderboards: {
         some: {
-          leaderboard: { userId: SDC_USER_ID },
+          leaderboard: {
+            userId: SDC_USER_ID,
+            archived: false,
+          },
         },
       },
       archived: false,
