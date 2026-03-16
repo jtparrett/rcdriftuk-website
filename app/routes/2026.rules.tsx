@@ -166,12 +166,7 @@ export default function RulesPage() {
                 widest point)
               </styled.li>
               <styled.li>
-                Weight: <Highlight>1400–2000g</Highlight> (including body)
-              </styled.li>
-              <styled.li>
-                Ride height at full weight (including battery and body):{" "}
-                <Highlight>Minimum 5mm</Highlight> from the ground to the bottom
-                of the chassis with vehicle at rest
+                Weight: <Highlight>1300–2000g</Highlight> (including body)
               </styled.li>
               <styled.li>
                 Maximum height at full weight: <Highlight>150mm</Highlight> for

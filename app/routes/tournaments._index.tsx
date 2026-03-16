@@ -8,7 +8,6 @@ import {
   RiCheckboxMultipleBlankFill,
   RiCircleLine,
   RiDeleteBinFill,
-  RiExchangeLine,
   RiSearchLine,
   RiVerifiedBadgeFill,
 } from "react-icons/ri";
@@ -262,25 +261,7 @@ const Page = () => {
                     <styled.span>Rated</styled.span>
                   </Flex>
                 )}
-                {tournament.ratingRequested && !tournament.rated && (
-                  <Flex
-                    bgColor="brand.900"
-                    rounded="full"
-                    borderWidth={1}
-                    borderColor="brand.800"
-                    color="brand.400"
-                    pl={2}
-                    pr={2.5}
-                    py={1}
-                    alignItems="center"
-                    gap={1}
-                    fontSize="sm"
-                    fontWeight="medium"
-                  >
-                    <RiExchangeLine />
-                    <styled.span>Rating Pending</styled.span>
-                  </Flex>
-                )}
+
                 {tournament.userId === userId && (
                   <>
                     <LinkButton
