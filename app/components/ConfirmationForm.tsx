@@ -42,6 +42,7 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
           mt={6}
           flexDir={{ base: "column", sm: "row" }}
         >
+          <Button type="submit">{confirmText}</Button>
           <Button
             variant="secondary"
             type="button"
@@ -54,7 +55,6 @@ export const ConfirmationForm = ({ title, disclaimer, confirmText }: Props) => {
           >
             Cancel
           </Button>
-          <Button type="submit">{confirmText}</Button>
         </Flex>
       </Form>
     </Box>

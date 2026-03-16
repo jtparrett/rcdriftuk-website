@@ -567,11 +567,14 @@ model Leaderboards {
   positionPoints      Json?
   tqPoints            Int                      @default(2)
   participationPoints Int                      @default(2)
+  archived            Boolean                  @default(false)
   user           Users                    @relation(fields: [userId], references: [id])
   type           LeaderboardType          @default(TOURNAMENTS)
   tournaments    LeaderboardTournaments[]
   drivers        LeaderboardDrivers[]
   tracks         Tracks[]
+
+  @@index([archived])
 }
 
 model LeaderboardTournaments {

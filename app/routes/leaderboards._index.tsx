@@ -1,5 +1,9 @@
 import { format } from "date-fns";
-import { RiAddCircleFill, RiArrowRightSLine } from "react-icons/ri";
+import {
+  RiAddCircleFill,
+  RiArrowRightSLine,
+  RiDeleteBinFill,
+} from "react-icons/ri";
 import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { LinkButton } from "~/components/Button";
 import { Card } from "~/components/CollapsibleCard";
@@ -18,6 +22,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const leaderboards = await prisma.leaderboards.findMany({
     where: {
+      archived: false,
       OR: [
         {
           userId: userId,
@@ -98,6 +103,18 @@ const LeaderboardsPage = () => {
                     {format(new Date(leaderboard.createdAt), "MMM d, yyyy")}
                   </styled.p>
                 </Box>
+
+                {leaderboard.userId === userId && (
+                  <LinkButton
+                    variant="ghost"
+                    pos="relative"
+                    zIndex={3}
+                    size="sm"
+                    to={`/leaderboards-archive/${leaderboard.id}`}
+                  >
+                    <RiDeleteBinFill />
+                  </LinkButton>
+                )}
 
                 <RiArrowRightSLine />
               </Flex>

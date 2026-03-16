@@ -10,7 +10,7 @@ import { getPositionPoints } from "~/utils/leaderboardPoints";
 
 export const loader = async () => {
   const leaderboards = await prisma.leaderboards.findMany({
-    where: { userId: SDC_USER_ID },
+    where: { userId: SDC_USER_ID, archived: false },
     include: {
       tournaments: {
         include: {
