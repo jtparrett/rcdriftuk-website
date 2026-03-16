@@ -180,7 +180,7 @@ const computeRatingsForRegion = async (region: Regions) => {
     );
     const loserStartingElo = Math.max(0, loserBaseElo + loserInactivityPenalty);
 
-    let winnersK = driverTotalBattles[winnerId] >= 4 ? 32 : 64;
+    let winnersK = driverTotalBattles[winnerId] > 5 ? 32 : 64;
 
     const losersK = 32;
 
@@ -265,7 +265,7 @@ const computeRatingsForRegion = async (region: Regions) => {
       data: {
         [`elo_${region}`]: elo,
         lastTournamentDate: driverLastTournamentDate[driverId],
-        ranked: driverTotalBattles[driverId] >= 4,
+        ranked: driverTotalBattles[driverId] >= 5,
       },
     });
     console.log(
