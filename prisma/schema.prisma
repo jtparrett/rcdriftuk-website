@@ -333,7 +333,7 @@ model Users {
   Posts                   Posts[]
   archived                Boolean              @default(false)
   carSetupChanges         CarSetupChanges[]
-  lastBattleDate          DateTime?
+  lastTournamentDate      DateTime?
   notifications           UserNotifications[]
   notificationsLastReadAt DateTime             @default(now())
   pushToken               String?
@@ -346,7 +346,7 @@ model Users {
 
   @@index([elo])
   @@index([archived])
-  @@index([lastBattleDate])
+  @@index([lastTournamentDate])
   @@index([team])
 }
 

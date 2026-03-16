@@ -6,17 +6,15 @@ import { getBestRegionalElo } from "./getBestRegionalElo";
 
 const PENALTY_SQL = `
   CASE
-    WHEN u."lastBattleDate" IS NULL THEN 0
-    WHEN EXTRACT(EPOCH FROM (NOW() - u."lastBattleDate")) / (60 * 60 * 24 * 365.25) < 0.5 THEN 0
-    ELSE FLOOR((EXTRACT(EPOCH FROM (NOW() - u."lastBattleDate")) / (60 * 60 * 24 * 365.25) - 0.5) * -200)
+    WHEN u."lastTournamentDate" IS NULL THEN 0
+    WHEN EXTRACT(EPOCH FROM (NOW() - u."lastTournamentDate")) / (60 * 60 * 24 * 365.25) < 0.5 THEN 0
+    ELSE FLOOR((EXTRACT(EPOCH FROM (NOW() - u."lastTournamentDate")) / (60 * 60 * 24 * 365.25) - 0.5) * -200)
   END`;
 
 export const getDriverRatings = async (region: Regions, limit?: number) => {
   const sortExpr =
     region !== Regions.ALL
-      ? Prisma.raw(
-          `(u."elo_${region}" + ${PENALTY_SQL}) DESC`,
-        )
+      ? Prisma.raw(`(u."elo_${region}" + ${PENALTY_SQL}) DESC`)
       : Prisma.raw(
           `(GREATEST(u."elo_UK", u."elo_EU", u."elo_NA", u."elo_ZA", u."elo_LA", u."elo_AP") + ${PENALTY_SQL}) DESC`,
         );
@@ -55,7 +53,7 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
     },
     select: {
       id: true,
-      lastBattleDate: true,
+      lastTournamentDate: true,
       driverId: true,
       firstName: true,
       lastName: true,
@@ -78,12 +76,12 @@ export const getDriverRatings = async (region: Regions, limit?: number) => {
     .map((user) => {
       const adjusted = {
         ...user,
-        elo_UK: adjustDriverElo(user.elo_UK, user.lastBattleDate),
-        elo_EU: adjustDriverElo(user.elo_EU, user.lastBattleDate),
-        elo_NA: adjustDriverElo(user.elo_NA, user.lastBattleDate),
-        elo_ZA: adjustDriverElo(user.elo_ZA, user.lastBattleDate),
-        elo_LA: adjustDriverElo(user.elo_LA, user.lastBattleDate),
-        elo_AP: adjustDriverElo(user.elo_AP, user.lastBattleDate),
+        elo_UK: adjustDriverElo(user.elo_UK, user.lastTournamentDate),
+        elo_EU: adjustDriverElo(user.elo_EU, user.lastTournamentDate),
+        elo_NA: adjustDriverElo(user.elo_NA, user.lastTournamentDate),
+        elo_ZA: adjustDriverElo(user.elo_ZA, user.lastTournamentDate),
+        elo_LA: adjustDriverElo(user.elo_LA, user.lastTournamentDate),
+        elo_AP: adjustDriverElo(user.elo_AP, user.lastTournamentDate),
       };
       const { bestElo, bestRegion } = getBestRegionalElo(adjusted);
       return { ...adjusted, bestElo, bestRegion };

@@ -144,18 +144,18 @@ export const loader = async (args: LoaderFunctionArgs) => {
         elo_LA: true,
         elo_AP: true,
         ranked: true,
-        lastBattleDate: true,
+        lastTournamentDate: true,
       },
     });
 
     if (user) {
       const bestRegionalElo = Math.max(
-        adjustDriverElo(user.elo_UK, user.lastBattleDate),
-        adjustDriverElo(user.elo_EU, user.lastBattleDate),
-        adjustDriverElo(user.elo_NA, user.lastBattleDate),
-        adjustDriverElo(user.elo_ZA, user.lastBattleDate),
-        adjustDriverElo(user.elo_LA, user.lastBattleDate),
-        adjustDriverElo(user.elo_AP, user.lastBattleDate),
+        adjustDriverElo(user.elo_UK, user.lastTournamentDate),
+        adjustDriverElo(user.elo_EU, user.lastTournamentDate),
+        adjustDriverElo(user.elo_NA, user.lastTournamentDate),
+        adjustDriverElo(user.elo_ZA, user.lastTournamentDate),
+        adjustDriverElo(user.elo_LA, user.lastTournamentDate),
+        adjustDriverElo(user.elo_AP, user.lastTournamentDate),
       );
       const userRank = getDriverRank(bestRegionalElo, user.ranked);
 

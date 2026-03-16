@@ -34,7 +34,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       driverId,
     },
     select: {
-      lastBattleDate: true,
+      lastTournamentDate: true,
       driverId: true,
       id: true,
       firstName: true,
@@ -67,12 +67,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   const adjusted = {
-    elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
-    elo_EU: adjustDriverElo(driver.elo_EU, driver.lastBattleDate),
-    elo_NA: adjustDriverElo(driver.elo_NA, driver.lastBattleDate),
-    elo_ZA: adjustDriverElo(driver.elo_ZA, driver.lastBattleDate),
-    elo_LA: adjustDriverElo(driver.elo_LA, driver.lastBattleDate),
-    elo_AP: adjustDriverElo(driver.elo_AP, driver.lastBattleDate),
+    elo_UK: adjustDriverElo(driver.elo_UK, driver.lastTournamentDate),
+    elo_EU: adjustDriverElo(driver.elo_EU, driver.lastTournamentDate),
+    elo_NA: adjustDriverElo(driver.elo_NA, driver.lastTournamentDate),
+    elo_ZA: adjustDriverElo(driver.elo_ZA, driver.lastTournamentDate),
+    elo_LA: adjustDriverElo(driver.elo_LA, driver.lastTournamentDate),
+    elo_AP: adjustDriverElo(driver.elo_AP, driver.lastTournamentDate),
   };
   const { bestElo, bestRegion } = getBestRegionalElo(adjusted);
 
@@ -86,7 +86,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isCurrentUserRequester,
     isSignedIn: !!userId,
     inactivityPenalty: calculateInactivityPenaltyOverPeriod(
-      driver.lastBattleDate,
+      driver.lastTournamentDate,
       new Date(),
     ),
   };
@@ -248,7 +248,7 @@ const Page = () => {
 
             <Flex gap={1} alignItems="center" mb={1}>
               {(driver.inactivityPenalty !== 0 ||
-                driver.lastBattleDate !== null) && (
+                driver.lastTournamentDate !== null) && (
                 <styled.span
                   borderWidth={1}
                   borderColor={isInactive ? "red.800" : "green.800"}

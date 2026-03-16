@@ -33,7 +33,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
     select: {
       ranked: true,
-      lastBattleDate: true,
+      lastTournamentDate: true,
       driverId: true,
       elo_UK: true,
       elo_EU: true,
@@ -48,10 +48,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const battles = await prisma.tournamentBattles.findMany({
     where: {
-      OR: [
-        { driverLeft: { driverId } },
-        { driverRight: { driverId } },
-      ],
+      OR: [{ driverLeft: { driverId } }, { driverRight: { driverId } }],
       tournament: {
         rated: true,
       },
@@ -85,12 +82,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
   });
 
   const adjusted = {
-    elo_UK: adjustDriverElo(driver.elo_UK, driver.lastBattleDate),
-    elo_EU: adjustDriverElo(driver.elo_EU, driver.lastBattleDate),
-    elo_NA: adjustDriverElo(driver.elo_NA, driver.lastBattleDate),
-    elo_ZA: adjustDriverElo(driver.elo_ZA, driver.lastBattleDate),
-    elo_LA: adjustDriverElo(driver.elo_LA, driver.lastBattleDate),
-    elo_AP: adjustDriverElo(driver.elo_AP, driver.lastBattleDate),
+    elo_UK: adjustDriverElo(driver.elo_UK, driver.lastTournamentDate),
+    elo_EU: adjustDriverElo(driver.elo_EU, driver.lastTournamentDate),
+    elo_NA: adjustDriverElo(driver.elo_NA, driver.lastTournamentDate),
+    elo_ZA: adjustDriverElo(driver.elo_ZA, driver.lastTournamentDate),
+    elo_LA: adjustDriverElo(driver.elo_LA, driver.lastTournamentDate),
+    elo_AP: adjustDriverElo(driver.elo_AP, driver.lastTournamentDate),
   };
   const { bestElo, bestRegion } = getBestRegionalElo(adjusted);
 
@@ -102,7 +99,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       bestElo,
       bestRegion,
       inactivityPenalty: calculateInactivityPenaltyOverPeriod(
-        driver.lastBattleDate,
+        driver.lastTournamentDate,
         new Date(),
       ),
     },
@@ -159,23 +156,21 @@ const Page = () => {
   );
 
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
-  const activeRegion: Region =
-    selectedRegion ?? (driver.bestRegion as Region);
+  const activeRegion: Region = selectedRegion ?? (driver.bestRegion as Region);
 
   const chartData = useMemo(() => {
     const regionBattles = battlesByRegion.get(activeRegion) ?? [];
 
     const points = regionBattles
       .map((battle) => {
-        const isLeftDriver =
-          battle.driverLeft?.driverId === driver.driverId;
+        const isLeftDriver = battle.driverLeft?.driverId === driver.driverId;
         const isWinner = isLeftDriver
           ? battle.winnerId === battle.driverLeft?.id
           : battle.winnerId === battle.driverRight?.id;
 
         const elo = isWinner
-          ? (battle.winnerRegionalElo ?? battle.winnerElo)
-          : (battle.loserRegionalElo ?? battle.loserElo);
+          ? battle.winnerRegionalElo ?? 1000
+          : battle.loserRegionalElo ?? 1000;
 
         if (elo == null) return null;
 
@@ -195,15 +190,11 @@ const Page = () => {
 
   const activeElo = getRegionElo(activeRegion);
   const activeRank = getDriverRank(activeElo, driver.ranked);
-  const activeBattleCount =
-    battlesByRegion.get(activeRegion)?.length ?? 0;
+  const activeBattleCount = battlesByRegion.get(activeRegion)?.length ?? 0;
 
   return (
     <Box>
-      <Grid
-        gridTemplateColumns="repeat(3, 1fr)"
-        gap={2}
-      >
+      <Grid gridTemplateColumns="repeat(3, 1fr)" gap={2}>
         {REGIONS.map((region) => {
           const elo = getRegionElo(region);
           const rank = getDriverRank(elo, driver.ranked);
@@ -251,11 +242,7 @@ const Page = () => {
                 </styled.span>
               )}
               <Flex alignItems="center" gap={1.5} mb={1}>
-                <styled.img
-                  src={`/badges/${rank}.png`}
-                  w={5}
-                  h={5}
-                />
+                <styled.img src={`/badges/${rank}.png`} w={5} h={5} />
                 <styled.span
                   fontSize="sm"
                   fontWeight="semibold"
@@ -319,11 +306,7 @@ const Page = () => {
             </Flex>
           </Box>
           <Spacer />
-          <styled.img
-            src={`/badges/${activeRank}.png`}
-            w={10}
-            h={10}
-          />
+          <styled.img src={`/badges/${activeRank}.png`} w={10} h={10} />
         </Flex>
 
         {chartData.length > 1 ? (
@@ -334,13 +317,7 @@ const Page = () => {
                 margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
               >
                 <defs>
-                  <linearGradient
-                    id="colorElo"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
+                  <linearGradient id="colorElo" x1="0" y1="0" x2="0" y2="1">
                     <stop
                       offset="5%"
                       stopColor="rgba(236, 26, 85, 0.3)"
@@ -393,12 +370,7 @@ const Page = () => {
             </ResponsiveContainer>
           </Box>
         ) : (
-          <Flex
-            h={200}
-            alignItems="center"
-            justifyContent="center"
-            pb={4}
-          >
+          <Flex h={200} alignItems="center" justifyContent="center" pb={4}>
             <styled.p color="gray.500" fontSize="sm">
               No rated battles in {getRegionName(activeRegion)}
             </styled.p>
