@@ -4,15 +4,7 @@ import { calculateElos } from "~/utils/calculateElos";
 import { Regions } from "~/utils/enums";
 import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.server";
 import { prisma } from "~/utils/prisma.server";
-
-const MAJOR_MULTIPLIER = 1.5;
-
-const MAJOR_TOURANMENTS = [
-  "35788ae3-9cd2-46e4-b295-1bb26cbeec25",
-  "319ea746-1c5f-4361-a9b5-a0aebacb2405",
-  "b324565b-539a-4ed5-99b3-0df733af1a6e",
-  "6aa1bebf-7400-4fc4-a55e-6e99605578d9",
-];
+import { getKRatingFromGrade } from "~/utils/tournament";
 
 const driverLastTournamentDate: Record<number, Date> = {};
 const driverTotalBattles: Record<number, number> = {};
@@ -76,6 +68,7 @@ const computeRatingsForRegion = async (region: Regions) => {
         select: {
           name: true,
           createdAt: true,
+          grade: true,
         },
       },
     },
@@ -180,13 +173,12 @@ const computeRatingsForRegion = async (region: Regions) => {
     );
     const loserStartingElo = Math.max(0, loserBaseElo + loserInactivityPenalty);
 
-    let winnersK = driverTotalBattles[winnerId] > 5 ? 32 : 64;
+    const baseK = getKRatingFromGrade(battle.tournament.grade);
+    let winnersK = baseK;
+    const losersK = baseK;
 
-    const losersK = 32;
-
-    // Increase K-factor for tournament finals
-    if (MAJOR_TOURANMENTS.includes(battle.tournamentId)) {
-      winnersK *= MAJOR_MULTIPLIER;
+    if (driverTotalBattles[winnerId] <= 5) {
+      winnersK *= 2;
     }
 
     // Calculate new ELOs

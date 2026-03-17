@@ -1,7 +1,12 @@
-export const getQualifyingWaveSize = (qualifyingLaps: number, run: number) => {
-  if (qualifyingLaps === 1) return 1;
+import { TournamentGrades } from "@prisma/client";
 
-  const adjustedIndex = Math.min(run - 1, qualifyingLaps - 1);
-
-  return adjustedIndex === 0 ? 1 - 0.25 * (qualifyingLaps - 1) : 0.25;
+export const getKRatingFromGrade = (grade: TournamentGrades) => {
+  switch (grade) {
+    case TournamentGrades.MAJOR:
+      return 48;
+    case TournamentGrades.REGIONAL:
+      return 38;
+    case TournamentGrades.CLUB:
+      return 16;
+  }
 };

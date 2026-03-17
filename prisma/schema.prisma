@@ -8,24 +8,24 @@ datasource db {
 }
 
 model Events {
-  cover             String?
-  name              String
-  track             String?
-  startDate         DateTime
-  endDate           DateTime
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @default(now()) @updatedAt
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  link              String?          @default("")
-  trackId           String?          @db.Uuid
-  description       String?
-  responses         EventResponses[]
-  eventTrack        Tracks?          @relation(fields: [trackId], references: [id])
-  ticketCapacity    Int?
-  EventTickets      EventTickets[]
-  earlyAccessCode   String?
-  rated             Boolean          @default(false)
-  ticketTypes       EventTicketTypes[]
+  cover           String?
+  name            String
+  track           String?
+  startDate       DateTime
+  endDate         DateTime
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @default(now()) @updatedAt
+  id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link            String?            @default("")
+  trackId         String?            @db.Uuid
+  description     String?
+  responses       EventResponses[]
+  eventTrack      Tracks?            @relation(fields: [trackId], references: [id])
+  ticketCapacity  Int?
+  EventTickets    EventTickets[]
+  earlyAccessCode String?
+  rated           Boolean            @default(false)
+  ticketTypes     EventTicketTypes[]
 
   @@index([startDate])
   @@index([endDate])
@@ -34,14 +34,14 @@ model Events {
 }
 
 model EventTickets {
-  id              Int          @id @default(autoincrement())
-  eventId         String       @db.Uuid
-  event           Events       @relation(fields: [eventId], references: [id])
+  id              Int               @id @default(autoincrement())
+  eventId         String            @db.Uuid
+  event           Events            @relation(fields: [eventId], references: [id])
   userId          String?
-  user            Users?       @relation(fields: [userId], references: [id])
-  status          TicketStatus @default(PENDING)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @default(now()) @updatedAt
+  user            Users?            @relation(fields: [userId], references: [id])
+  status          TicketStatus      @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
   sessionId       String?
   paymentIntentId String?
   ticketTypeId    Int?
@@ -113,7 +113,8 @@ model Tournaments {
   driverNumbers       TournamentsDriverNumbers @default(NONE)
   bracketSize         Int                      @default(4)
   judgingInterface    JudgingInterface         @default(SIMPLE)
-  disqualifyZeros    Boolean                  @default(true)
+  disqualifyZeros     Boolean                  @default(true)
+  grade               TournamentGrades         @default(REGIONAL)
 
   @@index([state])
   @@index([archived])
@@ -123,6 +124,12 @@ model Tournaments {
   @@index([rated])
   @@index([state, archived])
   @@index([region, rated])
+}
+
+enum TournamentGrades {
+  MAJOR
+  REGIONAL
+  CLUB
 }
 
 model TournamentDrivers {
@@ -250,29 +257,29 @@ model TournamentBattleVotes {
 }
 
 model Tracks {
-  region        Regions       @default(UK)
-  createdAt     DateTime      @default(now())
-  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String
-  description   String?
-  image         String
-  cover         String?
-  lat           Float
-  lng           Float
-  types         TrackTypes[]
-  url           String
-  slug          String        @unique
-  events        Events[]
-  Products      Products[]
-  Owners        TrackOwners[]
-  status        TrackStatus   @default(PENDING)
-  address       String?
-  posts         Posts[]
-  leaderboardId         String?       @db.Uuid
-  leaderboard           Leaderboards? @relation(fields: [leaderboardId], references: [id])
-  stripeAccountId       String?
-  stripeAccountEnabled  Boolean       @default(false)
-  reviews               TrackReviews[]
+  region               Regions        @default(UK)
+  createdAt            DateTime       @default(now())
+  id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String
+  description          String?
+  image                String
+  cover                String?
+  lat                  Float
+  lng                  Float
+  types                TrackTypes[]
+  url                  String
+  slug                 String         @unique
+  events               Events[]
+  Products             Products[]
+  Owners               TrackOwners[]
+  status               TrackStatus    @default(PENDING)
+  address              String?
+  posts                Posts[]
+  leaderboardId        String?        @db.Uuid
+  leaderboard          Leaderboards?  @relation(fields: [leaderboardId], references: [id])
+  stripeAccountId      String?
+  stripeAccountEnabled Boolean        @default(false)
+  reviews              TrackReviews[]
 
   @@index([status])
   @@index([types])
@@ -306,22 +313,22 @@ model TrackReviews {
 }
 
 model Users {
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @default(now()) @updatedAt
-  driverId                Int                  @id @default(autoincrement())
-  id                      String?              @unique
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @default(now()) @updatedAt
+  driverId                Int                    @id @default(autoincrement())
+  id                      String?                @unique
   firstName               String?
   image                   String?
   lastName                String?
   team                    String?
-  elo                     Float                @default(1000)
-  elo_UK                  Float                @default(1000)
-  elo_EU                  Float                @default(1000)
-  elo_NA                  Float                @default(1000)
-  elo_ZA                  Float                @default(1000)
-  elo_LA                  Float                @default(1000)
-  elo_AP                  Float                @default(1000)
-  ranked                  Boolean              @default(false)
+  elo                     Float                  @default(1000)
+  elo_UK                  Float                  @default(1000)
+  elo_EU                  Float                  @default(1000)
+  elo_NA                  Float                  @default(1000)
+  elo_ZA                  Float                  @default(1000)
+  elo_LA                  Float                  @default(1000)
+  elo_AP                  Float                  @default(1000)
+  ranked                  Boolean                @default(false)
   events                  EventResponses[]
   Tournaments             Tournaments[]
   TournamentJudges        TournamentJudges[]
@@ -331,11 +338,11 @@ model Users {
   PostLikes               PostLikes[]
   PostComments            PostComments[]
   Posts                   Posts[]
-  archived                Boolean              @default(false)
+  archived                Boolean                @default(false)
   carSetupChanges         CarSetupChanges[]
   lastTournamentDate      DateTime?
   notifications           UserNotifications[]
-  notificationsLastReadAt DateTime             @default(now())
+  notificationsLastReadAt DateTime               @default(now())
   pushToken               String?
   threads                 ThreadUsers[]
   leaderboards            LeaderboardDrivers[]
@@ -558,21 +565,21 @@ model ThreadMessages {
 }
 
 model Leaderboards {
-  id             String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name           String
-  createdAt      DateTime                 @default(now())
-  updatedAt      DateTime                 @default(now()) @updatedAt
-  userId         String
-  cutoff         Int?
+  id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @default(now()) @updatedAt
+  userId              String
+  cutoff              Int?
   positionPoints      Json?
   tqPoints            Int                      @default(2)
   participationPoints Int                      @default(2)
   archived            Boolean                  @default(false)
-  user           Users                    @relation(fields: [userId], references: [id])
-  type           LeaderboardType          @default(TOURNAMENTS)
-  tournaments    LeaderboardTournaments[]
-  drivers        LeaderboardDrivers[]
-  tracks         Tracks[]
+  user                Users                    @relation(fields: [userId], references: [id])
+  type                LeaderboardType          @default(TOURNAMENTS)
+  tournaments         LeaderboardTournaments[]
+  drivers             LeaderboardDrivers[]
+  tracks              Tracks[]
 
   @@index([archived])
 }
