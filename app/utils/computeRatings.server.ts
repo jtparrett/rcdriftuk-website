@@ -182,7 +182,7 @@ export const computeRatings = async () => {
 
       const baseK = getKRatingFromGrade(battle.tournament.grade);
       let winnersK = baseK;
-      const losersK = baseK;
+      const losersK = 42;
 
       if (driverTotalBattles[winnerId] <= 5) {
         winnersK *= 2;
