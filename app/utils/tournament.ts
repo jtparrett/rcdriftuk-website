@@ -5,7 +5,7 @@ export const getKRatingFromGrade = (grade: TournamentGrades) => {
     case TournamentGrades.MAJOR:
       return 48;
     case TournamentGrades.REGIONAL:
-      return 38;
+      return 32;
     case TournamentGrades.CLUB:
       return 16;
   }
