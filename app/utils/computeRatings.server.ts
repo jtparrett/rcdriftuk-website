@@ -1,3 +1,4 @@
+import { TournamentGrades } from "@prisma/client";
 import clc from "cli-color";
 import { isAfter } from "date-fns";
 import { calculateElos } from "~/utils/calculateElos";
@@ -83,8 +84,6 @@ export const computeRatings = async () => {
     }
 
     const driverElos: Record<number, number> = {};
-    // BYE driver, not ranked
-    driverElos[0] = 1000;
 
     // Process each battle in chronological order
     for (const [_index, battle] of battles.entries()) {
@@ -129,6 +128,9 @@ export const computeRatings = async () => {
 
       const loserBaseElo = (driverElos[loserId] =
         driverElos?.[loserId] ?? 1000);
+
+      // BYE driver, not ranked
+      driverElos[0] = 1000;
 
       driverTotalBattles[winnerId] = (driverTotalBattles[winnerId] ?? 0) + 1;
       driverTotalBattles[loserId] = (driverTotalBattles[loserId] ?? 0) + 1;
@@ -182,7 +184,9 @@ export const computeRatings = async () => {
 
       const baseK = getKRatingFromGrade(battle.tournament.grade);
       let winnersK = baseK;
-      const losersK = 42;
+
+      // This is temporary
+      const losersK = getKRatingFromGrade(TournamentGrades.REGIONAL);
 
       if (driverTotalBattles[winnerId] <= 5) {
         winnersK *= 2;
@@ -198,7 +202,9 @@ export const computeRatings = async () => {
 
       // Update driver ELOs (store the new ELO without penalty for next battle's base)
       driverElos[winnerId] = winnerElo;
-      driverElos[loserId] = loserElo;
+      if (loserId !== 0) {
+        driverElos[loserId] = loserElo;
+      }
 
       // Update battle with points
       await prisma.tournamentBattles.update({
