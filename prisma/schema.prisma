@@ -345,7 +345,6 @@ model Users {
   notificationsLastReadAt DateTime               @default(now())
   pushToken               String?
   threads                 ThreadUsers[]
-  leaderboards            LeaderboardDrivers[]
   Leaderboards            Leaderboards[]
   claimTargets            ProfileClaimRequests[] @relation("ClaimTarget")
   claimRequesters         ProfileClaimRequests[] @relation("ClaimRequester")
@@ -576,9 +575,7 @@ model Leaderboards {
   participationPoints Int                      @default(2)
   archived            Boolean                  @default(false)
   user                Users                    @relation(fields: [userId], references: [id])
-  type                LeaderboardType          @default(TOURNAMENTS)
   tournaments         LeaderboardTournaments[]
-  drivers             LeaderboardDrivers[]
   tracks              Tracks[]
 
   @@index([archived])
@@ -595,24 +592,6 @@ model LeaderboardTournaments {
   @@index([leaderboardId])
   @@index([tournamentId])
   @@index([leaderboardId, tournamentId])
-}
-
-model LeaderboardDrivers {
-  id            Int          @id @default(autoincrement())
-  leaderboardId String       @db.Uuid
-  driverId      Int
-  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
-  driver        Users        @relation(fields: [driverId], references: [driverId], onDelete: Cascade)
-
-  @@unique([leaderboardId, driverId])
-  @@index([leaderboardId])
-  @@index([driverId])
-  @@index([leaderboardId, driverId])
-}
-
-enum LeaderboardType {
-  TOURNAMENTS
-  DRIVERS
 }
 
 enum TrackTypes {

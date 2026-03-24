@@ -191,13 +191,6 @@ export const getScoreFormulaOptions = (
   ];
 };
 
-export const LeaderboardType = {
-  TOURNAMENTS: "TOURNAMENTS",
-  DRIVERS: "DRIVERS",
-} as const;
-
-export type LeaderboardType = Values<typeof LeaderboardType>;
-
 export const QualifyingOrder = {
   DRIVERS: "DRIVERS",
   RUNS: "RUNS",

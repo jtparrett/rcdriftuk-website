@@ -73,10 +73,6 @@ const run = async () => {
           where: { driverId: targetDriverId },
           data: { driverId: requesterDriverId },
         }),
-        prisma.leaderboardDrivers.updateMany({
-          where: { driverId: targetDriverId },
-          data: { driverId: requesterDriverId },
-        }),
         prisma.profileClaimRequests.delete({
           where: { id: claim.id },
         }),

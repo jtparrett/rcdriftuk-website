@@ -23,15 +23,12 @@ import { prisma } from "~/utils/prisma.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { Input } from "~/components/Input";
 import { Button } from "~/components/Button";
-import { TabButton, TabGroup } from "~/components/Tab";
-import { LeaderboardType, TournamentsState } from "~/utils/enums";
-import { capitalCase } from "change-case";
+import { TournamentsState } from "~/utils/enums";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Reorder } from "motion/react";
 import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
 import { Dropdown, Option } from "~/components/Dropdown";
 import { Card } from "~/components/CollapsibleCard";
-import { useUserSearch } from "~/hooks/useUserSearch";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
 import { Switch } from "~/components/Switch";
 
@@ -47,16 +44,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       userId,
     },
     include: {
-      drivers: {
-        include: {
-          driver: {
-            select: {
-              firstName: true,
-              lastName: true,
-            },
-          },
-        },
-      },
       tournaments: true,
     },
   });
@@ -103,36 +90,23 @@ export const action = async (args: LoaderFunctionArgs) => {
 
   const data = actionSchema.parse({
     name: formData.get("name"),
-    type: formData.get("type"),
     cutoff: Number(formData.get("cutoff")),
     tqPoints: Number(formData.get("tqPoints") ?? 0),
     participationPoints: Number(formData.get("participationPoints") ?? 0),
     positionPoints,
     tournaments: formData.getAll("tournaments"),
-    drivers: formData.getAll("drivers").map((driver) => Number(driver)),
+  });
+
+  await prisma.leaderboardTournaments.deleteMany({
+    where: {
+      leaderboardId: id,
+      leaderboard: {
+        userId,
+      },
+    },
   });
 
   await prisma.$transaction([
-    prisma.leaderboardDrivers.deleteMany({
-      where: {
-        leaderboardId: id,
-        leaderboard: {
-          userId,
-        },
-      },
-    }),
-    prisma.leaderboardTournaments.deleteMany({
-      where: {
-        leaderboardId: id,
-        leaderboard: {
-          userId,
-        },
-      },
-    }),
-  ]);
-
-  await prisma.$transaction([
-    // Update leaderboard
     prisma.leaderboards.update({
       where: {
         id,
@@ -140,7 +114,6 @@ export const action = async (args: LoaderFunctionArgs) => {
       },
       data: {
         name: data.name,
-        type: data.type,
         cutoff: data.cutoff,
         tqPoints: data.tqPoints,
         participationPoints: data.participationPoints,
@@ -148,19 +121,10 @@ export const action = async (args: LoaderFunctionArgs) => {
       },
     }),
 
-    // Create tournaments
     prisma.leaderboardTournaments.createMany({
       data: data.tournaments.map((tournamentId) => ({
         leaderboardId: id,
         tournamentId,
-      })),
-    }),
-
-    // Create drivers
-    prisma.leaderboardDrivers.createMany({
-      data: data.drivers.map((driverId) => ({
-        leaderboardId: id,
-        driverId,
       })),
     }),
   ]);
@@ -170,30 +134,20 @@ export const action = async (args: LoaderFunctionArgs) => {
 
 const actionSchema = z.object({
   name: z.string().min(1),
-  type: z.nativeEnum(LeaderboardType),
   cutoff: z.number(),
   tqPoints: z.number().min(0).max(100),
   participationPoints: z.number().min(0).max(100),
   positionPoints: z.record(z.string(), z.number()).nullable(),
   tournaments: z.array(z.string()),
-  drivers: z.array(z.number()),
 });
 
 const clientSchema = z.object({
   name: z.string().min(1),
-  type: z.nativeEnum(LeaderboardType),
   cutoff: z.number(),
   tqPoints: z.number().min(0).max(100),
   participationPoints: z.number().min(0).max(100),
   positionPoints: z.record(z.string(), z.number()),
   tournaments: z.array(z.string()),
-  drivers: z.array(
-    z.object({
-      driverId: z.number(),
-      firstName: z.string().nullable().optional(),
-      lastName: z.string().nullable().optional(),
-    }),
-  ),
 });
 
 const validationSchema = toFormikValidationSchema(clientSchema);
@@ -461,181 +415,6 @@ const TournamentsForm = ({
   );
 };
 
-interface DriverEntry {
-  driverId: number;
-  firstName?: string | null;
-  lastName?: string | null;
-}
-
-const PeopleForm = ({
-  value,
-  onChange,
-}: {
-  value: DriverEntry[];
-  onChange: (value: DriverEntry[]) => void;
-}) => {
-  const [focused, setFocused] = useState(false);
-  const [search, setSearch] = useState("");
-
-  const { data: searchResults = [], isLoading } = useUserSearch(search);
-
-  const selectedIds = new Set(value.map((v) => v.driverId));
-  const filteredResults = searchResults.filter(
-    (u) => !selectedIds.has(u.driverId),
-  );
-
-  return (
-    <Box>
-      {value.length > 0 && (
-        <Box
-          bgColor="gray.900"
-          rounded="lg"
-          mb={2}
-          overflow="hidden"
-          borderWidth={1}
-          borderColor="gray.800"
-        >
-          <Reorder.Group
-            axis="y"
-            values={value}
-            onReorder={onChange}
-            style={{
-              margin: 0,
-              padding: 0,
-              listStyle: "none",
-              marginBottom: "-1px",
-            }}
-          >
-            {value.map((entry, i) => {
-              const displayName = entry.firstName
-                ? `${entry.firstName} ${entry.lastName ?? ""}`.trim()
-                : `Driver #${entry.driverId}`;
-
-              return (
-                <Reorder.Item
-                  key={entry.driverId}
-                  value={entry}
-                  style={{ listStyle: "none" }}
-                  whileDrag={{
-                    zIndex: 1000,
-                  }}
-                  dragElastic={0.1}
-                >
-                  <Flex
-                    gap={2}
-                    borderBottomWidth={1}
-                    borderBottomColor="gray.800"
-                    cursor="grab"
-                    _active={{ cursor: "grabbing" }}
-                    transition="all 0.2s ease"
-                    _hover={{ bgColor: "gray.800" }}
-                    alignItems="center"
-                    pl={2}
-                  >
-                    <RiDraggable size={16} />
-
-                    <styled.p
-                      flex={1}
-                      userSelect="none"
-                      whiteSpace="nowrap"
-                      textOverflow="ellipsis"
-                      overflow="hidden"
-                      py={1}
-                    >
-                      {i + 1}. {displayName}
-                    </styled.p>
-
-                    <Box p={1}>
-                      <Button
-                        px={1}
-                        size="xs"
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          onChange(value.filter((_id, index) => index !== i));
-                        }}
-                      >
-                        <RiDeleteBinFill />
-                      </Button>
-                    </Box>
-                  </Flex>
-                </Reorder.Item>
-              );
-            })}
-          </Reorder.Group>
-        </Box>
-      )}
-
-      <Box pos="relative">
-        <Input
-          placeholder="Type to search..."
-          onBlur={() => {
-            setTimeout(() => {
-              const active = document.activeElement;
-              const listbox = document.querySelector('[role="listbox"]');
-              if (!listbox?.contains(active)) {
-                setFocused(false);
-              }
-            }, 300);
-          }}
-          onFocus={() => setFocused(true)}
-          onChange={(e) => setSearch(e.target.value)}
-          value={search}
-        />
-        {focused && search.length > 0 && (
-          <Dropdown role="listbox">
-            {isLoading && (
-              <styled.p px={2} py={1} color="gray.500">
-                Searching...
-              </styled.p>
-            )}
-
-            {!isLoading && filteredResults.length === 0 && (
-              <styled.p px={2} py={1} fontWeight="semibold">
-                No results found
-              </styled.p>
-            )}
-
-            {filteredResults.map((user) => {
-              return (
-                <Option
-                  key={user.driverId}
-                  type="button"
-                  onClick={() => {
-                    onChange([
-                      ...value,
-                      {
-                        driverId: user.driverId,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                      },
-                    ]);
-                    setSearch("");
-                  }}
-                >
-                  <Flex alignItems="center" gap={2}>
-                    <styled.img
-                      src={user.image ?? "/blank-driver-right.jpg"}
-                      alt={user.firstName ?? ""}
-                      w={6}
-                      h={6}
-                      rounded="full"
-                      objectFit="cover"
-                    />
-                    <styled.span>
-                      {user.firstName} {user.lastName}
-                    </styled.span>
-                  </Flex>
-                </Option>
-              );
-            })}
-          </Dropdown>
-        )}
-      </Box>
-    </Box>
-  );
-};
-
 const LeaderboardsEditPage = () => {
   const fetcher = useFetcher();
   const { leaderboard } = useLoaderData<typeof loader>();
@@ -650,16 +429,10 @@ const LeaderboardsEditPage = () => {
     validationSchema,
     initialValues: {
       name: leaderboard.name,
-      type: leaderboard.type,
       cutoff: leaderboard.cutoff ?? 0,
       tqPoints: leaderboard.tqPoints,
       participationPoints: leaderboard.participationPoints,
       positionPoints: initialPositionPoints,
-      drivers: leaderboard.drivers.map((driver) => ({
-        driverId: driver.driverId,
-        firstName: driver.driver.firstName,
-        lastName: driver.driver.lastName,
-      })),
       tournaments: leaderboard.tournaments.map(
         (tournament) => tournament.tournamentId,
       ),
@@ -668,7 +441,6 @@ const LeaderboardsEditPage = () => {
       const formData = new FormData();
 
       formData.append("name", values.name);
-      formData.append("type", values.type);
       formData.append("cutoff", values.cutoff.toString());
       formData.append("tqPoints", values.tqPoints.toString());
       formData.append(
@@ -682,9 +454,6 @@ const LeaderboardsEditPage = () => {
       }
       formData.append("positionPoints", JSON.stringify(filteredPoints));
 
-      values.drivers.forEach((driver) => {
-        formData.append("drivers", driver.driverId.toString());
-      });
       values.tournaments.forEach((tournament) => {
         formData.append("tournaments", tournament);
       });
@@ -710,26 +479,6 @@ const LeaderboardsEditPage = () => {
                   onChange={formik.handleChange}
                 />
               </FormControl>
-
-              <FormControl>
-                <Label>Leaderboard Type</Label>
-                <TabGroup>
-                  {Object.values(LeaderboardType).map((item) => {
-                    return (
-                      <TabButton
-                        key={item}
-                        type="button"
-                        isActive={formik.values.type === item}
-                        onClick={() => formik.setFieldValue("type", item)}
-                      >
-                        {capitalCase(item)}
-                      </TabButton>
-                    );
-                  })}
-                </TabGroup>
-              </FormControl>
-
-              <Divider borderColor="gray.800" />
 
               <FormControl>
                 <Flex alignItems="center" justifyContent="space-between" mb={1}>
@@ -844,27 +593,15 @@ const LeaderboardsEditPage = () => {
 
               <Divider borderColor="gray.800" />
 
-              {formik.values.type === LeaderboardType.TOURNAMENTS && (
-                <FormControl>
-                  <Label>Tournaments</Label>
-                  <TournamentsForm
-                    value={formik.values.tournaments}
-                    onChange={(value) =>
-                      formik.setFieldValue("tournaments", value)
-                    }
-                  />
-                </FormControl>
-              )}
-
-              {formik.values.type === LeaderboardType.DRIVERS && (
-                <FormControl>
-                  <Label>Drivers</Label>
-                  <PeopleForm
-                    value={formik.values.drivers}
-                    onChange={(value) => formik.setFieldValue("drivers", value)}
-                  />
-                </FormControl>
-              )}
+              <FormControl>
+                <Label>Tournaments</Label>
+                <TournamentsForm
+                  value={formik.values.tournaments}
+                  onChange={(value) =>
+                    formik.setFieldValue("tournaments", value)
+                  }
+                />
+              </FormControl>
 
               <Button
                 type="submit"

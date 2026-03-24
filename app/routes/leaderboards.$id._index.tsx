@@ -6,7 +6,6 @@ import {
 } from "react-router";
 import { Fragment } from "react";
 import { z } from "zod";
-import { LeaderboardType } from "~/utils/enums";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { LinkOverlay } from "~/components/LinkOverlay";
@@ -30,14 +29,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       id,
     },
     include: {
-      drivers: {
-        orderBy: {
-          id: "asc",
-        },
-        include: {
-          driver: true,
-        },
-      },
       tournaments: {
         orderBy: {
           tournament: {
@@ -56,78 +47,56 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const tqPoints = leaderboard.tqPoints;
   const participationPoints = leaderboard.participationPoints;
 
-  if (leaderboard.type === LeaderboardType.TOURNAMENTS) {
-    const rows = await prisma.tournamentDrivers.findMany({
-      where: {
-        tournamentId: {
-          in: leaderboard.tournaments.map((t) => t.tournamentId),
-        },
-        driverId: {
-          not: 0,
-        },
-      },
-      orderBy: [
-        {
-          finishingPosition: "asc",
-        },
-        {
-          qualifyingPosition: "asc",
-        },
-        {
-          id: "asc",
-        },
-      ],
-      include: {
-        user: true,
-      },
-    });
+  const tournamentIds = leaderboard.tournaments.map((t) => t.tournamentId);
+  const rows =
+    tournamentIds.length > 0
+      ? await prisma.tournamentDrivers.findMany({
+          where: {
+            tournamentId: { in: tournamentIds },
+            driverId: { not: 0 },
+          },
+          orderBy: [
+            { finishingPosition: "asc" },
+            { qualifyingPosition: "asc" },
+            { id: "asc" },
+          ],
+          include: {
+            user: true,
+          },
+        })
+      : [];
 
-    const byDriver = new Map<
-      number,
-      { user: (typeof rows)[0]["user"]; totalPoints: number }
-    >();
+  const byDriver = new Map<
+    number,
+    { user: (typeof rows)[0]["user"]; totalPoints: number }
+  >();
 
-    for (const row of rows) {
-      const pos = row.finishingPosition ?? 0;
-      let points = (pointsConfig[pos] ?? 0) + participationPoints;
+  for (const row of rows) {
+    const pos = row.finishingPosition ?? 0;
+    let points = (pointsConfig[pos] ?? 0) + participationPoints;
 
-      if (tqPoints > 0 && row.qualifyingPosition === 1) {
-        points += tqPoints;
-      }
-
-      const existing = byDriver.get(row.driverId);
-      if (existing) {
-        existing.totalPoints += points;
-      } else {
-        byDriver.set(row.driverId, {
-          user: row.user,
-          totalPoints: points,
-        });
-      }
+    if (tqPoints > 0 && row.qualifyingPosition === 1) {
+      points += tqPoints;
     }
 
-    const drivers = Array.from(byDriver.entries())
-      .map(([driverId, { user, totalPoints }]) => ({
-        driverId,
-        user,
-        totalPoints,
-      }))
-      .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
-
-    return {
-      leaderboard,
-      drivers,
-      isOwner,
-    };
+    const existing = byDriver.get(row.driverId);
+    if (existing) {
+      existing.totalPoints += points;
+    } else {
+      byDriver.set(row.driverId, {
+        user: row.user,
+        totalPoints: points,
+      });
+    }
   }
 
-  const drivers = leaderboard.drivers.map((d, i) => {
-    return {
-      driverId: d.driverId,
-      user: d.driver,
-      totalPoints: pointsConfig[i + 1] ?? 0,
-    };
-  });
+  const drivers = Array.from(byDriver.entries())
+    .map(([driverId, { user, totalPoints }]) => ({
+      driverId,
+      user,
+      totalPoints,
+    }))
+    .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
 
   return {
     leaderboard,

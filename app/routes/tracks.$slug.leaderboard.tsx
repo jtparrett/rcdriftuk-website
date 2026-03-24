@@ -4,7 +4,6 @@ import { prisma } from "~/utils/prisma.server";
 import { z } from "zod";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import notFoundInvariant from "~/utils/notFoundInvariant";
-import { LeaderboardType } from "~/utils/enums";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -18,14 +17,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
     include: {
       leaderboard: {
         include: {
-          drivers: {
-            orderBy: {
-              id: "asc",
-            },
-            include: {
-              driver: true,
-            },
-          },
           tournaments: true,
         },
       },
@@ -34,85 +25,67 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   notFoundInvariant(track, "Track not found");
 
-  if (track.leaderboard?.type === LeaderboardType.TOURNAMENTS) {
-    const pointsConfig = getPositionPoints(track.leaderboard.positionPoints);
-    const tqPoints = track.leaderboard.tqPoints;
-    const participationPoints = track.leaderboard.participationPoints;
+  if (!track.leaderboard) {
+    return { drivers: [], leaderboard: null };
+  }
 
-    const rows = await prisma.tournamentDrivers.findMany({
-      where: {
-        tournamentId: {
-          in: track.leaderboard.tournaments.map((t) => t.tournamentId),
-        },
-      },
-      orderBy: [
-        {
-          finishingPosition: "asc",
-        },
-        {
-          qualifyingPosition: "asc",
-        },
-        {
-          id: "asc",
-        },
-      ],
-      include: {
-        user: true,
-      },
-    });
+  const pointsConfig = getPositionPoints(track.leaderboard.positionPoints);
+  const tqPoints = track.leaderboard.tqPoints;
+  const participationPoints = track.leaderboard.participationPoints;
+  const tournamentIds = track.leaderboard.tournaments.map((t) => t.tournamentId);
 
-    const byDriver = new Map<
-      number,
-      { user: (typeof rows)[0]["user"]; totalPoints: number }
-    >();
+  const rows =
+    tournamentIds.length > 0
+      ? await prisma.tournamentDrivers.findMany({
+          where: {
+            tournamentId: { in: tournamentIds },
+            driverId: { not: 0 },
+          },
+          orderBy: [
+            { finishingPosition: "asc" },
+            { qualifyingPosition: "asc" },
+            { id: "asc" },
+          ],
+          include: {
+            user: true,
+          },
+        })
+      : [];
 
-    for (const row of rows) {
-      const pos = row.finishingPosition ?? 0;
-      let points = (pointsConfig[pos] ?? 0) + participationPoints;
+  const byDriver = new Map<
+    number,
+    { user: (typeof rows)[0]["user"]; totalPoints: number }
+  >();
 
-      if (tqPoints > 0 && row.qualifyingPosition === 1) {
-        points += tqPoints;
-      }
+  for (const row of rows) {
+    const pos = row.finishingPosition ?? 0;
+    let points = (pointsConfig[pos] ?? 0) + participationPoints;
 
-      const existing = byDriver.get(row.driverId);
-      if (existing) {
-        existing.totalPoints += points;
-      } else {
-        byDriver.set(row.driverId, {
-          user: row.user,
-          totalPoints: points,
-        });
-      }
+    if (tqPoints > 0 && row.qualifyingPosition === 1) {
+      points += tqPoints;
     }
 
-    const drivers = Array.from(byDriver.entries())
-      .map(([driverId, { user, totalPoints }]) => ({
-        driverId,
-        user,
-        totalPoints,
-      }))
-      .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
-
-    return {
-      drivers,
-      leaderboard: track.leaderboard,
-    };
+    const existing = byDriver.get(row.driverId);
+    if (existing) {
+      existing.totalPoints += points;
+    } else {
+      byDriver.set(row.driverId, {
+        user: row.user,
+        totalPoints: points,
+      });
+    }
   }
 
-  if (track.leaderboard?.type === LeaderboardType.DRIVERS) {
-    const pointsConfig = getPositionPoints(track.leaderboard.positionPoints);
-    return {
-      drivers: track.leaderboard.drivers.map((d, i) => ({
-        driverId: d.driverId,
-        user: d.driver,
-        totalPoints: pointsConfig[i + 1] ?? 0,
-      })),
-      leaderboard: track.leaderboard,
-    };
-  }
+  const drivers = Array.from(byDriver.entries())
+    .map(([driverId, { user, totalPoints }]) => ({
+      driverId,
+      user,
+      totalPoints,
+    }))
+    .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
 
   return {
-    drivers: [],
+    drivers,
     leaderboard: track.leaderboard,
   };
 };

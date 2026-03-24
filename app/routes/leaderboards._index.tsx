@@ -28,15 +28,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
           userId: userId,
         },
         {
-          drivers: {
-            some: {
-              driver: {
-                id: userId,
-              },
-            },
-          },
-        },
-        {
           tournaments: {
             some: {
               tournament: {
