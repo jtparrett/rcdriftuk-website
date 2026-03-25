@@ -1,5 +1,9 @@
 import type { Tournaments } from "@prisma/client";
-import { BattlesBracket, TournamentsFormat, TournamentsState } from "~/utils/enums";
+import {
+  BattlesBracket,
+  TournamentsFormat,
+  TournamentsState,
+} from "~/utils/enums";
 import invariant from "~/utils/invariant";
 import { sortByInnerOuter } from "~/utils/innerOuterSorting";
 import { prisma } from "~/utils/prisma.server";
@@ -42,7 +46,7 @@ const addByeDriverToTournament = async (
  * the last or second-to-last position in the bracket.
  */
 const getAdvanceSlotOffset = (): number => {
-  const slot = process.env.BRACKET_ADVANCE_SLOT ?? "LAST";
+  const slot = "SECOND_TO_LAST";
   return slot === "SECOND_TO_LAST" ? 2 : 1;
 };
 
@@ -230,19 +234,17 @@ export const tournamentSeedBattles = async (id: string) => {
       orderBy: { id: "asc" },
     });
 
-    const matchups = Array.from(
-      new Array(bracket.bracketSize / 2),
-    ).map((_, i) => {
-      const driverLeft = fullDriverList[bracket.bracketSize - i - 1];
-      const driverRight = fullDriverList[i];
+    const matchups = Array.from(new Array(bracket.bracketSize / 2)).map(
+      (_, i) => {
+        const driverLeft = fullDriverList[bracket.bracketSize - i - 1];
+        const driverRight = fullDriverList[i];
 
-      return {
-        driverLeftId:
-          driverLeft.id === 0 ? null : driverLeft.id,
-        driverRightId:
-          driverRight.id === 0 ? null : driverRight.id,
-      };
-    });
+        return {
+          driverLeftId: driverLeft.id === 0 ? null : driverLeft.id,
+          driverRightId: driverRight.id === 0 ? null : driverRight.id,
+        };
+      },
+    );
 
     const seededMatchups = sortByInnerOuter(matchups);
 
