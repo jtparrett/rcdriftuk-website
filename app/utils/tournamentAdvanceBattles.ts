@@ -3,6 +3,7 @@ import invariant from "~/utils/invariant";
 import { prisma } from "~/utils/prisma.server";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
 import { commitBattleWinner } from "~/utils/commitBattleWinner";
+import { resolveNextReadyBattleId } from "~/utils/getActiveBattleStage.server";
 
 export const tournamentAdvanceBattles = async (id: string) => {
   const tournament = await prisma.tournaments.findFirst({
@@ -56,30 +57,14 @@ export const tournamentAdvanceBattles = async (id: string) => {
     return null;
   }
 
-  // Find the next battle without a winner
-  const nextBattle = await prisma.tournamentBattles.findFirst({
-    where: {
-      tournamentId: id,
-      winnerId: null,
-    },
-    orderBy: [
-      { round: "asc" },
-      { bracket: "asc" },
-      {
-        id: "asc",
-      },
-    ],
-    select: {
-      id: true,
-    },
-  });
+  const nextBattleId = await resolveNextReadyBattleId(id);
 
   await prisma.tournaments.update({
     where: {
       id,
     },
     data: {
-      nextBattleId: nextBattle?.id ?? null,
+      nextBattleId,
     },
   });
 

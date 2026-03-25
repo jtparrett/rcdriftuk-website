@@ -6,7 +6,8 @@ import { prisma } from "~/utils/prisma.server";
 import { sortByQualifyingScores } from "~/utils/sortByQualifyingScores";
 import { sumScores } from "~/utils/sumScores";
 import { autoAdvanceByeRuns } from "~/utils/autoAdvanceByeRuns.server";
-import { setTournamentFinishingPositions } from "./setTournamentFinishingPositions";
+import { allocateDriverIdsToStages } from "./allocateTournamentStageDrivers";
+import { toStageRound } from "./tournamentStageRounds";
 
 const addByeDriverToTournament = async (
   tournament: Pick<Tournaments, "id" | "qualifyingLaps">,
@@ -39,16 +40,11 @@ const addByeDriverToTournament = async (
 // Only run this if you're sure all laps have been judged
 export const tournamentSeedBattles = async (id: string) => {
   const tournament = await prisma.tournaments.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
     select: {
       id: true,
       scoreFormula: true,
-      bracketSize: true,
-      format: true,
       qualifyingLaps: true,
-      enableBattles: true,
       enableQualifying: true,
       disqualifyZeros: true,
       _count: {
@@ -57,17 +53,11 @@ export const tournamentSeedBattles = async (id: string) => {
         },
       },
       judges: {
-        orderBy: {
-          sortOrder: "asc",
-        },
-        select: {
-          id: true,
-        },
+        orderBy: { sortOrder: "asc" },
+        select: { id: true },
       },
       drivers: {
-        orderBy: {
-          id: "asc",
-        },
+        orderBy: { id: "asc" },
         include: {
           laps: {
             include: {
@@ -76,47 +66,36 @@ export const tournamentSeedBattles = async (id: string) => {
           },
         },
       },
+      battleStages: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          sortOrder: true,
+          bracketSize: true,
+          format: true,
+        },
+      },
     },
   });
 
   invariant(tournament, "Missing tournament");
+  invariant(tournament.battleStages.length > 0, "No battle stages");
 
   const judgeIds = tournament.judges.map((j) => j.id);
 
   await prisma.tournaments.update({
-    where: {
-      id,
-    },
+    where: { id },
     data: {
-      state: tournament.enableBattles
-        ? TournamentsState.BATTLES
-        : TournamentsState.END,
+      state: TournamentsState.BATTLES,
       nextQualifyingLapId: null,
     },
   });
 
-  if (!tournament.enableBattles) {
-    await setTournamentFinishingPositions(id);
-    return;
-  }
-
   const byeTounamentDriver = await addByeDriverToTournament(tournament);
 
-  // Exclude the old bye driver (just deleted) so we never reference its id in updates
   const realDrivers = tournament.drivers.filter((d) => !d.isBye);
-  const totalBuysToCreate = Math.max(
-    0,
-    tournament.bracketSize - realDrivers.length,
-  );
 
-  const driversWithScores = [
-    ...realDrivers,
-    ...Array.from(new Array(totalBuysToCreate)).map((_, i) => ({
-      id: byeTounamentDriver.id,
-      laps: [],
-      tournamentDriverNumber: realDrivers.length + i + 1,
-    })),
-  ].map((driver) => {
+  const driversWithScores = realDrivers.map((driver) => {
     const lapScores = driver.laps.map((lap) =>
       sumScores(
         lap.scores,
@@ -133,9 +112,9 @@ export const tournamentSeedBattles = async (id: string) => {
       tournament.disqualifyZeros
     ) {
       return {
-        lapScores: [],
-        id: byeTounamentDriver.id,
-        tournamentDriverNumber: byeTounamentDriver.tournamentDriverNumber,
+        lapScores: [] as number[],
+        id: driver.id,
+        tournamentDriverNumber: driver.tournamentDriverNumber,
       };
     }
 
@@ -146,64 +125,88 @@ export const tournamentSeedBattles = async (id: string) => {
     };
   });
 
-  let sortedDrivers = sortByQualifyingScores(
+  const sortedReal = sortByQualifyingScores(
     driversWithScores,
     (d) => d.tournamentDriverNumber,
   );
 
-  // Set qualifying positions (exclude bye driver)
   await prisma.$transaction(
-    sortedDrivers
-      .filter((driver) => driver.id !== byeTounamentDriver.id)
-      .map((driver, i) => {
-        return prisma.tournamentDrivers.update({
-          where: {
-            id: driver.id,
-          },
-          data: {
-            qualifyingPosition: i + 1,
-          },
-        });
+    sortedReal.map((driver, i) =>
+      prisma.tournamentDrivers.update({
+        where: { id: driver.id },
+        data: { qualifyingPosition: i + 1 },
       }),
+    ),
   );
 
-  const initialBattles = await prisma.tournamentBattles.findMany({
-    where: {
-      tournamentId: id,
-      round: 1,
-      bracket: BattlesBracket.UPPER,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
+  const sortedRealIds = sortedReal.map((d) => d.id);
 
-  const initialBattleDrivers = sortByInnerOuter(
-    Array.from(new Array(tournament.bracketSize / 2)).map((_, i) => {
-      let { id: driverLeftId } = sortedDrivers[tournament.bracketSize - i - 1];
-      let { id: driverRightId } = sortedDrivers[i];
-
-      return {
-        driverLeftId,
-        driverRightId,
-      };
-    }),
+  const allocation = allocateDriverIdsToStages(
+    sortedRealIds,
+    tournament.battleStages,
   );
 
-  await prisma.$transaction(
-    initialBattles.map((battle, i) => {
-      return prisma.tournamentBattles.update({
-        where: {
-          id: battle.id,
-        },
-        data: {
-          driverLeftId: initialBattleDrivers[i].driverLeftId,
-          driverRightId: initialBattleDrivers[i].driverRightId,
-        },
-      });
-    }),
-  );
+  const stagesOrdered = tournament.battleStages;
 
-  // After setting up battles, check if the first battle is a bye run and auto-advance if needed
+  for (const stage of stagesOrdered) {
+    const assignedIds = allocation.get(stage.id) ?? [];
+    const B = stage.bracketSize;
+    const hasBump =
+      stagesOrdered.length > 1 && stage.id !== stagesOrdered[0]!.id;
+
+    const byeId = byeTounamentDriver.id;
+
+    // Cap reals per stage to bracket capacity; pad with byes (legacy single-bracket behaviour).
+    const maxReals = hasBump ? B - 1 : B;
+    const fromAlloc = assignedIds.slice(0, maxReals);
+    const byePad = Math.max(0, maxReals - fromAlloc.length);
+    const filled = [
+      ...fromAlloc,
+      ...Array.from({ length: byePad }).map(() => byeId),
+    ];
+
+    let slots: (number | null)[];
+    if (hasBump) {
+      slots = [...filled, null];
+    } else {
+      slots = filled;
+    }
+
+    const rawPairs = Array.from({ length: B / 2 }, (_, i) => ({
+      driverLeftId: slots[B - 1 - i] ?? null,
+      driverRightId: slots[i] ?? null,
+    }));
+
+    const initialBattleDrivers = sortByInnerOuter(rawPairs);
+
+    const r1 = toStageRound(stage.sortOrder, 1);
+    const initialBattles = await prisma.tournamentBattles.findMany({
+      where: {
+        tournamentId: id,
+        stageId: stage.id,
+        round: r1,
+        bracket: BattlesBracket.UPPER,
+      },
+      orderBy: { id: "asc" },
+    });
+
+    invariant(
+      initialBattles.length === initialBattleDrivers.length,
+      "Initial battle count mismatch for stage",
+    );
+
+    await prisma.$transaction(
+      initialBattles.map((battle, i) =>
+        prisma.tournamentBattles.update({
+          where: { id: battle.id },
+          data: {
+            driverLeftId: initialBattleDrivers[i]!.driverLeftId,
+            driverRightId: initialBattleDrivers[i]!.driverRightId,
+          },
+        }),
+      ),
+    );
+  }
+
   await autoAdvanceByeRuns(id);
 };

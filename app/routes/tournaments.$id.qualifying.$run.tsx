@@ -34,6 +34,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       _count: {
         select: {
           judges: true,
+          battleStages: true,
         },
       },
       judges: {
@@ -46,7 +47,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
       id: true,
       state: true,
-      enableBattles: true,
       bracketSize: true,
       format: true,
       qualifyingLaps: true,
@@ -160,7 +160,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isQualifying: tournament.state === "QUALIFYING",
     id: tournament.id,
     bracketSize: tournament.bracketSize,
-    enableBattles: tournament.enableBattles,
+    hasBattleStages: tournament._count.battleStages > 0,
     format: tournament.format,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
@@ -202,7 +202,7 @@ const Table = ({
           <Fragment key={i}>
             {i + startPosition === tournament.bracketSize &&
               tournament.run === 0 &&
-              tournament.enableBattles && (
+              tournament.hasBattleStages && (
                 <Box w="full" h="1px" bgColor="brand.500" />
               )}
             <Flex

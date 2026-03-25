@@ -22,10 +22,17 @@ export const getTournament = (id: string) => {
       region: true,
       driverNumbers: true,
       enableQualifying: true,
-      enableBattles: true,
       nextQualifyingLap: {
         include: {
           scores: true,
+        },
+      },
+      battleStages: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          name: true,
+          format: true,
         },
       },
       nextBattle: {
@@ -33,6 +40,7 @@ export const getTournament = (id: string) => {
           id: true,
           driverLeftId: true,
           driverRightId: true,
+          stageId: true,
           BattleVotes: {
             distinct: ["judgeId"],
           },

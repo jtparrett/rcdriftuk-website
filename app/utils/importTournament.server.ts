@@ -1,8 +1,14 @@
 import { prisma } from "./prisma.server";
 import { tournamentAddDrivers } from "./tournamentAddDrivers";
 import { tournamentCreateBattles } from "./tournamentCreateBattles";
-import { BattlesBracket, Regions, TournamentsState } from "./enums";
+import {
+  BattlesBracket,
+  Regions,
+  TournamentsFormat,
+  TournamentsState,
+} from "./enums";
 import { pow2Ceil } from "./powFns";
+import { toStageRound } from "./tournamentStageRounds";
 
 export interface ImportDriver {
   parsedName: string;
@@ -193,7 +199,6 @@ export async function createImportedTournament(
       name,
       userId,
       enableQualifying: false,
-      enableBattles: true,
       bracketSize,
       region: Regions.UK,
     },
@@ -216,7 +221,26 @@ export async function createImportedTournament(
     },
   });
 
+  await prisma.tournamentBattleStages.create({
+    data: {
+      tournamentId,
+      name: "Bracket",
+      sortOrder: 1,
+      bracketSize,
+      format: TournamentsFormat.STANDARD,
+    },
+  });
+
   await tournamentCreateBattles(tournamentId);
+
+  const firstStage = await prisma.tournamentBattleStages.findFirst({
+    where: { tournamentId },
+    orderBy: { sortOrder: "asc" },
+    select: { id: true, sortOrder: true },
+  });
+  const stageOrder = firstStage?.sortOrder ?? 1;
+  const toStoredRound = (localRound: number) =>
+    toStageRound(stageOrder, localRound);
 
   // tournamentCreateBattles always creates a playoff for STANDARD format.
   // Remove it when the import doesn't include one.
@@ -225,8 +249,9 @@ export async function createImportedTournament(
     await prisma.tournamentBattles.deleteMany({
       where: {
         tournamentId,
-        round: totalRounds + 1,
+        round: toStoredRound(totalRounds + 1),
         bracket: BattlesBracket.UPPER,
+        ...(firstStage?.id ? { stageId: firstStage.id } : {}),
       },
     });
   }
@@ -242,7 +267,11 @@ export async function createImportedTournament(
 
   // Group DB battles by round so we can fill them in order
   const dbBattles = await prisma.tournamentBattles.findMany({
-    where: { tournamentId, bracket: BattlesBracket.UPPER },
+    where: {
+      tournamentId,
+      bracket: BattlesBracket.UPPER,
+      ...(firstStage?.id ? { stageId: firstStage.id } : {}),
+    },
     orderBy: [{ round: "asc" }, { id: "asc" }],
   });
 
@@ -259,7 +288,8 @@ export async function createImportedTournament(
 
   for (let i = 0; i < battles.length; i++) {
     const importBattle = battles[i];
-    const round = rounds[i];
+    const round = rounds[i]!;
+    const storedRound = toStoredRound(round);
 
     const leftTd = tournamentDrivers[importBattle.driverLeftIndex];
     const rightTd = tournamentDrivers[importBattle.driverRightIndex];
@@ -271,13 +301,13 @@ export async function createImportedTournament(
         : null;
 
     // Find the next available DB battle slot for this round
-    const slots = dbBattlesByRound.get(round);
+    const slots = dbBattlesByRound.get(storedRound);
     if (!slots) continue;
 
-    const cursor = roundCursors.get(round) || 0;
+    const cursor = roundCursors.get(storedRound) || 0;
     const dbBattleId = slots[cursor];
     if (dbBattleId == null) continue;
-    roundCursors.set(round, cursor + 1);
+    roundCursors.set(storedRound, cursor + 1);
 
     await prisma.tournamentBattles.update({
       where: { id: dbBattleId },

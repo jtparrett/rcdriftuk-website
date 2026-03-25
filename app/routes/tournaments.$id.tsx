@@ -154,11 +154,24 @@ export const action = async (args: ActionFunctionArgs) => {
     tournament.state === TournamentsState.QUALIFYING &&
     tournament.nextQualifyingLapId === null
   ) {
-    // Set qualifying positions for all drivers before transitioning
     await setQualifyingPositions(id);
 
-    // Enter battles state
-    await tournamentSeedBattles(id);
+    const battleStageCount = await prisma.tournamentBattleStages.count({
+      where: { tournamentId: id },
+    });
+
+    if (battleStageCount > 0) {
+      await tournamentSeedBattles(id);
+    } else {
+      await prisma.tournaments.update({
+        where: { id },
+        data: {
+          state: TournamentsState.END,
+          nextQualifyingLapId: null,
+        },
+      });
+      await setTournamentFinishingPositions(id);
+    }
 
     publishUpdate();
 
@@ -395,9 +408,13 @@ const TournamentPage = () => {
               Qualifying
             </Tab>
           )}
-          {tournament.enableBattles && (
+          {tournament.battleStages.length > 0 && (
             <Tab
-              to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+              to={
+                tournament.battleStages[0]?.id
+                  ? `/tournaments/${tournament.id}/battles/${tournament.battleStages[0].id}/${BattlesBracket.UPPER}`
+                  : `/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`
+              }
               isActive={isBattlesTab}
               data-replace="true"
               replace

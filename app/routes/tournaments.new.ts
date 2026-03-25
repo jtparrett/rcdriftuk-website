@@ -46,7 +46,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
         ? {
             name: `${tournamentToClone.name} (Copy)`,
             enableQualifying: tournamentToClone.enableQualifying,
-            enableBattles: tournamentToClone.enableBattles,
             qualifyingLaps: tournamentToClone.qualifyingLaps,
             format: tournamentToClone.format,
             enableProtests: tournamentToClone.enableProtests,
@@ -77,9 +76,31 @@ export const loader = async (args: LoaderFunctionArgs) => {
         alias: judge.alias,
       })),
     });
+
+    const sourceStages = await prisma.tournamentBattleStages.findMany({
+      where: { tournamentId: tournamentToClone.id },
+      orderBy: { sortOrder: "asc" },
+    });
+    for (let i = 0; i < sourceStages.length; i++) {
+      const s = sourceStages[i]!;
+      await prisma.tournamentBattleStages.create({
+        data: {
+          tournamentId: tournament.id,
+          name: s.name,
+          sortOrder: i + 1,
+          bracketSize: s.bracketSize,
+          format: s.format,
+        },
+      });
+    }
   }
 
-  await tournamentCreateBattles(tournament.id);
+  const stageCount = await prisma.tournamentBattleStages.count({
+    where: { tournamentId: tournament.id },
+  });
+  if (stageCount > 0) {
+    await tournamentCreateBattles(tournament.id);
+  }
 
   return redirect(`/tournaments/${tournament.id}/setup`);
 };

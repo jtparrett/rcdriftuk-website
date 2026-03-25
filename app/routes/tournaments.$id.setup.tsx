@@ -1,7 +1,11 @@
 import { capitalCase } from "change-case";
 import { useFormik } from "formik";
 import {
+  RiAddLine,
+  RiArrowDownLine,
+  RiArrowUpLine,
   RiClipboardLine,
+  RiDeleteBinLine,
   RiFileUploadLine,
   RiLink,
   RiRefreshLine,
@@ -54,42 +58,48 @@ import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQuali
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 
-export const tournamentFormSchema = z.object({
-  name: z.string().min(1, "Tournament name is required"),
-  enableQualifying: z.boolean(),
-  enableBattles: z.boolean(),
-  drivers: z
-    .array(
-      z.object({
-        driverId: z.string(),
-        isNew: z.boolean().optional(),
-      }),
-    )
-    .min(1, "Please add at least one driver to the tournament"),
-  judges: z
-    .array(
-      z.object({
-        driverId: z.string(),
-        points: z.coerce.number(),
-        alias: z.string().min(1, "Alias is required"),
-      }),
-    )
-    .min(1, "Please add at least one judge to the tournament"),
-  qualifyingLaps: z.coerce
-    .number()
-    .min(1, "Qualifying laps must be at least 1")
-    .max(3, "Qualifying laps must be at most 3"),
-  format: z.nativeEnum(TournamentsFormat),
-  enableProtests: z.boolean(),
-  region: z.nativeEnum(Regions),
-  scoreFormula: z.nativeEnum(ScoreFormula),
-  qualifyingOrder: z.nativeEnum(QualifyingOrder),
-  driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
+const battleStageRowSchema = z.object({
+  name: z.string().min(1, "Stage name is required"),
   bracketSize: z.nativeEnum(BracketSize),
-  ratingRequested: z.boolean(),
-  judgingInterface: z.nativeEnum(JudgingInterface),
-  disqualifyZeros: z.boolean(),
+  format: z.nativeEnum(TournamentsFormat),
 });
+
+export const tournamentFormSchema = z.object({
+    name: z.string().min(1, "Tournament name is required"),
+    enableQualifying: z.boolean(),
+    drivers: z
+      .array(
+        z.object({
+          driverId: z.string(),
+          isNew: z.boolean().optional(),
+        }),
+      )
+      .min(1, "Please add at least one driver to the tournament"),
+    judges: z
+      .array(
+        z.object({
+          driverId: z.string(),
+          points: z.coerce.number(),
+          alias: z.string().min(1, "Alias is required"),
+        }),
+      )
+      .min(1, "Please add at least one judge to the tournament"),
+    qualifyingLaps: z.coerce
+      .number()
+      .min(1, "Qualifying laps must be at least 1")
+      .max(3, "Qualifying laps must be at most 3"),
+    format: z.nativeEnum(TournamentsFormat),
+    enableProtests: z.boolean(),
+    region: z.nativeEnum(Regions),
+    scoreFormula: z.nativeEnum(ScoreFormula),
+    qualifyingOrder: z.nativeEnum(QualifyingOrder),
+    driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
+    bracketSize: z.nativeEnum(BracketSize),
+    battleStages: z.array(battleStageRowSchema),
+    ratingRequested: z.boolean(),
+    judgingInterface: z.nativeEnum(JudgingInterface),
+    disqualifyZeros: z.boolean(),
+  });
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -132,6 +142,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       },
+      battleStages: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          name: true,
+          sortOrder: true,
+          bracketSize: true,
+          format: true,
+        },
+      },
     },
   });
 
@@ -156,12 +176,24 @@ export const action = async (args: ActionFunctionArgs) => {
       format: true,
       bracketSize: true,
       disqualifyZeros: true,
+      battleStages: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          name: true,
+          bracketSize: true,
+          format: true,
+        },
+      },
     },
   });
 
   notFoundInvariant(currentTournament, "Tournament not found");
 
   const isStartState = currentTournament.state === TournamentsState.START;
+
+  const primaryBracketSize =
+    data.battleStages[0]?.bracketSize ?? data.bracketSize;
+  const primaryFormat = data.battleStages[0]?.format ?? data.format;
 
   const tournament = await prisma.tournaments.update({
     where: {
@@ -171,15 +203,14 @@ export const action = async (args: ActionFunctionArgs) => {
     data: {
       name: data.name,
       enableQualifying: isStartState ? data.enableQualifying : undefined,
-      enableBattles: isStartState ? data.enableBattles : undefined,
       qualifyingLaps: isStartState ? data.qualifyingLaps : undefined,
-      format: data.format,
+      format: primaryFormat,
       enableProtests: data.enableProtests,
       region: data.region,
       scoreFormula: data.scoreFormula,
       qualifyingOrder: data.qualifyingOrder,
       driverNumbers: data.driverNumbers,
-      bracketSize: data.bracketSize,
+      bracketSize: primaryBracketSize,
       ratingRequested: data.ratingRequested,
       judgingInterface: data.judgingInterface,
       disqualifyZeros: data.disqualifyZeros,
@@ -286,13 +317,65 @@ export const action = async (args: ActionFunctionArgs) => {
     });
   }
 
+  const stagesSignature = (
+    stages: { name: string; bracketSize: number; format: string }[],
+  ) =>
+    JSON.stringify(
+      stages.map((s) => ({
+        n: s.name,
+        b: s.bracketSize,
+        f: s.format,
+      })),
+    );
+
+  const oldSig = stagesSignature(
+    currentTournament.battleStages.map((s) => ({
+      name: s.name,
+      bracketSize: s.bracketSize,
+      format: s.format,
+    })),
+  );
+  const newSig = stagesSignature(data.battleStages);
+
+  const stagesStructureChanged = oldSig !== newSig;
+
   const shouldUpdateBattles =
-    tournament.enableBattles &&
-    (currentTournament.format !== data.format ||
-      currentTournament.bracketSize !== data.bracketSize ||
+    data.battleStages.length > 0 &&
+    (stagesStructureChanged ||
+      currentTournament.format !== primaryFormat ||
+      currentTournament.bracketSize !== primaryBracketSize ||
       currentTournament.disqualifyZeros !== data.disqualifyZeros);
 
-  if (shouldUpdateBattles) {
+  if (isStartState && stagesStructureChanged) {
+    await prisma.tournamentBattleVotes.deleteMany({
+      where: { battle: { tournamentId: id } },
+    });
+    await prisma.tournamentBattles.deleteMany({ where: { tournamentId: id } });
+    await prisma.tournamentBattleStages.deleteMany({
+      where: { tournamentId: id },
+    });
+    await prisma.tournaments.update({
+      where: { id },
+      data: { nextBattleId: null },
+    });
+
+    for (let i = 0; i < data.battleStages.length; i++) {
+      const row = data.battleStages[i]!;
+      await prisma.tournamentBattleStages.create({
+        data: {
+          tournamentId: id,
+          name: row.name,
+          sortOrder: i + 1,
+          bracketSize: row.bracketSize,
+          format: row.format,
+        },
+      });
+    }
+
+    if (data.battleStages.length > 0) {
+      await tournamentCreateBattles(id);
+    }
+  } else if (shouldUpdateBattles && !(isStartState && stagesStructureChanged)) {
     await tournamentCreateBattles(id);
 
     if (tournament.state === TournamentsState.BATTLES) {
@@ -512,7 +595,6 @@ const Page = () => {
     initialValues: {
       name: tournament.name ?? "",
       enableQualifying: tournament.enableQualifying ?? false,
-      enableBattles: tournament.enableBattles ?? false,
       judges: tournament.judges.map((judge) => ({
         driverId: judge.driverId.toString(),
         firstName: judge.user.firstName,
@@ -528,6 +610,14 @@ const Page = () => {
         image: driver.user.image,
       })),
       bracketSize: tournament.bracketSize ?? BracketSize.TOP_4,
+      battleStages:
+        tournament.battleStages.length > 0
+          ? tournament.battleStages.map((s) => ({
+              name: s.name,
+              bracketSize: s.bracketSize as BracketSize,
+              format: s.format,
+            }))
+          : [],
       enableProtests: tournament.enableProtests ?? false,
       qualifyingLaps: tournament.qualifyingLaps ?? 1,
       region: tournament.region ?? Regions.UK,
@@ -682,6 +772,62 @@ const Page = () => {
                     : undefined
                 }
               />
+            </FormControl>
+
+            <FormControl flex={1} error={formik.errors.enableProtests}>
+              <Label>Enable protesting</Label>
+              <TabGroup>
+                <TabButton
+                  type="button"
+                  isActive={!formik.values.enableProtests}
+                  onClick={() =>
+                    formik.setFieldValue("enableProtests", false)
+                  }
+                >
+                  No
+                </TabButton>
+                <TabButton
+                  type="button"
+                  isActive={formik.values.enableProtests}
+                  onClick={() => formik.setFieldValue("enableProtests", true)}
+                >
+                  Yes
+                </TabButton>
+              </TabGroup>
+            </FormControl>
+
+            <FormControl flex={1} error={formik.errors.judgingInterface}>
+              <Label>Judging interface</Label>
+              <TabGroup>
+                <TabButton
+                  type="button"
+                  isActive={
+                    formik.values.judgingInterface === JudgingInterface.SIMPLE
+                  }
+                  onClick={() =>
+                    formik.setFieldValue(
+                      "judgingInterface",
+                      JudgingInterface.SIMPLE,
+                    )
+                  }
+                >
+                  Simple
+                </TabButton>
+                <TabButton
+                  type="button"
+                  isActive={
+                    formik.values.judgingInterface === JudgingInterface.ADVANCED
+                  }
+                  onClick={() =>
+                    formik.setFieldValue(
+                      "judgingInterface",
+                      JudgingInterface.ADVANCED,
+                    )
+                  }
+                >
+                  Advanced
+                </TabButton>
+              </TabGroup>
             </FormControl>
 
             <SaveButton />
@@ -956,12 +1102,7 @@ const Page = () => {
           </Card>
 
           <Card>
-            <CardHeader
-              onClick={() =>
-                isStartState && formik.setFieldValue("enableBattles", true)
-              }
-              gap={4}
-            >
+            <CardHeader gap={4}>
               <Icon>
                 <RiSwordLine />
               </Icon>
@@ -971,145 +1112,213 @@ const Page = () => {
               </styled.h2>
 
               <Spacer />
-
-              {isStartState && (
-                <TabGroup>
-                  <TabButton
-                    isActive={!formik.values.enableBattles}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      formik.setFieldValue("enableBattles", false);
-                    }}
-                    type="button"
-                  >
-                    Disable
-                  </TabButton>
-                  <TabButton
-                    isActive={formik.values.enableBattles}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      formik.setFieldValue("enableBattles", true);
-                    }}
-                    type="button"
-                  >
-                    Enable
-                  </TabButton>
-                </TabGroup>
-              )}
             </CardHeader>
 
-            {formik.values.enableBattles && (
-              <CardContent display="flex" flexDir="column" gap={4}>
-                <FormControl flex={1} error={formik.errors.format}>
-                  <Label>Battle Format</Label>
-                  <TabGroup>
-                    {Object.values(TournamentsFormat).map((item) => {
-                      return (
-                        <TabButton
-                          key={item}
-                          type="button"
-                          isActive={formik.values.format === item}
-                          onClick={() => formik.setFieldValue("format", item)}
-                        >
-                          {capitalCase(item)}
-                        </TabButton>
-                      );
-                    })}
-                  </TabGroup>
-                </FormControl>
+            <CardContent display="flex" flexDir="column" gap={4}>
+                <styled.p fontSize="sm" color="gray.400" lineHeight="1.5">
+                  Stages run in order. The last stage gets the best qualifiers
+                  (one slot reserved for the previous stage winner); each earlier
+                  stage fills from the remaining field. The first stage has no
+                  incoming bump.
+                </styled.p>
 
-                <FormControl flex={1} error={formik.errors.bracketSize}>
-                  <Label>Bracket Size</Label>
-                  <Flex
-                    gap={2}
-                    flexWrap="wrap"
+                {typeof formik.errors.battleStages === "string" && (
+                  <styled.p color="red.400" fontSize="sm">
+                    {formik.errors.battleStages}
+                  </styled.p>
+                )}
+
+                {formik.values.battleStages.map((stage, idx) => (
+                  <Box
+                    key={idx}
                     borderWidth={1}
                     borderColor="gray.700"
-                    rounded="2xl"
-                    p={1}
+                    rounded="xl"
+                    p={3}
+                    display="flex"
+                    flexDir="column"
+                    gap={3}
                   >
-                    {Object.values(BracketSize).map((item) => {
-                      return (
-                        <TabButton
-                          type="button"
-                          key={item}
-                          isActive={formik.values.bracketSize === item}
-                          onClick={() =>
-                            formik.setFieldValue("bracketSize", item)
-                          }
-                        >
-                          Top {item}
-                        </TabButton>
-                      );
-                    })}
-                  </Flex>
-                </FormControl>
+                    <Flex alignItems="center" gap={2} flexWrap="wrap">
+                      <styled.span
+                        fontSize="xs"
+                        fontWeight="semibold"
+                        color="gray.500"
+                      >
+                        Stage {idx + 1}
+                      </styled.span>
+                      <Spacer />
+                      {isStartState && (
+                        <Flex gap={1}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            disabled={idx === 0}
+                            onClick={() => {
+                              const next = [...formik.values.battleStages];
+                              const t = next[idx - 1]!;
+                              next[idx - 1] = next[idx]!;
+                              next[idx] = t;
+                              formik.setFieldValue("battleStages", next);
+                            }}
+                            aria-label="Move stage up"
+                          >
+                            <RiArrowUpLine />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            disabled={
+                              idx === formik.values.battleStages.length - 1
+                            }
+                            onClick={() => {
+                              const next = [...formik.values.battleStages];
+                              const t = next[idx + 1]!;
+                              next[idx + 1] = next[idx]!;
+                              next[idx] = t;
+                              formik.setFieldValue("battleStages", next);
+                            }}
+                            aria-label="Move stage down"
+                          >
+                            <RiArrowDownLine />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            disabled={formik.values.battleStages.length <= 1}
+                            onClick={() => {
+                              const next = formik.values.battleStages.filter(
+                                (_, i) => i !== idx,
+                              );
+                              formik.setFieldValue("battleStages", next);
+                            }}
+                            aria-label="Remove stage"
+                          >
+                            <RiDeleteBinLine />
+                          </Button>
+                        </Flex>
+                      )}
+                    </Flex>
 
-                <FormControl flex={1} error={formik.errors.enableProtests}>
-                  <Label>Enable Protesting</Label>
-
-                  <TabGroup>
-                    <TabButton
-                      type="button"
-                      isActive={!formik.values.enableProtests}
-                      onClick={() =>
-                        formik.setFieldValue("enableProtests", false)
+                    <FormControl
+                      flex={1}
+                      error={
+                        Array.isArray(formik.errors.battleStages)
+                          ? (formik.errors.battleStages[idx] as { name?: string })
+                              ?.name
+                          : undefined
                       }
                     >
-                      No
-                    </TabButton>
-                    <TabButton
-                      type="button"
-                      isActive={formik.values.enableProtests}
-                      onClick={() =>
-                        formik.setFieldValue("enableProtests", true)
-                      }
-                    >
-                      Yes
-                    </TabButton>
-                  </TabGroup>
-                </FormControl>
+                      <Label>Name (shown on bracket tabs)</Label>
+                      <Input
+                        value={stage.name}
+                        onChange={(e) => {
+                          const next = [...formik.values.battleStages];
+                          next[idx] = {
+                            ...next[idx]!,
+                            name: e.target.value,
+                          };
+                          formik.setFieldValue("battleStages", next);
+                        }}
+                        disabled={!isStartState}
+                        placeholder="e.g. LCQ"
+                      />
+                    </FormControl>
 
-                <FormControl flex={1} error={formik.errors.judgingInterface}>
-                  <Label>Judging Interface</Label>
+                    <FormControl
+                      flex={1}
+                      error={
+                        Array.isArray(formik.errors.battleStages)
+                          ? (formik.errors.battleStages[idx] as
+                              | { bracketSize?: string }
+                              | undefined)?.bracketSize
+                          : undefined
+                      }
+                    >
+                      <Label>Bracket size</Label>
+                      <Flex
+                        gap={2}
+                        flexWrap="wrap"
+                        borderWidth={1}
+                        borderColor="gray.700"
+                        rounded="2xl"
+                        p={1}
+                      >
+                        {Object.values(BracketSize).map((item) => (
+                          <TabButton
+                            type="button"
+                            key={item}
+                            isActive={stage.bracketSize === item}
+                            disabled={!isStartState}
+                            onClick={() => {
+                              const next = [...formik.values.battleStages];
+                              next[idx] = { ...next[idx]!, bracketSize: item };
+                              formik.setFieldValue("battleStages", next);
+                            }}
+                          >
+                            Top {item}
+                          </TabButton>
+                        ))}
+                      </Flex>
+                    </FormControl>
 
-                  <TabGroup>
-                    <TabButton
-                      type="button"
-                      isActive={
-                        formik.values.judgingInterface ===
-                        JudgingInterface.SIMPLE
-                      }
-                      onClick={() =>
-                        formik.setFieldValue(
-                          "judgingInterface",
-                          JudgingInterface.SIMPLE,
-                        )
+                    <FormControl
+                      flex={1}
+                      error={
+                        Array.isArray(formik.errors.battleStages)
+                          ? (formik.errors.battleStages[idx] as
+                              | { format?: string }
+                              | undefined)?.format
+                          : undefined
                       }
                     >
-                      Simple
-                    </TabButton>
-                    <TabButton
-                      type="button"
-                      isActive={
-                        formik.values.judgingInterface ===
-                        JudgingInterface.ADVANCED
-                      }
-                      onClick={() =>
-                        formik.setFieldValue(
-                          "judgingInterface",
-                          JudgingInterface.ADVANCED,
-                        )
-                      }
-                    >
-                      Advanced
-                    </TabButton>
-                  </TabGroup>
-                </FormControl>
+                      <Label>Format</Label>
+                      <TabGroup>
+                        {Object.values(TournamentsFormat).map((item) => (
+                          <TabButton
+                            key={item}
+                            type="button"
+                            isActive={stage.format === item}
+                            disabled={!isStartState}
+                            onClick={() => {
+                              const next = [...formik.values.battleStages];
+                              next[idx] = { ...next[idx]!, format: item };
+                              formik.setFieldValue("battleStages", next);
+                            }}
+                          >
+                            {capitalCase(item)}
+                          </TabButton>
+                        ))}
+                      </TabGroup>
+                    </FormControl>
+                  </Box>
+                ))}
+
+                {isStartState && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      formik.setFieldValue("battleStages", [
+                        ...formik.values.battleStages,
+                        {
+                          name: `Stage ${formik.values.battleStages.length + 1}`,
+                          bracketSize: BracketSize.TOP_16,
+                          format: TournamentsFormat.STANDARD,
+                        },
+                      ]);
+                    }}
+                  >
+                    Add stage
+                    <RiAddLine />
+                  </Button>
+                )}
 
                 <SaveButton />
               </CardContent>
-            )}
           </Card>
         </Flex>
 

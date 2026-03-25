@@ -104,6 +104,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       tournamentId: id,
       round: tournament.nextBattle?.round,
       bracket: tournament.nextBattle?.bracket,
+      stageId: tournament.nextBattle?.stageId ?? undefined,
     },
   });
 

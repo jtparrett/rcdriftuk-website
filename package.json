@@ -12,9 +12,9 @@
     "prepare": "panda codegen",
     "approve-ratings": "tsx ./scripts/approve-ratings.ts",
     "compute-ratings": "tsx ./scripts/compute-ratings.ts",
-    "compute-new-ratings": "tsx ./scripts/compute-new-ratings.ts",
     "import-zerofeel-tracks": "tsx ./scripts/import-zerofeel-tracks.ts",
-    "approve-claims": "tsx ./scripts/approve-claims.ts"
+    "approve-claims": "tsx ./scripts/approve-claims.ts",
+    "backfill:battle-stages": "tsx ./scripts/backfill-tournament-battle-stages.ts"
   },
   "dependencies": {
     "@clerk/react-router": "^2.1.4",

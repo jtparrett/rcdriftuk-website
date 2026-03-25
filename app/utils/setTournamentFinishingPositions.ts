@@ -13,7 +13,6 @@ async function getTournamentForStandings(tournamentId: string) {
       id: true,
       format: true,
       enableQualifying: true,
-      enableBattles: true,
       scoreFormula: true,
       _count: {
         select: {
@@ -28,6 +27,14 @@ async function getTournamentForStandings(tournamentId: string) {
           id: true,
         },
       },
+      battleStages: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          sortOrder: true,
+          format: true,
+        },
+      },
       battles: {
         orderBy: [{ round: "asc" }, { bracket: "asc" }, { id: "asc" }],
         select: {
@@ -35,6 +42,7 @@ async function getTournamentForStandings(tournamentId: string) {
           winnerId: true,
           bracket: true,
           round: true,
+          stageId: true,
           driverLeft: {
             select: {
               isBye: true,

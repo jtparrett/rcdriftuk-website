@@ -2,7 +2,7 @@ import { z } from "zod";
 import { prisma } from "~/utils/prisma.server";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Box, Flex } from "~/styled-system/jsx";
-import { Driver } from "./tournaments.$id.battles.$bracket";
+import { Driver } from "./tournaments.$id.battles.$stageId.$bracket";
 import { TournamentsDriverNumbers } from "~/utils/enums";
 import { Glow } from "~/components/Glow";
 
@@ -21,6 +21,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       tournamentId: id,
       round: tournament.nextBattle?.round,
       bracket: tournament.nextBattle?.bracket,
+      stageId: tournament.nextBattle?.stageId ?? undefined,
     },
     orderBy: [{ id: "asc" }],
     include: {

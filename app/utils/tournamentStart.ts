@@ -4,6 +4,7 @@ import { prisma } from "~/utils/prisma.server";
 import { tournamentSeedBattles } from "~/utils/tournamentSeedBattles";
 import invariant from "~/utils/invariant";
 import { setQualifyingPositions } from "./setQualifyingPositions";
+import { setTournamentFinishingPositions } from "./setTournamentFinishingPositions";
 
 /**
  * Starts a tournament by transitioning from START state to QUALIFYING or BATTLES
@@ -14,6 +15,9 @@ export const tournamentStart = async (id: string) => {
     where: {
       id,
       state: TournamentsState.START,
+    },
+    include: {
+      _count: { select: { battleStages: true } },
     },
   });
 
@@ -33,14 +37,17 @@ export const tournamentStart = async (id: string) => {
         nextQualifyingLapId: firstLap?.id ?? null,
       },
     });
-  } else if (tournament.enableBattles) {
+  } else if (tournament._count.battleStages > 0) {
     await setQualifyingPositions(id);
     await tournamentSeedBattles(id);
+  } else {
+    await setQualifyingPositions(id);
     await prisma.tournaments.update({
       where: { id },
       data: {
-        state: TournamentsState.BATTLES,
+        state: TournamentsState.END,
       },
     });
+    await setTournamentFinishingPositions(id);
   }
 };
