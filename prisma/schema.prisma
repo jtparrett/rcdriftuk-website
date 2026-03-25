@@ -85,6 +85,7 @@ model Tournaments {
   id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String
   enableQualifying    Boolean                  @default(true)
+  enableBattles       Boolean                  @default(true)
   archived            Boolean                  @default(false)
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @default(now()) @updatedAt

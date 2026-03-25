@@ -2,6 +2,7 @@ import { capitalCase } from "change-case";
 import { useFormik } from "formik";
 import {
   RiClipboardLine,
+  RiDeleteBin7Line,
   RiFileUploadLine,
   RiLink,
   RiRefreshLine,
@@ -347,12 +348,15 @@ export const action = async (args: ActionFunctionArgs) => {
   }
 
   // Update existing brackets
-  let bracketsChanged = removedBracketIds.length > 0 ||
+  let bracketsChanged =
+    removedBracketIds.length > 0 ||
     data.brackets.some((b) => b.id === undefined);
 
   for (const bracket of data.brackets) {
     if (bracket.id === undefined) continue;
-    const existing = currentTournament.brackets.find((b) => b.id === bracket.id);
+    const existing = currentTournament.brackets.find(
+      (b) => b.id === bracket.id,
+    );
     if (!existing) continue;
 
     if (
@@ -753,18 +757,14 @@ const Page = () => {
                 <TabButton
                   type="button"
                   isActive={!formik.values.enableProtests}
-                  onClick={() =>
-                    formik.setFieldValue("enableProtests", false)
-                  }
+                  onClick={() => formik.setFieldValue("enableProtests", false)}
                 >
                   No
                 </TabButton>
                 <TabButton
                   type="button"
                   isActive={formik.values.enableProtests}
-                  onClick={() =>
-                    formik.setFieldValue("enableProtests", true)
-                  }
+                  onClick={() => formik.setFieldValue("enableProtests", true)}
                 >
                   Yes
                 </TabButton>
@@ -1116,24 +1116,6 @@ const Page = () => {
               </styled.h2>
 
               <Spacer />
-
-              <Button
-                variant="secondary"
-                size="sm"
-                type="button"
-                onClick={() =>
-                  formik.setFieldValue("brackets", [
-                    ...formik.values.brackets,
-                    {
-                      name: `Bracket ${formik.values.brackets.length + 1}`,
-                      bracketSize: BracketSize.TOP_4,
-                      format: TournamentsFormat.STANDARD,
-                    },
-                  ])
-                }
-              >
-                Add Bracket
-              </Button>
             </CardHeader>
 
             <CardContent display="flex" flexDir="column" gap={4}>
@@ -1149,7 +1131,7 @@ const Page = () => {
                   p={4}
                   rounded="xl"
                   borderWidth={1}
-                  borderColor="gray.700"
+                  borderColor="gray.800"
                   display="flex"
                   flexDir="column"
                   gap={3}
@@ -1180,7 +1162,7 @@ const Page = () => {
                       }
                       mt={6}
                     >
-                      Remove
+                      <RiDeleteBin7Line />
                     </Button>
                   </Flex>
 
@@ -1234,6 +1216,24 @@ const Page = () => {
                   </FormControl>
                 </Box>
               ))}
+
+              <Button
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={() =>
+                  formik.setFieldValue("brackets", [
+                    ...formik.values.brackets,
+                    {
+                      name: `Bracket ${formik.values.brackets.length + 1}`,
+                      bracketSize: BracketSize.TOP_4,
+                      format: TournamentsFormat.STANDARD,
+                    },
+                  ])
+                }
+              >
+                Add Bracket
+              </Button>
 
               <SaveButton />
             </CardContent>
