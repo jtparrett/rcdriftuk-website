@@ -85,7 +85,6 @@ model Tournaments {
   id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String
   enableQualifying    Boolean                  @default(true)
-  enableBattles       Boolean                  @default(true)
   archived            Boolean                  @default(false)
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @default(now()) @updatedAt
@@ -101,6 +100,7 @@ model Tournaments {
   judges              TournamentJudges[]
   user                Users?                   @relation(fields: [userId], references: [id])
   nextQualifyingLap   Laps?                    @relation(fields: [nextQualifyingLapId], references: [id])
+  brackets            TournamentBrackets[]
   battles             TournamentBattles[]
   nextBattle          TournamentBattles?       @relation("tournamentNextBattle", fields: [nextBattleId], references: [id])
   enableProtests      Boolean                  @default(false)
@@ -202,6 +202,18 @@ model LapScores {
   @@unique([judgeId, lapId])
 }
 
+model TournamentBrackets {
+  id           Int                 @id @default(autoincrement())
+  tournamentId String              @db.Uuid
+  name         String
+  bracketSize  Int                 @default(4)
+  format       TournamentsFormat   @default(STANDARD)
+  tournament   Tournaments         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  battles      TournamentBattles[]
+
+  @@index([tournamentId])
+}
+
 model TournamentBattles {
   id            Int      @id @default(autoincrement())
   round         Float    @default(0)
@@ -229,17 +241,21 @@ model TournamentBattles {
   winnerNextBattleId Int?
   loserNextBattleId  Int?
 
-  tournament     Tournaments             @relation(fields: [tournamentId], references: [id])
-  driverLeft     TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
-  driverRight    TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
-  isNextBattle   Tournaments?            @relation("tournamentNextBattle")
-  bracket        BattlesBracket          @default(UPPER)
-  BattleVotes    TournamentBattleVotes[]
-  BattleProtests BattleProtests[]
+  tournamentBracketId Int?
+
+  tournament        Tournaments             @relation(fields: [tournamentId], references: [id])
+  tournamentBracket TournamentBrackets?     @relation(fields: [tournamentBracketId], references: [id])
+  driverLeft        TournamentDrivers?      @relation("battleDriverLeft", fields: [driverLeftId], references: [id])
+  driverRight       TournamentDrivers?      @relation("battleDriverRight", fields: [driverRightId], references: [id])
+  isNextBattle      Tournaments?            @relation("tournamentNextBattle")
+  bracket           BattlesBracket          @default(UPPER)
+  BattleVotes       TournamentBattleVotes[]
+  BattleProtests    BattleProtests[]
 
   @@index([tournamentId])
   @@index([tournamentId, round])
   @@index([tournamentId, bracket])
+  @@index([tournamentBracketId])
 }
 
 model TournamentBattleVotes {

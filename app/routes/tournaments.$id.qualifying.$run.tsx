@@ -46,9 +46,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
       id: true,
       state: true,
-      enableBattles: true,
-      bracketSize: true,
-      format: true,
+      brackets: {
+        orderBy: { id: "asc" as const },
+        select: { id: true, bracketSize: true },
+      },
       qualifyingLaps: true,
       userId: true,
       scoreFormula: true,
@@ -159,9 +160,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isOwner,
     isQualifying: tournament.state === "QUALIFYING",
     id: tournament.id,
-    bracketSize: tournament.bracketSize,
-    enableBattles: tournament.enableBattles,
-    format: tournament.format,
+    brackets: tournament.brackets,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
     nextQualifyingLap: tournament.nextQualifyingLap,
@@ -200,11 +199,20 @@ const Table = ({
 
         return (
           <Fragment key={i}>
-            {i + startPosition === tournament.bracketSize &&
+            {tournament.brackets.length > 0 &&
               tournament.run === 0 &&
-              tournament.enableBattles && (
-                <Box w="full" h="1px" bgColor="brand.500" />
-              )}
+              (() => {
+                // Show divider lines at bracket boundaries
+                // Brackets fill last-to-first, so calculate cumulative sizes from the end
+                let total = 0;
+                for (let b = tournament.brackets.length - 1; b >= 0; b--) {
+                  total += tournament.brackets[b].bracketSize - (b === 0 ? 0 : 1);
+                  if (i + startPosition === total) {
+                    return <Box w="full" h="1px" bgColor="brand.500" />;
+                  }
+                }
+                return null;
+              })()}
             <Flex
               key={driver.id}
               gap={2}

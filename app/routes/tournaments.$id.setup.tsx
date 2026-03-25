@@ -54,10 +54,16 @@ import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQuali
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 
+const bracketSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, "Bracket name is required"),
+  bracketSize: z.number(),
+  format: z.nativeEnum(TournamentsFormat),
+});
+
 export const tournamentFormSchema = z.object({
   name: z.string().min(1, "Tournament name is required"),
   enableQualifying: z.boolean(),
-  enableBattles: z.boolean(),
   drivers: z
     .array(
       z.object({
@@ -79,13 +85,12 @@ export const tournamentFormSchema = z.object({
     .number()
     .min(1, "Qualifying laps must be at least 1")
     .max(3, "Qualifying laps must be at most 3"),
-  format: z.nativeEnum(TournamentsFormat),
   enableProtests: z.boolean(),
   region: z.nativeEnum(Regions),
   scoreFormula: z.nativeEnum(ScoreFormula),
   qualifyingOrder: z.nativeEnum(QualifyingOrder),
   driverNumbers: z.nativeEnum(TournamentsDriverNumbers),
-  bracketSize: z.nativeEnum(BracketSize),
+  brackets: z.array(bracketSchema),
   ratingRequested: z.boolean(),
   judgingInterface: z.nativeEnum(JudgingInterface),
   disqualifyZeros: z.boolean(),
@@ -132,6 +137,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       },
+      brackets: {
+        orderBy: { id: "asc" },
+      },
     },
   });
 
@@ -153,9 +161,16 @@ export const action = async (args: ActionFunctionArgs) => {
     where: { id, userId },
     select: {
       state: true,
-      format: true,
-      bracketSize: true,
       disqualifyZeros: true,
+      brackets: {
+        orderBy: { id: "asc" },
+        select: {
+          id: true,
+          bracketSize: true,
+          format: true,
+          name: true,
+        },
+      },
     },
   });
 
@@ -171,15 +186,12 @@ export const action = async (args: ActionFunctionArgs) => {
     data: {
       name: data.name,
       enableQualifying: isStartState ? data.enableQualifying : undefined,
-      enableBattles: isStartState ? data.enableBattles : undefined,
       qualifyingLaps: isStartState ? data.qualifyingLaps : undefined,
-      format: data.format,
       enableProtests: data.enableProtests,
       region: data.region,
       scoreFormula: data.scoreFormula,
       qualifyingOrder: data.qualifyingOrder,
       driverNumbers: data.driverNumbers,
-      bracketSize: data.bracketSize,
       ratingRequested: data.ratingRequested,
       judgingInterface: data.judgingInterface,
       disqualifyZeros: data.disqualifyZeros,
@@ -187,6 +199,9 @@ export const action = async (args: ActionFunctionArgs) => {
     include: {
       judges: true,
       drivers: true,
+      brackets: {
+        orderBy: { id: "asc" },
+      },
     },
   });
 
@@ -286,13 +301,87 @@ export const action = async (args: ActionFunctionArgs) => {
     });
   }
 
-  const shouldUpdateBattles =
-    tournament.enableBattles &&
-    (currentTournament.format !== data.format ||
-      currentTournament.bracketSize !== data.bracketSize ||
-      currentTournament.disqualifyZeros !== data.disqualifyZeros);
+  // Handle bracket changes
+  const existingBracketIds = currentTournament.brackets.map((b) => b.id);
+  const submittedBracketIds = data.brackets
+    .filter((b) => b.id !== undefined)
+    .map((b) => b.id!);
 
-  if (shouldUpdateBattles) {
+  // Delete removed brackets
+  const removedBracketIds = existingBracketIds.filter(
+    (id) => !submittedBracketIds.includes(id),
+  );
+
+  if (removedBracketIds.length > 0) {
+    await prisma.tournamentBattleVotes.deleteMany({
+      where: {
+        battle: {
+          tournamentBracketId: { in: removedBracketIds },
+        },
+      },
+    });
+    await prisma.tournamentBattles.deleteMany({
+      where: {
+        tournamentBracketId: { in: removedBracketIds },
+      },
+    });
+    await prisma.tournamentBrackets.deleteMany({
+      where: {
+        id: { in: removedBracketIds },
+      },
+    });
+  }
+
+  // Create new brackets
+  for (const bracket of data.brackets) {
+    if (bracket.id === undefined) {
+      await prisma.tournamentBrackets.create({
+        data: {
+          tournamentId: id,
+          name: bracket.name,
+          bracketSize: bracket.bracketSize,
+          format: bracket.format,
+        },
+      });
+    }
+  }
+
+  // Update existing brackets
+  let bracketsChanged = removedBracketIds.length > 0 ||
+    data.brackets.some((b) => b.id === undefined);
+
+  for (const bracket of data.brackets) {
+    if (bracket.id === undefined) continue;
+    const existing = currentTournament.brackets.find((b) => b.id === bracket.id);
+    if (!existing) continue;
+
+    if (
+      existing.name !== bracket.name ||
+      existing.bracketSize !== bracket.bracketSize ||
+      existing.format !== bracket.format
+    ) {
+      await prisma.tournamentBrackets.update({
+        where: { id: bracket.id },
+        data: {
+          name: bracket.name,
+          bracketSize: bracket.bracketSize,
+          format: bracket.format,
+        },
+      });
+
+      if (
+        existing.bracketSize !== bracket.bracketSize ||
+        existing.format !== bracket.format
+      ) {
+        bracketsChanged = true;
+      }
+    }
+  }
+
+  const disqualifyZerosChanged =
+    currentTournament.disqualifyZeros !== data.disqualifyZeros;
+
+  if (bracketsChanged || disqualifyZerosChanged) {
     await tournamentCreateBattles(id);
 
     if (tournament.state === TournamentsState.BATTLES) {
@@ -512,7 +601,6 @@ const Page = () => {
     initialValues: {
       name: tournament.name ?? "",
       enableQualifying: tournament.enableQualifying ?? false,
-      enableBattles: tournament.enableBattles ?? false,
       judges: tournament.judges.map((judge) => ({
         driverId: judge.driverId.toString(),
         firstName: judge.user.firstName,
@@ -527,11 +615,15 @@ const Page = () => {
         lastName: driver.user.lastName,
         image: driver.user.image,
       })),
-      bracketSize: tournament.bracketSize ?? BracketSize.TOP_4,
+      brackets: tournament.brackets.map((b) => ({
+        id: b.id,
+        name: b.name,
+        bracketSize: b.bracketSize,
+        format: b.format as TournamentsFormat,
+      })),
       enableProtests: tournament.enableProtests ?? false,
       qualifyingLaps: tournament.qualifyingLaps ?? 1,
       region: tournament.region ?? Regions.UK,
-      format: tournament.format ?? TournamentsFormat.STANDARD,
       scoreFormula: tournament.scoreFormula ?? ScoreFormula.AVERAGE,
       qualifyingOrder: tournament.qualifyingOrder ?? QualifyingOrder.DRIVERS,
       driverNumbers: tournament.driverNumbers ?? TournamentsDriverNumbers.NONE,
@@ -652,6 +744,64 @@ const Page = () => {
                     </TabButton>
                   );
                 })}
+              </TabGroup>
+            </FormControl>
+
+            <FormControl flex={1} error={formik.errors.enableProtests}>
+              <Label>Enable Protesting</Label>
+              <TabGroup>
+                <TabButton
+                  type="button"
+                  isActive={!formik.values.enableProtests}
+                  onClick={() =>
+                    formik.setFieldValue("enableProtests", false)
+                  }
+                >
+                  No
+                </TabButton>
+                <TabButton
+                  type="button"
+                  isActive={formik.values.enableProtests}
+                  onClick={() =>
+                    formik.setFieldValue("enableProtests", true)
+                  }
+                >
+                  Yes
+                </TabButton>
+              </TabGroup>
+            </FormControl>
+
+            <FormControl flex={1} error={formik.errors.judgingInterface}>
+              <Label>Judging Interface</Label>
+              <TabGroup>
+                <TabButton
+                  type="button"
+                  isActive={
+                    formik.values.judgingInterface === JudgingInterface.SIMPLE
+                  }
+                  onClick={() =>
+                    formik.setFieldValue(
+                      "judgingInterface",
+                      JudgingInterface.SIMPLE,
+                    )
+                  }
+                >
+                  Simple
+                </TabButton>
+                <TabButton
+                  type="button"
+                  isActive={
+                    formik.values.judgingInterface === JudgingInterface.ADVANCED
+                  }
+                  onClick={() =>
+                    formik.setFieldValue(
+                      "judgingInterface",
+                      JudgingInterface.ADVANCED,
+                    )
+                  }
+                >
+                  Advanced
+                </TabButton>
               </TabGroup>
             </FormControl>
 
@@ -956,160 +1106,137 @@ const Page = () => {
           </Card>
 
           <Card>
-            <CardHeader
-              onClick={() =>
-                isStartState && formik.setFieldValue("enableBattles", true)
-              }
-              gap={4}
-            >
+            <CardHeader gap={4}>
               <Icon>
                 <RiSwordLine />
               </Icon>
 
               <styled.h2 fontSize="lg" fontWeight="semibold">
-                Battles
+                Brackets
               </styled.h2>
 
               <Spacer />
 
-              {isStartState && (
-                <TabGroup>
-                  <TabButton
-                    isActive={!formik.values.enableBattles}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      formik.setFieldValue("enableBattles", false);
-                    }}
-                    type="button"
-                  >
-                    Disable
-                  </TabButton>
-                  <TabButton
-                    isActive={formik.values.enableBattles}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      formik.setFieldValue("enableBattles", true);
-                    }}
-                    type="button"
-                  >
-                    Enable
-                  </TabButton>
-                </TabGroup>
-              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={() =>
+                  formik.setFieldValue("brackets", [
+                    ...formik.values.brackets,
+                    {
+                      name: `Bracket ${formik.values.brackets.length + 1}`,
+                      bracketSize: BracketSize.TOP_4,
+                      format: TournamentsFormat.STANDARD,
+                    },
+                  ])
+                }
+              >
+                Add Bracket
+              </Button>
             </CardHeader>
 
-            {formik.values.enableBattles && (
-              <CardContent display="flex" flexDir="column" gap={4}>
-                <FormControl flex={1} error={formik.errors.format}>
-                  <Label>Battle Format</Label>
-                  <TabGroup>
-                    {Object.values(TournamentsFormat).map((item) => {
-                      return (
+            <CardContent display="flex" flexDir="column" gap={4}>
+              {formik.values.brackets.length === 0 && (
+                <styled.p fontSize="sm" color="gray.500">
+                  No brackets configured. Battles are disabled.
+                </styled.p>
+              )}
+
+              {formik.values.brackets.map((bracket, index) => (
+                <Box
+                  key={bracket.id ?? `new-${index}`}
+                  p={4}
+                  rounded="xl"
+                  borderWidth={1}
+                  borderColor="gray.700"
+                  display="flex"
+                  flexDir="column"
+                  gap={3}
+                >
+                  <Flex alignItems="center" gap={2}>
+                    <FormControl flex={1}>
+                      <Label>Name</Label>
+                      <Input
+                        value={bracket.name}
+                        onChange={(e) =>
+                          formik.setFieldValue(
+                            `brackets.${index}.name`,
+                            e.target.value,
+                          )
+                        }
+                        placeholder="e.g. Main, Pro, Am"
+                      />
+                    </FormControl>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      type="button"
+                      onClick={() =>
+                        formik.setFieldValue(
+                          "brackets",
+                          formik.values.brackets.filter((_, i) => i !== index),
+                        )
+                      }
+                      mt={6}
+                    >
+                      Remove
+                    </Button>
+                  </Flex>
+
+                  <FormControl flex={1}>
+                    <Label>Format</Label>
+                    <TabGroup>
+                      {Object.values(TournamentsFormat).map((item) => (
                         <TabButton
                           key={item}
                           type="button"
-                          isActive={formik.values.format === item}
-                          onClick={() => formik.setFieldValue("format", item)}
+                          isActive={bracket.format === item}
+                          onClick={() =>
+                            formik.setFieldValue(
+                              `brackets.${index}.format`,
+                              item,
+                            )
+                          }
                         >
                           {capitalCase(item)}
                         </TabButton>
-                      );
-                    })}
-                  </TabGroup>
-                </FormControl>
+                      ))}
+                    </TabGroup>
+                  </FormControl>
 
-                <FormControl flex={1} error={formik.errors.bracketSize}>
-                  <Label>Bracket Size</Label>
-                  <Flex
-                    gap={2}
-                    flexWrap="wrap"
-                    borderWidth={1}
-                    borderColor="gray.700"
-                    rounded="2xl"
-                    p={1}
-                  >
-                    {Object.values(BracketSize).map((item) => {
-                      return (
+                  <FormControl flex={1}>
+                    <Label>Bracket Size</Label>
+                    <Flex
+                      gap={2}
+                      flexWrap="wrap"
+                      borderWidth={1}
+                      borderColor="gray.700"
+                      rounded="2xl"
+                      p={1}
+                    >
+                      {Object.values(BracketSize).map((item) => (
                         <TabButton
                           type="button"
                           key={item}
-                          isActive={formik.values.bracketSize === item}
+                          isActive={bracket.bracketSize === item}
                           onClick={() =>
-                            formik.setFieldValue("bracketSize", item)
+                            formik.setFieldValue(
+                              `brackets.${index}.bracketSize`,
+                              item,
+                            )
                           }
                         >
                           Top {item}
                         </TabButton>
-                      );
-                    })}
-                  </Flex>
-                </FormControl>
+                      ))}
+                    </Flex>
+                  </FormControl>
+                </Box>
+              ))}
 
-                <FormControl flex={1} error={formik.errors.enableProtests}>
-                  <Label>Enable Protesting</Label>
-
-                  <TabGroup>
-                    <TabButton
-                      type="button"
-                      isActive={!formik.values.enableProtests}
-                      onClick={() =>
-                        formik.setFieldValue("enableProtests", false)
-                      }
-                    >
-                      No
-                    </TabButton>
-                    <TabButton
-                      type="button"
-                      isActive={formik.values.enableProtests}
-                      onClick={() =>
-                        formik.setFieldValue("enableProtests", true)
-                      }
-                    >
-                      Yes
-                    </TabButton>
-                  </TabGroup>
-                </FormControl>
-
-                <FormControl flex={1} error={formik.errors.judgingInterface}>
-                  <Label>Judging Interface</Label>
-
-                  <TabGroup>
-                    <TabButton
-                      type="button"
-                      isActive={
-                        formik.values.judgingInterface ===
-                        JudgingInterface.SIMPLE
-                      }
-                      onClick={() =>
-                        formik.setFieldValue(
-                          "judgingInterface",
-                          JudgingInterface.SIMPLE,
-                        )
-                      }
-                    >
-                      Simple
-                    </TabButton>
-                    <TabButton
-                      type="button"
-                      isActive={
-                        formik.values.judgingInterface ===
-                        JudgingInterface.ADVANCED
-                      }
-                      onClick={() =>
-                        formik.setFieldValue(
-                          "judgingInterface",
-                          JudgingInterface.ADVANCED,
-                        )
-                      }
-                    >
-                      Advanced
-                    </TabButton>
-                  </TabGroup>
-                </FormControl>
-
-                <SaveButton />
-              </CardContent>
-            )}
+              <SaveButton />
+            </CardContent>
           </Card>
         </Flex>
 

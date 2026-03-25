@@ -1,7 +1,7 @@
 import { prisma } from "./prisma.server";
 import { tournamentAddDrivers } from "./tournamentAddDrivers";
 import { tournamentCreateBattles } from "./tournamentCreateBattles";
-import { BattlesBracket, Regions, TournamentsState } from "./enums";
+import { BattlesBracket, Regions, TournamentsFormat, TournamentsState } from "./enums";
 import { pow2Ceil } from "./powFns";
 
 export interface ImportDriver {
@@ -193,9 +193,17 @@ export async function createImportedTournament(
       name,
       userId,
       enableQualifying: false,
-      enableBattles: true,
-      bracketSize,
       region: Regions.UK,
+    },
+  });
+
+  // Create a bracket for the imported tournament
+  await prisma.tournamentBrackets.create({
+    data: {
+      tournamentId: tournament.id,
+      name: "Main",
+      bracketSize,
+      format: TournamentsFormat.STANDARD,
     },
   });
 

@@ -5,7 +5,7 @@ import {
 } from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData, useSearchParams } from "react-router";
+import { useLoaderData, useSearchParams } from "react-router";
 import { z } from "zod";
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
@@ -19,16 +19,15 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
-  const bracket = z
+  const bracketId = z.coerce.number().parse(args.params.bracketId);
+  const sub = z
     .nativeEnum(BattlesBracket)
-    .parse(args.params.bracket?.toUpperCase());
+    .parse(args.params.sub?.toUpperCase());
 
   const { userId } = await getAuth(args);
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
-    where: {
-      id,
-    },
+    where: { id },
     include: {
       drivers: {
         include: {
@@ -40,14 +39,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       },
+      brackets: {
+        orderBy: { id: "asc" },
+        select: {
+          id: true,
+          name: true,
+          format: true,
+        },
+      },
       battles: {
         where: {
-          bracket: bracket,
+          tournamentBracketId: bracketId,
+          bracket: sub,
         },
         orderBy: [
-          {
-            round: "asc",
-          },
+          { round: "asc" },
           { bracket: "asc" },
           { id: "asc" },
         ],
@@ -81,7 +87,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const isOwner = tournament.userId === userId;
 
-  return { tournament, bracket, isOwner };
+  return { tournament, bracketId, sub, isOwner };
 };
 
 type Battle = Awaited<
@@ -159,7 +165,8 @@ export const Driver = ({
 };
 
 const TournamentBattlesPage = () => {
-  const { tournament, bracket, isOwner } = useLoaderData<typeof loader>();
+  const { tournament, bracketId, sub, isOwner } =
+    useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
   const [searchParams] = useSearchParams();
   const maxBattlesToShow =
@@ -210,24 +217,45 @@ const TournamentBattlesPage = () => {
     [],
   );
 
+  // Build tabs from brackets
+  const tabs: { label: string; bracketId: number; sub: BattlesBracket }[] = [];
+  for (const bracket of tournament.brackets) {
+    if (bracket.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+      tabs.push({
+        label: `${bracket.name} | Upper`,
+        bracketId: bracket.id,
+        sub: BattlesBracket.UPPER,
+      });
+      tabs.push({
+        label: `${bracket.name} | Lower`,
+        bracketId: bracket.id,
+        sub: BattlesBracket.LOWER,
+      });
+    } else {
+      tabs.push({
+        label: bracket.name,
+        bracketId: bracket.id,
+        sub: BattlesBracket.UPPER,
+      });
+    }
+  }
+
   return (
     <>
       <HiddenEmbed>
-        {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
+        {tabs.length > 1 && (
           <TabGroup mb={2}>
-            {Object.values(BattlesBracket).map((sub) => {
-              return (
-                <Tab
-                  key={sub}
-                  to={`/tournaments/${tournament.id}/battles/${sub}`}
-                  isActive={sub === bracket}
-                  data-replace="true"
-                  replace
-                >
-                  {sentenceCase(sub)} Bracket
-                </Tab>
-              );
-            })}
+            {tabs.map((tab) => (
+              <Tab
+                key={`${tab.bracketId}-${tab.sub}`}
+                to={`/tournaments/${tournament.id}/battles/${tab.bracketId}/${tab.sub}`}
+                isActive={tab.bracketId === bracketId && tab.sub === sub}
+                data-replace="true"
+                replace
+              >
+                {tab.label}
+              </Tab>
+            ))}
           </TabGroup>
         )}
       </HiddenEmbed>
