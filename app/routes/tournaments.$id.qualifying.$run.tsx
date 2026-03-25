@@ -201,18 +201,14 @@ const Table = ({
           <Fragment key={i}>
             {tournament.brackets.length > 0 &&
               tournament.run === 0 &&
-              (() => {
-                // Show divider lines at bracket boundaries
-                // Brackets fill last-to-first, so calculate cumulative sizes from the end
-                let total = 0;
-                for (let b = tournament.brackets.length - 1; b >= 0; b--) {
-                  total += tournament.brackets[b].bracketSize - (b === 0 ? 0 : 1);
-                  if (i + startPosition === total) {
-                    return <Box w="full" h="1px" bgColor="brand.500" />;
-                  }
-                }
-                return null;
-              })()}
+              i + startPosition ===
+                // Total qualifying spots: sum of all bracket sizes, minus one for each
+                // non-first bracket (each reserves a slot for the advancing winner).
+                // e.g. brackets of [4, 8] → 4 + (8-1) = 11 qualifying spots.
+                tournament.brackets.reduce((sum, b) => sum + b.bracketSize, 0) -
+                  (tournament.brackets.length - 1) && (
+                <Box w="full" h="1px" bgColor="brand.500" />
+              )}
             <Flex
               key={driver.id}
               gap={2}
