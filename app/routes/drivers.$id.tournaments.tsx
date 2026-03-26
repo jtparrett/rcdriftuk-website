@@ -15,6 +15,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const tournaments = await prisma.tournaments.findMany({
     where: {
       rated: true,
+      archived: false,
       drivers: {
         some: {
           driverId,

@@ -53,6 +53,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const tournaments = await prisma.tournaments.findMany({
     where: {
       state: TournamentsState.END,
+      archived: false,
       OR: [
         {
           userId,

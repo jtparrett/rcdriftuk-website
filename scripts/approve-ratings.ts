@@ -16,6 +16,7 @@ const run = async () => {
       ratingRequested: true,
       rated: false,
       state: "END",
+      archived: false,
     },
     orderBy: { createdAt: "desc" },
     select: {
