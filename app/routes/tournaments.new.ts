@@ -32,6 +32,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
             sortOrder: "asc",
           },
         },
+        brackets: {
+          orderBy: { id: "asc" },
+        },
       },
     });
   };
@@ -46,21 +49,39 @@ export const loader = async (args: LoaderFunctionArgs) => {
         ? {
             name: `${tournamentToClone.name} (Copy)`,
             enableQualifying: tournamentToClone.enableQualifying,
-            enableBattles: tournamentToClone.enableBattles,
             qualifyingLaps: tournamentToClone.qualifyingLaps,
-            format: tournamentToClone.format,
             enableProtests: tournamentToClone.enableProtests,
             region: tournamentToClone.region,
             scoreFormula: tournamentToClone.scoreFormula,
             qualifyingOrder: tournamentToClone.qualifyingOrder,
             driverNumbers: tournamentToClone.driverNumbers,
-            bracketSize: tournamentToClone.bracketSize,
             ratingRequested: tournamentToClone.ratingRequested,
             judgingInterface: tournamentToClone.judgingInterface,
           }
         : {}),
     },
   });
+
+  // Clone brackets or create a default one
+  if (tournamentToClone && tournamentToClone.brackets.length > 0) {
+    await prisma.tournamentBrackets.createMany({
+      data: tournamentToClone.brackets.map((b) => ({
+        tournamentId: tournament.id,
+        name: b.name,
+        bracketSize: b.bracketSize,
+        format: b.format,
+      })),
+    });
+  } else {
+    await prisma.tournamentBrackets.create({
+      data: {
+        tournamentId: tournament.id,
+        name: "Main",
+        bracketSize: 4,
+        format: "STANDARD",
+      },
+    });
+  }
 
   if (tournamentToClone) {
     await tournamentAddDrivers(

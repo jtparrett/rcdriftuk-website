@@ -45,6 +45,7 @@ import {
   RiShuffleLine,
   RiSwordLine,
   RiDownloadLine,
+  RiListOrdered2,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
@@ -395,9 +396,9 @@ const TournamentPage = () => {
               Qualifying
             </Tab>
           )}
-          {tournament.enableBattles && (
+          {tournament.brackets.length > 0 && (
             <Tab
-              to={`/tournaments/${tournament.id}/battles/${BattlesBracket.UPPER}`}
+              to={`/tournaments/${tournament.id}/battles/${tournament.nextBattle?.tournamentBracketId ?? tournament.brackets[tournament.brackets.length - 1]?.id}/${tournament.nextBattle?.bracket ?? BattlesBracket.UPPER}`}
               isActive={isBattlesTab}
               data-replace="true"
               replace
@@ -413,6 +414,7 @@ const TournamentPage = () => {
               data-replace="true"
               replace
             >
+              <RiListOrdered2 />
               Standings
             </Tab>
           )}

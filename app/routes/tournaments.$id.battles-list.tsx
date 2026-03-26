@@ -2,7 +2,7 @@ import { z } from "zod";
 import { prisma } from "~/utils/prisma.server";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Box, Flex } from "~/styled-system/jsx";
-import { Driver } from "./tournaments.$id.battles.$bracket";
+import { Driver } from "./tournaments.$id.battles.$bracketId.$sub";
 import { TournamentsDriverNumbers } from "~/utils/enums";
 import { Glow } from "~/components/Glow";
 
@@ -19,6 +19,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const battles = await prisma.tournamentBattles.findMany({
     where: {
       tournamentId: id,
+      tournamentBracketId: tournament.nextBattle?.tournamentBracketId,
       round: tournament.nextBattle?.round,
       bracket: tournament.nextBattle?.bracket,
     },
@@ -94,11 +95,13 @@ const TournamentsBattlesListPage = () => {
                   driver={battle.driverLeft}
                   winnerId={battle.winnerId}
                   driverNo={getDriverNumber(battle.driverLeft)}
+                  isOwner={false}
                 />
                 <Driver
                   driver={battle.driverRight}
                   winnerId={battle.winnerId}
                   driverNo={getDriverNumber(battle.driverRight)}
+                  isOwner={false}
                 />
               </Box>
             </Box>

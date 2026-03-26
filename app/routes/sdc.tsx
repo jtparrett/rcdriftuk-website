@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router";
 import { Box, Container, styled } from "~/styled-system/jsx";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
+import { RiListOrdered2, RiVipCrown2Line } from "react-icons/ri";
 
 const Page = () => {
   const location = useLocation();
@@ -18,9 +19,7 @@ const Page = () => {
         borderColor="gray.900"
       >
         <Container maxW={1100} px={4} pt={{ base: 12, md: 20 }} pb={16}>
-          <styled.h1 srOnly>
-            SDC 2026 - Super Drift Competition
-          </styled.h1>
+          <styled.h1 srOnly>SDC 2026 - Super Drift Competition</styled.h1>
           <Box maxW={500} mx="auto" mb={6}>
             <styled.img
               w="full"
@@ -33,9 +32,11 @@ const Page = () => {
 
       <TabsBar maxW={800}>
         <Tab to="/" isActive={!isTournaments}>
+          <RiListOrdered2 />
           Standings
         </Tab>
         <Tab to="/tournaments" isActive={isTournaments}>
+          <RiVipCrown2Line />
           Tournaments
         </Tab>
       </TabsBar>

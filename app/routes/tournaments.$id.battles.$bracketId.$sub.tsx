@@ -2,10 +2,11 @@ import {
   BattlesBracket,
   TournamentsDriverNumbers,
   TournamentsFormat,
+  TournamentsState,
 } from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData, useSearchParams } from "react-router";
+import { useLoaderData, useSearchParams } from "react-router";
 import { z } from "zod";
 import { Box, Center, Flex, styled } from "~/styled-system/jsx";
 import { getBracketName } from "~/utils/getBracketName";
@@ -19,16 +20,15 @@ import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
-  const bracket = z
+  const bracketId = z.coerce.number().parse(args.params.bracketId);
+  const sub = z
     .nativeEnum(BattlesBracket)
-    .parse(args.params.bracket?.toUpperCase());
+    .parse(args.params.sub?.toUpperCase());
 
   const { userId } = await getAuth(args);
 
   const tournament = await prisma.tournaments.findFirstOrThrow({
-    where: {
-      id,
-    },
+    where: { id },
     include: {
       drivers: {
         include: {
@@ -40,14 +40,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
           },
         },
       },
+      brackets: {
+        orderBy: { id: "asc" },
+        select: {
+          id: true,
+          name: true,
+          format: true,
+        },
+      },
       battles: {
         where: {
-          bracket: bracket,
+          tournamentBracketId: bracketId,
+          bracket: sub,
         },
         orderBy: [
-          {
-            round: "asc",
-          },
+          { round: "asc" },
           { bracket: "asc" },
           { id: "asc" },
         ],
@@ -81,7 +88,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const isOwner = tournament.userId === userId;
 
-  return { tournament, bracket, isOwner };
+  return { tournament, bracketId, sub, isOwner };
 };
 
 type Battle = Awaited<
@@ -94,10 +101,12 @@ export const Driver = ({
   driver,
   winnerId,
   driverNo,
+  isOwner,
 }: {
   driver: Battle["driverLeft"] | Battle["driverRight"];
   winnerId: number | null;
   driverNo: number | undefined;
+  isOwner: boolean;
 }) => {
   if (driver?.isBye) {
     return (
@@ -115,7 +124,7 @@ export const Driver = ({
   }
 
   return (
-    <Flex alignItems="center" py={0.5} h={6} px="1px">
+    <Flex alignItems="center" py={0.5} h={6} px="1px" pos="relative">
       {driver?.qualifyingPosition !== null &&
         driver?.qualifyingPosition !== undefined && (
           <Center
@@ -133,37 +142,66 @@ export const Driver = ({
             </styled.span>
           </Center>
         )}
-      <styled.p
-        fontWeight="semibold"
-        fontSize="xs"
-        whiteSpace="nowrap"
-        textOverflow="ellipsis"
-        overflow="hidden"
-        ml={2}
-        color={
-          winnerId === null
-            ? undefined
-            : winnerId === driver?.id
-              ? "green.500"
-              : "gray.500"
-        }
-        pr={2}
-      >
-        {driver?.user.firstName} {driver?.user.lastName}{" "}
-        {driverNo !== undefined && (
-          <styled.span color="gray.600">({driverNo})</styled.span>
-        )}
-      </styled.p>
+      {!isOwner && driver?.user.driverId ? (
+        <LinkOverlay
+          to={`/drivers/${driver.user.driverId}`}
+          fontWeight="semibold"
+          fontSize="xs"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
+          overflow="hidden"
+          ml={2}
+          color={
+            winnerId === null
+              ? undefined
+              : winnerId === driver?.id
+                ? "green.500"
+                : "gray.500"
+          }
+          pr={2}
+        >
+          {driver?.user.firstName} {driver?.user.lastName}{" "}
+          {driverNo !== undefined && (
+            <styled.span color="gray.600">({driverNo})</styled.span>
+          )}
+        </LinkOverlay>
+      ) : (
+        <styled.p
+          fontWeight="semibold"
+          fontSize="xs"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
+          overflow="hidden"
+          ml={2}
+          color={
+            winnerId === null
+              ? undefined
+              : winnerId === driver?.id
+                ? "green.500"
+                : "gray.500"
+          }
+          pr={2}
+        >
+          {driver?.user.firstName} {driver?.user.lastName}{" "}
+          {driverNo !== undefined && (
+            <styled.span color="gray.600">({driverNo})</styled.span>
+          )}
+        </styled.p>
+      )}
     </Flex>
   );
 };
 
 const TournamentBattlesPage = () => {
-  const { tournament, bracket, isOwner } = useLoaderData<typeof loader>();
+  const { tournament, bracketId, sub, isOwner } =
+    useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
   const [searchParams] = useSearchParams();
   const maxBattlesToShow =
     z.coerce.number().nullable().parse(searchParams.get("max")) ?? undefined;
+
+  const canActivateBattles =
+    isOwner && tournament.state !== TournamentsState.END;
 
   const getDriverNumber = (
     driver: Battle["driverLeft"] | Battle["driverRight"],
@@ -210,24 +248,45 @@ const TournamentBattlesPage = () => {
     [],
   );
 
+  // Build tabs from brackets
+  const tabs: { label: string; bracketId: number; sub: BattlesBracket }[] = [];
+  for (const bracket of tournament.brackets) {
+    if (bracket.format === TournamentsFormat.DOUBLE_ELIMINATION) {
+      tabs.push({
+        label: `${bracket.name} | Upper`,
+        bracketId: bracket.id,
+        sub: BattlesBracket.UPPER,
+      });
+      tabs.push({
+        label: `${bracket.name} | Lower`,
+        bracketId: bracket.id,
+        sub: BattlesBracket.LOWER,
+      });
+    } else {
+      tabs.push({
+        label: bracket.name,
+        bracketId: bracket.id,
+        sub: BattlesBracket.UPPER,
+      });
+    }
+  }
+
   return (
     <>
       <HiddenEmbed>
-        {tournament.format === TournamentsFormat.DOUBLE_ELIMINATION && (
+        {tabs.length > 1 && (
           <TabGroup mb={2}>
-            {Object.values(BattlesBracket).map((sub) => {
-              return (
-                <Tab
-                  key={sub}
-                  to={`/tournaments/${tournament.id}/battles/${sub}`}
-                  isActive={sub === bracket}
-                  data-replace="true"
-                  replace
-                >
-                  {sentenceCase(sub)} Bracket
-                </Tab>
-              );
-            })}
+            {tabs.map((tab) => (
+              <Tab
+                key={`${tab.bracketId}-${tab.sub}`}
+                to={`/tournaments/${tournament.id}/battles/${tab.bracketId}/${tab.sub}`}
+                isActive={tab.bracketId === bracketId && tab.sub === sub}
+                data-replace="true"
+                replace
+              >
+                {tab.label}
+              </Tab>
+            ))}
           </TabGroup>
         )}
       </HiddenEmbed>
@@ -317,7 +376,7 @@ const TournamentBattlesPage = () => {
                             }}
                             zIndex={0}
                           >
-                            {isOwner && (
+                            {canActivateBattles && (
                               <LinkOverlay
                                 to={`/tournaments/${tournament.id}/activate/battle/${battle.id}`}
                               >
@@ -330,11 +389,13 @@ const TournamentBattlesPage = () => {
                               driver={battle.driverLeft}
                               winnerId={battle.winnerId}
                               driverNo={getDriverNumber(battle.driverLeft)}
+                              isOwner={canActivateBattles}
                             />
                             <Driver
                               driver={battle.driverRight}
                               winnerId={battle.winnerId}
                               driverNo={getDriverNumber(battle.driverRight)}
+                              isOwner={canActivateBattles}
                             />
                           </Box>
                         </Box>

@@ -1,6 +1,7 @@
 import { AspectRatio, Center, Flex, styled } from "~/styled-system/jsx";
 import { getRankColor, RANKS } from "~/utils/getDriverRank";
 import { RiTrophyLine } from "react-icons/ri";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 interface Driver {
   id: number;
@@ -8,6 +9,7 @@ interface Driver {
     firstName: string | null;
     lastName: string | null;
     image: string | null;
+    driverId: number;
   };
 }
 
@@ -59,7 +61,8 @@ export const FinalResults = ({ drivers }: { drivers: Driver[] }) => {
               />
             </AspectRatio>
 
-            <styled.p
+            <LinkOverlay
+              to={`/drivers/${driver.user.driverId}`}
               fontWeight="extrabold"
               fontSize={{ base: "lg", md: "xl" }}
               textTransform="uppercase"
@@ -89,7 +92,7 @@ export const FinalResults = ({ drivers }: { drivers: Driver[] }) => {
               >
                 {driver?.user.lastName}
               </styled.span>
-            </styled.p>
+            </LinkOverlay>
 
             <Center
               w={24}

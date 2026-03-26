@@ -15,9 +15,14 @@ export const tournamentStart = async (id: string) => {
       id,
       state: TournamentsState.START,
     },
+    include: {
+      _count: { select: { brackets: true } },
+    },
   });
 
   invariant(tournament, "Tournament not found or not in START state");
+
+  const hasBattles = tournament._count.brackets > 0;
 
   if (tournament.enableQualifying) {
     // Find the first qualifying lap to set as next
@@ -33,7 +38,7 @@ export const tournamentStart = async (id: string) => {
         nextQualifyingLapId: firstLap?.id ?? null,
       },
     });
-  } else if (tournament.enableBattles) {
+  } else if (hasBattles) {
     await setQualifyingPositions(id);
     await tournamentSeedBattles(id);
     await prisma.tournaments.update({

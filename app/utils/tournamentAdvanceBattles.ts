@@ -63,11 +63,10 @@ export const tournamentAdvanceBattles = async (id: string) => {
       winnerId: null,
     },
     orderBy: [
+      { tournamentBracketId: "asc" },
       { round: "asc" },
       { bracket: "asc" },
-      {
-        id: "asc",
-      },
+      { id: "asc" },
     ],
     select: {
       id: true,

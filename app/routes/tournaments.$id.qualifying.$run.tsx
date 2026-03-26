@@ -46,9 +46,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
       },
       id: true,
       state: true,
-      enableBattles: true,
-      bracketSize: true,
-      format: true,
+      brackets: {
+        orderBy: { id: "asc" as const },
+        select: { id: true, bracketSize: true },
+      },
       qualifyingLaps: true,
       userId: true,
       scoreFormula: true,
@@ -159,9 +160,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     isOwner,
     isQualifying: tournament.state === "QUALIFYING",
     id: tournament.id,
-    bracketSize: tournament.bracketSize,
-    enableBattles: tournament.enableBattles,
-    format: tournament.format,
+    brackets: tournament.brackets,
     qualifyingLaps: tournament.qualifyingLaps,
     nextQualifyingDriver: tournament.nextQualifyingLap?.driver,
     nextQualifyingLap: tournament.nextQualifyingLap,
@@ -200,9 +199,14 @@ const Table = ({
 
         return (
           <Fragment key={i}>
-            {i + startPosition === tournament.bracketSize &&
+            {tournament.brackets.length > 0 &&
               tournament.run === 0 &&
-              tournament.enableBattles && (
+              i + startPosition ===
+                // Total qualifying spots: sum of all bracket sizes, minus one for each
+                // non-first bracket (each reserves a slot for the advancing winner).
+                // e.g. brackets of [4, 8] → 4 + (8-1) = 11 qualifying spots.
+                tournament.brackets.reduce((sum, b) => sum + b.bracketSize, 0) -
+                  (tournament.brackets.length - 1) && (
                 <Box w="full" h="1px" bgColor="brand.500" />
               )}
             <Flex
