@@ -2,6 +2,7 @@ import {
   BattlesBracket,
   TournamentsDriverNumbers,
   TournamentsFormat,
+  TournamentsState,
 } from "~/utils/enums";
 import { Fragment } from "react";
 import type { LoaderFunctionArgs } from "react-router";
@@ -100,10 +101,12 @@ export const Driver = ({
   driver,
   winnerId,
   driverNo,
+  isOwner,
 }: {
   driver: Battle["driverLeft"] | Battle["driverRight"];
   winnerId: number | null;
   driverNo: number | undefined;
+  isOwner: boolean;
 }) => {
   if (driver?.isBye) {
     return (
@@ -121,7 +124,7 @@ export const Driver = ({
   }
 
   return (
-    <Flex alignItems="center" py={0.5} h={6} px="1px">
+    <Flex alignItems="center" py={0.5} h={6} px="1px" pos="relative">
       {driver?.qualifyingPosition !== null &&
         driver?.qualifyingPosition !== undefined && (
           <Center
@@ -139,27 +142,52 @@ export const Driver = ({
             </styled.span>
           </Center>
         )}
-      <styled.p
-        fontWeight="semibold"
-        fontSize="xs"
-        whiteSpace="nowrap"
-        textOverflow="ellipsis"
-        overflow="hidden"
-        ml={2}
-        color={
-          winnerId === null
-            ? undefined
-            : winnerId === driver?.id
-              ? "green.500"
-              : "gray.500"
-        }
-        pr={2}
-      >
-        {driver?.user.firstName} {driver?.user.lastName}{" "}
-        {driverNo !== undefined && (
-          <styled.span color="gray.600">({driverNo})</styled.span>
-        )}
-      </styled.p>
+      {!isOwner && driver?.user.driverId ? (
+        <LinkOverlay
+          to={`/drivers/${driver.user.driverId}`}
+          fontWeight="semibold"
+          fontSize="xs"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
+          overflow="hidden"
+          ml={2}
+          color={
+            winnerId === null
+              ? undefined
+              : winnerId === driver?.id
+                ? "green.500"
+                : "gray.500"
+          }
+          pr={2}
+        >
+          {driver?.user.firstName} {driver?.user.lastName}{" "}
+          {driverNo !== undefined && (
+            <styled.span color="gray.600">({driverNo})</styled.span>
+          )}
+        </LinkOverlay>
+      ) : (
+        <styled.p
+          fontWeight="semibold"
+          fontSize="xs"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
+          overflow="hidden"
+          ml={2}
+          color={
+            winnerId === null
+              ? undefined
+              : winnerId === driver?.id
+                ? "green.500"
+                : "gray.500"
+          }
+          pr={2}
+        >
+          {driver?.user.firstName} {driver?.user.lastName}{" "}
+          {driverNo !== undefined && (
+            <styled.span color="gray.600">({driverNo})</styled.span>
+          )}
+        </styled.p>
+      )}
     </Flex>
   );
 };
@@ -171,6 +199,9 @@ const TournamentBattlesPage = () => {
   const [searchParams] = useSearchParams();
   const maxBattlesToShow =
     z.coerce.number().nullable().parse(searchParams.get("max")) ?? undefined;
+
+  const canActivateBattles =
+    isOwner && tournament.state !== TournamentsState.END;
 
   const getDriverNumber = (
     driver: Battle["driverLeft"] | Battle["driverRight"],
@@ -345,7 +376,7 @@ const TournamentBattlesPage = () => {
                             }}
                             zIndex={0}
                           >
-                            {isOwner && (
+                            {canActivateBattles && (
                               <LinkOverlay
                                 to={`/tournaments/${tournament.id}/activate/battle/${battle.id}`}
                               >
@@ -358,11 +389,13 @@ const TournamentBattlesPage = () => {
                               driver={battle.driverLeft}
                               winnerId={battle.winnerId}
                               driverNo={getDriverNumber(battle.driverLeft)}
+                              isOwner={canActivateBattles}
                             />
                             <Driver
                               driver={battle.driverRight}
                               winnerId={battle.winnerId}
                               driverNo={getDriverNumber(battle.driverRight)}
+                              isOwner={canActivateBattles}
                             />
                           </Box>
                         </Box>

@@ -45,6 +45,7 @@ import {
   RiShuffleLine,
   RiSwordLine,
   RiDownloadLine,
+  RiListOrdered2,
 } from "react-icons/ri";
 import type { Route } from "./+types/tournaments.$id";
 import { HiddenEmbed, useIsEmbed } from "~/utils/EmbedContext";
@@ -413,6 +414,7 @@ const TournamentPage = () => {
               data-replace="true"
               replace
             >
+              <RiListOrdered2 />
               Standings
             </Tab>
           )}

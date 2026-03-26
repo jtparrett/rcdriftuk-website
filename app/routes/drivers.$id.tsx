@@ -10,6 +10,7 @@ import { calculateInactivityPenaltyOverPeriod } from "~/utils/inactivityPenalty.
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { AppName } from "~/utils/enums";
 import { getBestRegionalElo } from "~/utils/getBestRegionalElo";
+import { useTheme } from "~/utils/theme";
 import { TabsBar } from "~/components/TabsBar";
 import { Tab } from "~/components/Tab";
 import { Button } from "~/components/Button";
@@ -143,6 +144,8 @@ export const meta: Route.MetaFunction = ({ data }) => {
 const Page = () => {
   const driver = useLoaderData<typeof loader>();
   const location = useLocation();
+  const theme = useTheme();
+  const isSdc = theme.key === "sdc";
 
   const isBattlesTab = location.pathname.endsWith("battles");
   const isTournamentsTab = location.pathname.endsWith("tournaments");
@@ -193,36 +196,40 @@ const Page = () => {
         }}
       >
         <Container maxW={800} px={4} py={6}>
-          <Flex>
-            <Spacer />
-            <Flex
-              py={1}
-              pl={4}
-              pr={2}
-              rounded="full"
-              bg="gray.950"
-              borderWidth={1}
-              borderColor="gray.800"
-              shadow="lg"
-              alignItems="center"
-              gap={1}
-            >
-              <styled.p fontSize="md" fontWeight="medium" fontFamily="mono">
-                {driver.bestElo.toFixed(3)}
-                <styled.span color="gray.400" ml={1}>
-                  {driver.bestRegion}
-                </styled.span>
-              </styled.p>
-              <Box w={8} h={8} perspective="200px">
-                <styled.img
-                  src={`/badges/${rank}.png`}
-                  w="full"
-                  alt={rank}
-                  animation="badge 4s linear infinite"
-                />
-              </Box>
+          {!isSdc && (
+            <Flex>
+              <Spacer />
+              <Flex
+                py={1}
+                pl={4}
+                pr={2}
+                rounded="full"
+                bg="gray.950"
+                borderWidth={1}
+                borderColor="gray.800"
+                shadow="lg"
+                alignItems="center"
+                gap={1}
+              >
+                <styled.p fontSize="md" fontWeight="medium" fontFamily="mono">
+                  {driver.bestElo.toFixed(3)}
+                  <styled.span color="gray.400" ml={1}>
+                    {driver.bestRegion}
+                  </styled.span>
+                </styled.p>
+                <Box w={8} h={8} perspective="200px">
+                  <styled.img
+                    src={`/badges/${rank}.png`}
+                    w="full"
+                    alt={rank}
+                    animation="badge 4s linear infinite"
+                  />
+                </Box>
+              </Flex>
             </Flex>
-          </Flex>
+          )}
+
+          {isSdc && <Box h={12} />}
 
           <Flex textAlign="center" alignItems="center" flexDir="column" pb={12}>
             <Box p={2} rounded="full" bg="rgba(255, 255, 255, 0.06)" mb={4}>
@@ -304,15 +311,17 @@ const Page = () => {
       </Box>
 
       <TabsBar maxW={800}>
-        <Tab
-          to={`/drivers/${driver.driverId}/battles`}
-          isActive={isBattlesTab}
-          data-replace="true"
-          replace
-        >
-          <RiSwordLine />
-          Battles
-        </Tab>
+        {!isSdc && (
+          <Tab
+            to={`/drivers/${driver.driverId}/battles`}
+            isActive={isBattlesTab}
+            data-replace="true"
+            replace
+          >
+            <RiSwordLine />
+            Battles
+          </Tab>
+        )}
         <Tab
           to={`/drivers/${driver.driverId}/tournaments`}
           isActive={isTournamentsTab}
@@ -322,15 +331,17 @@ const Page = () => {
           <RiVipCrown2Line />
           Tournaments
         </Tab>
-        <Tab
-          to={`/drivers/${driver.driverId}/ratings`}
-          isActive={isRatingsTab}
-          data-replace="true"
-          replace
-        >
-          <RiListOrdered2 />
-          Ratings
-        </Tab>
+        {!isSdc && (
+          <Tab
+            to={`/drivers/${driver.driverId}/ratings`}
+            isActive={isRatingsTab}
+            data-replace="true"
+            replace
+          >
+            <RiListOrdered2 />
+            Ratings
+          </Tab>
+        )}
         <Tab
           to={`/drivers/${driver.driverId}/setup`}
           isActive={isSetupTab}

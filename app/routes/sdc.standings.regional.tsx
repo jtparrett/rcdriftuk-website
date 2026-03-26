@@ -7,6 +7,7 @@ import { Box, Center, Container, Flex, styled } from "~/styled-system/jsx";
 import { prisma } from "~/utils/prisma.server";
 import { SDC_USER_ID } from "~/utils/theme";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
+import { LinkOverlay } from "~/components/LinkOverlay";
 
 export const loader = async () => {
   const leaderboards = await prisma.leaderboards.findMany({
@@ -147,11 +148,7 @@ const Page = () => {
                   {leaderboard.name}
                 </styled.h2>
                 <styled.p fontSize="sm" color="gray.500">
-                  {pluralize(
-                    "tournament",
-                    leaderboard.tournamentCount,
-                    true,
-                  )}
+                  {pluralize("tournament", leaderboard.tournamentCount, true)}
                 </styled.p>
               </Box>
             </Flex>
@@ -173,16 +170,18 @@ const Page = () => {
                     transition="background-color .15s"
                     pos="relative"
                   >
-                    <styled.span
-                      w={5}
-                      textAlign="center"
-                      fontWeight="extrabold"
-                      fontSize="sm"
-                      fontStyle="italic"
-                      color={i === 0 ? "brand.500" : "gray.500"}
-                    >
-                      {i + 1}
-                    </styled.span>
+                    <LinkOverlay to={`/drivers/${driver.user.driverId}`}>
+                      <styled.span
+                        w={5}
+                        textAlign="center"
+                        fontWeight="extrabold"
+                        fontSize="sm"
+                        fontStyle="italic"
+                        color={i === 0 ? "brand.500" : "gray.500"}
+                      >
+                        {i + 1}
+                      </styled.span>
+                    </LinkOverlay>
 
                     <Box
                       w={9}
