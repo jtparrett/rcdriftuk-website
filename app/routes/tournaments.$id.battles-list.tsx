@@ -95,11 +95,13 @@ const TournamentsBattlesListPage = () => {
                   driver={battle.driverLeft}
                   winnerId={battle.winnerId}
                   driverNo={getDriverNumber(battle.driverLeft)}
+                  isOwner={false}
                 />
                 <Driver
                   driver={battle.driverRight}
                   winnerId={battle.winnerId}
                   driverNo={getDriverNumber(battle.driverRight)}
+                  isOwner={false}
                 />
               </Box>
             </Box>
