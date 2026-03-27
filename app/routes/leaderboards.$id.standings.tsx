@@ -48,7 +48,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const byDriver = new Map<
     number,
-    { user: (typeof rows)[0]["user"]; totalPoints: number }
+    {
+      user: (typeof rows)[0]["user"];
+      totalPoints: number;
+      bestQualifying: number | null;
+      bestDriverNumber: number | null;
+    }
   >();
 
   for (const row of rows) {
@@ -62,21 +67,46 @@ export const loader = async (args: LoaderFunctionArgs) => {
     const existing = byDriver.get(row.driverId);
     if (existing) {
       existing.totalPoints += points;
+      if (row.qualifyingPosition != null) {
+        existing.bestQualifying =
+          existing.bestQualifying != null
+            ? Math.min(existing.bestQualifying, row.qualifyingPosition)
+            : row.qualifyingPosition;
+      }
+      if (row.tournamentDriverNumber > 0) {
+        existing.bestDriverNumber =
+          existing.bestDriverNumber != null
+            ? Math.min(existing.bestDriverNumber, row.tournamentDriverNumber)
+            : row.tournamentDriverNumber;
+      }
     } else {
       byDriver.set(row.driverId, {
         user: row.user,
         totalPoints: points,
+        bestQualifying: row.qualifyingPosition,
+        bestDriverNumber:
+          row.tournamentDriverNumber > 0 ? row.tournamentDriverNumber : null,
       });
     }
   }
 
   const drivers = Array.from(byDriver.entries())
-    .map(([driverId, { user, totalPoints }]) => ({
+    .map(([driverId, { user, totalPoints, bestQualifying, bestDriverNumber }]) => ({
       driverId,
       user,
       totalPoints,
+      bestQualifying,
+      bestDriverNumber,
     }))
-    .sort((a, b) => b.totalPoints - a.totalPoints || a.driverId - b.driverId);
+    .sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+      const aQ = a.bestQualifying ?? Infinity;
+      const bQ = b.bestQualifying ?? Infinity;
+      if (aQ !== bQ) return aQ - bQ;
+      const aN = a.bestDriverNumber ?? Infinity;
+      const bN = b.bestDriverNumber ?? Infinity;
+      return aN - bN;
+    });
 
   return { drivers, cutoff };
 };

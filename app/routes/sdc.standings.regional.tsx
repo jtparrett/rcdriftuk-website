@@ -42,6 +42,8 @@ export const loader = async () => {
       {
         points: number;
         user: (typeof lb.tournaments)[0]["tournament"]["drivers"][0]["user"];
+        bestQualifying: number | null;
+        bestDriverNumber: number | null;
       }
     >();
 
@@ -58,17 +60,45 @@ export const loader = async () => {
         const existing = driverPoints.get(driver.driverId);
         if (existing) {
           existing.points += pts;
+          if (driver.qualifyingPosition != null) {
+            existing.bestQualifying =
+              existing.bestQualifying != null
+                ? Math.min(existing.bestQualifying, driver.qualifyingPosition)
+                : driver.qualifyingPosition;
+          }
+          if (driver.tournamentDriverNumber > 0) {
+            existing.bestDriverNumber =
+              existing.bestDriverNumber != null
+                ? Math.min(
+                    existing.bestDriverNumber,
+                    driver.tournamentDriverNumber,
+                  )
+                : driver.tournamentDriverNumber;
+          }
         } else {
           driverPoints.set(driver.driverId, {
             points: pts,
             user: driver.user,
+            bestQualifying: driver.qualifyingPosition,
+            bestDriverNumber:
+              driver.tournamentDriverNumber > 0
+                ? driver.tournamentDriverNumber
+                : null,
           });
         }
       }
     }
 
     const topDrivers = Array.from(driverPoints.values())
-      .sort((a, b) => b.points - a.points)
+      .sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        const aQ = a.bestQualifying ?? Infinity;
+        const bQ = b.bestQualifying ?? Infinity;
+        if (aQ !== bQ) return aQ - bQ;
+        const aN = a.bestDriverNumber ?? Infinity;
+        const bN = b.bestDriverNumber ?? Infinity;
+        return aN - bN;
+      })
       .slice(0, 5);
 
     return {
