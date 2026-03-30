@@ -61,6 +61,7 @@
     "sonner": "^2.0.7",
     "stripe": "^17.5.0",
     "uuid": "^11.0.5",
+    "web-haptics": "^0.0.6",
     "xlsx": "^0.18.5",
     "zod": "^3.25.51",
     "zod-formik-adapter": "^1.3.0"
