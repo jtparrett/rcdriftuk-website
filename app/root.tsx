@@ -31,6 +31,7 @@ import { queryClient } from "./utils/queryClient";
 import type { Route } from "./+types/root";
 import { useEffect } from "react";
 import { useExpoPushTokenSync } from "./utils/useExpoPushToken";
+import { WebHaptics } from "web-haptics";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { getTheme } from "./utils/theme";
 import { token } from "./styled-system/tokens";
@@ -160,6 +161,19 @@ function App({
   const { hideBanner, isEmbed, isApp, posthog, user } = loaderData || {};
   const location = useLocation();
   const isMap = location.pathname.includes("/map");
+
+  useEffect(() => {
+    const haptics = new WebHaptics();
+    const handleClick = (e: MouseEvent) => {
+      const el = e.target as HTMLElement;
+      if (el.closest("a") || el.closest("button")) haptics.trigger("selection");
+    };
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("click", handleClick);
+      haptics.destroy();
+    };
+  }, []);
 
   useEffect(() => {
     if (isApp) {

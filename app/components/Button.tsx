@@ -1,14 +1,6 @@
-import { forwardRef } from "react";
 import { Link } from "react-router";
 import { cva } from "~/styled-system/css/cva";
 import { styled } from "~/styled-system/jsx";
-import { WebHaptics } from "web-haptics";
-
-let haptics: WebHaptics | null = null;
-function getHaptics() {
-  if (!haptics) haptics = new WebHaptics();
-  return haptics;
-}
 
 const ButtonStyles = cva({
   base: {
@@ -103,36 +95,6 @@ const ButtonStyles = cva({
   },
 });
 
-const StyledButton = styled("button", ButtonStyles);
-const StyledLinkButton = styled(Link, ButtonStyles);
+export const Button = styled("button", ButtonStyles);
 
-type ButtonProps = React.ComponentProps<typeof StyledButton>;
-type LinkButtonProps = React.ComponentProps<typeof StyledLinkButton>;
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ onClick, ...props }, ref) => (
-    <StyledButton
-      ref={ref}
-      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-        getHaptics().trigger("selection");
-        onClick?.(e);
-      }}
-      {...props}
-    />
-  ),
-);
-Button.displayName = "Button";
-
-export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
-  ({ onClick, ...props }, ref) => (
-    <StyledLinkButton
-      ref={ref}
-      onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-        getHaptics().trigger("selection");
-        onClick?.(e);
-      }}
-      {...props}
-    />
-  ),
-);
-LinkButton.displayName = "LinkButton";
+export const LinkButton = styled(Link, ButtonStyles);

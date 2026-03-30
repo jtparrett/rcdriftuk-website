@@ -1,14 +1,6 @@
-import { forwardRef } from "react";
-import { Link, type LinkProps } from "react-router";
+import { Link } from "react-router";
 import { styled } from "~/styled-system/jsx";
-import { cva, type RecipeVariantProps } from "~/styled-system/css";
-import { WebHaptics } from "web-haptics";
-
-let haptics: WebHaptics | null = null;
-function getHaptics() {
-  if (!haptics) haptics = new WebHaptics();
-  return haptics;
-}
+import { cva } from "~/styled-system/css";
 
 const TabStyle = cva({
   base: {
@@ -40,39 +32,8 @@ const TabStyle = cva({
   },
 });
 
-const StyledTab = styled(Link, TabStyle);
-const StyledTabButton = styled("button", TabStyle);
-
-type TabProps = React.ComponentProps<typeof StyledTab>;
-type TabButtonProps = React.ComponentProps<typeof StyledTabButton>;
-
-export const Tab = forwardRef<HTMLAnchorElement, TabProps>(
-  ({ onClick, ...props }, ref) => (
-    <StyledTab
-      ref={ref}
-      onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-        getHaptics().trigger("selection");
-        onClick?.(e);
-      }}
-      {...props}
-    />
-  ),
-);
-Tab.displayName = "Tab";
-
-export const TabButton = forwardRef<HTMLButtonElement, TabButtonProps>(
-  ({ onClick, ...props }, ref) => (
-    <StyledTabButton
-      ref={ref}
-      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-        getHaptics().trigger("selection");
-        onClick?.(e);
-      }}
-      {...props}
-    />
-  ),
-);
-TabButton.displayName = "TabButton";
+export const Tab = styled(Link, TabStyle);
+export const TabButton = styled("button", TabStyle);
 
 export const TabGroup = styled("div", {
   base: {
