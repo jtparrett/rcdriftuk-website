@@ -7,6 +7,7 @@ import { Box, Flex, styled } from "~/styled-system/jsx";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { Card } from "~/components/CollapsibleCard";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
+import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -91,13 +92,18 @@ export const loader = async (args: LoaderFunctionArgs) => {
   }
 
   const drivers = Array.from(byDriver.entries())
-    .map(([driverId, { user, totalPoints, bestQualifying, bestDriverNumber }]) => ({
-      driverId,
-      user,
-      totalPoints,
-      bestQualifying,
-      bestDriverNumber,
-    }))
+    .map(
+      ([
+        driverId,
+        { user, totalPoints, bestQualifying, bestDriverNumber },
+      ]) => ({
+        driverId,
+        user,
+        totalPoints,
+        bestQualifying,
+        bestDriverNumber,
+      }),
+    )
     .sort((a, b) => {
       if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
       const aQ = a.bestQualifying ?? Infinity;
@@ -113,6 +119,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 const StandingsPage = () => {
   const { drivers, cutoff } = useLoaderData<typeof loader>();
+  const isEmbed = useIsEmbed();
 
   return (
     <>
@@ -122,7 +129,7 @@ const StandingsPage = () => {
         </styled.p>
       )}
 
-      <Flex flexDir="column" gap={2}>
+      <Flex flexDir="column" gap={1}>
         {drivers.map((driver, i) => (
           <Fragment key={driver.driverId}>
             {i === cutoff && cutoff > 0 && <Box h="1px" bgColor="red.500" />}
@@ -133,19 +140,21 @@ const StandingsPage = () => {
               gradientFrom="gray.900"
               gradientTo="black"
               opacity={i >= cutoff && cutoff > 0 ? 0.5 : 1}
+              rounded="xl"
             >
-              <Flex p={6} alignItems="center" gap={4}>
+              <Flex px={4} py={2} alignItems="center" gap={3}>
                 <styled.p
                   fontWeight="extrabold"
-                  fontSize="2xl"
+                  fontSize="xl"
                   fontStyle="italic"
+                  fontVariantNumeric="tabular-nums"
                 >
                   {i + 1}
                 </styled.p>
 
                 <Box
-                  w={10}
-                  h={10}
+                  w={8}
+                  h={8}
                   rounded="full"
                   overflow="hidden"
                   borderWidth={1}
@@ -161,7 +170,10 @@ const StandingsPage = () => {
                 </Box>
 
                 <Box flex={1} overflow="hidden">
-                  <LinkOverlay to={`/drivers/${driver.driverId}`}>
+                  <LinkOverlay
+                    to={`/drivers/${driver.driverId}`}
+                    target={isEmbed ? "_blank" : undefined}
+                  >
                     <styled.h2 lineHeight={1.1} fontWeight="medium">
                       {driver.user.firstName} {driver.user.lastName}
                     </styled.h2>
@@ -178,8 +190,8 @@ const StandingsPage = () => {
                 </Box>
 
                 <styled.p
-                  fontWeight="bold"
-                  fontSize="lg"
+                  fontWeight="semibold"
+                  fontFamily="mono"
                   fontVariantNumeric="tabular-nums"
                 >
                   {driver.totalPoints.toFixed(1)} pts

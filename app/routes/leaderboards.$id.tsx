@@ -15,6 +15,7 @@ import {
   RiVipCrown2Line,
 } from "react-icons/ri";
 import { TabsBar } from "~/components/TabsBar";
+import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -36,6 +37,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 const LeaderboardLayout = () => {
   const { leaderboard, isOwner } = useLoaderData<typeof loader>();
   const location = useLocation();
+  const isEmbed = useIsEmbed();
 
   const isStandingsTab =
     location.pathname.endsWith("/standings") ||
@@ -46,7 +48,7 @@ const LeaderboardLayout = () => {
     <>
       <TabsBar maxW={800}>
         <Tab
-          to={`/leaderboards/${leaderboard.id}/standings`}
+          to={`/leaderboards/${leaderboard.id}/standings${isEmbed ? "?embed=true" : ""}`}
           isActive={isStandingsTab}
           replace
         >
@@ -54,7 +56,7 @@ const LeaderboardLayout = () => {
           Standings
         </Tab>
         <Tab
-          to={`/leaderboards/${leaderboard.id}/tournaments`}
+          to={`/leaderboards/${leaderboard.id}/tournaments${isEmbed ? "?embed=true" : ""}`}
           isActive={isTournamentsTab}
           replace
         >

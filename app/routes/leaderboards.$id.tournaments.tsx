@@ -7,6 +7,7 @@ import { Card } from "~/components/CollapsibleCard";
 import { LinkOverlay } from "~/components/LinkOverlay";
 import { prisma } from "~/utils/prisma.server";
 import notFoundInvariant from "~/utils/notFoundInvariant";
+import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -32,6 +33,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 const TournamentsPage = () => {
   const { tournaments } = useLoaderData<typeof loader>();
+  const isEmbed = useIsEmbed();
 
   if (tournaments.length === 0) {
     return (
@@ -53,7 +55,10 @@ const TournamentsPage = () => {
         >
           <Flex alignItems="center" gap={1} p={6}>
             <Box flex={1}>
-              <LinkOverlay to={`/tournaments/${tournament.id}`}>
+              <LinkOverlay
+                to={`/tournaments/${tournament.id}`}
+                target={isEmbed ? "_blank" : undefined}
+              >
                 <styled.h2 fontWeight="medium">{tournament.name}</styled.h2>
               </LinkOverlay>
               <styled.p fontSize="sm" color="gray.500">
