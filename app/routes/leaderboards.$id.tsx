@@ -21,6 +21,7 @@ import {
 } from "react-icons/ri";
 import { TabsBar } from "~/components/TabsBar";
 import { useIsEmbed } from "~/utils/EmbedContext";
+import { useIsApp } from "~/utils/AppContext";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
@@ -44,6 +45,7 @@ const LeaderboardLayout = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const isEmbed = useIsEmbed();
+  const isApp = useIsApp();
 
   const isStandingsTab =
     location.pathname.endsWith("/standings") ||
@@ -105,18 +107,34 @@ const LeaderboardLayout = () => {
         </LinkButton>
       </TabsBar>
 
-      <Container maxW={800} px={2} py={4}>
-        <styled.h1
-          fontSize="lg"
-          fontWeight="semibold"
-          whiteSpace="nowrap"
-          overflow="hidden"
-          textOverflow="ellipsis"
-          mb={4}
-        >
-          {leaderboard.name}
-        </styled.h1>
+      <Box
+        pos="sticky"
+        style={
+          {
+            "--top": isApp || isEmbed ? "56px" : "120px",
+          } as React.CSSProperties
+        }
+        top="var(--top)"
+        zIndex={10}
+        bgColor="rgba(12, 12, 12, 0.75)"
+        backdropFilter="blur(10px)"
+        borderBottomWidth={1}
+        borderColor="gray.900"
+      >
+        <Container maxW={800} px={3} py={2}>
+          <styled.h1
+            fontSize="lg"
+            fontWeight="semibold"
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+          >
+            {leaderboard.name}
+          </styled.h1>
+        </Container>
+      </Box>
 
+      <Container maxW={800} px={3} py={3}>
         <Outlet />
       </Container>
     </>
