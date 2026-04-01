@@ -27,6 +27,20 @@ export async function action(args: ActionFunctionArgs) {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const ticketId = session.metadata?.ticketId;
+      const donationId = session.metadata?.donationId;
+
+      // Handle donation checkout
+      if (donationId) {
+        await prisma.donations.update({
+          where: { id: donationId },
+          data: {
+            status: "CONFIRMED",
+            paymentIntentId: (session.payment_intent as string) ?? undefined,
+          },
+        });
+        console.log(`[stripe-webhook] Donation ${donationId} confirmed`);
+        return new Response("Donation confirmed", { status: 200 });
+      }
 
       const ticket = await prisma.eventTickets.findUnique({
         where: {
@@ -152,10 +166,41 @@ export async function action(args: ActionFunctionArgs) {
       }
 
       if (!ticket) {
+        // Check if this is a donation refund
+        let donation = await prisma.donations.findFirst({
+          where: { paymentIntentId },
+        });
+
+        if (!donation) {
+          const sessions = await stripe.checkout.sessions.list({
+            payment_intent: paymentIntentId,
+          });
+          const donationId = sessions.data[0]?.metadata?.donationId;
+          if (donationId) {
+            donation = await prisma.donations.findUnique({
+              where: { id: donationId },
+            });
+          }
+        }
+
+        if (donation) {
+          if (donation.status === "REFUNDED") {
+            return new Response("Donation already refunded", { status: 200 });
+          }
+          await prisma.donations.update({
+            where: { id: donation.id },
+            data: { status: "REFUNDED", paymentIntentId },
+          });
+          console.log(
+            `[stripe-webhook] ${event.type}: donation ${donation.id} marked as REFUNDED`,
+          );
+          return new Response("Donation refunded", { status: 200 });
+        }
+
         console.error(
-          `[stripe-webhook] ${event.type}: could not find ticket for payment_intent ${paymentIntentId}`,
+          `[stripe-webhook] ${event.type}: could not find ticket or donation for payment_intent ${paymentIntentId}`,
         );
-        return new Response("Ticket not found", { status: 200 });
+        return new Response("Payment not found", { status: 200 });
       }
 
       if (ticket.status === TicketStatus.REFUNDED) {

@@ -29,7 +29,7 @@ import { TabButton, TabGroup } from "~/components/Tab";
 import { PeopleForm } from "~/components/PeopleForm";
 import { JudgesForm } from "~/components/JudgesForm";
 import { Box, Flex, Spacer, styled } from "~/styled-system/jsx";
-import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import { Dialog } from "~/components/Dialog";
 import {
   BracketSize,
   JudgingInterface,
@@ -53,7 +53,7 @@ import { tournamentRemoveDrivers } from "~/utils/tournamentRemoveDrivers";
 import { tournamentReorderDrivers } from "~/utils/tournamentReorderDrivers";
 import { findNextIncompleteQualifyingLap } from "~/utils/findNextIncompleteQualifyingLap";
 import { toast } from "sonner";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const bracketSchema = z.object({
   id: z.number().optional(),
@@ -535,20 +535,9 @@ const validationSchema = toFormikValidationSchema(tournamentFormSchema);
 
 const Page = () => {
   const { tournament } = useLoaderData<typeof loader>();
-  const modalRef = useRef<HTMLDialogElement>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const body = global.document?.body;
   const params = useParams();
-
-  const onOpen = () => {
-    disableBodyScroll(body);
-    modalRef.current?.showModal();
-  };
-
-  const onClose = () => {
-    enableBodyScroll(body);
-    modalRef.current?.close();
-  };
 
   const isStartState = tournament.state === TournamentsState.START;
   const canEditDrivers =
@@ -641,7 +630,7 @@ const Page = () => {
         encType: "application/json",
       });
 
-      onClose();
+      setModalOpen(false);
 
       toast.success("Changes saved successfully");
     },
@@ -656,7 +645,7 @@ const Page = () => {
       <Button
         type={tournament.state === TournamentsState.START ? "submit" : "button"}
         onClick={
-          tournament.state === TournamentsState.START ? undefined : onOpen
+          tournament.state === TournamentsState.START ? undefined : () => setModalOpen(true)
         }
         isLoading={isSubmitting}
         disabled={isSubmitting || !formik.isValid || !formik.dirty}
@@ -1240,73 +1229,50 @@ const Page = () => {
           </Card>
         </Flex>
 
-        <styled.dialog
-          ref={modalRef}
-          role="dialog"
-          m="auto"
-          bgColor="gray.950"
-          color="white"
-          p={1}
-          rounded="3xl"
-          borderWidth={1}
-          borderColor="gray.800"
-          textAlign="center"
-          _backdrop={{
-            bg: "rgba(0, 0, 0, 0.7)",
-            backdropFilter: "blur(10px)",
-          }}
-        >
-          <Box
-            bgColor="gray.900"
-            p={6}
-            borderWidth={1}
-            borderColor="gray.800"
-            rounded="2xl"
+        <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
+          <styled.h1
+            mb={2}
+            fontWeight="medium"
+            fontSize="2xl"
+            lineHeight="1.2"
+            textAlign="center"
           >
-            <styled.h1
-              mb={2}
-              fontWeight="medium"
-              fontSize="2xl"
-              lineHeight="1.2"
-            >
-              Are you sure you want to save these changes?
-            </styled.h1>
+            Are you sure you want to save these changes?
+          </styled.h1>
 
-            <styled.p
-              color="brand.500"
-              fontWeight="medium"
-              mb={2}
-              whiteSpace="pre-line"
-            >
-              This may result in some or all of the tournament progress being
-              reset.
-            </styled.p>
+          <styled.p
+            color="brand.500"
+            fontWeight="medium"
+            mb={2}
+            whiteSpace="pre-line"
+            textAlign="center"
+          >
+            This may result in some or all of the tournament progress being
+            reset.
+          </styled.p>
 
-            <Flex
-              gap={2}
-              justifyContent="center"
-              mt={6}
-              flexDir={{ base: "column", sm: "row" }}
+          <Flex
+            gap={2}
+            justifyContent="center"
+            mt={6}
+            flexDir={{ base: "column", sm: "row" }}
+          >
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => setModalOpen(false)}
             >
-              <Button
-                variant="secondary"
-                type="button"
-                onClick={() => {
-                  onClose();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                isLoading={isSubmitting}
-                disabled={isSubmitting || !formik.isValid || !formik.dirty}
-              >
-                Save Changes
-              </Button>
-            </Flex>
-          </Box>
-        </styled.dialog>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={isSubmitting || !formik.isValid || !formik.dirty}
+            >
+              Save Changes
+            </Button>
+          </Flex>
+        </Dialog>
       </form>
     </Flex>
   );

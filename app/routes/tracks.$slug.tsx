@@ -244,6 +244,16 @@ const TrackPage = () => {
             >
               Leaderboard
             </Tab>
+            {track?.stripeAccountEnabled && (
+              <Tab
+                to={`/tracks/${track?.slug}/donations`}
+                isActive={tab === "donations"}
+                data-replace="true"
+                replace
+              >
+                Donations
+              </Tab>
+            )}
           </Flex>
 
           <Box

@@ -67,6 +67,14 @@ export const TicketStatus = {
 
 export type TicketStatus = Values<typeof TicketStatus>;
 
+export const DonationStatus = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  REFUNDED: "REFUNDED",
+} as const;
+
+export type DonationStatus = Values<typeof DonationStatus>;
+
 export const Regions = {
   ALL: "ALL",
   UK: "UK",

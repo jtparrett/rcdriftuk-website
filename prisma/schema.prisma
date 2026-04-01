@@ -297,6 +297,7 @@ model Tracks {
   stripeAccountId      String?
   stripeAccountEnabled Boolean        @default(false)
   reviews              TrackReviews[]
+  donations            Donations[]
 
   @@index([status])
   @@index([types])
@@ -327,6 +328,28 @@ model TrackReviews {
   @@index([trackId])
   @@index([userId])
   @@index([createdAt])
+}
+
+model Donations {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trackId         String         @db.Uuid
+  track           Tracks         @relation(fields: [trackId], references: [id])
+  userId          String?
+  user            Users?         @relation(fields: [userId], references: [id])
+  amount          Float
+  status          DonationStatus @default(PENDING)
+  sessionId       String?
+  paymentIntentId String?
+  message         String?
+  anonymous       Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now()) @updatedAt
+
+  @@index([trackId])
+  @@index([userId])
+  @@index([status])
+  @@index([sessionId])
+  @@index([paymentIntentId])
 }
 
 model Users {
@@ -366,6 +389,7 @@ model Users {
   claimTargets            ProfileClaimRequests[] @relation("ClaimTarget")
   claimRequesters         ProfileClaimRequests[] @relation("ClaimRequester")
   TrackReviews            TrackReviews[]
+  Donations               Donations[]
 
   @@index([elo])
   @@index([archived])
@@ -676,6 +700,12 @@ enum TicketStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  REFUNDED
+}
+
+enum DonationStatus {
+  PENDING
+  CONFIRMED
   REFUNDED
 }
 
