@@ -31,6 +31,7 @@ import { RiDeleteBinFill, RiDraggable, RiFileUploadLine } from "react-icons/ri";
 import { Dropdown, Option } from "~/components/Dropdown";
 import { Card } from "~/components/CollapsibleCard";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
+import { toast } from "sonner";
 import { Switch } from "~/components/Switch";
 import { PeopleForm } from "~/components/PeopleForm";
 
@@ -454,6 +455,12 @@ const LeaderboardsEditPage = () => {
   const { leaderboard } = useLoaderData<typeof loader>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [embedLimitEnabled, setEmbedLimitEnabled] = useState(true);
+  const [embedMax, setEmbedMax] = useState(10);
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const embedUrl = `${origin}/leaderboards/${params.id}/standings?embed=true${embedLimitEnabled ? `&max=${embedMax}` : ""}`;
+  const embedCode = `<iframe frameborder="none" width="800px" height="800px" src="${embedUrl}"></iframe>`;
+
   const handleCsvImport = () => {
     fileInputRef.current?.click();
   };
@@ -634,7 +641,7 @@ const LeaderboardsEditPage = () => {
                 Set points awarded for each finishing position (1-32). Leave at
                 0 for no points.
               </styled.p>
-              <Grid columns={4} gap={1.5}>
+              <Grid columns={{ base: 3, md: 4 }} gap={1.5}>
                 {Array.from({ length: 32 }, (_, i) => i + 1).map((pos) => (
                   <Box
                     key={pos}
@@ -715,6 +722,66 @@ const LeaderboardsEditPage = () => {
             </Button>
           </VStack>
         </form>
+      </Card>
+
+      <styled.h2 mt={6} mb={2}>
+        Embed Code
+      </styled.h2>
+      <Card>
+        <VStack gap={0} alignItems="stretch">
+          <FormControl p={4}>
+            <Flex alignItems="center" justifyContent="space-between" mb={1}>
+              <Label mb={0}>Limit Drivers</Label>
+              <Switch
+                checked={embedLimitEnabled}
+                onChange={(on) => setEmbedLimitEnabled(on)}
+              />
+            </Flex>
+            {embedLimitEnabled && (
+              <Input
+                type="number"
+                min={1}
+                value={embedMax}
+                onChange={(e) => setEmbedMax(Number(e.target.value))}
+              />
+            )}
+          </FormControl>
+
+          <Divider borderColor="gray.800" />
+
+          <Box p={4}>
+            <Label>Embed Snippet</Label>
+            <Box
+              bgColor="black"
+              rounded="lg"
+              p={3}
+              borderWidth={1}
+              borderColor="gray.800"
+              overflow="auto"
+            >
+              <styled.code
+                fontSize="xs"
+                color="gray.300"
+                whiteSpace="pre-wrap"
+                wordBreak="break-all"
+              >
+                {embedCode}
+              </styled.code>
+            </Box>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              mt={2}
+              onClick={() => {
+                navigator.clipboard.writeText(embedCode);
+                toast.success("Embed code copied to clipboard");
+              }}
+            >
+              Copy
+            </Button>
+          </Box>
+        </VStack>
       </Card>
     </Container>
   );
