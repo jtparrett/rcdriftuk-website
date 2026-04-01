@@ -1,6 +1,11 @@
 import { z } from "zod";
 import type { LoaderFunctionArgs } from "react-router";
-import { Outlet, useLoaderData, useLocation } from "react-router";
+import {
+  Outlet,
+  useLoaderData,
+  useLocation,
+  useSearchParams,
+} from "react-router";
 import { Box, Container, Flex, Spacer, styled } from "~/styled-system/jsx";
 import { Button, LinkButton } from "~/components/Button";
 import { Tab } from "~/components/Tab";
@@ -37,6 +42,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 const LeaderboardLayout = () => {
   const { leaderboard, isOwner } = useLoaderData<typeof loader>();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const isEmbed = useIsEmbed();
 
   const isStandingsTab =
@@ -44,11 +50,14 @@ const LeaderboardLayout = () => {
     location.pathname === `/leaderboards/${leaderboard.id}`;
   const isTournamentsTab = location.pathname.endsWith("/tournaments");
 
+  const queryString = searchParams.toString();
+  const search = queryString ? `?${queryString}` : "";
+
   return (
     <>
       <TabsBar maxW={800}>
         <Tab
-          to={`/leaderboards/${leaderboard.id}/standings${isEmbed ? "?embed=true" : ""}`}
+          to={`/leaderboards/${leaderboard.id}/standings${search}`}
           isActive={isStandingsTab}
           replace
         >
@@ -56,7 +65,7 @@ const LeaderboardLayout = () => {
           Standings
         </Tab>
         <Tab
-          to={`/leaderboards/${leaderboard.id}/tournaments${isEmbed ? "?embed=true" : ""}`}
+          to={`/leaderboards/${leaderboard.id}/tournaments${search}`}
           isActive={isTournamentsTab}
           replace
         >
@@ -87,7 +96,7 @@ const LeaderboardLayout = () => {
           <RiShareForwardFill />
         </Button>
         <LinkButton
-          to={location.pathname + "?embed=true"}
+          to={`${location.pathname}?${new URLSearchParams([...Array.from(searchParams).filter(([k]) => k !== "embed"), ["embed", "true"]]).toString()}`}
           px={2}
           target="_blank"
           variant="secondary"
