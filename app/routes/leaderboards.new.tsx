@@ -33,7 +33,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  return redirect(`/leaderboards/${leaderboard.id}/edit`);
+  return redirect(`/leaderboards-edit/${leaderboard.id}`);
 };
 
 const LeaderboardsNewPage = () => {

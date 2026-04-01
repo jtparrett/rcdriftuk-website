@@ -16,6 +16,7 @@ import {
   redirect,
   useFetcher,
   useLoaderData,
+  useParams,
   type LoaderFunctionArgs,
 } from "react-router";
 import { getAuth } from "~/utils/getAuth.server";
@@ -26,11 +27,12 @@ import { Button } from "~/components/Button";
 import { TournamentsState } from "~/utils/enums";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Reorder } from "motion/react";
-import { RiDeleteBinFill, RiDraggable } from "react-icons/ri";
+import { RiDeleteBinFill, RiDraggable, RiFileUploadLine } from "react-icons/ri";
 import { Dropdown, Option } from "~/components/Dropdown";
 import { Card } from "~/components/CollapsibleCard";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
 import { Switch } from "~/components/Switch";
+import { PeopleForm } from "~/components/PeopleForm";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
@@ -45,6 +47,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     },
     include: {
       tournaments: true,
+      drivers: {
+        include: { user: true },
+      },
     },
   });
 
@@ -96,18 +101,24 @@ export const action = async (args: LoaderFunctionArgs) => {
     participationPoints: Number(formData.get("participationPoints") ?? 0),
     positionPoints,
     tournaments: formData.getAll("tournaments"),
-  });
-
-  await prisma.leaderboardTournaments.deleteMany({
-    where: {
-      leaderboardId: id,
-      leaderboard: {
-        userId,
-      },
-    },
+    registeredDrivers: formData.getAll("registeredDrivers"),
   });
 
   await prisma.$transaction([
+    prisma.leaderboardTournaments.deleteMany({
+      where: {
+        leaderboardId: id,
+        leaderboard: { userId },
+      },
+    }),
+
+    prisma.leaderboardDrivers.deleteMany({
+      where: {
+        leaderboardId: id,
+        leaderboard: { userId },
+      },
+    }),
+
     prisma.leaderboards.update({
       where: {
         id,
@@ -128,6 +139,17 @@ export const action = async (args: LoaderFunctionArgs) => {
         tournamentId,
       })),
     }),
+
+    ...(data.registeredDrivers.length > 0
+      ? [
+          prisma.leaderboardDrivers.createMany({
+            data: data.registeredDrivers.map((driverId) => ({
+              leaderboardId: id,
+              driverId: Number(driverId),
+            })),
+          }),
+        ]
+      : []),
   ]);
 
   return redirect(`/leaderboards/${id}`);
@@ -140,6 +162,7 @@ const actionSchema = z.object({
   participationPoints: z.number().min(0).max(100),
   positionPoints: z.record(z.string(), z.number()).nullable(),
   tournaments: z.array(z.string()),
+  registeredDrivers: z.array(z.string()),
 });
 
 const clientSchema = z.object({
@@ -149,6 +172,14 @@ const clientSchema = z.object({
   participationPoints: z.number().min(0).max(100),
   positionPoints: z.record(z.string(), z.number()),
   tournaments: z.array(z.string()),
+  registeredDrivers: z.array(
+    z.object({
+      driverId: z.string(),
+      firstName: z.string().nullish(),
+      lastName: z.string().nullish(),
+      image: z.string().nullish(),
+    }),
+  ),
 });
 
 const validationSchema = toFormikValidationSchema(clientSchema);
@@ -418,7 +449,30 @@ const TournamentsForm = ({
 
 const LeaderboardsEditPage = () => {
   const fetcher = useFetcher();
+  const csvFetcher = useFetcher();
+  const params = useParams();
   const { leaderboard } = useLoaderData<typeof loader>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCsvImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    csvFetcher.submit(formData, {
+      method: "POST",
+      action: `/api/leaderboards/${params.id}/import-csv`,
+      encType: "multipart/form-data",
+    });
+
+    event.target.value = "";
+  };
 
   const savedPoints = getPositionPoints(leaderboard.positionPoints);
   const initialPositionPoints: Record<string, number> = {};
@@ -428,6 +482,7 @@ const LeaderboardsEditPage = () => {
 
   const formik = useFormik({
     validationSchema,
+    enableReinitialize: true,
     initialValues: {
       name: leaderboard.name,
       cutoff: leaderboard.cutoff ?? 0,
@@ -437,6 +492,12 @@ const LeaderboardsEditPage = () => {
       tournaments: leaderboard.tournaments.map(
         (tournament) => tournament.tournamentId,
       ),
+      registeredDrivers: leaderboard.drivers.map((d) => ({
+        driverId: d.driverId.toString(),
+        firstName: d.user.firstName,
+        lastName: d.user.lastName,
+        image: d.user.image,
+      })),
     },
     async onSubmit(values) {
       const formData = new FormData();
@@ -459,6 +520,10 @@ const LeaderboardsEditPage = () => {
         formData.append("tournaments", tournament);
       });
 
+      values.registeredDrivers.forEach((driver) => {
+        formData.append("registeredDrivers", driver.driverId);
+      });
+
       await fetcher.submit(formData, {
         method: "POST",
       });
@@ -466,155 +531,191 @@ const LeaderboardsEditPage = () => {
   });
 
   return (
-    <Container maxW={1100} px={2} py={4}>
-      <Box maxW="580px" mx="auto">
-        <styled.h2 mb={2}>Edit Leaderboard Details</styled.h2>
-        <Card p={4} overflow="visible">
-          <form onSubmit={formik.handleSubmit}>
-            <VStack gap={4} alignItems="stretch">
-              <FormControl error={formik.errors.name}>
-                <Label>Leaderboard Name</Label>
-                <Input
-                  name="name"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                />
-              </FormControl>
+    <Container maxW={640} px={2} py={4}>
+      <styled.h2 mb={2}>Edit Leaderboard Details</styled.h2>
+      <Card overflow="visible">
+        <form onSubmit={formik.handleSubmit}>
+          <VStack gap={0} alignItems="stretch">
+            <FormControl error={formik.errors.name} p={4}>
+              <Label>Leaderboard Name</Label>
+              <Input
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+              />
+            </FormControl>
 
-              <FormControl>
-                <Flex alignItems="center" justifyContent="space-between" mb={1}>
-                  <Label mb={0}>Qualifying Cutoff Position</Label>
-                  <Switch
-                    checked={formik.values.cutoff > 0}
-                    onChange={(on) => {
-                      formik.setFieldValue("cutoff", on ? 1 : 0);
-                    }}
-                  />
-                </Flex>
-                {formik.values.cutoff > 0 && (
+            <Divider borderColor="gray.800" />
+
+            <FormControl p={4}>
+              <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                <Label mb={0}>Qualifying Cutoff Position</Label>
+                <Switch
+                  checked={formik.values.cutoff > 0}
+                  onChange={(on) => {
+                    formik.setFieldValue("cutoff", on ? 1 : 0);
+                  }}
+                />
+              </Flex>
+              {formik.values.cutoff > 0 && (
+                <Input
+                  type="number"
+                  name="cutoff"
+                  min={1}
+                  onChange={formik.handleChange}
+                  value={formik.values.cutoff}
+                />
+              )}
+            </FormControl>
+
+            <Divider borderColor="gray.800" />
+
+            <FormControl p={4}>
+              <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                <Label mb={0}>Top Qualifier (TQ) Bonus Points</Label>
+                <Switch
+                  checked={formik.values.tqPoints > 0}
+                  onChange={(on) => {
+                    formik.setFieldValue("tqPoints", on ? 1 : 0);
+                  }}
+                />
+              </Flex>
+              {formik.values.tqPoints > 0 && (
+                <>
                   <Input
                     type="number"
-                    name="cutoff"
+                    name="tqPoints"
                     min={1}
+                    max={100}
                     onChange={formik.handleChange}
-                    value={formik.values.cutoff}
+                    value={formik.values.tqPoints}
                   />
-                )}
-              </FormControl>
+                  <styled.p fontSize="xs" color="gray.500" mt={1}>
+                    Bonus points awarded to the top qualifier in each tournament
+                  </styled.p>
+                </>
+              )}
+            </FormControl>
 
-              <Divider borderColor="gray.800" />
+            <Divider borderColor="gray.800" />
 
-              <FormControl>
-                <Flex alignItems="center" justifyContent="space-between" mb={1}>
-                  <Label mb={0}>Top Qualifier (TQ) Bonus Points</Label>
-                  <Switch
-                    checked={formik.values.tqPoints > 0}
-                    onChange={(on) => {
-                      formik.setFieldValue("tqPoints", on ? 1 : 0);
-                    }}
-                  />
-                </Flex>
-                {formik.values.tqPoints > 0 && (
-                  <>
-                    <Input
-                      type="number"
-                      name="tqPoints"
-                      min={1}
-                      max={100}
-                      onChange={formik.handleChange}
-                      value={formik.values.tqPoints}
-                    />
-                    <styled.p fontSize="xs" color="gray.500" mt={1}>
-                      Bonus points awarded to the top qualifier in each
-                      tournament
-                    </styled.p>
-                  </>
-                )}
-              </FormControl>
-
-              <Divider borderColor="gray.800" />
-
-              <FormControl>
-                <Flex alignItems="center" justifyContent="space-between" mb={1}>
-                  <Label mb={0}>Participation Bonus</Label>
-                  <Switch
-                    checked={formik.values.participationPoints > 0}
-                    onChange={(on) => {
-                      formik.setFieldValue("participationPoints", on ? 1 : 0);
-                    }}
-                  />
-                </Flex>
-                {formik.values.participationPoints > 0 && (
-                  <>
-                    <Input
-                      type="number"
-                      name="participationPoints"
-                      min={1}
-                      max={100}
-                      onChange={formik.handleChange}
-                      value={formik.values.participationPoints}
-                    />
-                    <styled.p fontSize="xs" color="gray.500" mt={1}>
-                      Bonus points awarded to every driver in each tournament
-                    </styled.p>
-                  </>
-                )}
-              </FormControl>
-
-              <Divider borderColor="gray.800" />
-
-              <FormControl>
-                <Label>Points Distribution</Label>
-                <styled.p fontSize="xs" color="gray.500" mb={2}>
-                  Set points awarded for each finishing position (1-32). Leave
-                  at 0 for no points.
-                </styled.p>
-                <Grid columns={4} gap={1.5}>
-                  {Array.from({ length: 32 }, (_, i) => i + 1).map((pos) => (
-                    <Box
-                      key={pos}
-                      bgColor="gray.900"
-                      rounded="lg"
-                      py={1.5}
-                      px={1}
-                      borderWidth={1}
-                      borderColor="gray.800"
-                    >
-                      <NumberStepper
-                        label={`P${pos}`}
-                        value={formik.values.positionPoints[String(pos)] ?? 0}
-                        onChange={(v) =>
-                          formik.setFieldValue(`positionPoints.${pos}`, v)
-                        }
-                      />
-                    </Box>
-                  ))}
-                </Grid>
-              </FormControl>
-
-              <Divider borderColor="gray.800" />
-
-              <FormControl>
-                <Label>Tournaments</Label>
-                <TournamentsForm
-                  value={formik.values.tournaments}
-                  onChange={(value) =>
-                    formik.setFieldValue("tournaments", value)
-                  }
+            <FormControl p={4}>
+              <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                <Label mb={0}>Participation Bonus</Label>
+                <Switch
+                  checked={formik.values.participationPoints > 0}
+                  onChange={(on) => {
+                    formik.setFieldValue("participationPoints", on ? 1 : 0);
+                  }}
                 />
-              </FormControl>
+              </Flex>
+              {formik.values.participationPoints > 0 && (
+                <>
+                  <Input
+                    type="number"
+                    name="participationPoints"
+                    min={1}
+                    max={100}
+                    onChange={formik.handleChange}
+                    value={formik.values.participationPoints}
+                  />
+                  <styled.p fontSize="xs" color="gray.500" mt={1}>
+                    Bonus points awarded to every driver in each tournament
+                  </styled.p>
+                </>
+              )}
+            </FormControl>
 
-              <Button
-                type="submit"
-                isLoading={formik.isSubmitting}
-                disabled={formik.isSubmitting}
-              >
-                Save Changes
-              </Button>
-            </VStack>
-          </form>
-        </Card>
-      </Box>
+            <Divider borderColor="gray.800" />
+
+            <FormControl p={4}>
+              <Label>Points Distribution</Label>
+              <styled.p fontSize="xs" color="gray.500" mb={2}>
+                Set points awarded for each finishing position (1-32). Leave at
+                0 for no points.
+              </styled.p>
+              <Grid columns={4} gap={1.5}>
+                {Array.from({ length: 32 }, (_, i) => i + 1).map((pos) => (
+                  <Box
+                    key={pos}
+                    bgColor="gray.900"
+                    rounded="lg"
+                    py={1.5}
+                    px={1}
+                    borderWidth={1}
+                    borderColor="gray.800"
+                  >
+                    <NumberStepper
+                      label={`P${pos}`}
+                      value={formik.values.positionPoints[String(pos)] ?? 0}
+                      onChange={(v) =>
+                        formik.setFieldValue(`positionPoints.${pos}`, v)
+                      }
+                    />
+                  </Box>
+                ))}
+              </Grid>
+            </FormControl>
+
+            <Divider borderColor="gray.800" />
+
+            <FormControl p={4}>
+              <Label>Tournaments</Label>
+              <TournamentsForm
+                value={formik.values.tournaments}
+                onChange={(value) => formik.setFieldValue("tournaments", value)}
+              />
+            </FormControl>
+
+            <Divider borderColor="gray.800" />
+
+            <FormControl p={4}>
+              <Flex alignItems="center" justifyContent="space-between" mb={1}>
+                <Label mb={0}>Registered Drivers</Label>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  type="button"
+                  onClick={handleCsvImport}
+                  isLoading={csvFetcher.state !== "idle"}
+                  disabled={csvFetcher.state !== "idle"}
+                >
+                  Import CSV <RiFileUploadLine />
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+              </Flex>
+              <styled.p fontSize="xs" color="gray.500" mb={2}>
+                Only registered drivers will appear in standings. Leave empty to
+                show all drivers.
+              </styled.p>
+              <PeopleForm
+                name="registeredDrivers"
+                value={formik.values.registeredDrivers}
+                onChange={(value) =>
+                  formik.setFieldValue("registeredDrivers", value)
+                }
+              />
+            </FormControl>
+
+            <Divider borderColor="gray.800" />
+
+            <Button
+              type="submit"
+              isLoading={formik.isSubmitting}
+              disabled={formik.isSubmitting}
+              m={4}
+            >
+              Save Changes
+            </Button>
+          </VStack>
+        </form>
+      </Card>
     </Container>
   );
 };

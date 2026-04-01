@@ -179,8 +179,6 @@ export const Map = ({ tracks }: Props) => {
                 key={item}
                 isActive={item === region}
                 to={`/map/${item}`}
-                data-replace="true"
-                replace
               >
                 {item}
               </Tab>

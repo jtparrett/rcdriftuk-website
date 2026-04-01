@@ -13,6 +13,7 @@ export const loader = async () => {
   const leaderboards = await prisma.leaderboards.findMany({
     where: { userId: SDC_USER_ID, archived: false },
     include: {
+      drivers: true,
       tournaments: {
         include: {
           tournament: {
@@ -86,6 +87,13 @@ export const loader = async () => {
                 : null,
           });
         }
+      }
+    }
+
+    const registeredDriverIds = new Set(lb.drivers.map((d) => d.driverId));
+    if (registeredDriverIds.size > 0) {
+      for (const key of driverPoints.keys()) {
+        if (!registeredDriverIds.has(key)) driverPoints.delete(key);
       }
     }
 

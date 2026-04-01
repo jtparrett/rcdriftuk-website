@@ -205,24 +205,18 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/events`}
               isActive={tab === "events"}
-              data-replace="true"
-              replace
             >
               Events
             </Tab>
             <Tab
               to={`/tracks/${track?.slug}/posts`}
               isActive={tab === "posts"}
-              data-replace="true"
-              replace
             >
               Posts
             </Tab>
             <Tab
               to={`/tracks/${track?.slug}/reviews`}
               isActive={tab === "reviews"}
-              data-replace="true"
-              replace
             >
               Reviews
             </Tab>
@@ -230,8 +224,6 @@ const TrackPage = () => {
               <Tab
                 to={`/tracks/${track?.slug}/products`}
                 isActive={tab === "products"}
-                data-replace="true"
-                replace
               >
                 Products
               </Tab>
@@ -239,8 +231,6 @@ const TrackPage = () => {
             <Tab
               to={`/tracks/${track?.slug}/leaderboard`}
               isActive={tab === "leaderboard"}
-              data-replace="true"
-              replace
             >
               Leaderboard
             </Tab>
@@ -248,8 +238,6 @@ const TrackPage = () => {
               <Tab
                 to={`/tracks/${track?.slug}/donations`}
                 isActive={tab === "donations"}
-                data-replace="true"
-                replace
               >
                 Donations
               </Tab>

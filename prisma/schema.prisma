@@ -390,6 +390,7 @@ model Users {
   claimRequesters         ProfileClaimRequests[] @relation("ClaimRequester")
   TrackReviews            TrackReviews[]
   Donations               Donations[]
+  LeaderboardDrivers      LeaderboardDrivers[] @relation("LeaderboardDrivers")
 
   @@index([elo])
   @@index([archived])
@@ -618,6 +619,7 @@ model Leaderboards {
   user                Users                    @relation(fields: [userId], references: [id])
   tournaments         LeaderboardTournaments[]
   tracks              Tracks[]
+  drivers             LeaderboardDrivers[]
 
   @@index([archived])
 }
@@ -633,6 +635,17 @@ model LeaderboardTournaments {
   @@index([leaderboardId])
   @@index([tournamentId])
   @@index([leaderboardId, tournamentId])
+}
+
+model LeaderboardDrivers {
+  id            Int          @id @default(autoincrement())
+  leaderboardId String       @db.Uuid
+  driverId      Int
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  user          Users        @relation("LeaderboardDrivers", fields: [driverId], references: [driverId], onDelete: Cascade)
+
+  @@unique([leaderboardId, driverId])
+  @@index([leaderboardId])
 }
 
 enum TrackTypes {

@@ -315,8 +315,6 @@ const Page = () => {
           <Tab
             to={`/drivers/${driver.driverId}/battles`}
             isActive={isBattlesTab}
-            data-replace="true"
-            replace
           >
             <RiSwordLine />
             Battles
@@ -325,8 +323,6 @@ const Page = () => {
         <Tab
           to={`/drivers/${driver.driverId}/tournaments`}
           isActive={isTournamentsTab}
-          data-replace="true"
-          replace
         >
           <RiVipCrown2Line />
           Tournaments
@@ -335,8 +331,6 @@ const Page = () => {
           <Tab
             to={`/drivers/${driver.driverId}/ratings`}
             isActive={isRatingsTab}
-            data-replace="true"
-            replace
           >
             <RiListOrdered2 />
             Ratings
@@ -345,8 +339,6 @@ const Page = () => {
         <Tab
           to={`/drivers/${driver.driverId}/setup`}
           isActive={isSetupTab}
-          data-replace="true"
-          replace
         >
           <RiDashboard2Line />
           Setup
@@ -354,8 +346,6 @@ const Page = () => {
         <Tab
           to={`/drivers/${driver.driverId}/posts`}
           isActive={isPostsTab}
-          data-replace="true"
-          replace
         >
           <RiMessageLine />
           Posts

@@ -79,7 +79,7 @@ const LeaderboardLayout = () => {
 
         {isOwner && (
           <LinkButton
-            to={`/leaderboards/${leaderboard.id}/edit`}
+            to={`/leaderboards-edit/${leaderboard.id}`}
             variant="secondary"
             py={1.5}
           >

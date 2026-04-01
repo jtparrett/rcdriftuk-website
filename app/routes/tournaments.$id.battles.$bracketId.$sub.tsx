@@ -281,8 +281,6 @@ const TournamentBattlesPage = () => {
                 key={`${tab.bracketId}-${tab.sub}`}
                 to={`/tournaments/${tournament.id}/battles/${tab.bracketId}/${tab.sub}`}
                 isActive={tab.bracketId === bracketId && tab.sub === sub}
-                data-replace="true"
-                replace
               >
                 {tab.label}
               </Tab>

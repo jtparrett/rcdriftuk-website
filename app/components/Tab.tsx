@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { forwardRef } from "react";
+import { Link, type LinkProps } from "react-router";
 import { styled } from "~/styled-system/jsx";
 import { cva } from "~/styled-system/css";
 
@@ -32,7 +33,12 @@ const TabStyle = cva({
   },
 });
 
-export const Tab = styled(Link, TabStyle);
+const TabLink = forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => (
+  <Link ref={ref} replace data-replace="true" {...props} />
+));
+TabLink.displayName = "TabLink";
+
+export const Tab = styled(TabLink, TabStyle);
 export const TabButton = styled("button", TabStyle);
 
 export const TabGroup = styled("div", {

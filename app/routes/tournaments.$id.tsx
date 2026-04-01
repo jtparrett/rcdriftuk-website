@@ -355,8 +355,6 @@ const TournamentPage = () => {
             <Tab
               to={`/tournaments/${tournament.id}/setup`}
               isActive={isSetupTab}
-              data-replace="true"
-              replace
             >
               <RiSettings2Line />
               Setup
@@ -367,8 +365,6 @@ const TournamentPage = () => {
             <Tab
               to={`/tournaments/${tournament.id}/judge`}
               isActive={isJudgeTab}
-              data-replace="true"
-              replace
             >
               <RiRemoteControlLine />
               Judge
@@ -378,8 +374,6 @@ const TournamentPage = () => {
           <Tab
             to={`/tournaments/${tournament.id}/overview`}
             isActive={isOverviewTab}
-            data-replace="true"
-            replace
           >
             <RiBubbleChartLine />
             Overview
@@ -389,8 +383,6 @@ const TournamentPage = () => {
             <Tab
               to={`/tournaments/${tournament.id}/qualifying/0`}
               isActive={isQualifyingTab}
-              data-replace="true"
-              replace
             >
               <RiShieldCheckLine />
               Qualifying
@@ -400,8 +392,6 @@ const TournamentPage = () => {
             <Tab
               to={`/tournaments/${tournament.id}/battles/${tournament.nextBattle?.tournamentBracketId ?? tournament.brackets[tournament.brackets.length - 1]?.id}/${tournament.nextBattle?.bracket ?? BattlesBracket.UPPER}`}
               isActive={isBattlesTab}
-              data-replace="true"
-              replace
             >
               <RiSwordLine />
               Battles
@@ -411,8 +401,6 @@ const TournamentPage = () => {
             <Tab
               to={`/tournaments/${tournament.id}/standings`}
               isActive={isStandingsTab}
-              data-replace="true"
-              replace
             >
               <RiListOrdered2 />
               Standings

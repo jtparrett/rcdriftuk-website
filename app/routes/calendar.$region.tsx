@@ -132,8 +132,6 @@ const CalendarPage = () => {
               key={option}
               to={`/calendar/${option.toLowerCase()}/${increment}/${dateParam}`}
               isActive={option === region}
-              data-replace="true"
-              replace
             >
               {option}
             </Tab>
@@ -149,8 +147,6 @@ const CalendarPage = () => {
                 `/calendar/${params.region}/day`,
               )}
               to={`/calendar/${params.region}/day/${dateParam}`}
-              data-replace="true"
-              replace
             >
               Day
             </Tab>
@@ -159,8 +155,6 @@ const CalendarPage = () => {
                 `/calendar/${params.region}/week`,
               )}
               to={`/calendar/${params.region}/week/${dateParam}`}
-              data-replace="true"
-              replace
             >
               Week
             </Tab>
@@ -169,8 +163,6 @@ const CalendarPage = () => {
                 `/calendar/${params.region}/month`,
               )}
               to={`/calendar/${params.region}/month/${dateParam}`}
-              data-replace="true"
-              replace
             >
               Month
             </Tab>
@@ -181,8 +173,6 @@ const CalendarPage = () => {
               size="sm"
               variant="secondary"
               to={`/calendar/${region}/${increment}/${previousDate()}`}
-              data-replace="true"
-              replace
               h={10}
             >
               <RiArrowLeftSLine />
@@ -192,8 +182,6 @@ const CalendarPage = () => {
               variant="secondary"
               to={`/calendar/${region}/${increment}/${today}`}
               h={10}
-              data-replace="true"
-              replace
             >
               Today
             </LinkButton>
@@ -202,8 +190,6 @@ const CalendarPage = () => {
               variant="secondary"
               to={`/calendar/${region}/${increment}/${nextDate()}`}
               h={10}
-              data-replace="true"
-              replace
             >
               <RiArrowRightSLine />
             </LinkButton>

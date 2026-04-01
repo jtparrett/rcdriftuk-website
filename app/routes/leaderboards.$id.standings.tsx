@@ -26,6 +26,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       tournaments: {
         orderBy: { id: "asc" },
       },
+      drivers: true,
     },
   });
 
@@ -36,13 +37,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const participationPoints = leaderboard.participationPoints;
   const cutoff = leaderboard.cutoff ?? 0;
 
+  const registeredDriverIds = leaderboard.drivers.map((d) => d.driverId);
   const tournamentIds = leaderboard.tournaments.map((t) => t.tournamentId);
   const rows =
     tournamentIds.length > 0
       ? await prisma.tournamentDrivers.findMany({
           where: {
             tournamentId: { in: tournamentIds },
-            driverId: { not: 0 },
+            driverId:
+              registeredDriverIds.length > 0
+                ? { in: registeredDriverIds }
+                : { not: 0 },
           },
           orderBy: [
             { finishingPosition: "asc" },

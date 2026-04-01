@@ -12,32 +12,24 @@ const Page = () => {
         <Tab
           to="/2025"
           isActive={location.pathname.replaceAll(/\//g, "") === "2025"}
-          data-replace="true"
-          replace
         >
           Overview
         </Tab>
         <Tab
           to="/2025/schedule"
           isActive={location.pathname.startsWith("/2025/schedule")}
-          data-replace="true"
-          replace
         >
           Schedule
         </Tab>
         <Tab
           to="/2025/rules"
           isActive={location.pathname.startsWith("/2025/rules")}
-          data-replace="true"
-          replace
         >
           Rules & Regs
         </Tab>
         <Tab
           to="/2025/judging-criteria"
           isActive={location.pathname.startsWith("/2025/judging-criteria")}
-          data-replace="true"
-          replace
         >
           Judging Criteria
         </Tab>

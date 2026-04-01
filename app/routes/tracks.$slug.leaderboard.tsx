@@ -18,6 +18,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
       leaderboard: {
         include: {
           tournaments: true,
+          drivers: true,
         },
       },
     },
@@ -32,6 +33,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const pointsConfig = getPositionPoints(track.leaderboard.positionPoints);
   const tqPoints = track.leaderboard.tqPoints;
   const participationPoints = track.leaderboard.participationPoints;
+  const registeredDriverIds = track.leaderboard.drivers.map((d) => d.driverId);
   const tournamentIds = track.leaderboard.tournaments.map((t) => t.tournamentId);
 
   const rows =
@@ -39,7 +41,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
       ? await prisma.tournamentDrivers.findMany({
           where: {
             tournamentId: { in: tournamentIds },
-            driverId: { not: 0 },
+            driverId:
+              registeredDriverIds.length > 0
+                ? { in: registeredDriverIds }
+                : { not: 0 },
           },
           orderBy: [
             { finishingPosition: "asc" },
