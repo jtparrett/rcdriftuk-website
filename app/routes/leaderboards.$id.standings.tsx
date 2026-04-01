@@ -220,15 +220,15 @@ const StandingsPage = () => {
       </Flex>
 
       {hasMore && (
-        <Flex justifyContent="center" mt={3}>
-          <LinkButton
-            to={location.pathname}
-            target="_blank"
-            variant="secondary"
-          >
-            See More
-          </LinkButton>
-        </Flex>
+        <LinkButton
+          mt={3}
+          to={location.pathname}
+          target="_blank"
+          variant="secondary"
+          w="full"
+        >
+          See More
+        </LinkButton>
       )}
     </>
   );
