@@ -34,7 +34,7 @@ export const action = async (args: ActionFunctionArgs) => {
     },
   });
 
-  if (!track || !track.stripeAccountId) {
+  if (!track) {
     throw new Response("Track not found or donations not enabled", {
       status: 404,
     });
@@ -72,10 +72,12 @@ export const action = async (args: ActionFunctionArgs) => {
       ...(values.anonymous ? {} : { userId }),
     },
     payment_intent_data: {
-      application_fee_amount: PLATFORM_FEE_AMOUNT,
-      transfer_data: {
-        destination: track.stripeAccountId,
-      },
+      ...(track.stripeAccountId && {
+        application_fee_amount: PLATFORM_FEE_AMOUNT,
+        transfer_data: {
+          destination: track.stripeAccountId,
+        },
+      }),
     },
   });
 
