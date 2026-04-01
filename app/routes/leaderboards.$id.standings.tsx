@@ -1,16 +1,24 @@
 import { prisma } from "~/utils/prisma.server";
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import {
+  useLoaderData,
+  useLocation,
+  type LoaderFunctionArgs,
+} from "react-router";
 import { Fragment } from "react";
 import { z } from "zod";
 import notFoundInvariant from "~/utils/notFoundInvariant";
 import { Box, Flex, styled } from "~/styled-system/jsx";
 import { LinkOverlay } from "~/components/LinkOverlay";
+import { LinkButton } from "~/components/Button";
 import { Card } from "~/components/CollapsibleCard";
 import { getPositionPoints } from "~/utils/leaderboardPoints";
 import { useIsEmbed } from "~/utils/EmbedContext";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = z.string().parse(args.params.id);
+  const url = new URL(args.request.url);
+  const maxParam = url.searchParams.get("max");
+  const max = maxParam ? Math.max(1, parseInt(maxParam, 10) || 0) : null;
 
   const leaderboard = await prisma.leaderboards.findUnique({
     where: { id },
@@ -114,12 +122,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
       return aN - bN;
     });
 
-  return { drivers, cutoff };
+  const totalCount = drivers.length;
+
+  return {
+    drivers: max ? drivers.slice(0, max) : drivers,
+    cutoff,
+    max,
+    totalCount,
+  };
 };
 
 const StandingsPage = () => {
-  const { drivers, cutoff } = useLoaderData<typeof loader>();
+  const { drivers, cutoff, max, totalCount } = useLoaderData<typeof loader>();
   const isEmbed = useIsEmbed();
+  const location = useLocation();
+  const hasMore = max !== null && totalCount > max;
 
   return (
     <>
@@ -201,6 +218,18 @@ const StandingsPage = () => {
           </Fragment>
         ))}
       </Flex>
+
+      {hasMore && (
+        <Flex justifyContent="center" mt={3}>
+          <LinkButton
+            to={location.pathname}
+            target="_blank"
+            variant="secondary"
+          >
+            See More
+          </LinkButton>
+        </Flex>
+      )}
     </>
   );
 };
